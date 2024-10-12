@@ -59,7 +59,7 @@ export default class HomeScreen extends React.PureComponent<IHomeScreenProps, IH
         <HeaderBase hideLeftIcon title={strings.home_page} />
 
         <View style={{
-          width: sizes.width - sizes._32sdp, marginBottom: sizes._32sdp, marginLeft: sizes._16sdp,
+          width: sizes.width - sizes._32sdp, marginBottom: sizes._22sdp, marginLeft: sizes._16sdp,
           marginTop: sizes._16sdp,
           flexDirection: 'row',
           alignItems: 'center',
@@ -68,11 +68,11 @@ export default class HomeScreen extends React.PureComponent<IHomeScreenProps, IH
           <TextInput
             mode="outlined"
             label="Tìm kiếm địa điểm du lịch"
-            placeholder="Nhập tên, địa chỉ..."
-            outlineStyle={{ borderColor: colors.primary }}
+            placeholder="Nhập tên địa điểm, địa chỉ..."
+            outlineStyle={{ borderColor: colors.primary, borderRadius: sizes._20sdp }}
             textColor={colors.primary_950}
             placeholderTextColor={colors.primary_950}
-            style={{ width: sizes.width - sizes._138sdp, color: colors.primary_950 }}
+            style={{ width: sizes.width - sizes._135sdp, color: colors.primary_950 }}
             onChangeText={(txt) => {
               this.setState({
                 valueSearch: txt
@@ -84,24 +84,26 @@ export default class HomeScreen extends React.PureComponent<IHomeScreenProps, IH
             style={{
               paddingVertical: sizes._16sdp,
               backgroundColor: colors.primary,
-              borderRadius: sizes._10sdp,
+              borderRadius: sizes._20sdp,
               width: sizes._90sdp,
-              alignItems: 'center'
+              height: sizes._54sdp,
+              alignItems: 'center',
+              justifyContent: 'center',
             }}
             onPress={() => this.handleSearch(false, _.unionBy(LOCATION_POPULAR, LOCATION_NEARLY, 'id'))}
           >
-            <TextBase style={AppStyle.txt_14_medium}>Tìm kiếm</TextBase>
+            <TextBase style={AppStyle.txt_16_medium}>Tìm kiếm</TextBase>
           </TouchableOpacity>
         </View>
         <ScrollView>
           <View style={styles.container}>
 
             <View style={styles.rowCenter}>
-              <TextBase style={[AppStyle.txt_16_bold, { color: colors.primary_950, marginBottom: sizes._16sdp }]}>Phổ biến</TextBase>
+              <TextBase style={[AppStyle.txt_18_bold, { color: colors.primary_950, marginBottom: sizes._16sdp }]}>Phổ biến</TextBase>
               <TouchableOpacity
                 onPress={() => this.handleSearch(true, LOCATION_POPULAR)}
               >
-                <TextBase style={[AppStyle.txt_16_regular, { color: colors.primary_950, marginBottom: sizes._16sdp, textDecorationLine: 'underline' }]}>Xem tất cả</TextBase>
+                <TextBase style={[AppStyle.txt_18_regular, { color: colors.primary_950, marginBottom: sizes._16sdp,  }]}>Xem tất cả</TextBase>
               </TouchableOpacity>
             </View>
 
@@ -114,12 +116,12 @@ export default class HomeScreen extends React.PureComponent<IHomeScreenProps, IH
             />
 
             <View style={[styles.rowCenter, { marginTop: sizes._32sdp }]}>
-              <TextBase style={[AppStyle.txt_16_bold, { color: colors.primary_950, marginBottom: sizes._16sdp }]}>Gần tôi</TextBase>
+              <TextBase style={[AppStyle.txt_18_bold, { color: colors.primary_950, marginBottom: sizes._16sdp }]}>Gần tôi</TextBase>
               <TouchableOpacity
                 onPress={() => this.handleSearch(true, LOCATION_NEARLY)}
 
               >
-                <TextBase style={[AppStyle.txt_16_regular, { color: colors.primary_950, marginBottom: sizes._16sdp, textDecorationLine: 'underline' }]}>Xem tất cả</TextBase>
+                <TextBase style={[AppStyle.txt_18_regular, { color: colors.primary_950, marginBottom: sizes._16sdp,  }]}>Xem tất cả</TextBase>
               </TouchableOpacity>
             </View>
 

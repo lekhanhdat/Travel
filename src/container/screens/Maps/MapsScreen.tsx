@@ -21,6 +21,7 @@ import AIApi from '../../../services/AIApi';
 import BottomSheet from '../../../component/BottomSheet';
 import { AppStyle } from '../../../common/AppStyle';
 import TextBase from '../../../common/TextBase';
+import images from '../../../res/images';
 
 interface IMapsScreenProps {
   navigation: any;
@@ -257,6 +258,7 @@ export default class MapsScreen extends React.PureComponent<IMapsScreenProps, IM
                       title={location.name}
                       description={location.description}
                       pinColor={colors.primary}
+                      icon={location.icon}
                     />
                   })
                 }

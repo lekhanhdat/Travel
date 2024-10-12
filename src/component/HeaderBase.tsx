@@ -125,7 +125,7 @@ export default HeaderBase;
 const styles = StyleSheet.create({
   container: {
     width: sizes.width,
-    height: sizes._72sdp + StatusBarManager.HEIGHT,
+    height: sizes._60sdp + StatusBarManager.HEIGHT,
     backgroundColor: colors.primary,
     paddingTop: StatusBarManager.HEIGHT,
 
@@ -137,14 +137,14 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.36,
     shadowRadius: 6.68,
 
-    elevation: 11,
+    elevation: 11,    
   },
   content: {
     flex: 1,
     padding: sizes._8sdp,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between'
+    justifyContent: 'center'
   },
   viewPadding: {
     padding: sizes._8sdp,
@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
     fontSize: sizes._20sdp,
     fontFamily: fonts.NotoSansJP_Bold,
     color: colors.primary_950,
-    lineHeight: sizes._30sdp
+    lineHeight: sizes._30sdp,
   },
   viewLeft: {
     flexDirection: 'row',

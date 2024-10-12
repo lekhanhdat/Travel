@@ -14,6 +14,7 @@ export interface ILocation {
   long: number;
   haveVoice?: boolean;
   reviews: IReview[];
+  icon?: any;
 }
 
 export interface IReview {

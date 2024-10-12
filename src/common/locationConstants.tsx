@@ -1,58 +1,60 @@
+import { icon_camera } from "../assets/ImageSvg";
+import images from "../res/images";
 import { ILocation } from "./types";
 
 export const LOCATION_POPULAR: ILocation[] = [
-  {
-    id: 3,
-    name: 'DEV_LOCATION',
-    avatar: 'https://banahills.sunworld.vn/wp-content/uploads/2024/04/DJI_0004-1536x879.jpg',
-    address: 'Thôn An Sơn, xã Hòa Ninh, huyện Hòa Vang, TP. Đà Nẵng, Việt Nam',
-    description: 'Nằm ở độ cao 1.487m so với mực nước biển, Sun World Ba Na Hills được mênh danh là “chốn bồng lai tiên cảnh”, sở hữu khí hậu tuyệt vời cùng cảnh quan thiên nhiên kỳ thú. Đến với Sun World Ba Na Hills để trải nghiệm khí hậu 4 mùa trong một ngày cùng nhiều hoạt động lễ hội, vui chơi giải trí, ẩm thực hấp dẫn đa dạng.',
-    lat: 20.99943765883785,
-    long: 105.75394391643286,
-    reviews: [
-      {
-        id: 1,
-        content: 'Cảnh quan nơi đây trên cả mong đợi, khung cảnh thiên nhiên hùng vĩ và không khí trong lành.',
-        name_user_review: 'Ngô Châu Bảo Khanh',
-        time_review: '1/10/2024 13:45',
-        start: 5,
-        avatar: ' https://ss-images.saostar.vn/wwebp1200/pc/1613810558698/Facebook-Avatar_3.png'
-      },
-      {
-        id: 3,
-        content: ' Mình thắc mắc tại sao nơi đây vẫn chưa được mệnh danh là thiên đường ẩm thực nhỉ, dường như sơn hào hải vị trên thế gian đều có thể được tìm thấy ở đây ấy',
-        name_user_review: 'Ngô Ngọc Hoàng Vương',
-        time_review: '1/7/2024  9:28',
-        start: 5,
-        avatar: ' https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-nam-nu-trang-2.jpg'
-      },
-      {
-        id: 5,
-        content: ' Tôi rất hứng thú với nền văn hóa nơi đây, đa dạng và mang đậm bản sắc người Việt',
-        name_user_review: 'Châu Thị Diễm',
-        time_review: ' 10/2/2024 20:08',
-        start: 5,
-        avatar: ' https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-nam-nu-trang-2.jpg'
-      },
-      {
-        id: 7,
-        content: 'Thật không hổ danh là thành phố du lịch, tôi dường như có rất nhiều lựa chọn nơi ở, hầu như tất cả đều rất mới mẻ và có dịch vụ tốt',
-        name_user_review: 'Ngô Ngọc Hoàng Vương',
-        time_review: '9/10/2024 23:08',
-        start: 5,
-        avatar: ' https://cdn-media.sforum.vn/storage/app/media/THANHAN/avatar-trang-89.jpg'
-      },
-      {
-        id: 9,
-        content: 'Amazing!!, I love it !!',
-        name_user_review: 'John Peterson',
-        time_review: '30/9/2024 11:44',
-        start: 5,
-        avatar: 'https://vnn-imgs-a1.vgcloud.vn/image1.ictnews.vn/_Files/2020/03/17/trend-avatar-1.jpg'
-      },
-    ],
-    haveVoice: true,
-  },
+  // {
+  //   id: 3,
+  //   name: 'DEV_LOCATION',
+  //   avatar: 'https://banahills.sunworld.vn/wp-content/uploads/2024/04/DJI_0004-1536x879.jpg',
+  //   address: 'Thôn An Sơn, xã Hòa Ninh, huyện Hòa Vang, TP. Đà Nẵng, Việt Nam',
+  //   description: 'Nằm ở độ cao 1.487m so với mực nước biển, Sun World Ba Na Hills được mênh danh là “chốn bồng lai tiên cảnh”, sở hữu khí hậu tuyệt vời cùng cảnh quan thiên nhiên kỳ thú. Đến với Sun World Ba Na Hills để trải nghiệm khí hậu 4 mùa trong một ngày cùng nhiều hoạt động lễ hội, vui chơi giải trí, ẩm thực hấp dẫn đa dạng.',
+  //   lat: 20.99943765883785,
+  //   long: 105.75394391643286,
+  //   reviews: [
+  //     {
+  //       id: 1,
+  //       content: 'Cảnh quan nơi đây trên cả mong đợi, khung cảnh thiên nhiên hùng vĩ và không khí trong lành.',
+  //       name_user_review: 'Ngô Châu Bảo Khanh',
+  //       time_review: '1/10/2024 13:45',
+  //       start: 5,
+  //       avatar: ' https://ss-images.saostar.vn/wwebp1200/pc/1613810558698/Facebook-Avatar_3.png'
+  //     },
+  //     {
+  //       id: 3,
+  //       content: ' Mình thắc mắc tại sao nơi đây vẫn chưa được mệnh danh là thiên đường ẩm thực nhỉ, dường như sơn hào hải vị trên thế gian đều có thể được tìm thấy ở đây ấy',
+  //       name_user_review: 'Ngô Ngọc Hoàng Vương',
+  //       time_review: '1/7/2024  9:28',
+  //       start: 5,
+  //       avatar: ' https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-nam-nu-trang-2.jpg'
+  //     },
+  //     {
+  //       id: 5,
+  //       content: ' Tôi rất hứng thú với nền văn hóa nơi đây, đa dạng và mang đậm bản sắc người Việt',
+  //       name_user_review: 'Châu Thị Diễm',
+  //       time_review: ' 10/2/2024 20:08',
+  //       start: 5,
+  //       avatar: ' https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-nam-nu-trang-2.jpg'
+  //     },
+  //     {
+  //       id: 7,
+  //       content: 'Thật không hổ danh là thành phố du lịch, tôi dường như có rất nhiều lựa chọn nơi ở, hầu như tất cả đều rất mới mẻ và có dịch vụ tốt',
+  //       name_user_review: 'Ngô Ngọc Hoàng Vương',
+  //       time_review: '9/10/2024 23:08',
+  //       start: 5,
+  //       avatar: ' https://cdn-media.sforum.vn/storage/app/media/THANHAN/avatar-trang-89.jpg'
+  //     },
+  //     {
+  //       id: 9,
+  //       content: 'Amazing!!, I love it !!',
+  //       name_user_review: 'John Peterson',
+  //       time_review: '30/9/2024 11:44',
+  //       start: 5,
+  //       avatar: 'https://vnn-imgs-a1.vgcloud.vn/image1.ictnews.vn/_Files/2020/03/17/trend-avatar-1.jpg'
+  //     },
+  //   ],
+  //   haveVoice: true,
+  // },
   {
     id: 3,
     name: 'Khu du lịch Bà Nà – Núi Chúa',
@@ -68,23 +70,23 @@ export const LOCATION_POPULAR: ILocation[] = [
         name_user_review: 'Ngô Châu Bảo Khanh',
         time_review: '1/10/2024 13:45',
         start: 5,
-        avatar: ' https://ss-images.saostar.vn/wwebp1200/pc/1613810558698/Facebook-Avatar_3.png'
+        avatar: 'https://ss-images.saostar.vn/wwebp1200/pc/1613810558698/Facebook-Avatar_3.png'
       },
       {
         id: 3,
-        content: ' Mình thắc mắc tại sao nơi đây vẫn chưa được mệnh danh là thiên đường ẩm thực nhỉ, dường như sơn hào hải vị trên thế gian đều có thể được tìm thấy ở đây ấy',
+        content: 'Mình thắc mắc tại sao nơi đây vẫn chưa được mệnh danh là thiên đường ẩm thực nhỉ, dường như sơn hào hải vị trên thế gian đều có thể được tìm thấy ở đây ấy',
         name_user_review: 'Ngô Ngọc Hoàng Vương',
         time_review: '1/7/2024  9:28',
         start: 5,
-        avatar: ' https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-nam-nu-trang-2.jpg'
+        avatar: 'https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-nam-nu-trang-2.jpg'
       },
       {
         id: 5,
-        content: ' Tôi rất hứng thú với nền văn hóa nơi đây, đa dạng và mang đậm bản sắc người Việt',
+        content: 'Tôi rất hứng thú với nền văn hóa nơi đây, đa dạng và mang đậm bản sắc người Việt',
         name_user_review: 'Châu Thị Diễm',
         time_review: ' 10/2/2024 20:08',
         start: 5,
-        avatar: ' https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-nam-nu-trang-2.jpg'
+        avatar: 'https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-nam-nu-trang-2.jpg'
       },
       {
         id: 7,
@@ -92,7 +94,7 @@ export const LOCATION_POPULAR: ILocation[] = [
         name_user_review: 'Ngô Ngọc Hoàng Vương',
         time_review: '9/10/2024 23:08',
         start: 5,
-        avatar: ' https://cdn-media.sforum.vn/storage/app/media/THANHAN/avatar-trang-89.jpg'
+        avatar: 'https://cdn-media.sforum.vn/storage/app/media/THANHAN/avatar-trang-89.jpg'
       },
       {
         id: 9,
@@ -152,7 +154,7 @@ export const LOCATION_POPULAR: ILocation[] = [
         name_user_review: ' Liz',
         time_review: '28/9/2023 17:09',
         start: 5,
-        avatar: ' https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-trang-nu-11.jpg '
+        avatar: 'https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-trang-nu-11.jpg '
       },
     ]
   },
@@ -179,7 +181,7 @@ export const LOCATION_POPULAR: ILocation[] = [
         name_user_review: ' Xuân Hiệp',
         time_review: ' 6/9/2024 12:44',
         start: 5,
-        avatar: ' https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-facebook-trang-7-2.jpg '
+        avatar: 'https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-facebook-trang-7-2.jpg '
       },
       {
         id: 25,
@@ -203,7 +205,7 @@ export const LOCATION_POPULAR: ILocation[] = [
         name_user_review: ' 黄 贺 江',
         time_review: ' 6/7/2024 7:56 ',
         start: 5,
-        avatar: ' https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-facebook-trang-2-2.jpg '
+        avatar: 'https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-facebook-trang-2-2.jpg '
       },
     ]
   },
@@ -254,7 +256,7 @@ export const LOCATION_POPULAR: ILocation[] = [
         name_user_review: '黄 贺 江',
         time_review: ' 6/7/2024 7:56',
         start: 5,
-        avatar: ' https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-facebook-trang-2-2.jpg '
+        avatar: 'https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-facebook-trang-2-2.jpg '
       },
     ]
   },
@@ -273,7 +275,7 @@ export const LOCATION_POPULAR: ILocation[] = [
         name_user_review: 'Ngô Châu Bảo Khanh',
         time_review: '1/10/2024 13:45',
         start: 5,
-        avatar: ' https://ss-images.saostar.vn/wwebp1200/pc/1613810558698/Facebook-Avatar_3.png '
+        avatar: 'https://ss-images.saostar.vn/wwebp1200/pc/1613810558698/Facebook-Avatar_3.png '
       },
       {
         id: 2,
@@ -281,7 +283,7 @@ export const LOCATION_POPULAR: ILocation[] = [
         name_user_review: 'Trần Đình Quý',
         time_review: '23/9/2024 8:32',
         start: 5,
-        avatar: ' https://cdn.kona-blue.com/upload/kona-blue_com/post/images/2024/09/18/457/avatar-mac-dinh-1.jpg '
+        avatar: 'https://cdn.kona-blue.com/upload/kona-blue_com/post/images/2024/09/18/457/avatar-mac-dinh-1.jpg '
       },
       {
         id: 3,
@@ -297,15 +299,15 @@ export const LOCATION_POPULAR: ILocation[] = [
         name_user_review: 'Ngô Bảo Khang',
         time_review: '5/7/2024 16:02',
         start: 5,
-        avatar: ' https://cellphones.com.vn/sforum/wp-content/uploads/2023/10/avatar-trang-34.jpg '
+        avatar: 'https://cellphones.com.vn/sforum/wp-content/uploads/2023/10/avatar-trang-34.jpg '
       },
       {
         id: 5,
-        content: ' Tôi rất hứng thú với nền văn hóa nơi đây, đa dạng và mang đậm bản sắc người Việt',
+        content: 'Tôi rất hứng thú với nền văn hóa nơi đây, đa dạng và mang đậm bản sắc người Việt',
         name_user_review: 'Châu Thị Diễm',
         time_review: ' 10/2/2024 20:08',
         start: 5,
-        avatar: ' https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-nam-nu-trang-2.jpg '
+        avatar: 'https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-nam-nu-trang-2.jpg '
       },
     ]
   },
@@ -324,7 +326,7 @@ export const LOCATION_POPULAR: ILocation[] = [
         name_user_review: 'Nguyễn Ngọc Mai Khanh',
         time_review: ' 6/9/2024 7:30',
         start: 5,
-        avatar: ' https://cdn-media.sforum.vn/storage/app/media/THANHAN/avatar-trang-100.jpg '
+        avatar: 'https://cdn-media.sforum.vn/storage/app/media/THANHAN/avatar-trang-100.jpg '
       },
       {
         id: 7,
@@ -332,7 +334,7 @@ export const LOCATION_POPULAR: ILocation[] = [
         name_user_review: 'Ngô Ngọc Hoàng Vương',
         time_review: '9/10/2024 23:08',
         start: 5,
-        avatar: ' https://cdn-media.sforum.vn/storage/app/media/THANHAN/avatar-trang-89.jpg '
+        avatar: 'https://cdn-media.sforum.vn/storage/app/media/THANHAN/avatar-trang-89.jpg '
       },
       {
         id: 8,
@@ -383,7 +385,7 @@ export const LOCATION_POPULAR: ILocation[] = [
         name_user_review: ' Việt Hà',
         time_review: '21/4/2024 14:43',
         start: 5,
-        avatar: ' https://vnn-imgs-a1.vgcloud.vn/image1.ictnews.vn/_Files/2020/03/21/trend-avatar-7.jpg '
+        avatar: 'https://vnn-imgs-a1.vgcloud.vn/image1.ictnews.vn/_Files/2020/03/21/trend-avatar-7.jpg '
       },
       {
         id: 13,
@@ -427,7 +429,7 @@ export const LOCATION_POPULAR: ILocation[] = [
         name_user_review: ' Tomoka',
         time_review: '15/12/2023 17:38',
         start: 5,
-        avatar: ' https://cellphones.com.vn/sforum/wp-content/uploads/2023/10/avatar-trang-51.jpg '
+        avatar: 'https://cellphones.com.vn/sforum/wp-content/uploads/2023/10/avatar-trang-51.jpg '
       },
       {
         id: 17,
@@ -451,7 +453,7 @@ export const LOCATION_POPULAR: ILocation[] = [
         name_user_review: ' Liz',
         time_review: '28/9/2023 17:09',
         start: 5,
-        avatar: ' https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-trang-nu-11.jpg '
+        avatar: 'https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-trang-nu-11.jpg '
       },
       {
         id: 20,
@@ -479,7 +481,7 @@ export const LOCATION_POPULAR: ILocation[] = [
         name_user_review: '김남준',
         time_review: '12/9/2023 21:08',
         start: 5,
-        avatar: ' https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-facebook-trang-8-1.jpg '
+        avatar: 'https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-facebook-trang-8-1.jpg '
       },
       {
         id: 23,
@@ -538,7 +540,7 @@ export const LOCATION_POPULAR: ILocation[] = [
         name_user_review: 'Hoàng Kiên',
         time_review: '13/4/2024',
         start: 4,
-        avatar: ' https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/59d24ea49dc6ecd890c9b00f85c4aecb.jpg '
+        avatar: 'https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/59d24ea49dc6ecd890c9b00f85c4aecb.jpg '
       },
       {
         id: 28,
@@ -672,58 +674,59 @@ export const LOCATION_POPULAR: ILocation[] = [
 ];
 
 export const LOCATION_NEARLY: ILocation[] = [
-  {
-    id: 99,
-    name: 'Tổng lãnh sự quán Hàn Quốc tại Đà Nẵng',
-    avatar: 'https://pantravel.vn/wp-content/uploads/2024/08/lanh-su-quan-han-quoc-o-da-nang.jpg',
-    address: '26HQ+57J, Bùi Tá Hán, Khuê Mỹ, Ngũ Hành Sơn, Đà Nẵng',
-    description: 'Tổng lãnh sự quán Hàn Quốc tại Đà Nẵng',
-    lat: 16.028103753018076,
-    long: 108.23813349999999,
-    reviews: [
-      {
-        id: 2,
-        content: 'Mình thích cái cách người dân nơi đây tiếp đón mình thật sự, họ tử tế và vui vẻ lắm.',
-        name_user_review: 'Trần Đình Quý',
-        time_review: '23/9/2024 8:32',
-        start: 5,
-        avatar: ' https://cdn.kona-blue.com/upload/kona-blue_com/post/images/2024/09/18/457/avatar-mac-dinh-1.jpg '
-      },
-      {
-        id: 4,
-        content: 'chắc chắn mình sẽ quay lại đây nhiều lần nữa, chất lượng thật sự rất tương xứng với giá tiền bỏ ra',
-        name_user_review: 'Ngô Bảo Khang',
-        time_review: '5/7/2024 16:02',
-        start: 5,
-        avatar: ' https://cellphones.com.vn/sforum/wp-content/uploads/2023/10/avatar-trang-34.jpg '
-      },
-      {
-        id: 6,
-        content: 'Quả thật là một thành phố hiện đại và đáng sống, cơ sở hạ tầng rất thuận lợi cho di chuyển, tham quan và du lịch',
-        name_user_review: 'Nguyễn Ngọc Mai Khanh',
-        time_review: ' 6/9/2024 7:30',
-        start: 5,
-        avatar: ' https://cdn-media.sforum.vn/storage/app/media/THANHAN/avatar-trang-100.jpg '
-      },
-      {
-        id: 8,
-        content: 'Tôi thật bất ngờ với các hoạt động du lịch tại đây, có rất nhiều hoạt động cho du khách như pháo hoa hay nhạc hội, tất cả đều rất tuyệt vời',
-        name_user_review: 'Ngô Châu Bảo Khanh',
-        time_review: ' 15/8/2024 17:02',
-        start: 5,
-        avatar: 'https://cdn-media.sforum.vn/storage/app/media/THANHAN/avatar-trang-96.jpg '
-      },
-      {
-        id: 10,
-        content: ' the atmosphere is insane!!',
-        name_user_review: ' David',
-        time_review: '23/9/2024 5:45',
-        start: 5,
-        avatar: 'https://vnn-imgs-a1.vgcloud.vn/image1.ictnews.vn/_Files/2020/03/20/trend-avatar-12.jpg '
-      },
-    ],
-    haveVoice: true,
-  },
+  // {
+  //   id: 99,
+  //   name: 'Tổng lãnh sự quán Hàn Quốc tại Đà Nẵng',
+  //   avatar: 'https://pantravel.vn/wp-content/uploads/2024/08/lanh-su-quan-han-quoc-o-da-nang.jpg',
+  //   address: '26HQ+57J, Bùi Tá Hán, Khuê Mỹ, Ngũ Hành Sơn, Đà Nẵng',
+  //   description: 'Tổng lãnh sự quán Hàn Quốc tại Đà Nẵng',
+  //   lat: 16.028103753018076,
+  //   long: 108.23813349999999,
+  //   reviews: [
+  //     {
+  //       id: 2,
+  //       content: 'Mình thích cái cách người dân nơi đây tiếp đón mình thật sự, họ tử tế và vui vẻ lắm.',
+  //       name_user_review: 'Trần Đình Quý',
+  //       time_review: '23/9/2024 8:32',
+  //       start: 5,
+  //       avatar: ' https://cdn.kona-blue.com/upload/kona-blue_com/post/images/2024/09/18/457/avatar-mac-dinh-1.jpg '
+  //     },
+  //     {
+  //       id: 4,
+  //       content: 'chắc chắn mình sẽ quay lại đây nhiều lần nữa, chất lượng thật sự rất tương xứng với giá tiền bỏ ra',
+  //       name_user_review: 'Ngô Bảo Khang',
+  //       time_review: '5/7/2024 16:02',
+  //       start: 5,
+  //       avatar: ' https://cellphones.com.vn/sforum/wp-content/uploads/2023/10/avatar-trang-34.jpg '
+  //     },
+  //     {
+  //       id: 6,
+  //       content: 'Quả thật là một thành phố hiện đại và đáng sống, cơ sở hạ tầng rất thuận lợi cho di chuyển, tham quan và du lịch',
+  //       name_user_review: 'Nguyễn Ngọc Mai Khanh',
+  //       time_review: ' 6/9/2024 7:30',
+  //       start: 5,
+  //       avatar: ' https://cdn-media.sforum.vn/storage/app/media/THANHAN/avatar-trang-100.jpg '
+  //     },
+  //     {
+  //       id: 8,
+  //       content: 'Tôi thật bất ngờ với các hoạt động du lịch tại đây, có rất nhiều hoạt động cho du khách như pháo hoa hay nhạc hội, tất cả đều rất tuyệt vời',
+  //       name_user_review: 'Ngô Châu Bảo Khanh',
+  //       time_review: ' 15/8/2024 17:02',
+  //       start: 5,
+  //       avatar: 'https://cdn-media.sforum.vn/storage/app/media/THANHAN/avatar-trang-96.jpg '
+  //     },
+  //     {
+  //       id: 10,
+  //       content: ' the atmosphere is insane!!',
+  //       name_user_review: ' David',
+  //       time_review: '23/9/2024 5:45',
+  //       start: 5,
+  //       avatar: 'https://vnn-imgs-a1.vgcloud.vn/image1.ictnews.vn/_Files/2020/03/20/trend-avatar-12.jpg '
+  //     },
+  //   ],
+  //   haveVoice: true,
+  //   icon: images.icon_camera
+  // },
   {
     id: 1,
     name: 'Bảo Tàng Điêu Khắc Chăm Đà Nẵng - Cổ Viện Chàm',

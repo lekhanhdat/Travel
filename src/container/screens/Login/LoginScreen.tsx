@@ -33,9 +33,9 @@ export default class LoginScreen extends React.PureComponent<ILoginScreenProps, 
       userName: '',
       password: '',
       banners: [
-        images.banner,
-        images.banner2,
-        images.banner,
+        images.caurong,
+        images.causonghan,
+        images.vooc,
 
       ]
     }
@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: sizes._16sdp,
-    marginTop: sizes._100sdp
+    marginTop: sizes._10sdp,
   },
   btn: {
     width: '100%',

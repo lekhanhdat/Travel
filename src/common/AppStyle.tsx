@@ -60,4 +60,43 @@ export const AppStyle = StyleSheet.create({
     fontFamily: fonts.NotoSansJP_Bold,
     color: colors.primary_950,
   },
+
+  txt_18_regular: {
+    fontSize: sizes._18sdp,
+    lineHeight: sizes._23sdp,
+    fontFamily: fonts.NotoSansJP_Regular,
+    color: colors.primary_950,
+  },
+  txt_18_medium: {
+    fontSize: sizes._18sdp,
+    lineHeight: sizes._23sdp,
+    fontFamily: fonts.NotoSansJP_Medium,
+    color: colors.primary_950,
+  },
+  txt_18_bold: {
+    fontSize: sizes._18sdp,
+    lineHeight: sizes._23sdp,
+    fontFamily: fonts.NotoSansJP_Bold,
+    color: colors.primary_950,
+  },
+
+  txt_20_regular: {
+    fontSize: sizes._20sdp,
+    lineHeight: sizes._26sdp,
+    fontFamily: fonts.NotoSansJP_Regular,
+    color: colors.primary_950,
+  },
+  txt_20_medium: {
+    fontSize: sizes._20sdp,
+    lineHeight: sizes._26sdp,
+    fontFamily: fonts.NotoSansJP_Medium,
+    color: colors.primary_950,
+  },
+  txt_20_bold: {
+    fontSize: sizes._20sdp,
+    lineHeight: sizes._26sdp,
+    fontFamily: fonts.NotoSansJP_Bold,
+    color: colors.primary_950,
+  },
+
 });

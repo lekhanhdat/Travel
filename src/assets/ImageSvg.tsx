@@ -12,6 +12,7 @@ import FAQ from './svg/FAQ.svg';
 import Frame from './svg/Frame.svg';
 import FriendsSvg from './svg/FriendsSvg.svg';
 import HomeSvg from './svg/HomeSvg.svg';
+import icon_camera from './svg/icon_camera.svg';
 import LibrarySvg from './svg/LibrarySvg.svg';
 import Lightning from './svg/Lightning.svg';
 import LightningOff from './svg/LightningOff.svg';
@@ -35,6 +36,7 @@ FAQ,
 Frame,
 FriendsSvg,
 HomeSvg,
+icon_camera,
 LibrarySvg,
 Lightning,
 LightningOff,

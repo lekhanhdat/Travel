@@ -56,13 +56,13 @@ export default class ProfileScreen extends React.PureComponent<IProfileScreenPro
       <Page>
         <HeaderBase hideLeftIcon title={strings.profile} />
         <View style={styles.container}>
-          <Image source={{ uri: account?.avatar }} width={sizes._60sdp} height={sizes._60sdp} style={{ borderRadius: 100, alignSelf: 'center' }} />
+          <Image source={{ uri: account?.avatar }} width={sizes._60sdp} height={sizes._60sdp} style={{ borderRadius: 100, alignSelf: 'center', marginTop: sizes._16sdp, marginBottom: sizes._16sdp }} />
 
-          <View style={{ width: '100%', height: 1, backgroundColor: colors.primary, marginTop: sizes._16sdp }} />
+          <View style={{ width: '100%', height: 1, backgroundColor: colors.primary, marginTop: sizes._16sdp, marginBottom: sizes._16sdp }} />
 
-          <TextBase style={[AppStyle.txt_16_regular, { marginTop: sizes._16sdp, fontSize: sizes._20sdp }]}>Account</TextBase>
+          <TextBase style={[AppStyle.txt_16_bold, { marginTop: sizes._16sdp, fontSize: sizes._20sdp, marginBottom: sizes._10sdp }]}>Account</TextBase>
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-            <TextBase style={AppStyle.txt_14_bold}>{'Cuộc gọi khẩn cấp'}</TextBase>
+            <TextBase style={AppStyle.txt_16_bold}>{'Cuộc gọi khẩn cấp SOS'}</TextBase>
             <TouchableOpacity style={{
               width: sizes._56sdp,
               height: sizes._40sdp,
@@ -80,7 +80,7 @@ export default class ProfileScreen extends React.PureComponent<IProfileScreenPro
           </View>
 
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: sizes._8sdp }}>
-            <TextBase style={AppStyle.txt_14_bold}>{'Thông tin tài khoản'}</TextBase>
+            <TextBase style={AppStyle.txt_16_bold}>{'Thông tin tài khoản'}</TextBase>
             <TouchableOpacity style={{
               width: sizes._56sdp,
               height: sizes._40sdp,
@@ -95,12 +95,12 @@ export default class ProfileScreen extends React.PureComponent<IProfileScreenPro
 
 
           </View>
-          <View style={{ width: '100%', height: 1, backgroundColor: colors.primary, marginTop: sizes._16sdp }} />
+          <View style={{ width: '100%', height: 1, backgroundColor: colors.primary, marginTop: sizes._16sdp, marginBottom: sizes._16sdp }} />
 
 
-          <TextBase style={[AppStyle.txt_16_regular, { marginTop: sizes._16sdp, fontSize: sizes._20sdp }]}>Others</TextBase>
+          <TextBase style={[AppStyle.txt_16_bold, { marginTop: sizes._16sdp, fontSize: sizes._20sdp, marginBottom: sizes._10sdp }]}>Other</TextBase>
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-            <TextBase style={AppStyle.txt_14_bold}>{'Setting'}</TextBase>
+            <TextBase style={AppStyle.txt_16_bold}>{'Cài đặt'}</TextBase>
             <TouchableOpacity style={{
               width: sizes._56sdp,
               height: sizes._40sdp,
@@ -117,7 +117,7 @@ export default class ProfileScreen extends React.PureComponent<IProfileScreenPro
           </View>
 
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: sizes._8sdp }}>
-            <TextBase style={AppStyle.txt_14_bold}>{'FAQ'}</TextBase>
+            <TextBase style={AppStyle.txt_16_bold}>{'Các câu hỏi thường gặp'}</TextBase>
             <TouchableOpacity style={{
               width: sizes._56sdp,
               height: sizes._40sdp,
@@ -134,7 +134,7 @@ export default class ProfileScreen extends React.PureComponent<IProfileScreenPro
           </View>
 
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: sizes._8sdp }}>
-            <TextBase style={AppStyle.txt_14_bold}>{'Privacy & Policy'}</TextBase>
+            <TextBase style={AppStyle.txt_16_bold}>{'Chính sách & bảo mật'}</TextBase>
             <TouchableOpacity style={{
               width: sizes._56sdp,
               height: sizes._40sdp,
@@ -153,7 +153,7 @@ export default class ProfileScreen extends React.PureComponent<IProfileScreenPro
 
 
           <View
-            style={{ position: 'absolute', bottom: sizes._50sdp, left: sizes._16sdp }}
+            style={{ position: 'absolute', bottom: sizes._150sdp, left: sizes._16sdp }}
           >
             <TouchableOpacity style={[styles.btn,]}
               onPress={() => {

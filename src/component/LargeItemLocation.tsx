@@ -39,8 +39,8 @@ export default class LargeItemLocation extends React.PureComponent<
           <Image
             source={{ uri: location.avatar }}
             style={{
-              width: sizes._60sdp,
-              height: sizes._60sdp,
+              width: sizes._69sdp,
+              height: sizes._69sdp,
               resizeMode: 'cover',
               marginRight: sizes._16sdp,
 
@@ -48,12 +48,12 @@ export default class LargeItemLocation extends React.PureComponent<
             }}
           />
           <View style={{ flex: 1 }}>
-            <TextBase numberOfLines={1} style={AppStyle.txt_14_medium}>
+            <TextBase numberOfLines={1} style={AppStyle.txt_16_medium}>
               {`${location.name}`}
             </TextBase>
             <TextBase
               numberOfLines={3}
-              style={[AppStyle.txt_12_regular, { marginTop: sizes._8sdp }]}>
+              style={[AppStyle.txt_14_regular, { marginTop: sizes._8sdp }]}>
               {location.description}
             </TextBase>
           </View>
@@ -66,7 +66,7 @@ export default class LargeItemLocation extends React.PureComponent<
 const styles = StyleSheet.create({
   container: {
     padding: sizes._16sdp,
-    backgroundColor: colors.primary,
+    backgroundColor: colors.primary_400,
     marginBottom: sizes._16sdp,
     borderRadius: sizes._20sdp,
   },

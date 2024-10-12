@@ -19,7 +19,7 @@ export const reviews: IReview[] = [
   },
   {
     id: 3,
-    content: ' Mình thắc mắc tại sao nơi đây vẫn chưa được mệnh danh là thiên đường ẩm thực nhỉ, dường như sơn hào hải vị trên thế gian đều có thể được tìm thấy ở đây ấy',
+    content: 'Mình thắc mắc tại sao nơi đây vẫn chưa được mệnh danh là thiên đường ẩm thực nhỉ, dường như sơn hào hải vị trên thế gian đều có thể được tìm thấy ở đây ấy',
     name_user_review: 'Ngô Ngọc Hoàng Vương',
     time_review: '1/7/2024  9:28',
     start: 5,
@@ -35,7 +35,7 @@ export const reviews: IReview[] = [
   },
   {
     id: 5,
-    content: ' Tôi rất hứng thú với nền văn hóa nơi đây, đa dạng và mang đậm bản sắc người Việt',
+    content: 'Tôi rất hứng thú với nền văn hóa nơi đây, đa dạng và mang đậm bản sắc người Việt',
     name_user_review: 'Châu Thị Diễm',
     time_review: ' 10/2/2024 20:08',
     start: 5,

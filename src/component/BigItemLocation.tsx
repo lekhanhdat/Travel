@@ -35,10 +35,10 @@ export default class BigItemLocation extends React.PureComponent<IBigItemLocatio
             console.log('errr', location.avatar)
           }}
         />
-        <TextBase numberOfLines={1} style={[AppStyle.txt_14_medium, { marginTop: sizes._8sdp }]}>
+        <TextBase numberOfLines={1} style={[AppStyle.txt_16_medium, { marginTop: sizes._10sdp }]}>
           {`${location.name}`}
         </TextBase>
-        <TextBase numberOfLines={3} style={[AppStyle.txt_12_regular, { marginTop: sizes._8sdp }]}>
+        <TextBase numberOfLines={3} style={[AppStyle.txt_14_regular, { marginTop: sizes._8sdp }]}>
           {location.description}
         </TextBase>
       </TouchableOpacity>
@@ -49,14 +49,16 @@ export default class BigItemLocation extends React.PureComponent<IBigItemLocatio
 const styles = StyleSheet.create({
   container: {
     padding: sizes._16sdp,
-    backgroundColor: colors.primary,
+    backgroundColor: colors.primary_400,
+    borderWidth: 1,             // Nếu cần đường viền
+    borderColor: colors.primary,
     marginRight: sizes._16sdp,
     borderRadius: sizes._20sdp,
     maxWidth: sizes.width * 0.6
   },
   icon: {
-    width: sizes._75sdp,
-    height: sizes._55sdp,
+    width: sizes._160sdp,
+    height: sizes._90sdp,
     borderRadius: sizes._10sdp,
   }
 })

@@ -124,7 +124,7 @@ export default class NewFeedScreen extends React.PureComponent<
                 paddingVertical: sizes._16sdp,
                 alignItems: 'center',
               }}>
-              <TextBase style={AppStyle.txt_16_medium}>Thêm Đánh Giá</TextBase>
+              <TextBase style={AppStyle.txt_20_bold}>Thêm Đánh Giá</TextBase>
             </View>
 
             <View
@@ -132,7 +132,7 @@ export default class NewFeedScreen extends React.PureComponent<
                 flexDirection: 'row',
                 alignItems: 'center',
                 paddingHorizontal: sizes._16sdp,
-                paddingVertical: sizes._8sdp,
+                paddingVertical: sizes._16sdp,
                 borderBottomWidth: 1,
                 borderColor: colors.primary,
               }}>
@@ -145,21 +145,21 @@ export default class NewFeedScreen extends React.PureComponent<
                 }}
               />
               <TextBase
-                style={[AppStyle.txt_16_bold, { marginLeft: sizes._16sdp }]}>
+                style={[AppStyle.txt_18_bold, { marginLeft: sizes._16sdp }]}>
                 {this.state.avt?.userName}
               </TextBase>
             </View>
 
-            <TextBase style={[AppStyle.txt_14_medium, {
-              marginLeft: sizes._16sdp, marginTop: sizes._8sdp
+            <TextBase style={[AppStyle.txt_16_medium, {
+              marginLeft: sizes._16sdp, marginTop: sizes._24sdp
             }]}>Đánh giá</TextBase>
             <View
               style={{
                 flexDirection: 'row',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                paddingHorizontal: sizes._16sdp,
-                paddingVertical: sizes._8sdp
+                paddingHorizontal: sizes._40sdp,
+                paddingVertical: sizes._10sdp
               }}>
               {Array.from([1, 2, 3, 4, 5]).map(i => {
                 return (
@@ -181,17 +181,17 @@ export default class NewFeedScreen extends React.PureComponent<
               })}
             </View>
 
-            <TextBase style={[AppStyle.txt_14_medium, {
-              marginLeft: sizes._16sdp, marginTop: sizes._8sdp
+            <TextBase style={[AppStyle.txt_16_medium, {
+              marginLeft: sizes._16sdp, marginTop: sizes._24sdp
             }]}>Nội dung</TextBase>
 
-            <View style={{ paddingHorizontal: sizes._16sdp, paddingVertical: sizes._8sdp }}>
+            <View style={{ paddingHorizontal: sizes._16sdp, paddingVertical: sizes._8sdp, }}>
               <TextInput
                 mode="outlined"
                 label="Đánh giá"
                 placeholder="Nhập nội dung"
-                style={{ width: '100%', maxHeight: sizes._200sdp }}
-                outlineStyle={{ borderColor: colors.primary }}
+                style={{ width: '100%', maxHeight: sizes._180sdp,  }}
+                outlineStyle={{ borderColor: colors.primary, borderRadius: sizes._10sdp }}
                 textColor={colors.primary_950}
                 placeholderTextColor={colors.primary_950}
 
@@ -203,8 +203,9 @@ export default class NewFeedScreen extends React.PureComponent<
                 multiline
               />
             </View>
-            <TextBase style={[AppStyle.txt_14_medium, {
-              marginLeft: sizes._16sdp, marginVertical: sizes._8sdp
+
+            <TextBase style={[AppStyle.txt_16_medium, {
+              marginLeft: sizes._16sdp, marginTop: sizes._24sdp, marginBottom: sizes._16sdp
             }]}>Địa điểm</TextBase>
 
             {
@@ -223,7 +224,7 @@ export default class NewFeedScreen extends React.PureComponent<
                 this.refSheetLocation?.open()
               }}
             >
-              <TextBase style={AppStyle.txt_14_medium}> {this.state.location ? 'Chọn lại địa điểm' : 'Chọn địa điểm'}</TextBase>
+              <TextBase style={AppStyle.txt_16_medium}> {this.state.location ? 'Chọn lại địa điểm' : 'Chọn địa điểm'}</TextBase>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -280,7 +281,7 @@ export default class NewFeedScreen extends React.PureComponent<
               paddingVertical: sizes._16sdp,
               alignItems: 'center',
             }}>
-            <TextBase style={AppStyle.txt_16_medium}>Chọn địa điểm</TextBase>
+            <TextBase style={AppStyle.txt_20_medium}>Chọn địa điểm</TextBase>
           </View>
           <View style={{ padding: sizes._16sdp }}>
             <FlatList

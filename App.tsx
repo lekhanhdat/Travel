@@ -1,19 +1,16 @@
-import { NavigationContainer } from '@react-navigation/native';
+import {NavigationContainer} from '@react-navigation/native';
 import React from 'react';
 // import { SafeAreaView } from 'react-native-safe-area-context';
-import { SafeAreaView, StatusBar, StyleSheet, View } from 'react-native';
+import {SafeAreaView, StatusBar, StyleSheet, View} from 'react-native';
 import AppContainer from './src/container/AppContainer';
 import NavigationService from './src/container/screens/NavigationService';
-import { RootSiblingParent } from 'react-native-root-siblings';
-import {
-  MD3LightTheme as DefaultTheme,
-  PaperProvider,
-} from 'react-native-paper';
+import {RootSiblingParent} from 'react-native-root-siblings';
+import {MD3LightTheme as DefaultTheme, PaperProvider} from 'react-native-paper';
 import colors from './src/common/colors';
 import Toast from 'react-native-toast-message';
 
-interface Props { }
-interface States { }
+interface Props {}
+interface States {}
 class App extends React.PureComponent<Props, States> {
   render() {
     return (
@@ -25,11 +22,9 @@ class App extends React.PureComponent<Props, States> {
               background: colors.white,
               placeholder: colors.primary,
 
-
               onSurfaceVariant: colors.primary,
-            }
-          }}
-        >
+            },
+          }}>
           <View style={styles.container}>
             <StatusBar barStyle={'dark-content'} backgroundColor={'#ffffff'} />
 
@@ -39,7 +34,9 @@ class App extends React.PureComponent<Props, States> {
                   NavigationService.setActiveScreen(
                     state.routes[state.routes.length - 1].name,
                   );
-                  NavigationService.setParentOfActiveScreen(state.routes[0].name);
+                  NavigationService.setParentOfActiveScreen(
+                    state.routes[0].name,
+                  );
                 }
               }}
               ref={ref => {
@@ -52,7 +49,6 @@ class App extends React.PureComponent<Props, States> {
           </View>
         </PaperProvider>
         <Toast />
-
       </RootSiblingParent>
     );
   }

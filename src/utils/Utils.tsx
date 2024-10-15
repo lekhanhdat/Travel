@@ -1,4 +1,4 @@
-import { NativeModules } from 'react-native';
+import {NativeModules} from 'react-native';
 
 export const getRSAKeys = async (): Promise<{
   public: string;
@@ -10,7 +10,7 @@ export const getRSAKeys = async (): Promise<{
   return _keys;
 };
 
-export function formatTime(seconds) {
+export function formatTime(seconds: number) {
   const h = Math.floor(seconds / 3600);
   const m = Math.floor((seconds % 3600) / 60);
   const s = Math.round(seconds % 60);
@@ -55,13 +55,11 @@ export const validateEmail = (email: string) => {
   return re.test(email.toLowerCase());
 };
 
-
-
 /**
-   * Xoa dau tieng viet.
-   * @param {string} words
-   * @returns Chuoi khong co dau.
-   */
+ * Xoa dau tieng viet.
+ * @param {string} words
+ * @returns Chuoi khong co dau.
+ */
 export const convertCitationVietnameseUnsigned = (words: string) => {
   if (!words || !words.trim()) {
     return '';
@@ -74,7 +72,7 @@ export const convertCitationVietnameseUnsigned = (words: string) => {
   });
 
   return citationConvert.join(' ');
-}
+};
 
 /**
  * Xoa dau tu tieng viet
@@ -99,4 +97,4 @@ const removeSign = (str: string) => {
   str = str.replace(/Ỳ|Ý|Ỵ|Ỷ|Ỹ/g, 'Y');
   str = str.replace(/Đ/g, 'D');
   return str;
-}
+};

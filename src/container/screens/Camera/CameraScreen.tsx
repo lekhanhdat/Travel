@@ -1,9 +1,10 @@
-import axios from 'axios';
 import React from 'react';
 import {Modal, Platform, TouchableOpacity, View} from 'react-native';
+import RNFS from 'react-native-fs';
 import {ActivityIndicator} from 'react-native-paper';
 import Toast from 'react-native-toast-message';
 import {Camera} from 'react-native-vision-camera';
+import RNFetchBlob from 'rn-fetch-blob';
 import {CameraSvg, Lightning, LightningOff} from '../../../assets/ImageSvg';
 import {AppStyle} from '../../../common/AppStyle';
 import colors from '../../../common/colors';
@@ -11,6 +12,7 @@ import sizes from '../../../common/sizes';
 import TextBase from '../../../common/TextBase';
 import Page from '../../../component/Page';
 import {SERVER_URL} from '../../../utils/configs';
+
 interface ICameraScreenProps {
   navigation: any;
 }
@@ -23,6 +25,12 @@ interface ICameraScreenState {
   isLoading: boolean;
   isShowLightning: boolean;
   visible: boolean;
+  resultName: string;
+  resultDescription: string;
+  // content: {
+  //   name: string;
+  //   description: string;
+  // };
 }
 const defaultSize = sizes.width * 0.7;
 
@@ -31,7 +39,6 @@ export default class CameraScreen extends React.PureComponent<
   ICameraScreenState
 > {
   camera: Camera | null = null;
-  content: {title: string; description: string} = {title: '', description: ''};
   constructor(props: ICameraScreenProps) {
     super(props);
     this.state = {
@@ -42,6 +49,9 @@ export default class CameraScreen extends React.PureComponent<
       isLoading: false,
       isShowLightning: false,
       visible: false,
+      // content: {name: '', description: ''},
+      resultName: '',
+      resultDescription: '',
     };
   }
 
@@ -86,45 +96,76 @@ export default class CameraScreen extends React.PureComponent<
             });
             return;
           }
-          this.uploadImage(photo.path);
-          // NavigationService.navigate(ScreenName.PREVIEW_IMAGE_SCREEN, { uri: 'file://' + photo.path })
+          const checking = await RNFS.exists(photo.path);
+          console.log('checking', checking);
+          // get image path
+          const path = photo.path.replace('file://', '');
+          console.log('path', path);
+
+          await this.uploadImage(photo.path);
+          // NavigationService.navigate(ScreenName.PREVIEW_IMAGE_SCREEN, {
+          //   uri: 'file://' + photo.path,
+          // });
+
+          this.setState({
+            isLoading: false,
+          });
         }
       },
     );
   };
 
   uploadImage = async (filePath: string) => {
+    // const res = await fetch(`${SERVER_URL}/ai/`, {method: 'get'});
+    // console.log(await res.json());
+    // return;
+
     const url = `${SERVER_URL}/ai/detect`;
     console.log('url', url);
 
-    // Lấy file từ local
-
-    // Tạo FormData để gửi ảnh
-    const formData = new FormData();
-    formData.append('image_file', {
-      uri: Platform.OS === 'android' ? 'file://' + filePath : filePath,
-      type: 'image/jpg', // Loại file
-      name: 'concho.jpg', // Tên file
-    } as any);
-
     try {
-      const response = await axios.post(url, formData, {
-        headers: {
-          'content-type': 'multipart/form-data',
-          Accept: 'application/json',
+      const data = new FormData();
+      data.append('image_file', {
+        name: 'image.jpg',
+        type: 'image/jpg',
+        uri: Platform.OS === 'android' ? 'file://' + filePath : filePath,
+        // uri: filePath,
+      } as any);
+
+      const response = await RNFetchBlob.fetch(
+        'POST',
+        url,
+        {
+          'Content-Type': 'multipart/form-data',
         },
-      });
+        [
+          {
+            name: 'image_file',
+            filename: 'image.jpg',
+            data: RNFetchBlob.wrap(filePath),
+          },
+        ],
+      );
+
+      // const response = await fetch(url, {
+      //   method: 'post',
+      //   headers: {
+      //     'content-type': 'multipart/form-data; ',
+      //   },
+      //   // assign form data
+      //   body: data,
+      //   // body: data,
+      // });
+
       this.setState({
         isLoading: false,
       });
-      console.log(response);
-      const data = response?.data;
-
-      console.log('data', data);
-      this.content = data;
+      const content = JSON.parse(response?.data);
 
       this.setState({
         visible: true,
+        resultName: content.name,
+        resultDescription: content.description,
       });
     } catch (error) {
       this.setState({
@@ -352,11 +393,11 @@ export default class CameraScreen extends React.PureComponent<
                   AppStyle.txt_20_bold,
                   {textAlign: 'center', marginBottom: sizes._8sdp},
                 ]}>
-                {this.content.title}
+                {this.state.resultName}
               </TextBase>
               <TextBase
                 style={[AppStyle.txt_16_regular, {textAlign: 'center'}]}>
-                {this.content.description}
+                {this.state.resultDescription}
               </TextBase>
             </View>
           </View>

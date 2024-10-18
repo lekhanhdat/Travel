@@ -102,7 +102,7 @@ function getSourceWithIndex(key: number, isFocused: boolean) {
     case 0:
       if (isFocused) {
         return {
-          icon: <HomeSvg width={24} height={24} fill={colors.primary} />,
+          icon: <HomeSvg width={24} height={24} fill={colors.black} />,
           name: strings.home_page,
         };
       }
@@ -113,7 +113,7 @@ function getSourceWithIndex(key: number, isFocused: boolean) {
     case 1:
       if (isFocused) {
         return {
-          icon: <NewFeed width={24} height={24} fill={colors.primary} />,
+          icon: <NewFeed width={24} height={24} fill={colors.black} />,
           name: strings.new_feed,
         };
       }
@@ -124,7 +124,7 @@ function getSourceWithIndex(key: number, isFocused: boolean) {
     case 2:
       if (isFocused) {
         return {
-          icon: <MapSvg width={24} height={24} fill={colors.primary} />,
+          icon: <MapSvg width={24} height={24} fill={colors.black} />,
           name: strings.map,
         };
       }
@@ -132,7 +132,7 @@ function getSourceWithIndex(key: number, isFocused: boolean) {
     case 3:
       if (isFocused) {
         return {
-          icon: <CameraSvg width={24} height={24} fill={colors.primary} />,
+          icon: <CameraSvg width={24} height={24} fill={colors.black} />,
           name: strings.camera,
         };
       }
@@ -143,7 +143,7 @@ function getSourceWithIndex(key: number, isFocused: boolean) {
     case 4:
       if (isFocused) {
         return {
-          icon: <ProfileSvg width={24} height={24} fill={colors.primary} />,
+          icon: <ProfileSvg width={24} height={24} fill={colors.black} />,
           name: strings.profile,
         };
       }
@@ -151,7 +151,7 @@ function getSourceWithIndex(key: number, isFocused: boolean) {
     default:
       if (isFocused) {
         return {
-          icon: <HomeSvg width={24} height={24} fill={colors.primary} />,
+          icon: <HomeSvg width={24} height={24} fill={colors.black} />,
           name: strings.home_page,
         };
       }
@@ -192,7 +192,7 @@ function HomeStack() {
     <View style={styles.container}>
       <Tabs.Navigator
         key={getRouterFromProp()}
-        initialRouteName={strings.home_page}
+        initialRouteName={strings.map}
         screenOptions={{
           headerShown: false,
         }}

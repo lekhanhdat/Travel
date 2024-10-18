@@ -262,7 +262,7 @@ export default class NewFeedScreen extends React.PureComponent<
             >
               <TextBase
                 //@ts-ignore
-                style={[AppStyle.txt_16_regular, (this.state.content.length === 0 || !this.state.location) && { color: colors.primary_400 }]}>Đăng</TextBase>
+                style={[AppStyle.txt_16_medium, (this.state.content.length === 0 || !this.state.location) && { color: colors.primary_400 }]}>Đăng</TextBase>
             </TouchableOpacity>
           </View>
         </BottomSheet>

@@ -30,7 +30,7 @@ export default class BigItemLocation extends React.PureComponent<IBigItemLocatio
           NavigationService.navigate(ScreenName.DETAIL_LOCATION_SCREEN, { location: location })
         }}
       >
-        <Image source={{ uri: location.avatar }} style={styles.icon}
+        <Image source={{ uri: location.avatar }} style={styles.icon} 
           onError={() => {
             console.log('errr', location.avatar)
           }}
@@ -57,8 +57,8 @@ const styles = StyleSheet.create({
     maxWidth: sizes.width * 0.6
   },
   icon: {
-    width: sizes._160sdp,
-    height: sizes._90sdp,
+    width: sizes._210sdp,
+    height: sizes._112sdp,
     borderRadius: sizes._10sdp,
   }
 })

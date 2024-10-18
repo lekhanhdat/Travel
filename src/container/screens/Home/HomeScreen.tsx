@@ -15,6 +15,9 @@ import LargeItemLocation from '../../../component/LargeItemLocation';
 import NavigationService from '../NavigationService';
 import { ScreenName } from '../../AppContainer';
 import _ from 'lodash';
+import images from '../../../res/images';
+import { Text } from 'react-native-paper';
+import { Image } from 'react-native-svg';
 
 interface IHomeScreenProps {
   navigation: any;
@@ -57,6 +60,9 @@ export default class HomeScreen extends React.PureComponent<IHomeScreenProps, IH
     return (
       <Page>
         <HeaderBase hideLeftIcon title={strings.home_page} />
+        
+        <Text style={[AppStyle.txt_18_regular, {marginTop: sizes._26sdp, marginLeft: sizes._16sdp}]}>Xin chào, </Text>
+        <Text style={[AppStyle.txt_18_bold, {marginTop: sizes._6sdp, marginLeft: sizes._16sdp}]}>Chúc bạn có những trải nghiệm thật tuyệt vời tại Đà Nẵng</Text>
 
         <View style={{
           width: sizes.width - sizes._32sdp, marginBottom: sizes._22sdp, marginLeft: sizes._16sdp,
@@ -69,10 +75,10 @@ export default class HomeScreen extends React.PureComponent<IHomeScreenProps, IH
             mode="outlined"
             label="Tìm kiếm địa điểm du lịch"
             placeholder="Nhập tên địa điểm, địa chỉ..."
-            outlineStyle={{ borderColor: colors.primary, borderRadius: sizes._20sdp }}
-            textColor={colors.primary_950}
-            placeholderTextColor={colors.primary_950}
-            style={{ width: sizes.width - sizes._135sdp, color: colors.primary_950 }}
+            outlineStyle={{ borderColor: colors.black, borderRadius: sizes._20sdp }}
+            textColor={colors.black}
+            placeholderTextColor={colors.black}
+            style={{ width: sizes.width - sizes._135sdp, color: colors.black }}
             onChangeText={(txt) => {
               this.setState({
                 valueSearch: txt
@@ -93,13 +99,14 @@ export default class HomeScreen extends React.PureComponent<IHomeScreenProps, IH
             onPress={() => this.handleSearch(false, _.unionBy(LOCATION_POPULAR, LOCATION_NEARLY, 'id'))}
           >
             <TextBase style={AppStyle.txt_16_medium}>Tìm kiếm</TextBase>
+
           </TouchableOpacity>
         </View>
         <ScrollView>
           <View style={styles.container}>
 
             <View style={styles.rowCenter}>
-              <TextBase style={[AppStyle.txt_18_bold, { color: colors.primary_950, marginBottom: sizes._16sdp }]}>Phổ biến</TextBase>
+              <TextBase style={[AppStyle.txt_20_bold, { color: colors.primary_950, marginBottom: sizes._16sdp }]}>Phổ biến</TextBase>
               <TouchableOpacity
                 onPress={() => this.handleSearch(true, LOCATION_POPULAR)}
               >
@@ -116,7 +123,7 @@ export default class HomeScreen extends React.PureComponent<IHomeScreenProps, IH
             />
 
             <View style={[styles.rowCenter, { marginTop: sizes._32sdp }]}>
-              <TextBase style={[AppStyle.txt_18_bold, { color: colors.primary_950, marginBottom: sizes._16sdp }]}>Gần tôi</TextBase>
+              <TextBase style={[AppStyle.txt_20_bold, { color: colors.primary_950, marginBottom: sizes._16sdp }]}>Gần tôi</TextBase>
               <TouchableOpacity
                 onPress={() => this.handleSearch(true, LOCATION_NEARLY)}
 

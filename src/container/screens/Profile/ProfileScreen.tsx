@@ -160,7 +160,7 @@ export default class ProfileScreen extends React.PureComponent<IProfileScreenPro
                 NavigationService.reset(ScreenName.LOGIN_SCREEN)
               }}
             >
-              <TextBase style={[AppStyle.txt_16_medium, {
+              <TextBase style={[AppStyle.txt_18_bold, {
                 color: colors.primary_950
               }]}>Đăng xuất</TextBase>
             </TouchableOpacity>
@@ -176,9 +176,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   btn: {
-    width: sizes.width - sizes._32sdp,
+    width: sizes.width - sizes._30sdp,
     paddingVertical: sizes._16sdp,
-    borderRadius: sizes._8sdp,
+    borderRadius: sizes._30sdp,
     backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',

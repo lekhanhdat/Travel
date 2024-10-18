@@ -68,7 +68,7 @@ class HeaderBase extends React.PureComponent<Props, States> {
             }
             {title &&
               //@ts-ignore
-              <TextBase style={[styles.title, hideLeftIcon && { marginLeft: sizes._8sdp }]}>{title}</TextBase>
+              <TextBase style={[styles.title, hideLeftIcon && { }]}>{title}</TextBase>
             }
           </View>
 
@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
   container: {
     width: sizes.width,
     height: sizes._60sdp + StatusBarManager.HEIGHT,
-    backgroundColor: colors.primary,
+    backgroundColor: '#3ca227',
     paddingTop: StatusBarManager.HEIGHT,
 
     shadowColor: '#000',
@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: sizes._20sdp,
     fontFamily: fonts.NotoSansJP_Bold,
-    color: colors.primary_950,
+    color: colors.white,
     lineHeight: sizes._30sdp,
   },
   viewLeft: {

@@ -2,7 +2,7 @@ const colors = {
   black: '#000000',
   white: '#FFFFFF',
   transparent: 'transparent',
-
+  xam: '#E6E4E6',
 
   primary_50: '#f1fcf5',
   primary_100: '#defaea',

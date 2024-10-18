@@ -1,5 +1,5 @@
 const strings = {
-  home_page: 'Trang chủ',
+  home_page: 'Địa điểm',
   new_feed: 'Bảng tin',
   map: 'Bản đồ',
   camera: 'Camera',

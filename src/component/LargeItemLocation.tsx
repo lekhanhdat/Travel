@@ -39,8 +39,8 @@ export default class LargeItemLocation extends React.PureComponent<
           <Image
             source={{ uri: location.avatar }}
             style={{
-              width: sizes._69sdp,
-              height: sizes._69sdp,
+              width: sizes._80sdp,
+              height: sizes._80sdp,
               resizeMode: 'cover',
               marginRight: sizes._16sdp,
 

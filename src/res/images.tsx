@@ -15,5 +15,7 @@
     icon_camera: require('../assets/images/icon_camera.png'),
     tab_add_friends: require('../assets/images/tab_add_friends.png'),
     tab_add_friends_focus: require('../assets/images/tab_add_friends_focus.png'),
+    danang: require('../assets/images/danang.jpg'),
+    search: require('../assets/images/search.png'),
  }
  export default images

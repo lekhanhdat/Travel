@@ -33,10 +33,10 @@ export default class LoginScreen extends React.PureComponent<ILoginScreenProps, 
       userName: '',
       password: '',
       banners: [
-        images.caurong,
-        images.causonghan,
-        images.vooc,
-
+        // images.caurong,
+        // images.causonghan,
+        // images.vooc,
+        images.danang,
       ]
     }
   }
@@ -61,27 +61,28 @@ export default class LoginScreen extends React.PureComponent<ILoginScreenProps, 
       <Page >
         <View style={[styles.wrapper]}>
           <Swiper
-            height={sizes._200sdp}
+            height={sizes._300sdp}
             autoplay
             activeDotColor={colors.primary}
           >
             {
               this.state.banners.map(banner => {
                 return <View style={{ flex: 1 }}>
-                  <Image source={banner} style={{ width: sizes.width, height: sizes._200sdp }} />
+                  <Image source={banner} style={{ width: sizes.width, height: sizes._300sdp }} />
                 </View>
               })
             }
           </Swiper>
         </View>
+        
         <View style={styles.container}>
 
           <TextInput
             mode="outlined"
             label="Tên đăng nhập"
             placeholder="Nhập tên đăng nhập"
-            style={{ width: '100%', marginBottom: sizes._16sdp }}
-            outlineStyle={{ borderColor: colors.primary }}
+            style={{ width: '100%', marginBottom: sizes._16sdp, backgroundColor: '#E6E4E6' }}
+            outlineStyle={{ borderColor: colors.primary, borderRadius: sizes._16sdp }}
             textColor={colors.primary_950}
             placeholderTextColor={colors.primary_950}
             onChangeText={(txt) => {
@@ -95,8 +96,8 @@ export default class LoginScreen extends React.PureComponent<ILoginScreenProps, 
             mode="outlined"
             label="Mật khẩu"
             placeholder="Nhập mật khẩu"
-            style={{ width: '100%' }}
-            outlineStyle={{ borderColor: colors.primary }}
+            style={{ width: '100%', backgroundColor: '#E6E4E6' }}
+            outlineStyle={{ borderColor: colors.primary, borderRadius: sizes._16sdp }}
             textColor={colors.primary_950}
             placeholderTextColor={colors.primary_950}
             right={<TextInput.Icon icon={this.state.isSecureTextEntry ? images.eye_open : images.eye_close} onPress={() => {
@@ -112,17 +113,31 @@ export default class LoginScreen extends React.PureComponent<ILoginScreenProps, 
             }}
           />
 
+        <View>
+          <Text style={{color: colors.primary_700, marginTop: sizes._10sdp, marginLeft: sizes._10sdp}}>
+            Quên mật khẩu?
+          </Text>
+        </View>
+
           <TouchableOpacity style={[styles.btn, (this.state.userName.length === 0 || this.state.password.length === 0) && {
             backgroundColor: colors.primary_100
           }]}
             onPress={this.handleLogin}
             disabled={this.state.userName.length === 0 || this.state.password.length === 0}
           >
-            <Text style={[AppStyle.txt_16_medium, {
+            <Text style={[AppStyle.txt_20_bold, {
               color: (this.state.userName.length === 0 || this.state.password.length === 0) ?
-                colors.primary_400 : colors.primary_950
+                colors.primary_400 : colors.white
             }]}>Đăng nhập</Text>
           </TouchableOpacity>
+
+          <Text style={{color: colors.primary_700, marginTop: sizes._10sdp, textAlign: 'center'}}>
+            Chưa có tài khoản? {' '}
+            <Text style={{fontWeight: 'bold'}}>
+                Đăng ký
+            </Text>
+          </Text>
+
 
         </View>
       </Page>
@@ -139,14 +154,16 @@ const styles = StyleSheet.create({
   btn: {
     width: '100%',
     paddingVertical: sizes._16sdp,
-    borderRadius: sizes._8sdp,
+    borderRadius: sizes._16sdp,
     backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: sizes._16sdp
+    marginTop: sizes._40sdp
   },
   wrapper: {
     width: '100%',
-    height: sizes._200sdp,
-  }
+    height: sizes._300sdp,
+    marginTop: sizes._50sdp,
+    marginBottom: sizes._50sdp,
+  },
 })

@@ -1,10 +1,10 @@
-import React, { useRef } from 'react';
-import { createAppContainer, createSwitchNavigator } from 'react-navigation';
-import { createCompatNavigatorFactory } from '@react-navigation/compat';
-import { createStackNavigator } from '@react-navigation/stack';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { useRoute } from '@react-navigation/native';
-import { StyleSheet, View, Image, TouchableOpacity } from 'react-native';
+import React, {useRef} from 'react';
+import {createAppContainer, createSwitchNavigator} from 'react-navigation';
+import {createCompatNavigatorFactory} from '@react-navigation/compat';
+import {createStackNavigator} from '@react-navigation/stack';
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import {useRoute} from '@react-navigation/native';
+import {StyleSheet, View, Image, TouchableOpacity} from 'react-native';
 import images from '../res/images';
 import strings from '../res/strings';
 import sizes from '../common/sizes';
@@ -57,7 +57,7 @@ function MyTabBar({
 
   if (refScroll.current) {
     //@ts-ignore
-    refScroll.current.scrollToIndex({ index: state.index });
+    refScroll.current.scrollToIndex({index: state.index});
   }
   return (
     <View style={[styles.containerTab, {}]}>
@@ -88,7 +88,11 @@ function MyTabBar({
             onLongPress={onLongPress}
             style={[styles.containerTouch]}>
             {getSourceWithIndex(index, isFocused).icon}
-            <TextBase style={[styles.title, { color: isFocused ? colors.black : '#DDDDDD' }]}>
+            <TextBase
+              style={[
+                styles.title,
+                {color: isFocused ? colors.black : '#DDDDDD'},
+              ]}>
               {getSourceWithIndex(index, isFocused).name}
             </TextBase>
           </TouchableOpacity>
@@ -128,7 +132,10 @@ function getSourceWithIndex(key: number, isFocused: boolean) {
           name: strings.map,
         };
       }
-      return { icon: <MapSvg width={24} height={24} fill={'#DDDDDD'} />, name: strings.map };
+      return {
+        icon: <MapSvg width={24} height={24} fill={'#DDDDDD'} />,
+        name: strings.map,
+      };
     case 3:
       if (isFocused) {
         return {
@@ -147,7 +154,10 @@ function getSourceWithIndex(key: number, isFocused: boolean) {
           name: strings.profile,
         };
       }
-      return { icon: <ProfileSvg width={24} height={24} />, name: strings.profile };
+      return {
+        icon: <ProfileSvg width={24} height={24} />,
+        name: strings.profile,
+      };
     default:
       if (isFocused) {
         return {
@@ -203,7 +213,7 @@ function HomeStack() {
           name={strings.home_page}
           component={HomeScreen}
           options={{
-            tabBarIcon: ({ focused }) => (
+            tabBarIcon: ({focused}) => (
               <Image
                 source={
                   focused
@@ -218,7 +228,7 @@ function HomeStack() {
           name={strings.new_feed}
           component={NewFeedScreen}
           options={{
-            tabBarIcon: ({ focused }) => (
+            tabBarIcon: ({focused}) => (
               <View>
                 <Image
                   source={
@@ -233,7 +243,7 @@ function HomeStack() {
           name={strings.map}
           component={MapsScreen}
           options={{
-            tabBarIcon: ({ focused }) => (
+            tabBarIcon: ({focused}) => (
               <Image
                 source={
                   focused ? images.tab_add_friends : images.tab_add_friends
@@ -246,7 +256,7 @@ function HomeStack() {
           name={strings.camera}
           component={CameraScreen}
           options={{
-            tabBarIcon: ({ focused }) => (
+            tabBarIcon: ({focused}) => (
               <Image
                 source={
                   focused ? images.tab_add_friends : images.tab_add_friends
@@ -259,7 +269,7 @@ function HomeStack() {
           name={strings.profile}
           component={ProfileScreen}
           options={{
-            tabBarIcon: ({ focused }) => (
+            tabBarIcon: ({focused}) => (
               <Image
                 source={
                   focused ? images.tab_add_friends : images.tab_add_friends
@@ -275,16 +285,18 @@ function HomeStack() {
 //@ts-ignore
 const AppNavigator = createCompatNavigatorFactory(createStackNavigator)(
   {
-    HomeStack: { screen: HomeStack },
-    LoginScreen: { screen: LoginScreen },
-    ViewAllLocation: { screen: ViewAllLocation },
-    DetailLocationScreen: { screen: DetailLocationScreen },
-    PreviewImage: { screen: PreviewImage },
-    MapsScreen: { screen: MapsScreen }
+    HomeStack: {screen: HomeStack},
+    LoginScreen: {screen: LoginScreen},
+    ViewAllLocation: {screen: ViewAllLocation},
+    DetailLocationScreen: {screen: DetailLocationScreen},
+    PreviewImage: {screen: PreviewImage},
+    MapsScreen: {screen: MapsScreen},
   },
   {
     headerMode: 'none',
-    initialRouteName: __DEV__ ? ScreenName.HOME_STACK_SCREEN : ScreenName.LOGIN_SCREEN,
+    initialRouteName: __DEV__
+      ? ScreenName.HOME_STACK_SCREEN
+      : ScreenName.LOGIN_SCREEN,
   },
 );
 const switchNavigator = createSwitchNavigator(

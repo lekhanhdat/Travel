@@ -1,5 +1,5 @@
 import React from 'react';
-import {Modal, Platform, TouchableOpacity, View} from 'react-native';
+import {Modal, Platform, Text, TouchableOpacity, View} from 'react-native';
 import RNFS from 'react-native-fs';
 import {ActivityIndicator} from 'react-native-paper';
 import Toast from 'react-native-toast-message';
@@ -12,6 +12,8 @@ import sizes from '../../../common/sizes';
 import TextBase from '../../../common/TextBase';
 import Page from '../../../component/Page';
 import {SERVER_URL} from '../../../utils/configs';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import {launchImageLibrary} from 'react-native-image-picker';
 
 interface ICameraScreenProps {
   navigation: any;
@@ -96,11 +98,9 @@ export default class CameraScreen extends React.PureComponent<
             });
             return;
           }
+
           const checking = await RNFS.exists(photo.path);
-          console.log('checking', checking);
-          // get image path
           const path = photo.path.replace('file://', '');
-          console.log('path', path);
 
           await this.uploadImage(photo.path);
           // NavigationService.navigate(ScreenName.PREVIEW_IMAGE_SCREEN, {
@@ -121,7 +121,6 @@ export default class CameraScreen extends React.PureComponent<
     // return;
 
     const url = `${SERVER_URL}/ai/detect`;
-    console.log('url', url);
 
     try {
       const data = new FormData();
@@ -147,16 +146,6 @@ export default class CameraScreen extends React.PureComponent<
         ],
       );
 
-      // const response = await fetch(url, {
-      //   method: 'post',
-      //   headers: {
-      //     'content-type': 'multipart/form-data; ',
-      //   },
-      //   // assign form data
-      //   body: data,
-      //   // body: data,
-      // });
-
       this.setState({
         isLoading: false,
       });
@@ -177,6 +166,31 @@ export default class CameraScreen extends React.PureComponent<
       });
       console.error('Error Details:', JSON.stringify(error, null, 2));
     }
+  };
+
+  pickImage = async () => {
+    await launchImageLibrary(
+      {
+        mediaType: 'photo',
+        quality: 0.5,
+      },
+      response => {
+        if (response.didCancel) {
+          console.log('User cancelled image picker');
+        } else if (response.errorCode) {
+          console.log('ImagePicker Error: ', response.errorCode);
+        } else {
+          console.log('response', response);
+          if (response.assets && response.assets.length > 0) {
+            const img = response.assets[0];
+            this.setState({
+              isLoading: true,
+            });
+            this.uploadImage(img.uri!.replace('file://', ''));
+          }
+        }
+      },
+    );
   };
 
   render(): React.ReactNode {
@@ -305,6 +319,26 @@ export default class CameraScreen extends React.PureComponent<
             />
           </View>
         </View>
+
+        <TouchableOpacity
+          onPress={this.pickImage}
+          style={{
+            width: sizes._50sdp,
+            height: sizes._50sdp,
+            position: 'absolute',
+            bottom: sizes._10sdp,
+            left: sizes._16sdp,
+            borderRadius: 50,
+            borderColor: colors.white,
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 3,
+          }}>
+          {/* <Icon name="insert-photo" color="white" /> */}
+          {/* TODO: replace into image picker icon */}
+          <Text style={{color: 'white'}}>Add image</Text>
+        </TouchableOpacity>
+
         <TouchableOpacity
           disabled={this.state.isLoading}
           onPress={this.capturePhoto}
@@ -365,6 +399,7 @@ export default class CameraScreen extends React.PureComponent<
             />
           )}
         </TouchableOpacity>
+
         <Modal visible={this.state.visible} transparent>
           <View
             onStartShouldSetResponder={() => {

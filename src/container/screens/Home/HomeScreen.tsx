@@ -89,7 +89,7 @@ export default class HomeScreen extends React.PureComponent<IHomeScreenProps, IH
           <TouchableOpacity
             style={{
               paddingVertical: sizes._16sdp,
-              backgroundColor: colors.primary,
+              backgroundColor: colors.primary_600,
               borderRadius: sizes._20sdp,
               width: sizes._90sdp,
               height: sizes._54sdp,
@@ -106,11 +106,11 @@ export default class HomeScreen extends React.PureComponent<IHomeScreenProps, IH
           <View style={styles.container}>
 
             <View style={styles.rowCenter}>
-              <TextBase style={[AppStyle.txt_20_bold, { color: colors.primary_950, marginBottom: sizes._16sdp }]}>Phổ biến</TextBase>
+              <TextBase style={[AppStyle.txt_20_bold, {  marginBottom: sizes._16sdp }]}>Phổ biến</TextBase>
               <TouchableOpacity
                 onPress={() => this.handleSearch(true, LOCATION_POPULAR)}
               >
-                <TextBase style={[AppStyle.txt_18_regular, { color: colors.primary_950, marginBottom: sizes._16sdp,  }]}>Xem tất cả</TextBase>
+                <TextBase style={[AppStyle.txt_18_regular, { marginBottom: sizes._16sdp,  }]}>Xem tất cả</TextBase>
               </TouchableOpacity>
             </View>
 
@@ -123,12 +123,12 @@ export default class HomeScreen extends React.PureComponent<IHomeScreenProps, IH
             />
 
             <View style={[styles.rowCenter, { marginTop: sizes._32sdp }]}>
-              <TextBase style={[AppStyle.txt_20_bold, { color: colors.primary_950, marginBottom: sizes._16sdp }]}>Gần tôi</TextBase>
+              <TextBase style={[AppStyle.txt_20_bold, { marginBottom: sizes._16sdp }]}>Gần tôi</TextBase>
               <TouchableOpacity
                 onPress={() => this.handleSearch(true, LOCATION_NEARLY)}
 
               >
-                <TextBase style={[AppStyle.txt_18_regular, { color: colors.primary_950, marginBottom: sizes._16sdp,  }]}>Xem tất cả</TextBase>
+                <TextBase style={[AppStyle.txt_18_regular, { marginBottom: sizes._16sdp,  }]}>Xem tất cả</TextBase>
               </TouchableOpacity>
             </View>
 

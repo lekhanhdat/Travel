@@ -59,20 +59,14 @@ export default class LoginScreen extends React.PureComponent<ILoginScreenProps, 
   render(): React.ReactNode {
     return (
       <Page >
-        <View style={[styles.wrapper]}>
-          <Swiper
-            height={sizes._300sdp}
-            autoplay
-            activeDotColor={colors.primary}
-          >
+        <View style={[styles.wrapper]}>          
             {
               this.state.banners.map(banner => {
                 return <View style={{ flex: 1 }}>
-                  <Image source={banner} style={{ width: sizes.width, height: sizes._300sdp }} />
+                  <Image source={banner} style={{ width: sizes.width, height: sizes._350sdp, borderBottomLeftRadius: sizes._60sdp, borderBottomRightRadius: sizes._60sdp, alignSelf: 'center' }} />
                 </View>
               })
             }
-          </Swiper>
         </View>
         
         <View style={styles.container}>
@@ -114,7 +108,7 @@ export default class LoginScreen extends React.PureComponent<ILoginScreenProps, 
           />
 
         <View>
-          <Text style={{color: colors.primary_700, marginTop: sizes._10sdp, marginLeft: sizes._10sdp}}>
+          <Text style={{color: colors.primary, marginTop: sizes._10sdp, marginLeft: sizes._10sdp}}>
             Quên mật khẩu?
           </Text>
         </View>
@@ -131,7 +125,7 @@ export default class LoginScreen extends React.PureComponent<ILoginScreenProps, 
             }]}>Đăng nhập</Text>
           </TouchableOpacity>
 
-          <Text style={{color: colors.primary_700, marginTop: sizes._10sdp, textAlign: 'center'}}>
+          <Text style={{color: colors.primary, marginTop: sizes._10sdp, textAlign: 'center'}}>
             Chưa có tài khoản? {' '}
             <Text style={{fontWeight: 'bold'}}>
                 Đăng ký
@@ -163,7 +157,6 @@ const styles = StyleSheet.create({
   wrapper: {
     width: '100%',
     height: sizes._300sdp,
-    marginTop: sizes._50sdp,
-    marginBottom: sizes._50sdp,
+    marginBottom: sizes._90sdp,
   },
 })

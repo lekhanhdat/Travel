@@ -48,7 +48,7 @@ export default class LargeItemLocation extends React.PureComponent<
             }}
           />
           <View style={{ flex: 1 }}>
-            <TextBase numberOfLines={1} style={AppStyle.txt_16_medium}>
+            <TextBase numberOfLines={1} style={AppStyle.txt_16_bold}>
               {`${location.name}`}
             </TextBase>
             <TextBase
@@ -66,7 +66,7 @@ export default class LargeItemLocation extends React.PureComponent<
 const styles = StyleSheet.create({
   container: {
     padding: sizes._16sdp,
-    backgroundColor: colors.primary_400,
+    backgroundColor: colors.primary_600,
     marginBottom: sizes._16sdp,
     borderRadius: sizes._20sdp,
   },

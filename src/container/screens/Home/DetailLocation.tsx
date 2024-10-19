@@ -84,13 +84,13 @@ export default class DetailLocationScreen extends React.PureComponent<IDetailLoc
                 {location.name}
               </TextBase>
 
-              <TextBase style={[AppStyle.txt_16_regular, { marginTop: sizes._16sdp }]}>
+              <TextBase style={[AppStyle.txt_16_regular, { marginTop: sizes._12sdp }]}>
                 {location.description}
               </TextBase>
 
               <View style={{ width: sizes.width - sizes._32sdp, height: 3, backgroundColor: colors.primary, marginVertical: sizes._25sdp }} />
 
-              <TextBase style={[AppStyle.txt_16_bold, { marginBottom: sizes._16sdp }]}>
+              <TextBase style={[AppStyle.txt_20_bold, { marginBottom: sizes._20sdp }]}>
                 {'Nhận xét của du khách:'}
               </TextBase>
 

@@ -112,7 +112,7 @@ export default class NewFeedScreen extends React.PureComponent<
         </View>
 
         <BottomSheet
-          height={sizes._csreen_height * 0.7}
+          height={sizes._csreen_height * 0.75}
           ref={ref => {
             this.refSheet = ref;
           }}>
@@ -145,13 +145,13 @@ export default class NewFeedScreen extends React.PureComponent<
                 }}
               />
               <TextBase
-                style={[AppStyle.txt_18_bold, { marginLeft: sizes._16sdp }]}>
+                style={[AppStyle.txt_18_bold_review, { marginLeft: sizes._16sdp }]}>
                 {this.state.avt?.userName}
               </TextBase>
             </View>
 
-            <TextBase style={[AppStyle.txt_16_medium, {
-              marginLeft: sizes._16sdp, marginTop: sizes._24sdp
+            <TextBase style={[AppStyle.txt_16_medium_review, {
+              marginLeft: sizes._16sdp, marginTop: sizes._16sdp
             }]}>Đánh giá</TextBase>
             <View
               style={{
@@ -181,8 +181,8 @@ export default class NewFeedScreen extends React.PureComponent<
               })}
             </View>
 
-            <TextBase style={[AppStyle.txt_16_medium, {
-              marginLeft: sizes._16sdp, marginTop: sizes._24sdp
+            <TextBase style={[AppStyle.txt_16_medium_review, {
+              marginLeft: sizes._16sdp, marginTop: sizes._16sdp
             }]}>Nội dung</TextBase>
 
             <View style={{ paddingHorizontal: sizes._16sdp, paddingVertical: sizes._8sdp, }}>
@@ -204,8 +204,8 @@ export default class NewFeedScreen extends React.PureComponent<
               />
             </View>
 
-            <TextBase style={[AppStyle.txt_16_medium, {
-              marginLeft: sizes._16sdp, marginTop: sizes._24sdp, marginBottom: sizes._16sdp
+            <TextBase style={[AppStyle.txt_16_medium_review, {
+              marginLeft: sizes._16sdp, marginTop: sizes._16sdp, marginBottom: sizes._16sdp
             }]}>Địa điểm</TextBase>
 
             {
@@ -224,7 +224,7 @@ export default class NewFeedScreen extends React.PureComponent<
                 this.refSheetLocation?.open()
               }}
             >
-              <TextBase style={AppStyle.txt_16_medium}> {this.state.location ? 'Chọn lại địa điểm' : 'Chọn địa điểm'}</TextBase>
+              <TextBase style={AppStyle.txt_16_bold}> {this.state.location ? 'Chọn lại địa điểm' : 'Chọn địa điểm'}</TextBase>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -262,7 +262,7 @@ export default class NewFeedScreen extends React.PureComponent<
             >
               <TextBase
                 //@ts-ignore
-                style={[AppStyle.txt_16_medium, (this.state.content.length === 0 || !this.state.location) && { color: colors.primary_400 }]}>Đăng</TextBase>
+                style={[AppStyle.txt_16_bold, (this.state.content.length === 0 || !this.state.location) && { color: colors.primary_400 }]}>Đăng</TextBase>
             </TouchableOpacity>
           </View>
         </BottomSheet>

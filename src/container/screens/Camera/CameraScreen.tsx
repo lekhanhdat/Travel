@@ -1,6 +1,7 @@
 import React from 'react';
 import {Modal, Platform, Text, TouchableOpacity, View} from 'react-native';
 import RNFS from 'react-native-fs';
+import {launchImageLibrary} from 'react-native-image-picker';
 import {ActivityIndicator} from 'react-native-paper';
 import Toast from 'react-native-toast-message';
 import {Camera} from 'react-native-vision-camera';
@@ -13,7 +14,6 @@ import TextBase from '../../../common/TextBase';
 import Page from '../../../component/Page';
 import {SERVER_URL} from '../../../utils/configs';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import {launchImageLibrary} from 'react-native-image-picker';
 
 interface ICameraScreenProps {
   navigation: any;
@@ -334,9 +334,7 @@ export default class CameraScreen extends React.PureComponent<
             justifyContent: 'center',
             zIndex: 3,
           }}>
-          {/* <Icon name="insert-photo" color="white" /> */}
-          {/* TODO: replace into image picker icon */}
-          <Text style={{color: 'white'}}>Add image</Text>
+          <Icon name="insert-photo" color="white" size={24} />
         </TouchableOpacity>
 
         <TouchableOpacity

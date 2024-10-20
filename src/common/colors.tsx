@@ -3,7 +3,7 @@ const colors = {
   white: '#FFFFFF',
   transparent: 'transparent',
   xam: '#E6E4E6',
-
+  nen: '#111c10',
   primary_50: '#f1fcf5',
   primary_100: '#defaea',
   primary_200: '#bef4d4',

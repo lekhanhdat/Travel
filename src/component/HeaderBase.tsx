@@ -55,7 +55,7 @@ class HeaderBase extends React.PureComponent<Props, States> {
         <View style={styles.content}>
           <View style={styles.viewLeft}>
             {!hideLeftIcon &&
-              <TouchableOpacity onPress={onLeftIconPress} style={{ marginRight: sizes._16sdp }}>
+              <TouchableOpacity onPress={onLeftIconPress} style={{ marginRight: sizes._2sdp }}>
                 <View style={styles.viewPadding}>
                   {
                     leftIconImage ?

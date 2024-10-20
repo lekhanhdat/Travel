@@ -15,5 +15,6 @@ const colors = {
   primary_800: '#1a6139',
   primary_900: '#175031',
   primary_950: '#072c18',
+  background: '#f7f7f8',
 };
 export default colors;

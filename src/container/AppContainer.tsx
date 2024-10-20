@@ -91,7 +91,7 @@ function MyTabBar({
             <TextBase
               style={[
                 styles.title,
-                {color: isFocused ? colors.black : '#DDDDDD'},
+                {color: isFocused ? colors.black : colors.xam},
               ]}>
               {getSourceWithIndex(index, isFocused).name}
             </TextBase>
@@ -325,7 +325,7 @@ const styles = StyleSheet.create({
   },
   containerTab: {
     width: sizes.width,
-    height: sizes._49sdp,
+    height: sizes._64sdp,
     backgroundColor: colors.white,
     flexDirection: 'row',
     alignItems: 'center',

@@ -1,19 +1,19 @@
 import React from 'react';
-import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
-import { ILocation } from '../common/types';
+import {Image, StyleSheet, TouchableOpacity, View} from 'react-native';
+import {ILocation} from '../common/types';
 import sizes from '../common/sizes';
 import colors from '../common/colors';
-import { AppStyle } from '../common/AppStyle';
+import {AppStyle} from '../common/AppStyle';
 import TextBase from '../common/TextBase';
-import { ScreenName } from '../container/AppContainer';
+import {ScreenName} from '../container/AppContainer';
 import NavigationService from '../container/screens/NavigationService';
 
 interface ILargeItemLocationProps {
   location: ILocation;
-  onPress?: () => void
+  onPress?: () => void;
 }
 
-interface ILargeItemLocationState { }
+interface ILargeItemLocationState {}
 
 export default class LargeItemLocation extends React.PureComponent<
   ILargeItemLocationProps,
@@ -24,36 +24,42 @@ export default class LargeItemLocation extends React.PureComponent<
     this.state = {};
   }
   render(): React.ReactNode {
-    const { location } = this.props;
+    const {location} = this.props;
     return (
-      <TouchableOpacity style={styles.container}
+      <TouchableOpacity
+        style={styles.container}
         onPress={() => {
           if (this.props.onPress) {
             this.props.onPress();
             return;
           }
-          NavigationService.navigate(ScreenName.DETAIL_LOCATION_SCREEN, { location: location })
-        }}
-      >
+          NavigationService.navigate(ScreenName.DETAIL_LOCATION_SCREEN, {
+            location: location,
+          });
+        }}>
         <View style={styles.rowCenter}>
           <Image
-            source={{ uri: location.avatar }}
+            source={{uri: location.avatar}}
             style={{
-              width: sizes._80sdp,
-              height: sizes._80sdp,
+              height: sizes.width * 0.3,
+              width: sizes.width * 0.3,
               resizeMode: 'cover',
               marginRight: sizes._16sdp,
-
-              borderRadius: sizes._10sdp,
             }}
           />
-          <View style={{ flex: 1 }}>
-            <TextBase numberOfLines={1} style={AppStyle.txt_16_bold}>
+          <View
+            style={{
+              flex: 1,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'flex-start',
+            }}>
+            <TextBase style={AppStyle.txt_20_bold}>
               {`${location.name}`}
             </TextBase>
             <TextBase
               numberOfLines={3}
-              style={[AppStyle.txt_14_regular, { marginTop: sizes._8sdp }]}>
+              style={[AppStyle.txt_16_regular, {marginTop: sizes._8sdp}]}>
               {location.description}
             </TextBase>
           </View>
@@ -65,10 +71,11 @@ export default class LargeItemLocation extends React.PureComponent<
 
 const styles = StyleSheet.create({
   container: {
-    padding: sizes._16sdp,
-    backgroundColor: colors.primary_600,
+    backgroundColor: colors.primary_200,
+
     marginBottom: sizes._16sdp,
-    borderRadius: sizes._20sdp,
+    borderRadius: sizes._24sdp,
+    overflow: 'hidden',
   },
   rowCenter: {
     flexDirection: 'row',

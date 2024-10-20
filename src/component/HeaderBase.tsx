@@ -1,14 +1,18 @@
 import React from 'react';
-import { StyleSheet, View, TouchableOpacity, Image, Text, StatusBar, NativeModules } from 'react-native';
+import {
+  Image,
+  NativeModules,
+  StatusBar,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import {OptionsSvg} from '../assets/ImageSvg';
 import colors from '../common/colors';
 import fonts from '../common/fonts';
 import sizes from '../common/sizes';
 import TextBase from '../common/TextBase';
-import NavigationService from '../container/screens/NavigationService';
-import Moment from 'react-moment';
-import moment from 'moment';
-import { OptionsSvg } from '../assets/ImageSvg'
-const { StatusBarManager } = NativeModules;
+const {StatusBarManager} = NativeModules;
 
 interface Props {
   leftIconSvg?: any;
@@ -30,7 +34,7 @@ interface Props {
   onRightIconTwoPress?: () => void;
   onRightIconThreePress?: () => void;
 }
-interface States { }
+interface States {}
 class HeaderBase extends React.PureComponent<Props, States> {
   render() {
     const {
@@ -47,76 +51,88 @@ class HeaderBase extends React.PureComponent<Props, States> {
       onLeftIconPress,
       onRightIconOnePress,
       onRightIconThreePress,
-      onRightIconTwoPress
+      onRightIconTwoPress,
     } = this.props;
     return (
       <View style={styles.container}>
         <StatusBar translucent backgroundColor={colors.transparent} />
         <View style={styles.content}>
           <View style={styles.viewLeft}>
-            {!hideLeftIcon &&
-              <TouchableOpacity onPress={onLeftIconPress} style={{ marginRight: sizes._2sdp }}>
+            {!hideLeftIcon && (
+              <TouchableOpacity
+                onPress={onLeftIconPress}
+                style={{marginRight: sizes._2sdp}}>
                 <View style={styles.viewPadding}>
-                  {
-                    leftIconImage ?
-                      <Image source={leftIconImage} style={styles.icon} />
-                      :
-                      leftIconSvg ?? <OptionsSvg />
-                  }
+                  {leftIconImage ? (
+                    <Image source={leftIconImage} style={styles.icon} />
+                  ) : (
+                    leftIconSvg ?? <OptionsSvg />
+                  )}
                 </View>
               </TouchableOpacity>
-            }
-            {title &&
+            )}
+            {title && (
               //@ts-ignore
-              <TextBase style={[styles.title, hideLeftIcon && { }]}>{title}</TextBase>
-            }
+              <TextBase style={[styles.title, hideLeftIcon && {}]}>
+                {title}
+              </TextBase>
+            )}
           </View>
 
           <View style={styles.viewRight}>
             {/* icon phải 1 */}
-            {(rightIconImageOne || rightIconSvgOne) &&
-              <TouchableOpacity style={(rightIconImageTwo || rightIconSvgTwo) && { marginRight: sizes._16sdp }} onPress={onRightIconOnePress}>
-                <View style={styles.viewPadding}>
-                  {
-                    rightIconImageOne ?
-                      <Image source={rightIconImageOne} style={styles.icon} />
-                      :
-                      rightIconSvgOne
+            {(rightIconImageOne || rightIconSvgOne) && (
+              <TouchableOpacity
+                style={
+                  (rightIconImageTwo || rightIconSvgTwo) && {
+                    marginRight: sizes._16sdp,
                   }
+                }
+                onPress={onRightIconOnePress}>
+                <View style={styles.viewPadding}>
+                  {rightIconImageOne ? (
+                    <Image source={rightIconImageOne} style={styles.icon} />
+                  ) : (
+                    rightIconSvgOne
+                  )}
                 </View>
               </TouchableOpacity>
-            }
+            )}
 
             {/* icon phải 2 */}
-            {(rightIconImageTwo || rightIconSvgTwo) &&
-              <TouchableOpacity style={(rightIconImageThree || rightIconSvgThree) && { marginRight: sizes._16sdp }} onPress={onRightIconTwoPress}>
-                <View style={styles.viewPadding}>
-                  {
-                    rightIconImageTwo ?
-                      <Image source={rightIconImageTwo} style={styles.icon} />
-                      :
-                      rightIconSvgTwo
+            {(rightIconImageTwo || rightIconSvgTwo) && (
+              <TouchableOpacity
+                style={
+                  (rightIconImageThree || rightIconSvgThree) && {
+                    marginRight: sizes._16sdp,
                   }
+                }
+                onPress={onRightIconTwoPress}>
+                <View style={styles.viewPadding}>
+                  {rightIconImageTwo ? (
+                    <Image source={rightIconImageTwo} style={styles.icon} />
+                  ) : (
+                    rightIconSvgTwo
+                  )}
                 </View>
               </TouchableOpacity>
-            }
+            )}
 
             {/* icon phải 3 */}
-            {(rightIconImageThree || rightIconSvgThree) &&
+            {(rightIconImageThree || rightIconSvgThree) && (
               <TouchableOpacity onPress={onRightIconThreePress}>
                 <View style={styles.viewPadding}>
-                  {
-                    rightIconImageThree ?
-                      <Image source={rightIconImageThree} style={styles.icon} />
-                      :
-                      rightIconSvgThree
-                  }
+                  {rightIconImageThree ? (
+                    <Image source={rightIconImageThree} style={styles.icon} />
+                  ) : (
+                    rightIconSvgThree
+                  )}
                 </View>
               </TouchableOpacity>
-            }
+            )}
           </View>
         </View>
-      </View >
+      </View>
     );
   }
 }
@@ -126,7 +142,7 @@ const styles = StyleSheet.create({
   container: {
     width: sizes.width,
     height: sizes._60sdp + StatusBarManager.HEIGHT,
-    backgroundColor: '#3ca227',
+    backgroundColor: colors.primary,
     paddingTop: StatusBarManager.HEIGHT,
 
     shadowColor: '#000',
@@ -137,14 +153,14 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.36,
     shadowRadius: 6.68,
 
-    elevation: 11,    
+    elevation: 11,
   },
   content: {
     flex: 1,
     padding: sizes._8sdp,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
   },
   viewPadding: {
     padding: sizes._8sdp,
@@ -152,12 +168,12 @@ const styles = StyleSheet.create({
   icon: {
     width: sizes._24sdp,
     height: sizes._24sdp,
-    resizeMode: 'contain'
+    resizeMode: 'contain',
   },
   title: {
     fontSize: sizes._20sdp,
     fontFamily: fonts.NotoSansJP_Bold,
-    color: colors.white,
+    color: colors.black,
     lineHeight: sizes._30sdp,
   },
   viewLeft: {
@@ -166,6 +182,6 @@ const styles = StyleSheet.create({
   },
   viewRight: {
     flexDirection: 'row',
-    alignItems: 'center'
-  }
+    alignItems: 'center',
+  },
 });

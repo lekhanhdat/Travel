@@ -17,10 +17,13 @@ class App extends React.PureComponent<Props, States> {
       <RootSiblingParent>
         <PaperProvider
           theme={{
+            ...DefaultTheme,
             colors: {
+              ...DefaultTheme.colors,
               primary: colors.primary,
               background: colors.white,
-              placeholder: colors.primary,
+              // place
+              // placeholder: colors.primary,
 
               onSurfaceVariant: colors.primary,
             },

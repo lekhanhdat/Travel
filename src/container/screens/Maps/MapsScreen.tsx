@@ -22,6 +22,11 @@ import BottomSheet from '../../../component/BottomSheet';
 import {AppStyle} from '../../../common/AppStyle';
 import TextBase from '../../../common/TextBase';
 import images from '../../../res/images';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+import { Image } from 'react-native';
+
+
+
 
 interface IMapsScreenProps {
   navigation: any;
@@ -32,6 +37,8 @@ interface IMapsScreenState {
   currentLong: number;
   routeCoordinates: any[];
   visible: boolean;
+  selectedLocation: ILocation | null; // Thêm selectedLocation, mặc định là null
+  visibleSecondModal: boolean; // Quản lý trạng thái modal thứ hai
 }
 
 export default class MapsScreen extends React.PureComponent<
@@ -51,6 +58,8 @@ export default class MapsScreen extends React.PureComponent<
       currentLong: 0,
       routeCoordinates: [],
       visible: false,
+      selectedLocation: null, // Dữ liệu cho modal 2
+      visibleSecondModal: false, // Trạng thái để điều khiển modal thứ hai
     };
   }
 
@@ -215,6 +224,14 @@ export default class MapsScreen extends React.PureComponent<
     BackgroundGeolocation.stopWatchPosition();
   }
 
+
+  onMarkerPress = (location) => {
+    this.setState({
+      selectedLocation: location, // Lưu thông tin của Marker
+      visibleSecondModal: true, // Hiển thị modal thứ hai
+    });
+  };
+  
   onRegionChange = () => {};
 
   toRadian = (angle: any) => (Math.PI / 180) * angle;
@@ -295,6 +312,7 @@ export default class MapsScreen extends React.PureComponent<
                     description={location.description}
                     pinColor={colors.primary}
                     icon={location.icon}
+                    onPress={() => this.onMarkerPress(location)} // Khi nhấn vào marker, mở modal 2
                   />
                 );
               })}
@@ -377,6 +395,73 @@ export default class MapsScreen extends React.PureComponent<
             </View>
           </View>
         </Modal>
+
+        <Modal visible={this.state.visibleSecondModal} transparent>
+  <View
+    onStartShouldSetResponder={() => {
+      this.setState({ visibleSecondModal: false }); // Đóng modal thứ hai
+      return true;
+    }}
+    style={{
+      flex: 1,
+      backgroundColor: 'rgba(0,0,0,0.5)',
+      alignItems: 'center',
+      justifyContent: 'center',
+    }}>
+    <View
+      style={{
+        width: sizes.width - sizes._32sdp,
+        padding: sizes._16sdp,
+        backgroundColor: colors.white,
+        borderRadius: sizes._8sdp,
+      }}>
+      {this.state.selectedLocation && (
+        <>
+          <TextBase style={[AppStyle.txt_16_bold, { marginBottom: 10 }]}>
+            {this.state.selectedLocation.name}
+          </TextBase>
+          <TextBase style={[AppStyle.txt_16_bold, { marginBottom: 10 }]}>
+            {this.state.selectedLocation.description}
+          </TextBase>
+          <TextBase style={[AppStyle.txt_16_bold, { marginBottom: 10 }]}>
+              Địa chỉ: {this.state.selectedLocation.address}
+          </TextBase>       
+
+          <Image
+            source={{ uri: this.state.selectedLocation.avatar }} // Đường dẫn đến hình ảnh
+            style={{ width: '100%', height: 200, borderRadius: 8, marginBottom: 10 }} // Tùy chỉnh kích thước và kiểu dáng
+            resizeMode="cover" // Cách hiển thị hình ảnh
+          />  
+
+          {/* <Image
+            source={{ uri: images.chibi }} // Đường dẫn đến hình ảnh
+            style={{ width: '100%', height: 200, borderRadius: 8, marginBottom: 10 }} // Tùy chỉnh kích thước và kiểu dáng
+            resizeMode="cover" // Cách hiển thị hình ảnh
+          />   */}
+
+                    <TouchableOpacity
+            style={{
+              backgroundColor: colors.primary, // Màu nền của nút
+              padding: 10, // Padding bên trong nút
+              borderRadius: 8, // Bo góc nút
+              marginTop: 20, // Khoảng cách phía trên nút
+            }}
+            onPress={() => {
+              this.setState({ visibleSecondModal: false }); // Đóng modal
+              // this.props.navigation.navigate('DetailLocation', {
+              //   location: this.state.selectedLocation, // Truyền dữ liệu địa điểm sang trang DetailLocation
+              // });
+            }}>
+            <TextBase style={{ color: colors.white, textAlign: 'center' }}>
+              Xem chi tiết địa điểm
+            </TextBase>
+          </TouchableOpacity> 
+        </>
+      )}
+    </View>
+  </View>
+</Modal>
+
       </Page>
     );
   }

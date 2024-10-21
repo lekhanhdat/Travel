@@ -17,5 +17,6 @@
     tab_add_friends_focus: require('../assets/images/tab_add_friends_focus.png'),
     danang: require('../assets/images/danang.jpg'),
     search: require('../assets/images/search.png'),
+    chibi: require('../assets/images/chibi.png'),
  }
  export default images

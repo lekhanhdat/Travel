@@ -120,7 +120,7 @@ export default class CameraScreen extends React.PureComponent<
     // console.log(await res.json());
     // return;
 
-    const url = `${SERVER_URL}/ai/detect`;
+    const url = `${SERVER_URL}/detect`;
 
     try {
       const data = new FormData();

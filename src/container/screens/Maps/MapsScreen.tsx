@@ -1,5 +1,5 @@
 import React from 'react';
-import {Modal, View} from 'react-native';
+import {Modal, ScrollView, View} from 'react-native';
 import Page from '../../../component/Page';
 import HeaderBase from '../../../component/HeaderBase';
 import strings from '../../../res/strings';
@@ -24,6 +24,8 @@ import TextBase from '../../../common/TextBase';
 import images from '../../../res/images';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { Image } from 'react-native';
+import { ScreenName } from '../../AppContainer';
+
 
 
 
@@ -290,11 +292,12 @@ export default class MapsScreen extends React.PureComponent<
             <MapView
               provider={PROVIDER_GOOGLE}
               style={{flex: 1}}
+              mapType="satellite" // Chế độ vệ tinh
               initialRegion={{
                 latitude: this.state.currentLat,
                 longitude: this.state.currentLong,
-                latitudeDelta: 0.0922,
-                longitudeDelta: 0.0421,
+                latitudeDelta: 0.0090,
+                longitudeDelta: 0.0030,
               }}
               onRegionChange={this.onRegionChange}>
               {(locationProps?.length > 0
@@ -309,7 +312,7 @@ export default class MapsScreen extends React.PureComponent<
                       longitude: location.long,
                     }}
                     title={location.name}
-                    description={location.description}
+                    // description={location.description}
                     pinColor={colors.primary}
                     icon={location.icon}
                     onPress={() => this.onMarkerPress(location)} // Khi nhấn vào marker, mở modal 2
@@ -411,10 +414,13 @@ export default class MapsScreen extends React.PureComponent<
     <View
       style={{
         width: sizes.width - sizes._32sdp,
+        height: 400, // Đặt chiều cao cố định cho modal
         padding: sizes._16sdp,
         backgroundColor: colors.white,
-        borderRadius: sizes._8sdp,
+        borderRadius: sizes._16sdp,
       }}>
+
+      <ScrollView>
       {this.state.selectedLocation && (
         <>
           <TextBase style={[AppStyle.txt_16_bold, { marginBottom: 10 }]}>
@@ -433,13 +439,7 @@ export default class MapsScreen extends React.PureComponent<
             resizeMode="cover" // Cách hiển thị hình ảnh
           />  
 
-          {/* <Image
-            source={{ uri: images.chibi }} // Đường dẫn đến hình ảnh
-            style={{ width: '100%', height: 200, borderRadius: 8, marginBottom: 10 }} // Tùy chỉnh kích thước và kiểu dáng
-            resizeMode="cover" // Cách hiển thị hình ảnh
-          />   */}
-
-                    <TouchableOpacity
+          <TouchableOpacity
             style={{
               backgroundColor: colors.primary, // Màu nền của nút
               padding: 10, // Padding bên trong nút
@@ -447,17 +447,56 @@ export default class MapsScreen extends React.PureComponent<
               marginTop: 20, // Khoảng cách phía trên nút
             }}
             onPress={() => {
-              this.setState({ visibleSecondModal: false }); // Đóng modal
-              // this.props.navigation.navigate('DetailLocation', {
-              //   location: this.state.selectedLocation, // Truyền dữ liệu địa điểm sang trang DetailLocation
-              // });
+              // this.setState({ visibleSecondModal: false }); // Đóng modal
+              NavigationService.navigate(ScreenName.DETAIL_LOCATION_SCREEN, {
+                location: location,
+              });
             }}>
+            <View>
             <TextBase style={{ color: colors.white, textAlign: 'center' }}>
-              Xem chi tiết địa điểm
+              Xem thông tin chi tiết
             </TextBase>
+            </View>
           </TouchableOpacity> 
+
+          <TouchableOpacity 
+          style={{
+            backgroundColor: colors.primary, // Màu nền của nút
+            padding: 10, // Padding bên trong nút
+            borderRadius: 8, // Bo góc nút
+            marginTop: 12, // Khoảng cách phía trên nút
+          }}>
+            <TextBase style={{ color: colors.white, textAlign: 'center' }}>
+              Xem thêm hình ảnh
+            </TextBase>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+          style={{
+            backgroundColor: colors.primary, // Màu nền của nút
+            padding: 10, // Padding bên trong nút
+            borderRadius: 8, // Bo góc nút
+            marginTop: 12, // Khoảng cách phía trên nút
+          }}>
+            <TextBase style={{ color: colors.white, textAlign: 'center' }}>
+              Xem thêm video
+            </TextBase>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+          style={{
+            backgroundColor: colors.primary, // Màu nền của nút
+            padding: 10, // Padding bên trong nút
+            borderRadius: 8, // Bo góc nút
+            marginTop: 12, // Khoảng cách phía trên nút
+          }}>
+            <TextBase style={{ color: colors.white, textAlign: 'center' }}>
+              Xem địa điểm liên quan
+            </TextBase>
+          </TouchableOpacity>
         </>
       )}
+      </ScrollView>
     </View>
   </View>
 </Modal>

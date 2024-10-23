@@ -97,7 +97,18 @@ export default class HomeScreen extends React.PureComponent<
               color: colors.black,              
             },
           ]}>
-          Chúc bạn có những trải nghiệm thật tuyệt vời tại Đà Nẵng
+          Chúc bạn có những trải nghiệm tuyệt vời
+        </TextBase>
+        <TextBase
+          style={[
+            AppStyle.txt_20_bold,
+            {
+              marginLeft: sizes._16sdp,
+              marginBottom: sizes._8sdp,
+              color: colors.black,              
+            },
+          ]}>
+          tại Đà Nẵng
         </TextBase>
 
         <View
@@ -122,7 +133,7 @@ export default class HomeScreen extends React.PureComponent<
             onChangeText={txt => {
               this.setState({valueSearch: txt});
             }}
-            placeholder="Nhập tên địa điểm, địa chỉ..."
+            placeholder="Tìm kiếm địa điểm, địa chỉ, lễ hội..."
             style={{
               backgroundColor: colors.primary_200,
               color: colors.black,

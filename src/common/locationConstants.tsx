@@ -727,6 +727,113 @@ export const LOCATION_NEARLY: ILocation[] = [
   //   haveVoice: true,
   //   icon: images.icon_camera
   // },
+
+    {
+    id: 99,
+    name: 'Trung tâm văn hóa Quận Sơn Trà',
+    avatar: 'https://toquoc.mediacdn.vn/280518851207290880/2024/2/7/t13-17072924281061610153581.jpg',
+    address: '02 An Trung 2, An Hải, Sơn Trà, Đà Nẵng 550000, Việt Nam',
+    description: 'Nhà văn hóa quận Sơn Trà, Đà Nẵng, là một trung tâm văn hóa cộng đồng quan trọng, đóng vai trò cung cấp các hoạt động văn hóa, nghệ thuật và giải trí cho cư dân trong khu vực. Với mục tiêu phát triển đời sống tinh thần cho người dân, Nhà văn hóa quận Sơn Trà đóng góp quan trọng trong việc nâng cao nhận thức và gắn kết cộng đồng. Đây là nơi diễn ra các hoạt động giao lưu, sinh hoạt văn hóa lành mạnh, giúp cư dân địa phương có cơ hội tham gia vào các hoạt động mang tính giáo dục và giải trí.',
+    lat: 16.05619768599021,
+    long: 108.23339486724585,
+    reviews: [
+      {
+        id: 2,
+        content: 'Mình thích cái cách người dân nơi đây tiếp đón mình thật sự, họ tử tế và vui vẻ lắm.',
+        name_user_review: 'Trần Đình Quý',
+        time_review: '23/9/2024 8:32',
+        start: 5,
+        avatar: ' https://cdn.kona-blue.com/upload/kona-blue_com/post/images/2024/09/18/457/avatar-mac-dinh-1.jpg '
+      },
+      {
+        id: 4,
+        content: 'chắc chắn mình sẽ quay lại đây nhiều lần nữa, chất lượng thật sự rất tương xứng với giá tiền bỏ ra',
+        name_user_review: 'Ngô Bảo Khang',
+        time_review: '5/7/2024 16:02',
+        start: 5,
+        avatar: ' https://cellphones.com.vn/sforum/wp-content/uploads/2023/10/avatar-trang-34.jpg '
+      },
+      {
+        id: 6,
+        content: 'Quả thật là một thành phố hiện đại và đáng sống, cơ sở hạ tầng rất thuận lợi cho di chuyển, tham quan và du lịch',
+        name_user_review: 'Nguyễn Ngọc Mai Khanh',
+        time_review: ' 6/9/2024 7:30',
+        start: 5,
+        avatar: ' https://cdn-media.sforum.vn/storage/app/media/THANHAN/avatar-trang-100.jpg '
+      },
+      {
+        id: 8,
+        content: 'Tôi thật bất ngờ với các hoạt động du lịch tại đây, có rất nhiều hoạt động cho du khách như pháo hoa hay nhạc hội, tất cả đều rất tuyệt vời',
+        name_user_review: 'Ngô Châu Bảo Khanh',
+        time_review: ' 15/8/2024 17:02',
+        start: 5,
+        avatar: 'https://cdn-media.sforum.vn/storage/app/media/THANHAN/avatar-trang-96.jpg '
+      },
+      {
+        id: 10,
+        content: ' the atmosphere is insane!!',
+        name_user_review: ' David',
+        time_review: '23/9/2024 5:45',
+        start: 5,
+        avatar: 'https://vnn-imgs-a1.vgcloud.vn/image1.ictnews.vn/_Files/2020/03/20/trend-avatar-12.jpg '
+      },
+    ],
+    haveVoice: true,
+  },
+
+  {
+    id: 98,
+    name: 'Trường THPT chuyên Lê Quý Đôn',
+    avatar: 'https://docs.portal.danang.gov.vn/images/image/30142036.JPG',
+    address: '01 Vũ Văn Dũng, An Hải Tây, Sơn Trà, Đà Nẵng 550000, Việt Nam',
+    description: 'Nhà văn hóa quận Sơn Trà, Đà Nẵng, là một trung tâm văn hóa cộng đồng quan trọng, đóng vai trò cung cấp các hoạt động văn hóa, nghệ thuật và giải trí cho cư dân trong khu vực. Với mục tiêu phát triển đời sống tinh thần cho người dân, Nhà văn hóa quận Sơn Trà đóng góp quan trọng trong việc nâng cao nhận thức và gắn kết cộng đồng. Đây là nơi diễn ra các hoạt động giao lưu, sinh hoạt văn hóa lành mạnh, giúp cư dân địa phương có cơ hội tham gia vào các hoạt động mang tính giáo dục và giải trí.',
+    lat: 16.05732852824048,
+    long: 108.23345538952117,
+    reviews: [
+      {
+        id: 2,
+        content: 'Mình thích cái cách người dân nơi đây tiếp đón mình thật sự, họ tử tế và vui vẻ lắm.',
+        name_user_review: 'Trần Đình Quý',
+        time_review: '23/9/2024 8:32',
+        start: 5,
+        avatar: ' https://cdn.kona-blue.com/upload/kona-blue_com/post/images/2024/09/18/457/avatar-mac-dinh-1.jpg '
+      },
+      {
+        id: 4,
+        content: 'chắc chắn mình sẽ quay lại đây nhiều lần nữa, chất lượng thật sự rất tương xứng với giá tiền bỏ ra',
+        name_user_review: 'Ngô Bảo Khang',
+        time_review: '5/7/2024 16:02',
+        start: 5,
+        avatar: ' https://cellphones.com.vn/sforum/wp-content/uploads/2023/10/avatar-trang-34.jpg '
+      },
+      {
+        id: 6,
+        content: 'Quả thật là một thành phố hiện đại và đáng sống, cơ sở hạ tầng rất thuận lợi cho di chuyển, tham quan và du lịch',
+        name_user_review: 'Nguyễn Ngọc Mai Khanh',
+        time_review: ' 6/9/2024 7:30',
+        start: 5,
+        avatar: ' https://cdn-media.sforum.vn/storage/app/media/THANHAN/avatar-trang-100.jpg '
+      },
+      {
+        id: 8,
+        content: 'Tôi thật bất ngờ với các hoạt động du lịch tại đây, có rất nhiều hoạt động cho du khách như pháo hoa hay nhạc hội, tất cả đều rất tuyệt vời',
+        name_user_review: 'Ngô Châu Bảo Khanh',
+        time_review: ' 15/8/2024 17:02',
+        start: 5,
+        avatar: 'https://cdn-media.sforum.vn/storage/app/media/THANHAN/avatar-trang-96.jpg '
+      },
+      {
+        id: 10,
+        content: ' the atmosphere is insane!!',
+        name_user_review: ' David',
+        time_review: '23/9/2024 5:45',
+        start: 5,
+        avatar: 'https://vnn-imgs-a1.vgcloud.vn/image1.ictnews.vn/_Files/2020/03/20/trend-avatar-12.jpg '
+      },
+    ],
+    haveVoice: true,
+  },
+
   {
     id: 1,
     name: 'Bảo Tàng Điêu Khắc Chăm Đà Nẵng - Cổ Viện Chàm',

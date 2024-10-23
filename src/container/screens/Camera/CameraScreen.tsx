@@ -1,5 +1,5 @@
 import React from 'react';
-import {Modal, Platform, Text, TouchableOpacity, View} from 'react-native';
+import {Modal, Platform, ScrollView, Text, TouchableOpacity, View} from 'react-native';
 import RNFS from 'react-native-fs';
 import {launchImageLibrary} from 'react-native-image-picker';
 import {ActivityIndicator} from 'react-native-paper';
@@ -397,7 +397,7 @@ export default class CameraScreen extends React.PureComponent<
             />
           )}
         </TouchableOpacity>
-
+        
         <Modal visible={this.state.visible} transparent>
           <View
             onStartShouldSetResponder={() => {
@@ -416,11 +416,13 @@ export default class CameraScreen extends React.PureComponent<
               style={{
                 width: sizes.width - sizes._32sdp,
                 padding: sizes._16sdp,
+                height: 400, // Đặt chiều cao cố định cho modal
                 backgroundColor: colors.white,
-                borderRadius: sizes._8sdp,
+                borderRadius: sizes._16sdp,
                 alignItems: 'center',
                 justifyContent: 'center',
               }}>
+            <ScrollView>
               <TextBase
                 style={[
                   AppStyle.txt_20_bold,
@@ -432,6 +434,7 @@ export default class CameraScreen extends React.PureComponent<
                 style={[AppStyle.txt_16_regular, {textAlign: 'center'}]}>
                 {this.state.resultDescription}
               </TextBase>
+            </ScrollView>
             </View>
           </View>
         </Modal>

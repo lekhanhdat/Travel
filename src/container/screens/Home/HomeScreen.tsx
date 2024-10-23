@@ -81,7 +81,7 @@ export default class HomeScreen extends React.PureComponent<
           style={[
             AppStyle.txt_16_bold,
             {
-              marginTop: sizes._26sdp,
+              marginTop: sizes._36sdp,
               marginLeft: sizes._16sdp,
               color: colors.black,
             },
@@ -94,7 +94,7 @@ export default class HomeScreen extends React.PureComponent<
             {
               marginTop: sizes._6sdp,
               marginLeft: sizes._16sdp,
-              color: colors.black,
+              color: colors.black,              
             },
           ]}>
           Chúc bạn có những trải nghiệm thật tuyệt vời tại Đà Nẵng
@@ -107,6 +107,7 @@ export default class HomeScreen extends React.PureComponent<
             alignItems: 'center',
             justifyContent: 'space-between',
             marginVertical: sizes._16sdp,
+            marginHorizontal: sizes._16sdp,
             // width: sizes.width - sizes._32sdp,
             // marginBottom: sizes._22sdp,
             // marginLeft: sizes._16sdp,
@@ -188,7 +189,7 @@ export default class HomeScreen extends React.PureComponent<
           <View style={styles.container}>
             <View style={styles.rowCenter}>
               <TextBase
-                style={[AppStyle.txt_20_bold, {marginBottom: sizes._16sdp}]}>
+                style={[AppStyle.txt_20_bold, {marginBottom: sizes._12sdp}]}>
                 Phổ biến
               </TextBase>
               <TouchableOpacity

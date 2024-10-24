@@ -397,47 +397,73 @@ export default class CameraScreen extends React.PureComponent<
             />
           )}
         </TouchableOpacity>
-        
         <Modal visible={this.state.visible} transparent>
-          <View
-            onStartShouldSetResponder={() => {
-              this.setState({
-                visible: false,
-              });
-              return true;
-            }}
-            style={{
-              flex: 1,
-              backgroundColor: 'rgba(255,255,255,0.5)',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}>
-            <View
-              style={{
-                width: sizes.width - sizes._32sdp,
-                padding: sizes._16sdp,
-                height: 400, // Đặt chiều cao cố định cho modal
-                backgroundColor: colors.white,
-                borderRadius: sizes._16sdp,
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}>
-            <ScrollView>
-              <TextBase
-                style={[
-                  AppStyle.txt_20_bold,
-                  {textAlign: 'center', marginBottom: sizes._8sdp},
-                ]}>
-                {this.state.resultName}
-              </TextBase>
-              <TextBase
-                style={[AppStyle.txt_16_regular, {textAlign: 'center'}]}>
-                {this.state.resultDescription}
-              </TextBase>
-            </ScrollView>
-            </View>
-          </View>
-        </Modal>
+  <View
+    onStartShouldSetResponder={() => {
+      this.setState({
+        visible: false,
+      });
+      return true;
+    }}
+    style={{
+      flex: 1,
+      backgroundColor: 'rgba(255,255,255,0.5)',
+      alignItems: 'center',
+      justifyContent: 'center',
+    }}>
+    
+    {/* Modal 1 */}
+    <View
+      style={{
+        width: sizes.width - sizes._32sdp,
+        padding: sizes._16sdp,
+        maxHeight: 400, 
+        backgroundColor: colors.white,
+        borderRadius: sizes._16sdp,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginBottom: sizes._16sdp,  // Khoảng cách giữa Modal 1 và Modal 2
+      }}>
+      <ScrollView>
+        <TextBase
+          style={[
+            AppStyle.txt_20_bold,
+            { textAlign: 'center', marginBottom: sizes._8sdp },
+          ]}>
+          // Ảnh đã chụp
+        </TextBase>
+      </ScrollView>
+    </View>
+
+    {/* Modal 2 */}
+    <View
+      style={{
+        width: sizes.width - sizes._32sdp,
+        padding: sizes._16sdp,
+        maxHeight: 400, 
+        backgroundColor: colors.white,
+        borderRadius: sizes._16sdp,
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}>
+      <ScrollView>
+        <TextBase
+          style={[
+            AppStyle.txt_20_bold,
+            { textAlign: 'center', marginBottom: sizes._8sdp },
+          ]}>
+          {this.state.resultName}
+        </TextBase>
+        <TextBase
+          style={[AppStyle.txt_16_medium, { textAlign: 'justify' }]}>
+          {this.state.resultDescription}
+        </TextBase>
+      </ScrollView>
+    </View>
+
+  </View>
+</Modal>
+
       </Page>
     );
   }

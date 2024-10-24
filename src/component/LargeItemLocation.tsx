@@ -41,8 +41,8 @@ export default class LargeItemLocation extends React.PureComponent<
           <Image
             source={{uri: location.avatar}}
             style={{
-              height: sizes.width * 0.3,
-              width: sizes.width * 0.3,
+              height: sizes.width * 0.25,
+              width: sizes.width * 0.25,
               resizeMode: 'cover',
               marginRight: sizes._16sdp,
             }}
@@ -53,13 +53,17 @@ export default class LargeItemLocation extends React.PureComponent<
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'flex-start',
+              marginRight: sizes._16sdp,
             }}>
-            <TextBase style={AppStyle.txt_20_bold}>
+            <TextBase 
+                  numberOfLines={1} // Thay đổi thành 1 để nội dung không xuống dòng
+                  ellipsizeMode="tail" // Thêm thuộc tính này để hiển thị dấu '...'
+                  style={AppStyle.txt_18_bold}>
               {`${location.name}`}
             </TextBase>
             <TextBase
               numberOfLines={3}
-              style={[AppStyle.txt_16_regular, {marginTop: sizes._8sdp}]}>
+              style={[AppStyle.txt_14_regular, {marginTop: sizes._8sdp}]}>
               {location.description}
             </TextBase>
           </View>
@@ -71,11 +75,12 @@ export default class LargeItemLocation extends React.PureComponent<
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: colors.primary_200,
+    backgroundColor: '#CEE8E7',
 
     marginBottom: sizes._16sdp,
-    borderRadius: sizes._24sdp,
+    borderRadius: sizes._16sdp,
     overflow: 'hidden',
+    elevation: 5,
   },
   rowCenter: {
     flexDirection: 'row',

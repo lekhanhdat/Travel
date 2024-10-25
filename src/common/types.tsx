@@ -15,6 +15,10 @@ export interface ILocation {
   haveVoice?: boolean;
   reviews: IReview[];
   icon?: any;
+  voiceName?: string;
+  images?: string[];
+  videos?: string[];
+  relatedKeyWord?: string;
 }
 
 export interface IReview {

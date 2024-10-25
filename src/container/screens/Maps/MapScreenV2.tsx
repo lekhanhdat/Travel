@@ -65,8 +65,8 @@ const AnnotationContent = ({title}: {title: string}) => (
 );
 
 const MapScreenV2 = ({navigation}: {navigation: any}) => {
-  const [currentLat, setCurrentLat] = useState(16.058201585672407);
-  const [currentLong, setCurrentLong] = useState(108.23299452089593);
+  const [currentLat, setCurrentLat] = useState(16.057634336111732);
+  const [currentLong, setCurrentLong] = useState(108.23327483325855);
   const [routeCoordinates, setRouteCoordinates] = useState([]);
   const [visible, setVisible] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState<ILocation | null>(
@@ -79,7 +79,7 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
   >(null);
 
   useEffect(() => {
-    SoundPlayer.stop();
+    console.log('restart0-----------')
 
     const onFinishedPlayingSubscription = SoundPlayer.addEventListener(
       'FinishedPlaying',
@@ -99,9 +99,9 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
     const onFinishedLoadingFileSubscription = SoundPlayer.addEventListener(
       'FinishedLoadingFile',
       ({success, name, type}) => {
-        console.log('finished loading file', success, name, type);
+        console.log('finished loading file111111', success, name, type);
         SoundPlayer.play();
-        setVisible(true);
+        console.log('finished loading file2222', SoundPlayer.play(), name, type);
       },
     );
 
@@ -175,14 +175,14 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
     // }
 
     return () => {
-      onFinishedPlayingSubscription.remove();
-      onFinishedLoadingSubscription.remove();
-      onFinishedLoadingFileSubscription.remove();
+      // onFinishedPlayingSubscription.remove();
+      // onFinishedLoadingSubscription.remove();
+      // onFinishedLoadingFileSubscription.remove();
       // focusListener();
       // blurListener();
       // BackgroundGeolocation.stopWatchPosition();
     };
-  }, [navigation, isPlayingSuccess, locationShowWarning]);
+  }, []);
 
   // const fetchRoute = async () => {
   //   const locationProps: ILocation[] =
@@ -216,6 +216,10 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
 
   const onPressView = () => {
     if (selectedLocation) {
+      if(selectedLocation.voiceName) {
+        SoundPlayer.stop();
+        SoundPlayer.loadSoundFile(selectedLocation.voiceName, 'mp3')
+      }
       setVisibleSecondModal(true);
     }
   };
@@ -467,12 +471,11 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
                   <Button
                     mode="contained"
                     onPress={() => {
-                      // NavigationService.navigate(
-                      //   ScreenName.DETAIL_LOCATION_SCREEN,
-                      //   {
-                      //     location: selectedLocation,
-                      //   },
-                      // );
+                      NavigationService.navigate(ScreenName.VIEW_ALL_SCREEN, {
+                        title:'Tìm kiếm',
+                        locations: _.unionBy(LOCATION_POPULAR, LOCATION_NEARLY, 'id'),
+                        valueSearch: selectedLocation?.relatedKeyWord ?? '',
+                      });
                     }}>
                     Xem địa điểm liên quan
                   </Button>

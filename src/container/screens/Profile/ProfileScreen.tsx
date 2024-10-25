@@ -80,9 +80,19 @@ export default class ProfileScreen extends React.PureComponent<
               borderRadius: 100,
               alignSelf: 'center',
               marginTop: sizes._16sdp,
-              marginBottom: sizes._20sdp,
+              marginBottom: sizes._10sdp,
             }}
           />
+
+              <TextBase
+                style={[
+                  AppStyle.txt_18_bold_review,
+                  {alignSelf: 'center',},
+                  
+                  // {marginLeft: sizes._16sdp},
+                ]}>
+                {this.state.account?.userName}
+              </TextBase>
 
           <View
             style={{
@@ -96,9 +106,9 @@ export default class ProfileScreen extends React.PureComponent<
 
           <TextBase
             style={[
-              AppStyle.txt_16_bold,
+              AppStyle.txt_20_bold,
               {
-                marginTop: sizes._16sdp,
+                marginTop: sizes._12sdp,
                 fontSize: sizes._20sdp,
                 marginBottom: sizes._16sdp,
               },
@@ -111,7 +121,7 @@ export default class ProfileScreen extends React.PureComponent<
               alignItems: 'center',
               justifyContent: 'space-between',
             }}>
-            <TextBase style={AppStyle.txt_16_bold}>
+            <TextBase style={AppStyle.txt_18_bold}>
               {'Cuộc gọi khẩn cấp SOS'}
             </TextBase>
             <TouchableOpacity
@@ -139,7 +149,7 @@ export default class ProfileScreen extends React.PureComponent<
               justifyContent: 'space-between',
               marginTop: sizes._16sdp,
             }}>
-            <TextBase style={AppStyle.txt_16_bold}>
+            <TextBase style={AppStyle.txt_18_bold}>
               {'Thông tin tài khoản'}
             </TextBase>
             <TouchableOpacity
@@ -170,9 +180,9 @@ export default class ProfileScreen extends React.PureComponent<
 
           <TextBase
             style={[
-              AppStyle.txt_16_bold,
+              AppStyle.txt_20_bold,
               {
-                marginTop: sizes._16sdp,
+                marginTop: sizes._12sdp,
                 fontSize: sizes._20sdp,
                 marginBottom: sizes._16sdp,
               },
@@ -185,7 +195,7 @@ export default class ProfileScreen extends React.PureComponent<
               alignItems: 'center',
               justifyContent: 'space-between',
             }}>
-            <TextBase style={AppStyle.txt_16_bold}>{'Cài đặt'}</TextBase>
+            <TextBase style={AppStyle.txt_18_bold}>{'Cài đặt'}</TextBase>
             <TouchableOpacity
               style={{
                 width: sizes._56sdp,
@@ -210,7 +220,7 @@ export default class ProfileScreen extends React.PureComponent<
               justifyContent: 'space-between',
               marginTop: sizes._16sdp,
             }}>
-            <TextBase style={AppStyle.txt_16_bold}>
+            <TextBase style={AppStyle.txt_18_bold}>
               {'Các câu hỏi thường gặp'}
             </TextBase>
             <TouchableOpacity
@@ -237,7 +247,7 @@ export default class ProfileScreen extends React.PureComponent<
               justifyContent: 'space-between',
               marginTop: sizes._16sdp,
             }}>
-            <TextBase style={AppStyle.txt_16_bold}>
+            <TextBase style={AppStyle.txt_18_bold}>
               {'Chính sách & bảo mật'}
             </TextBase>
             <TouchableOpacity
@@ -260,8 +270,9 @@ export default class ProfileScreen extends React.PureComponent<
           <View style={{marginTop: sizes._26sdp}}>
             <Button
               mode="contained"
+              labelStyle={{ fontSize: 18, height: sizes._30sdp, textAlignVertical: 'center', color: '#B22222' }} // Tăng kích thước chữ
               onPress={() => {
-                NavigationService.reset(ScreenName.LOGIN_SCREEN);
+                NavigationService.reset(ScreenName.LOGIN_SCREEN);            
               }}>
               Đăng xuất
             </Button>

@@ -323,8 +323,8 @@ export default class NewFeedScreen extends React.PureComponent<
                     : colors.primary,
                 alignItems: 'center',
                 justifyContent: 'center',
-                height: sizes._40sdp,
-                borderRadius: sizes._8sdp,
+                height: sizes._50sdp,
+                borderRadius: sizes._16sdp,
               }}>
               <TextBase
                 //@ts-ignore

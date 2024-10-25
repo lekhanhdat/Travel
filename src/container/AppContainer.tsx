@@ -33,6 +33,10 @@ import ProfileScreen from './screens/Profile/ProfileScreen';
 import ViewAllLocation from './screens/Home/ViewAllLocation';
 import DetailLocationScreen from './screens/Home/DetailLocation';
 import PreviewImage from './screens/Camera/PreviewImage';
+import LocationImage from './screens/Home/LocationImage';
+import LocationVideo from './screens/Home/LocationVideo';
+
+
 export enum ScreenName {
   SPLASH_SCREEN = 'SplashScreen',
   HOME_STACK_SCREEN = 'HomeStack',
@@ -41,6 +45,8 @@ export enum ScreenName {
   DETAIL_LOCATION_SCREEN = 'DetailLocationScreen',
   PREVIEW_IMAGE_SCREEN = 'PreviewImage',
   MAP_SCREEN = 'MapsScreen',
+  LOCATION_IMAGE = 'LocationImage',
+  LOCATION_VIDEO = 'LocationVideo',
 }
 function MyTabBar({
   state,
@@ -291,6 +297,8 @@ const AppNavigator = createCompatNavigatorFactory(createStackNavigator)(
     DetailLocationScreen: {screen: DetailLocationScreen},
     PreviewImage: {screen: PreviewImage},
     MapsScreen: {screen: MapsScreen},
+    LocationImage: {screen: LocationImage},
+    LocationVideo: {screen: LocationVideo},
   },
   {
     headerMode: 'none',

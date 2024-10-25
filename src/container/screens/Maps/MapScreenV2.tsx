@@ -28,6 +28,7 @@ import {SPACE_WARNING} from '../../../common/constants';
 import haversineDistance from '../../../utils/haversineDistance';
 import decodePolyline from '../../../utils/decodePolyline';
 import {Button, Modal, Text} from 'react-native-paper';
+import images from '../../../res/images';
 
 MapboxGL.setAccessToken(
   'pk.eyJ1IjoiaG9hbmd0cnVuZzE4MDEiLCJhIjoiY20ybXVpbDJ3MHF6NzJqcHMyOWJnbzQ0OSJ9.eMymOvaYvLYhRhoMTLhPng',
@@ -369,7 +370,7 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
         <View
           style={{
             width: sizes.width - sizes._32sdp,
-            maxHeight: 400,
+            maxHeight: 300,
             // height: 400, // Fixed height for the modal
             padding: sizes._16sdp,
             backgroundColor: colors.white,
@@ -379,7 +380,7 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
           <ScrollView>
             {selectedLocation && (
               <>
-                <TextBase style={[AppStyle.txt_16_bold, {marginBottom: 10}]}>
+                <TextBase style={[AppStyle.txt_18_bold, {marginBottom: 10, alignSelf: 'center',}]}>
                   {selectedLocation.name}
                 </TextBase>
                 <TextBase style={[AppStyle.txt_16_bold, {marginBottom: 10}]}>
@@ -399,11 +400,30 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
                   resizeMode="cover" // Image display mode
                 />
 
-                <View
+                
+              </>
+            )}
+          </ScrollView>
+        </View>
+
+        <View
+    style={{
+      width: sizes.width - sizes._32sdp,
+      maxHeight: 400,
+      padding: sizes._16sdp,
+      backgroundColor: colors.white,
+      borderRadius: sizes._16sdp,
+      marginHorizontal: 'auto',
+      marginTop: sizes._16sdp,
+      flexDirection: 'row', // Thay đổi chiều hướng của View
+      alignItems: 'center',  // Căn giữa theo chiều dọc
+    }}>
+    <View
                   style={{
                     display: 'flex',
                     flexDirection: 'column',
                     gap: sizes._12sdp,
+                    flex: 1, // Để View này chiếm phần còn lại
                   }}>
                   <Button
                     mode="contained"
@@ -421,12 +441,12 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
                   <Button
                     mode="contained"
                     onPress={() => {
-                      // NavigationService.navigate(
-                      //   ScreenName.DETAIL_LOCATION_SCREEN,
-                      //   {
-                      //     location: selectedLocation,
-                      //   },
-                      // );
+                      NavigationService.navigate(
+                        ScreenName.LOCATION_IMAGE,
+                        {
+                          location: selectedLocation,
+                        },
+                      );
                     }}>
                     Xem thêm hình ảnh
                   </Button>
@@ -434,12 +454,12 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
                   <Button
                     mode="contained"
                     onPress={() => {
-                      // NavigationService.navigate(
-                      //   ScreenName.DETAIL_LOCATION_SCREEN,
-                      //   {
-                      //     location: selectedLocation,
-                      //   },
-                      // );
+                      NavigationService.navigate(
+                        ScreenName.LOCATION_VIDEO,
+                        {
+                          location: selectedLocation,
+                        },
+                      );
                     }}>
                     Xem thêm video
                   </Button>
@@ -457,10 +477,17 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
                     Xem địa điểm liên quan
                   </Button>
                 </View>
-              </>
-            )}
-          </ScrollView>
-        </View>
+
+                    {/* Hình ảnh ở bên phải của các button */}
+    <Image
+        source={{ uri: 'https://dangthang.vn/wp-content/uploads/2023/03/chibi-ao-dai-doan-01.png' }} // Thay đường dẫn bằng URL hoặc require('./path/to/image.png')
+        style={{
+          width: 100, // Đặt chiều rộng cho hình ảnh
+          height: 200, // Đặt chiều cao cho hình ảnh
+          marginLeft: sizes._16sdp, // Khoảng cách giữa button và hình ảnh
+        }}
+    />
+  </View>
       </Modal>
     </Page>
   );

@@ -91,8 +91,13 @@ export default class DetailLocationScreen extends React.PureComponent<
               </TextBase>
 
               <TextBase
-                style={[AppStyle.txt_16_regular, {marginTop: sizes._12sdp}]}>
+                style={[AppStyle.txt_16_medium, {marginTop: sizes._12sdp}]}>
                 {location.description}
+              </TextBase>
+
+              <TextBase 
+                style={[AppStyle.txt_16_medium, {marginTop: sizes._12sdp}]}>
+                Địa chỉ: {location.address}
               </TextBase>
 
               <View

@@ -6,13 +6,14 @@ buildscript {
         targetSdkVersion = 34
         ndkVersion = "26.1.10909125"
         kotlinVersion = "1.9.24"
-        googlePlayServicesLocationVersion = "21.0.1"  
+        googlePlayServicesLocationVersion = "21.0.1"
+        RNMapboxMapsImpl = "mapbox"
     }
     repositories {
         google()
         mavenCentral()
-      maven { url("${project(':react-native-background-geolocation').projectDir}/libs") }
-      maven { url("${project(':react-native-background-fetch').projectDir}/libs") }
+    //   maven { url("${project(':react-native-background-geolocation').projectDir}/libs") }
+    //   maven { url("${project(':react-native-background-fetch').projectDir}/libs") }
 
     }
     dependencies {
@@ -27,7 +28,20 @@ allprojects {
     repositories {
         google()
         mavenCentral()
-       maven { url("${project(':react-native-background-geolocation').projectDir}/libs") }
-      maven { url("${project(':react-native-background-fetch').projectDir}/libs") }
+        // maven { url("${project(':react-native-background-geolocation').projectDir}/libs") }
+        maven { url("${project(':react-native-background-fetch').projectDir}/libs") }
+        maven {
+            url 'https://api.mapbox.com/downloads/v2/releases/maven'
+            authentication {
+                basic(BasicAuthentication)
+            }
+            credentials {
+                // Do not change the username below.
+                // This should always be `mapbox` (not your username).
+                username = 'mapbox'
+                // Use the secret token you stored in gradle.properties as the password
+                password = project.properties['MAPBOX_DOWNLOADS_TOKEN'] ?: ""
+            }
+        }
     }
 }

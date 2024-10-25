@@ -27,7 +27,7 @@ import {
 import LoginScreen from './screens/Login/LoginScreen';
 import HomeScreen from './screens/Home/HomeScreen';
 import NewFeedScreen from './screens/NewFeed/NewFeedScreen';
-import MapsScreen from './screens/Maps/MapsScreen';
+import MapsScreen from './screens/Maps/MapScreenV2';
 import CameraScreen from './screens/Camera/CameraScreen';
 import ProfileScreen from './screens/Profile/ProfileScreen';
 import ViewAllLocation from './screens/Home/ViewAllLocation';

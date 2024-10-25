@@ -1,19 +1,18 @@
 import React from 'react';
-import {Modal, Platform, ScrollView, Text, TouchableOpacity, View} from 'react-native';
-import RNFS from 'react-native-fs';
+import {Platform, TouchableOpacity, View} from 'react-native';
 import {launchImageLibrary} from 'react-native-image-picker';
 import {ActivityIndicator} from 'react-native-paper';
 import Toast from 'react-native-toast-message';
 import {Camera} from 'react-native-vision-camera';
 import RNFetchBlob from 'rn-fetch-blob';
 import {CameraSvg, Lightning, LightningOff} from '../../../assets/ImageSvg';
-import {AppStyle} from '../../../common/AppStyle';
 import colors from '../../../common/colors';
 import sizes from '../../../common/sizes';
-import TextBase from '../../../common/TextBase';
 import Page from '../../../component/Page';
 import {SERVER_URL} from '../../../utils/configs';
+// @ts-ignore
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import CameraResultModal from '../../../component/CameraResultModal';
 
 interface ICameraScreenProps {
   navigation: any;
@@ -29,6 +28,7 @@ interface ICameraScreenState {
   visible: boolean;
   resultName: string;
   resultDescription: string;
+  resultPhotoPath: string;
   // content: {
   //   name: string;
   //   description: string;
@@ -54,6 +54,7 @@ export default class CameraScreen extends React.PureComponent<
       // content: {name: '', description: ''},
       resultName: '',
       resultDescription: '',
+      resultPhotoPath: '',
     };
   }
 
@@ -99,8 +100,12 @@ export default class CameraScreen extends React.PureComponent<
             return;
           }
 
-          const checking = await RNFS.exists(photo.path);
-          const path = photo.path.replace('file://', '');
+          // const checking = await RNFS.exists(photo.path);
+          // const path = photo.path.replace('file://', '');
+
+          this.setState({
+            resultPhotoPath: photo.path,
+          });
 
           await this.uploadImage(photo.path);
           // NavigationService.navigate(ScreenName.PREVIEW_IMAGE_SCREEN, {
@@ -397,73 +402,18 @@ export default class CameraScreen extends React.PureComponent<
             />
           )}
         </TouchableOpacity>
-        <Modal visible={this.state.visible} transparent>
-  <View
-    onStartShouldSetResponder={() => {
-      this.setState({
-        visible: false,
-      });
-      return true;
-    }}
-    style={{
-      flex: 1,
-      backgroundColor: 'rgba(255,255,255,0.5)',
-      alignItems: 'center',
-      justifyContent: 'center',
-    }}>
-    
-    {/* Modal 1 */}
-    <View
-      style={{
-        width: sizes.width - sizes._32sdp,
-        padding: sizes._16sdp,
-        maxHeight: 400, 
-        backgroundColor: colors.white,
-        borderRadius: sizes._16sdp,
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginBottom: sizes._16sdp,  // Khoảng cách giữa Modal 1 và Modal 2
-      }}>
-      <ScrollView>
-        <TextBase
-          style={[
-            AppStyle.txt_20_bold,
-            { textAlign: 'center', marginBottom: sizes._8sdp },
-          ]}>
-          // Ảnh đã chụp
-        </TextBase>
-      </ScrollView>
-    </View>
 
-    {/* Modal 2 */}
-    <View
-      style={{
-        width: sizes.width - sizes._32sdp,
-        padding: sizes._16sdp,
-        maxHeight: 400, 
-        backgroundColor: colors.white,
-        borderRadius: sizes._16sdp,
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}>
-      <ScrollView>
-        <TextBase
-          style={[
-            AppStyle.txt_20_bold,
-            { textAlign: 'center', marginBottom: sizes._8sdp },
-          ]}>
-          {this.state.resultName}
-        </TextBase>
-        <TextBase
-          style={[AppStyle.txt_16_medium, { textAlign: 'justify' }]}>
-          {this.state.resultDescription}
-        </TextBase>
-      </ScrollView>
-    </View>
-
-  </View>
-</Modal>
-
+        <CameraResultModal
+          visible={this.state.visible}
+          onClose={() => {
+            this.setState({
+              visible: false,
+            });
+          }}
+          resultName={this.state.resultName}
+          resultDescription={this.state.resultDescription}
+          resultPhotoPath={this.state.resultPhotoPath}
+        />
       </Page>
     );
   }

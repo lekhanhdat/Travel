@@ -65,8 +65,8 @@ const AnnotationContent = ({title}: {title: string}) => (
 );
 
 const MapScreenV2 = ({navigation}: {navigation: any}) => {
-  const [currentLat, setCurrentLat] = useState(16.0655567);
-  const [currentLong, setCurrentLong] = useState(108.2077633);
+  const [currentLat, setCurrentLat] = useState(16.058201585672407);
+  const [currentLong, setCurrentLong] = useState(108.23299452089593);
   const [routeCoordinates, setRouteCoordinates] = useState([]);
   const [visible, setVisible] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState<ILocation | null>(
@@ -252,7 +252,7 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
           onRegionDidChange={onRegionChange}>
           <MapboxGL.Camera
             centerCoordinate={[currentLong, currentLat]}
-            zoomLevel={14}
+            zoomLevel={17}
           />
 
           {(locationProps.length > 0

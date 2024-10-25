@@ -81,7 +81,7 @@ export default class DetailLocationScreen extends React.PureComponent<
               source={{uri: location.avatar}}
               style={{
                 width: sizes.width,
-                height: sizes._200sdp,
+                height: sizes._200sdp,    
               }}
             />
 
@@ -99,7 +99,8 @@ export default class DetailLocationScreen extends React.PureComponent<
                 style={{
                   width: sizes.width - sizes._32sdp,
                   height: 2,
-                  backgroundColor: colors.primary_200,
+                  elevation: 2,
+                  backgroundColor: colors.primary_700,
                   marginVertical: sizes._25sdp,
                 }}
               />

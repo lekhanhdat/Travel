@@ -23,7 +23,7 @@ import {
 import LargeItemLocation from '../../../component/LargeItemLocation';
 import NavigationService from '../NavigationService';
 import {ScreenName} from '../../AppContainer';
-import _ from 'lodash';
+import _, { size } from 'lodash';
 import images from '../../../res/images';
 import {Text} from 'react-native-paper';
 import {Image} from 'react-native-svg';
@@ -79,11 +79,11 @@ export default class HomeScreen extends React.PureComponent<
 
         <TextBase
           style={[
-            AppStyle.txt_16_bold,
+            AppStyle.txt_18_bold,
             {
               marginTop: sizes._36sdp,
               marginLeft: sizes._16sdp,
-              color: colors.black,
+              color: colors.black,              
             },
           ]}>
           Xin chào,
@@ -118,7 +118,11 @@ export default class HomeScreen extends React.PureComponent<
             alignItems: 'center',
             justifyContent: 'space-between',
             marginVertical: sizes._16sdp,
-            marginHorizontal: sizes._16sdp,
+            marginHorizontal: sizes._16sdp,       
+            backgroundColor: '#fff', // Nền trắng để đổ bóng hiển thị tốt hơn
+            borderRadius: 30, // Bo tròn các góc
+            // Đổ bóng trên Android
+            elevation: 7,  
             // width: sizes.width - sizes._32sdp,
             // marginBottom: sizes._22sdp,
             // marginLeft: sizes._16sdp,
@@ -135,7 +139,7 @@ export default class HomeScreen extends React.PureComponent<
             }}
             placeholder="Tìm kiếm địa điểm, địa chỉ, lễ hội..."
             style={{
-              backgroundColor: colors.primary_200,
+              backgroundColor: '#CEE8E7',
               color: colors.black,
               flex: 1,
             }}
@@ -200,15 +204,14 @@ export default class HomeScreen extends React.PureComponent<
           <View style={styles.container}>
             <View style={styles.rowCenter}>
               <TextBase
-                style={[AppStyle.txt_20_bold, {marginBottom: sizes._12sdp}]}>
+                style={[AppStyle.txt_20_bold,  ]}>
                 Phổ biến
               </TextBase>
               <TouchableOpacity
                 onPress={() => this.handleSearch(true, LOCATION_POPULAR)}>
                 <TextBase
                   style={[
-                    AppStyle.txt_18_regular,
-                    {marginBottom: sizes._16sdp},
+                    AppStyle.txt_18_regular,                    
                   ]}>
                   Xem tất cả
                 </TextBase>
@@ -226,7 +229,7 @@ export default class HomeScreen extends React.PureComponent<
               showsHorizontalScrollIndicator={false}
             />
 
-            <View style={[styles.rowCenter, {marginTop: sizes._32sdp}]}>
+            <View style={[styles.rowCenter, {marginTop: sizes._24sdp}]}>
               <TextBase
                 style={[AppStyle.txt_20_bold, {marginBottom: sizes._16sdp}]}>
                 Gần tôi
@@ -259,7 +262,7 @@ export default class HomeScreen extends React.PureComponent<
 
 const styles = StyleSheet.create({
   container: {
-    padding: sizes._16sdp,
+    padding: sizes._16sdp,    
   },
   rowCenter: {
     flexDirection: 'row',

@@ -107,7 +107,7 @@ export const AppStyle = StyleSheet.create({
   txt_16_medium_review: {
     fontSize: sizes._18sdp,
     lineHeight: sizes._20sdp,
-    fontFamily: fonts.NotoSansJP_Medium,
+    fontFamily: fonts.NotoSansJP_Bold,
     color: colors.black,
   },
 });

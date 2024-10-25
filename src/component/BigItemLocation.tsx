@@ -47,7 +47,7 @@ export default class BigItemLocation extends React.PureComponent<
           }}>
           <TextBase
             numberOfLines={1}
-            style={[AppStyle.txt_20_bold, {marginTop: sizes._10sdp}]}>
+            style={[AppStyle.txt_20_bold]}>
             {`${location.name}`}
           </TextBase>
           <TextBase
@@ -83,11 +83,16 @@ export default class BigItemLocation extends React.PureComponent<
 const styles = StyleSheet.create({
   container: {
     // padding: sizes._16sdp,
-    backgroundColor: colors.primary_200,
+    backgroundColor: '#CEE8E7',
     marginRight: sizes._16sdp,
-    borderRadius: sizes._24sdp,
+    borderRadius: sizes._16sdp,
     overflow: 'hidden',
     maxWidth: sizes.width * 0.8,
+    elevation: 7, // Tạo độ cao đổ bóng trên Android
+    shadowColor: '#000', // Màu của bóng
+    shadowOffset: { width: 2, height: 2 }, // Vị trí bóng (ngang, dọc)
+    shadowOpacity: 0.25, // Độ mờ của bóng
+    shadowRadius: 3.84, // Độ lớn của bóng
   },
   icon: {
     // width: sizes._210sdp,

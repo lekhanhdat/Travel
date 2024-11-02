@@ -23,10 +23,11 @@ import {
 import LargeItemLocation from '../../../component/LargeItemLocation';
 import NavigationService from '../NavigationService';
 import {ScreenName} from '../../AppContainer';
-import _, { size } from 'lodash';
+import _, {size} from 'lodash';
 import images from '../../../res/images';
 import {Text} from 'react-native-paper';
 import {Image} from 'react-native-svg';
+import locationApi from '../../../services/locations.api';
 
 interface IHomeScreenProps {
   navigation: any;
@@ -34,6 +35,9 @@ interface IHomeScreenProps {
 
 interface IHomeScreenState {
   valueSearch: string;
+  locations: ILocation[];
+  locationsPopular: ILocation[];
+  locationsNearly: ILocation[];
 }
 
 export default class HomeScreen extends React.PureComponent<
@@ -45,6 +49,9 @@ export default class HomeScreen extends React.PureComponent<
     super(props);
     this.state = {
       valueSearch: '',
+      locations: [],
+      locationsNearly: [],
+      locationsPopular: [],
     };
   }
 
@@ -52,6 +59,15 @@ export default class HomeScreen extends React.PureComponent<
     this.props.navigation.addListener('focus', () => {
       this.setState({
         valueSearch: '',
+      });
+    });
+
+    // fetch data by locationApi.getLocations()
+    locationApi.getLocations().then(data => {
+      this.setState({
+        locations: data,
+        locationsNearly: data.slice(10, 20),
+        locationsPopular: data.slice(0, 10),
       });
     });
   }
@@ -83,7 +99,7 @@ export default class HomeScreen extends React.PureComponent<
             {
               marginTop: sizes._36sdp,
               marginLeft: sizes._16sdp,
-              color: colors.black,              
+              color: colors.black,
             },
           ]}>
           Xin chào,
@@ -94,7 +110,7 @@ export default class HomeScreen extends React.PureComponent<
             {
               marginTop: sizes._6sdp,
               marginLeft: sizes._16sdp,
-              color: colors.black,              
+              color: colors.black,
             },
           ]}>
           Chúc bạn có những trải nghiệm tuyệt vời
@@ -105,7 +121,7 @@ export default class HomeScreen extends React.PureComponent<
             {
               marginLeft: sizes._16sdp,
               marginBottom: sizes._8sdp,
-              color: colors.black,              
+              color: colors.black,
             },
           ]}>
           tại Đà Nẵng
@@ -118,11 +134,11 @@ export default class HomeScreen extends React.PureComponent<
             alignItems: 'center',
             justifyContent: 'space-between',
             marginVertical: sizes._16sdp,
-            marginHorizontal: sizes._16sdp,       
+            marginHorizontal: sizes._16sdp,
             backgroundColor: '#fff', // Nền trắng để đổ bóng hiển thị tốt hơn
             borderRadius: 30, // Bo tròn các góc
             // Đổ bóng trên Android
-            elevation: 7,  
+            elevation: 7,
             // width: sizes.width - sizes._32sdp,
             // marginBottom: sizes._22sdp,
             // marginLeft: sizes._16sdp,
@@ -149,7 +165,8 @@ export default class HomeScreen extends React.PureComponent<
             onIconPress={() =>
               this.handleSearch(
                 false,
-                _.unionBy(LOCATION_POPULAR, LOCATION_NEARLY, 'id'),
+                this.state.locations,
+                // _.unionBy(LOCATION_POPULAR, LOCATION_NEARLY, 'id'),
               )
             }
           />
@@ -203,16 +220,12 @@ export default class HomeScreen extends React.PureComponent<
         <ScrollView>
           <View style={styles.container}>
             <View style={styles.rowCenter}>
-              <TextBase
-                style={[AppStyle.txt_20_bold,  ]}>
-                Phổ biến
-              </TextBase>
+              <TextBase style={[AppStyle.txt_20_bold]}>Phổ biến</TextBase>
               <TouchableOpacity
-                onPress={() => this.handleSearch(true, LOCATION_POPULAR)}>
-                <TextBase
-                  style={[
-                    AppStyle.txt_18_regular,                    
-                  ]}>
+                onPress={() =>
+                  this.handleSearch(true, this.state.locationsPopular)
+                }>
+                <TextBase style={[AppStyle.txt_18_regular]}>
                   Xem tất cả
                 </TextBase>
               </TouchableOpacity>
@@ -222,7 +235,7 @@ export default class HomeScreen extends React.PureComponent<
               contentContainerStyle={{
                 paddingVertical: sizes._16sdp,
               }}
-              data={LOCATION_POPULAR.slice(0, 5)}
+              data={this.state.locationsPopular}
               renderItem={this.renderItemHorizontal}
               keyExtractor={item => item.id.toString()}
               horizontal={true}
@@ -235,7 +248,9 @@ export default class HomeScreen extends React.PureComponent<
                 Gần tôi
               </TextBase>
               <TouchableOpacity
-                onPress={() => this.handleSearch(true, LOCATION_NEARLY)}>
+                onPress={() =>
+                  this.handleSearch(true, this.state.locationsNearly)
+                }>
                 <TextBase
                   style={[
                     AppStyle.txt_18_regular,
@@ -247,7 +262,7 @@ export default class HomeScreen extends React.PureComponent<
             </View>
 
             <FlatList
-              data={LOCATION_NEARLY.slice(0, 5)}
+              data={this.state.locationsNearly}
               renderItem={this.renderItemLarge}
               keyExtractor={item => item.id.toString()}
               showsHorizontalScrollIndicator={false}
@@ -262,7 +277,7 @@ export default class HomeScreen extends React.PureComponent<
 
 const styles = StyleSheet.create({
   container: {
-    padding: sizes._16sdp,    
+    padding: sizes._16sdp,
   },
   rowCenter: {
     flexDirection: 'row',

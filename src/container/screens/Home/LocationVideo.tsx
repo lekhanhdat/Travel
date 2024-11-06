@@ -17,7 +17,6 @@ interface States {}
 export default class LocationVideo extends React.PureComponent<Props, States> {
   render(): React.ReactNode {
     const location: ILocation = this.props.navigation.state.params?.location;
-
     return (
       <Page>
         <HeaderBase

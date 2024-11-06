@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Image,
   StyleSheet,
+  Linking,
 } from 'react-native';
 import MapboxGL from '@rnmapbox/maps';
 import Page from '../../../component/Page';
@@ -29,6 +30,7 @@ import haversineDistance from '../../../utils/haversineDistance';
 import decodePolyline from '../../../utils/decodePolyline';
 import {Button, Modal, Text} from 'react-native-paper';
 import images from '../../../res/images';
+
 
 MapboxGL.setAccessToken(
   'pk.eyJ1IjoiaG9hbmd0cnVuZzE4MDEiLCJhIjoiY20ybXVpbDJ3MHF6NzJqcHMyOWJnbzQ0OSJ9.eMymOvaYvLYhRhoMTLhPng',
@@ -72,6 +74,10 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
   const [selectedLocation, setSelectedLocation] = useState<ILocation | null>(
     null,
   );
+  const openGoogleForm = () => {
+    const url = 'https://docs.google.com/forms/d/e/1FAIpQLSeX1E_nGFHyvYNVoLiNFrf--wHvTqHlrlPiuR90aTsEM1ZVsw/viewform?vc=0&c=0&w=1&flr=0&usp=mail_form_link'; // Thay bằng link Google Form của bạn
+    Linking.openURL(url).catch(err => console.error("Couldn't load page", err));
+  };
   const [visibleSecondModal, setVisibleSecondModal] = useState(false);
   const [isPlayingSuccess, setIsPlayingSuccess] = useState(true);
   const [locationShowWarning, setLocationShowWarning] = useState<
@@ -433,13 +439,27 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
                     mode="contained"
                     onPress={() => {
                       NavigationService.navigate(
+                        ScreenName.ADVISE,
+                        {
+                          location: selectedLocation,
+                        },
+                      );
+                    }}>
+                    Quy tắc ứng xử văn minh
+                  </Button>
+
+
+                  <Button
+                    mode="contained"
+                    onPress={() => {
+                      NavigationService.navigate(
                         ScreenName.DETAIL_LOCATION_SCREEN,
                         {
                           location: selectedLocation,
                         },
                       );
                     }}>
-                    Xem thông tin chi tiết
+                    Thông tin chi tiết
                   </Button>
 
                   <Button
@@ -452,10 +472,10 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
                         },
                       );
                     }}>
-                    Xem thêm hình ảnh
+                    Hình ảnh & Video
                   </Button>
 
-                  <Button
+                  {/* <Button
                     mode="contained"
                     onPress={() => {
                       NavigationService.navigate(
@@ -466,7 +486,7 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
                       );
                     }}>
                     Xem thêm video
-                  </Button>
+                  </Button> */}
 
                   <Button
                     mode="contained"
@@ -477,16 +497,22 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
                         valueSearch: selectedLocation?.relatedKeyWord ?? '',
                       });
                     }}>
-                    Xem địa điểm liên quan
+                    Địa điểm liên quan
+                  </Button>
+
+                  <Button
+                    mode="contained"
+                    onPress={openGoogleForm}>
+                    Trắc nghiệm tìm hiểu
                   </Button>
                 </View>
 
                     {/* Hình ảnh ở bên phải của các button */}
     <Image
-        source={{ uri: 'https://dangthang.vn/wp-content/uploads/2023/03/chibi-ao-dai-doan-01.png' }} // Thay đường dẫn bằng URL hoặc require('./path/to/image.png')
+        source={{ uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ_pVBsB5wJh3VkQuxCioJDHpG8k_15dhaMGQ&s' }}
         style={{
           width: 100, // Đặt chiều rộng cho hình ảnh
-          height: 200, // Đặt chiều cao cho hình ảnh
+          height: 210, // Đặt chiều cao cho hình ảnh
           marginLeft: sizes._16sdp, // Khoảng cách giữa button và hình ảnh
         }}
     />

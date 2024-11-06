@@ -3,7 +3,8 @@ const strings = {
   new_feed: 'Bảng tin',
   map: 'Bản đồ',
   camera: 'Camera',
-  profile: 'Cá nhân'
+  profile: 'Cá nhân',
+  personal: 'Thông tin cá nhân',
 };
 
 export default strings;

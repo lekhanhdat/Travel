@@ -16,6 +16,7 @@ export interface ILocation {
   reviews: IReview[];
   icon?: any;
   voiceName?: string;
+  advise?: string[];
   images?: string[];
   videos?: string[];
   relatedKeyWord?: string;

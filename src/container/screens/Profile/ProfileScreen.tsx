@@ -67,9 +67,9 @@ export default class ProfileScreen extends React.PureComponent<
     const {account} = this.state;
     return (
       <Page>
-        {/* <HeaderBase hideLeftIcon /> */}
+        <HeaderBase hideLeftIcon title={strings.profile} />
         <View style={styles.container}>
-          <TextBase style={[AppStyle.txt_20_bold]}>Thông tin cá nhân</TextBase>
+          {/* <TextBase style={[AppStyle.txt_20_bold]}>Thông tin cá nhân</TextBase> */}
 
           <Image
             source={{uri: account?.avatar}}
@@ -79,7 +79,7 @@ export default class ProfileScreen extends React.PureComponent<
             style={{
               borderRadius: 100,
               alignSelf: 'center',
-              marginTop: sizes._16sdp,
+              // marginTop: sizes._16sdp,
               marginBottom: sizes._10sdp,
             }}
           />
@@ -161,10 +161,14 @@ export default class ProfileScreen extends React.PureComponent<
                 alignItems: 'center',
                 justifyContent: 'center',
               }}>
+                
               <UserSvg
                 width={sizes._20sdp}
                 height={sizes._20sdp}
                 color={colors.primary_950}
+                onPress={() => {
+                  NavigationService.reset(ScreenName.PERSONAL);            
+                }}
               />
             </TouchableOpacity>
           </View>

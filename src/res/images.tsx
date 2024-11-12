@@ -18,5 +18,7 @@
     danang: require('../assets/images/danang.jpg'),
     search: require('../assets/images/search.png'),
     chibi: require('../assets/images/chibi.png'),
+    dantoc: require('../assets/images/dantoc.png'),
+    nharong: require('../assets/images/nharong.jpg'),
  }
  export default images

@@ -1402,6 +1402,70 @@ export const LOCATION_NEARLY: ILocation[] = [
     ],
   },
   {
+    id: 50,
+    name: 'Trường THPT Hoàng Hoa Thám',
+    avatar: 'https://docs.portal.danang.gov.vn/images/image/30142036.JPG',
+    address: '01 Vũ Văn Dũng, An Hải Tây, Sơn Trà, Đà Nẵng 550000, Việt Nam',
+    description: 'Trường Trung học Phổ thông chuyên Lê Quý Đôn, thành phố Đà Nẵng là trường trung học phổ thông chuyên công lập tại Thành phố Đà Nẵng. Mang trong mình sứ mệnh phát hiện và kiến tạo những giá trị ưu việt, trường không ngừng được đầu tư, nâng cao về cơ sở vật chất và chất lượng giảng dạy. Trường THPT Chuyên Lê Quý Đôn Đà Nẵng tự hào là một ngôi trường cấp 3 hàng đầu thành phố với bề dày thành tích đồ sộ, là nơi nuôi dưỡng và trưởng thành của bao thế hệ học trò thành đạt.',
+    lat: 16.05732852824048,
+    long: 108.23345538952117,
+    reviews: [
+      {
+        id: 2,
+        content: 'Mình thích cái cách người dân nơi đây tiếp đón mình thật sự, họ tử tế và vui vẻ lắm.',
+        name_user_review: 'Trần Đình Quý',
+        time_review: '23/9/2024 8:32',
+        start: 5,
+        avatar: 'https://cdn.kona-blue.com/upload/kona-blue_com/post/images/2024/09/18/457/avatar-mac-dinh-1.jpg'
+      },
+      {
+        id: 4,
+        content: 'Các em học sinh tại đây rất giỏi, ngoan ngoãn, lễ phép!',
+        name_user_review: 'Ngô Bảo Khang',
+        time_review: '5/7/2024 16:02',
+        start: 5,
+        avatar: 'https://cellphones.com.vn/sforum/wp-content/uploads/2023/10/avatar-trang-34.jpg'
+      },
+      {
+        id: 6,
+        content: 'Quả thật là một trường chuyên của một thành phố hiện đại và đáng sống, cơ sở hạ tầng rất tuỵet vời, tham quan mang lại nhiều trải nghiệm',
+        name_user_review: 'Nguyễn Ngọc Mai Khanh',
+        time_review: ' 6/9/2024 7:30',
+        start: 5,
+        avatar: 'https://cdn-media.sforum.vn/storage/app/media/THANHAN/avatar-trang-100.jpg'
+      },
+      {
+        id: 8,
+        content: 'Tôi thật bất ngờ với các hoạt động tại đây, có rất nhiều hoạt động bổ ích cho học sinh, tất cả đều rất tuyệt vời',
+        name_user_review: 'Ngô Châu Bảo Khanh',
+        time_review: ' 15/8/2024 17:02',
+        start: 5,
+        avatar: 'https://cdn-media.sforum.vn/storage/app/media/THANHAN/avatar-trang-96.jpg '
+      },
+      {
+        id: 10,
+        content: 'The atmosphere is insane!!',
+        name_user_review: ' David',
+        time_review: '23/9/2024 5:45',
+        start: 5,
+        avatar: 'https://vnn-imgs-a1.vgcloud.vn/image1.ictnews.vn/_Files/2020/03/20/trend-avatar-12.jpg '
+      },
+    ],
+    haveVoice: true,
+    images: [
+      'https://docs.portal.danang.gov.vn/images/image/30142036.JPG',
+      'https://img.giaoduc.net.vn/w1000/Uploaded/2024/uivplwiv/2022_03_22/truong-thpt-chuyen-le-quy-don-da-nang-2496.jpeg',
+    ],
+    videos: ['VHpp2M7BFg4', 'JRPGdSOyN9w', 'fSjFibPXdw8'],
+    relatedKeyWord: 'Bao Tang',
+    voiceName: 'lequydon',
+    advise: [
+      'Tuân thủ các quy định của pháp luật; phù hợp với chuẩn mực đạo đức, thuần phong mỹ tục và truyền thống văn hóa của dân tộc.',
+      'Giữ gìn trật tự và không gây ồn ào',
+      'Có thái độ, hành vi cư xử văn minh, lịch sự, tôn trọng khi tiếp xúc với mọi người',
+    ],
+  },
+  {
     id: 97,
     name: 'Nhà trưng bày tác phẩm nghệ thuật quận Sơn Trà',
     avatar: 'https://docs.portal.danang.gov.vn/images/images/Nam%202024/Thang%2001/22-1%20NHA%20TRUNG%20BAY%20QUAN%20SON%20TRA.jpg',
@@ -1463,7 +1527,7 @@ export const LOCATION_NEARLY: ILocation[] = [
       'Nên mặc trang phục gọn gàng và lịch sự khi vào tham quan. cần giữ gìn vệ sinh khu vực tham quan, không xả rác bừa bãi.',
       'Hạn chế chạm vào các tác phẩm nghệ thuật trưng bày tránh hư hại tác phẩm hoặc gây ảnh hưởng đến trải nghiệm của người khác.',
       'Du khách nên giữ yên lặng và không gây ồn ào trong không gian trưng bày. Tự quản tư trang cá nhân',
-    ]
+    ] 
   },  
   {
     id: 32,

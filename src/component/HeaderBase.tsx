@@ -142,7 +142,8 @@ const styles = StyleSheet.create({
   container: {
     width: sizes.width,
     height: sizes._60sdp + StatusBarManager.HEIGHT,
-    backgroundColor: '#0A8791',
+    // backgroundColor: '#0A8791',
+    backgroundColor: colors.primary_600,
     paddingTop: StatusBarManager.HEIGHT,
 
     shadowColor: '#000',
@@ -172,7 +173,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: sizes._20sdp,
-    fontFamily: fonts.NotoSansJP_Bold,
+    fontFamily: fonts.GoogleSans_Bold,
     color: colors.black,
     lineHeight: sizes._30sdp,
   },

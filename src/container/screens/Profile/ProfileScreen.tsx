@@ -271,10 +271,10 @@ export default class ProfileScreen extends React.PureComponent<
             </TouchableOpacity>
           </View>
 
-          <View style={{marginTop: sizes._26sdp}}>
+          <View style={{marginTop: sizes._26sdp, marginHorizontal: sizes._26sdp,}}>
             <Button
               mode="contained"
-              labelStyle={{ fontSize: 18, height: sizes._30sdp, textAlignVertical: 'center', color: '#B22222' }} // Tăng kích thước chữ
+              labelStyle={{ fontSize: 16, height: sizes._30sdp, textAlignVertical: 'center', color: '#B22222', }} // Tăng kích thước chữ
               onPress={() => {
                 NavigationService.reset(ScreenName.LOGIN_SCREEN);            
               }}>

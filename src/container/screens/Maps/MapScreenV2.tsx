@@ -46,6 +46,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  customButton: {
+    backgroundColor: 'white',  // White background
+    borderColor: 'green',  // Green border
+    borderWidth: 3,  // Border width
+  },
   touchableText: {
     color: 'white',
     fontWeight: 'bold',
@@ -78,6 +83,7 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
     const url = 'https://docs.google.com/forms/d/e/1FAIpQLSeX1E_nGFHyvYNVoLiNFrf--wHvTqHlrlPiuR90aTsEM1ZVsw/viewform?vc=0&c=0&w=1&flr=0&usp=mail_form_link'; // Thay bằng link Google Form của bạn
     Linking.openURL(url).catch(err => console.error("Couldn't load page", err));
   };
+  
   const [visibleSecondModal, setVisibleSecondModal] = useState(false);
   const [isPlayingSuccess, setIsPlayingSuccess] = useState(true);
   const [locationShowWarning, setLocationShowWarning] = useState<
@@ -393,10 +399,10 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
                 <TextBase style={[AppStyle.txt_18_bold, {marginBottom: 10, alignSelf: 'center',}]}>
                   {selectedLocation.name}
                 </TextBase>
-                <TextBase style={[AppStyle.txt_16_bold, {marginBottom: 10}]}>
+                <TextBase style={[AppStyle.txt_16_medium, {marginBottom: 10, textAlign: 'justify'}]}>
                   {selectedLocation.description}
                 </TextBase>
-                <TextBase style={[AppStyle.txt_16_bold, {marginBottom: 10}]}>
+                <TextBase style={[AppStyle.txt_16_medium, {marginBottom: 10, textAlign: 'justify'}]}>
                   Địa chỉ: {selectedLocation.address}
                 </TextBase>
                 <Image
@@ -420,11 +426,12 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
     style={{
       width: sizes.width - sizes._32sdp,
       maxHeight: 400,
-      padding: sizes._16sdp,
-      backgroundColor: colors.white,
+      paddingHorizontal: sizes._20sdp,
+      padding: sizes._8sdp,
+      backgroundColor: 'rgba(255, 255, 255, 0.0)', // Nền trong suốt
       borderRadius: sizes._16sdp,
       marginHorizontal: 'auto',
-      marginTop: sizes._16sdp,
+      marginTop: sizes._8sdp,
       flexDirection: 'row', // Thay đổi chiều hướng của View
       alignItems: 'center',  // Căn giữa theo chiều dọc
     }}>
@@ -436,7 +443,7 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
                     flex: 1, // Để View này chiếm phần còn lại
                   }}>
                   <Button
-                    mode="contained"
+                    mode="outlined"
                     onPress={() => {
                       NavigationService.navigate(
                         ScreenName.ADVISE,
@@ -444,13 +451,14 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
                           location: selectedLocation,
                         },
                       );
-                    }}>
+                    }}
+                    style={styles.customButton}>
                     Quy tắc ứng xử văn minh
                   </Button>
 
 
                   <Button
-                    mode="contained"
+                    mode="outlined"
                     onPress={() => {
                       NavigationService.navigate(
                         ScreenName.DETAIL_LOCATION_SCREEN,
@@ -458,12 +466,13 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
                           location: selectedLocation,
                         },
                       );
-                    }}>
+                    }}
+                    style={styles.customButton}>
                     Thông tin chi tiết
-                  </Button>
+                  </Button>                  
 
                   <Button
-                    mode="contained"
+                    mode="outlined"
                     onPress={() => {
                       NavigationService.navigate(
                         ScreenName.LOCATION_IMAGE,
@@ -471,7 +480,8 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
                           location: selectedLocation,
                         },
                       );
-                    }}>
+                    }}
+                    style={styles.customButton}>
                     Hình ảnh & Video
                   </Button>
 
@@ -489,30 +499,32 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
                   </Button> */}
 
                   <Button
-                    mode="contained"
+                    mode="outlined"
                     onPress={() => {
                       NavigationService.navigate(ScreenName.VIEW_ALL_SCREEN, {
                         title:'Tìm kiếm',
                         locations: _.unionBy(LOCATION_POPULAR, LOCATION_NEARLY, 'id'),
                         valueSearch: selectedLocation?.relatedKeyWord ?? '',
                       });
-                    }}>
+                    }}
+                    style={styles.customButton}>
                     Địa điểm liên quan
                   </Button>
 
                   <Button
-                    mode="contained"
-                    onPress={openGoogleForm}>
+                    mode="outlined"
+                    onPress={openGoogleForm}
+                    style={styles.customButton}>
                     Trắc nghiệm tìm hiểu
                   </Button>
                 </View>
 
                     {/* Hình ảnh ở bên phải của các button */}
     <Image
-        source={{ uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ_pVBsB5wJh3VkQuxCioJDHpG8k_15dhaMGQ&s' }}
+        source={images.dantoc}
         style={{
           width: 100, // Đặt chiều rộng cho hình ảnh
-          height: 210, // Đặt chiều cao cho hình ảnh
+          height: 270, // Đặt chiều cao cho hình ảnh
           marginLeft: sizes._16sdp, // Khoảng cách giữa button và hình ảnh
         }}
     />

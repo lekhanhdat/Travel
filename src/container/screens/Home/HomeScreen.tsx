@@ -28,6 +28,7 @@ import images from '../../../res/images';
 import {Text} from 'react-native-paper';
 import {Image} from 'react-native-svg';
 import locationApi from '../../../services/locations.api';
+import fonts from '../../../common/fonts';
 
 interface IHomeScreenProps {
   navigation: any;
@@ -153,7 +154,7 @@ export default class HomeScreen extends React.PureComponent<
             onChangeText={txt => {
               this.setState({valueSearch: txt});
             }}
-            placeholder="Tìm kiếm địa điểm, địa chỉ, lễ hội..."
+            placeholder="Tìm kiếm địa điểm, địa chỉ,..."
             style={{
               backgroundColor: '#CEE8E7',
               color: colors.black,
@@ -161,7 +162,8 @@ export default class HomeScreen extends React.PureComponent<
             }}
             inputStyle={{
               color: colors.black,
-            }}
+              fontFamily: 'GoogleSans_Regular',
+            }}            
             onIconPress={() =>
               this.handleSearch(
                 false,

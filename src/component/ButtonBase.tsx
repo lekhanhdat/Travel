@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: sizes._20sdp,
-    fontFamily: fonts.NotoSansJP_Bold,
+    fontFamily: fonts.GoogleSans_Bold,
     lineHeight: sizes._48sdp,
     textAlign: 'center',
   },

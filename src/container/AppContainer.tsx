@@ -330,7 +330,7 @@ const styles = StyleSheet.create({
   },
   txtLabel: {
     fontSize: sizes._12sdp,
-    fontFamily: fonts.NotoSansJP_Regular,
+    fontFamily: fonts.GoogleSans_Regular,
   },
   containerTouch: {
     width: sizes.width / 5,
@@ -364,7 +364,7 @@ const styles = StyleSheet.create({
   title: {
     textAlign: 'center',
     fontSize: sizes._14sdp,
-    fontFamily: fonts.NotoSansJP_Regular,
+    fontFamily: fonts.GoogleSans_Regular,
     marginTop: sizes._4sdp,
   },
 });

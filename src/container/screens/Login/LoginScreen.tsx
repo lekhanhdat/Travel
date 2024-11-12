@@ -36,7 +36,7 @@ export default class LoginScreen extends React.PureComponent<ILoginScreenProps, 
         // images.caurong,
         // images.causonghan,
         // images.vooc,
-        images.danang,
+        images.nharong,
       ]
     }
   }
@@ -63,11 +63,24 @@ export default class LoginScreen extends React.PureComponent<ILoginScreenProps, 
             {
               this.state.banners.map(banner => {
                 return <View style={{ flex: 1 }}>
-                  <Image source={banner} style={{ width: sizes.width, height: sizes._350sdp, borderBottomLeftRadius: sizes._60sdp, borderBottomRightRadius: sizes._60sdp, alignSelf: 'center' }} />
+                  <Image source={banner} style={{ width: sizes.width, height: sizes._400sdp, borderBottomLeftRadius: sizes._50sdp, borderBottomRightRadius: sizes._50sdp, alignSelf: 'center' }} />
                 </View>
               })
             }
         </View>
+
+        <View style={{ alignItems: 'center'}}>
+          <Text
+            style={{
+              color: colors.primary,
+              fontSize: sizes._25sdp,
+              fontWeight: 'bold', // In đậm
+              textAlign: 'center', // Căn giữa văn bản
+            }}>
+            Đăng nhập
+          </Text>
+        </View>
+
         
         <View style={styles.container}>
 
@@ -156,7 +169,7 @@ const styles = StyleSheet.create({
   },
   wrapper: {
     width: '100%',
-    height: sizes._300sdp,
+    height: sizes._320sdp,
     marginBottom: sizes._90sdp,
   },
 })

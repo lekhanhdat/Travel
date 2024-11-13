@@ -15,6 +15,7 @@
     "link": "react-native link"
   },
   "dependencies": {
+    "@faker-js/faker": "^9.2.0",
     "@react-native-async-storage/async-storage": "^1.23.1",
     "@react-native/gradle-plugin": "^0.75.3",
     "@react-navigation/bottom-tabs": "^6.5.20",

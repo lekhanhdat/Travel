@@ -144,6 +144,7 @@ const styles = StyleSheet.create({
     height: sizes._60sdp + StatusBarManager.HEIGHT,
     // backgroundColor: '#0A8791',
     backgroundColor: colors.primary_600,
+    // backgroundColor: colors.white,
     paddingTop: StatusBarManager.HEIGHT,
 
     shadowColor: '#000',

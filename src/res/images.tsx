@@ -20,5 +20,8 @@
     chibi: require('../assets/images/chibi.png'),
     dantoc: require('../assets/images/dantoc.png'),
     nharong: require('../assets/images/nharong.jpg'),
+    cauvang: require('../assets/images/cauvang.jpg'),
+    dienhai: require('../assets/images/dienhai.jpeg'),
+    nguhanhson: require('../assets/images/nguhanhson.png'),
  }
  export default images

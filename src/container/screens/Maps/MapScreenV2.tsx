@@ -53,6 +53,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontWeight: 'bold',  // Làm đậm chữ
+    color: '#F97350',
   },
   touchableText: {
     color: 'white',
@@ -401,7 +402,7 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
           <ScrollView>
             {selectedLocation && (
               <>
-                <TextBase style={[AppStyle.txt_18_bold, {marginBottom: 10, textAlign: 'center', alignSelf: 'center',}]}>
+                <TextBase style={[AppStyle.txt_18_bold, {marginBottom: 10, textAlign: 'center', alignSelf: 'center', color: '#F97350'}]}>
                   {selectedLocation.name}
                 </TextBase>
                 <TextBase style={[AppStyle.txt_16_medium, {marginBottom: 10, textAlign: 'justify'}]}>

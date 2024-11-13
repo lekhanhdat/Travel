@@ -33,9 +33,9 @@ export default class LoginScreen extends React.PureComponent<ILoginScreenProps, 
       userName: '',
       password: '',
       banners: [
-        // images.caurong,
-        // images.causonghan,
-        // images.vooc,
+        images.caurong,
+        images.cauvang,
+        images.dienhai,
         images.nharong,
       ]
     }
@@ -59,7 +59,12 @@ export default class LoginScreen extends React.PureComponent<ILoginScreenProps, 
   render(): React.ReactNode {
     return (
       <Page >
-        <View style={[styles.wrapper]}>          
+        <View style={[styles.wrapper]}>  
+        <Swiper
+            height={sizes._400sdp}
+            autoplay
+            activeDotColor={colors.primary}
+          >        
             {
               this.state.banners.map(banner => {
                 return <View style={{ flex: 1 }}>
@@ -67,12 +72,14 @@ export default class LoginScreen extends React.PureComponent<ILoginScreenProps, 
                 </View>
               })
             }
+          </Swiper>
         </View>
 
         <View style={{ alignItems: 'center'}}>
           <Text
             style={{
-              color: colors.primary,
+              // color: colors.primary,
+              color: '#F97350',
               fontSize: sizes._25sdp,
               fontWeight: 'bold', // In đậm
               textAlign: 'center', // Căn giữa văn bản
@@ -88,10 +95,10 @@ export default class LoginScreen extends React.PureComponent<ILoginScreenProps, 
             mode="outlined"
             label="Tên đăng nhập"
             placeholder="Nhập tên đăng nhập"
-            style={{ width: '100%', marginBottom: sizes._16sdp, backgroundColor: '#E6E4E6' }}
+            style={{ width: '100%', marginBottom: sizes._16sdp, backgroundColor: '#F7F2E5' }}
             outlineStyle={{ borderColor: colors.primary, borderRadius: sizes._16sdp }}
             textColor={colors.primary_950}
-            placeholderTextColor={colors.primary_950}
+            placeholderTextColor={'#F97350'}
             onChangeText={(txt) => {
               this.setState({
                 userName: txt
@@ -103,10 +110,10 @@ export default class LoginScreen extends React.PureComponent<ILoginScreenProps, 
             mode="outlined"
             label="Mật khẩu"
             placeholder="Nhập mật khẩu"
-            style={{ width: '100%', backgroundColor: '#E6E4E6' }}
+            style={{ width: '100%', backgroundColor: '#F7F2E5' }}
             outlineStyle={{ borderColor: colors.primary, borderRadius: sizes._16sdp }}
             textColor={colors.primary_950}
-            placeholderTextColor={colors.primary_950}
+            placeholderTextColor={'#F97350'}
             right={<TextInput.Icon icon={this.state.isSecureTextEntry ? images.eye_open : images.eye_close} onPress={() => {
               this.setState({
                 isSecureTextEntry: !this.state.isSecureTextEntry
@@ -134,7 +141,7 @@ export default class LoginScreen extends React.PureComponent<ILoginScreenProps, 
           >
             <Text style={[AppStyle.txt_20_bold, {
               color: (this.state.userName.length === 0 || this.state.password.length === 0) ?
-                colors.primary_400 : colors.white
+                colors.primary_400 : '#F7F2E5'
             }]}>Đăng nhập</Text>
           </TouchableOpacity>
 
@@ -163,6 +170,7 @@ const styles = StyleSheet.create({
     paddingVertical: sizes._16sdp,
     borderRadius: sizes._16sdp,
     backgroundColor: colors.primary,
+    // backgroundColor: '#FAD06C',
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: sizes._40sdp
@@ -170,6 +178,9 @@ const styles = StyleSheet.create({
   wrapper: {
     width: '100%',
     height: sizes._320sdp,
-    marginBottom: sizes._90sdp,
+    marginBottom: sizes._30sdp,
+    borderBottomLeftRadius: sizes._50sdp,
+    borderBottomRightRadius: sizes._50sdp,
+    overflow: 'hidden',  // Clips content to the rounded corners
   },
 })

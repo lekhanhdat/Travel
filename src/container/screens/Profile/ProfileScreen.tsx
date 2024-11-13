@@ -42,7 +42,7 @@ export default class ProfileScreen extends React.PureComponent<
     };
   }
 
-  phoneNumber = 'tel:0905447085'; // Số điện thoại cần gọi
+  phoneNumber = 'tel:0795569611'; // Số điện thoại cần gọi
 
   handleOpenCall = () => {
     Linking.openURL(this.phoneNumber).catch(err =>
@@ -122,7 +122,7 @@ export default class ProfileScreen extends React.PureComponent<
               justifyContent: 'space-between',
             }}>
             <TextBase style={AppStyle.txt_18_bold}>
-              {'Cuộc gọi khẩn cấp SOS'}
+              {'Gọi hỗ trợ / khẩn cấp SOS'}
             </TextBase>
             <TouchableOpacity
               style={{

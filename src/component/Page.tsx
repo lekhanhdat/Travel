@@ -46,6 +46,7 @@ const styles = StyleSheet.create({
     flex: 1,
     // paddingHorizontal: sizes._24sdp,
     backgroundColor: colors.background,
+    // backgroundColor: '#F97350',
   },
 });
 export default withNavigation(Page);

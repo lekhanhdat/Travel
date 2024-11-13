@@ -142,9 +142,8 @@ const styles = StyleSheet.create({
   container: {
     width: sizes.width,
     height: sizes._60sdp + StatusBarManager.HEIGHT,
-    // backgroundColor: '#0A8791',
-    backgroundColor: colors.primary_600,
-    // backgroundColor: colors.white,
+    backgroundColor: '#F97350',
+    // backgroundColor: colors.primary_600,
     paddingTop: StatusBarManager.HEIGHT,
 
     shadowColor: '#000',

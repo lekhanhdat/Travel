@@ -72,8 +72,8 @@ const AnnotationContent = ({title}: {title: string}) => (
 );
 
 const MapScreenV2 = ({navigation}: {navigation: any}) => {
-  const [currentLat, setCurrentLat] = useState(16.057634336111732);
-  const [currentLong, setCurrentLong] = useState(108.23327483325855);
+  const [currentLat, setCurrentLat] = useState(16.058425754796364);
+  const [currentLong, setCurrentLong] = useState(108.23708583212756);
   const [routeCoordinates, setRouteCoordinates] = useState([]);
   const [visible, setVisible] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState<ILocation | null>(

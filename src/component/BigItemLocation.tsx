@@ -45,9 +45,7 @@ export default class BigItemLocation extends React.PureComponent<
             paddingVertical: sizes._12sdp,
             paddingHorizontal: sizes._16sdp,
           }}>
-          <TextBase
-            numberOfLines={1}
-            style={[AppStyle.txt_20_bold]}>
+          <TextBase numberOfLines={1} style={[AppStyle.txt_20_bold]}>
             {`${location.name}`}
           </TextBase>
           <TextBase
@@ -91,7 +89,7 @@ const styles = StyleSheet.create({
     maxWidth: sizes.width * 0.8,
     elevation: 7, // Tạo độ cao đổ bóng trên Android
     shadowColor: '#000', // Màu của bóng
-    shadowOffset: { width: 2, height: 2 }, // Vị trí bóng (ngang, dọc)
+    shadowOffset: {width: 2, height: 2}, // Vị trí bóng (ngang, dọc)
     shadowOpacity: 0.25, // Độ mờ của bóng
     shadowRadius: 3.84, // Độ lớn của bóng
   },

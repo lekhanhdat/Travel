@@ -1,16 +1,23 @@
 import React from 'react';
-import {FlatList, TouchableOpacity, View, Image, ScrollView, StyleSheet} from 'react-native';
+import {
+  FlatList,
+  TouchableOpacity,
+  View,
+  Image,
+  ScrollView,
+  StyleSheet,
+} from 'react-native';
 import Page from '../../../component/Page';
 import HeaderBase from '../../../component/HeaderBase';
 import strings from '../../../res/strings';
-import {IAccount, ILocation, IReview} from '../../../common/types';
+import {IAccount, IItem, ILocation, IReview} from '../../../common/types';
 import sizes from '../../../common/sizes';
 import BottomSheet from '../../../component/BottomSheet';
 import colors from '../../../common/colors';
 import TextBase from '../../../common/TextBase';
 import {AppStyle} from '../../../common/AppStyle';
 import {Searchbar, TextInput} from 'react-native-paper';
-import _, { size } from 'lodash';
+import _, {size} from 'lodash';
 import {
   LOCATION_NEARLY,
   LOCATION_POPULAR,
@@ -18,15 +25,11 @@ import {
 import LargeItemLocation from '../../../component/LargeItemLocation';
 import BigItemLocation from '../../../component/BigItemLocation';
 import NavigationService from '../NavigationService';
-import { ScreenName } from '../../AppContainer';
+import {ScreenName} from '../../AppContainer';
 import HistoricalArtifact from '../../../component/HistoricalArtifact';
-
-
+import locationApi from '../../../services/locations.api';
 
 // DAY LA TRANG HIEN VAT, TRANG NEWFEED GOC DOI TEN THANH NewFeedGoc.tsx
-
-
-
 
 interface INewFeedScreenProps {
   navigation: any;
@@ -34,9 +37,9 @@ interface INewFeedScreenProps {
 
 interface INewFeedScreenState {
   valueSearch: string;
-  locations: ILocation[];
-  LOCATION_POPULAR: ILocation[];
-  LOCATION_NEARLY: ILocation[];
+  items: IItem[];
+  ITEMS_POPULAR: IItem[];
+  ITEMS_NEARLY: IItem[];
 }
 
 export default class NewFeedScreen extends React.PureComponent<
@@ -49,34 +52,48 @@ export default class NewFeedScreen extends React.PureComponent<
     super(props);
     this.state = {
       valueSearch: '',
-      locations: [],
-      LOCATION_POPULAR: [],
-      LOCATION_NEARLY: [],
+      items: [],
+      ITEMS_POPULAR: [],
+      ITEMS_NEARLY: [],
     };
   }
 
   componentDidMount(): void {
     this.props.navigation.addListener('focus', () => {
       this.setState({
-        valueSearch: '',      
-        LOCATION_POPULAR,
-        LOCATION_NEARLY,
+        valueSearch: '',
+        // ITEMS_POPULAR: LOCATION_POPULAR,
+        // ITEMS_NEARLY: LOCATION_NEARLY,
       });
+    });
+
+    this.fetchItems();
+  }
+
+  async fetchItems() {
+    const data = await locationApi.getItems();
+    console.log(JSON.stringify(data, null, 2));
+    this.setState({
+      items: data,
+      ITEMS_POPULAR: data.slice(0, 5),
+      ITEMS_NEARLY: data.slice(0, 5),
     });
   }
 
-  renderItemHorizontal = ({ item, index }: { item: ILocation, index: number }) => {
-    return <HistoricalArtifact location={item} />
-  }
-  renderItemLarge = ({ item, index }: { item: ILocation, index: number }) => {
-    return <HistoricalArtifact location={item} />
-  }
+  renderItemHorizontal = ({item, index}: {item: IItem; index: number}) => {
+    return <HistoricalArtifact key={`item-${item}`} item={item} />;
+  };
+  renderItemLarge = ({item, index}: {item: ILocation; index: number}) => {
+    return <HistoricalArtifact key={`item-${index}`} item={item} />;
+  };
 
-  handleSearch = (isViewAll: boolean, locations: ILocation[]) => {
-    NavigationService.navigate(ScreenName.VIEW_ALL_SCREEN, { title: isViewAll ? 'Xem tất cả' : 'Tìm kiếm', locations: locations, valueSearch: this.state.valueSearch });
-  }
-
-  
+  handleSearch = (isViewAll: boolean, locations: IItem[]) => {
+    // NavigationService.navigate(ScreenName.VIEW_ALL_SCREEN, {
+    //   title: isViewAll ? 'Xem tất cả' : 'Tìm kiếm',
+    //   locations: locations,
+    //   valueSearch: this.state.valueSearch,
+    // });
+  };
 
   render(): React.ReactNode {
     return (
@@ -91,8 +108,8 @@ export default class NewFeedScreen extends React.PureComponent<
             marginVertical: sizes._16sdp,
             marginHorizontal: sizes._16sdp,
             marginTop: sizes._24sdp,
-            backgroundColor: '#fff', 
-            borderRadius: 30, 
+            backgroundColor: '#fff',
+            borderRadius: 30,
             elevation: 7,
           }}>
           <Searchbar
@@ -110,11 +127,11 @@ export default class NewFeedScreen extends React.PureComponent<
             inputStyle={{
               color: colors.black,
               fontFamily: 'GoogleSans_Regular',
-            }}            
+            }}
             onIconPress={() =>
               this.handleSearch(
                 false,
-                this.state.locations,
+                this.state.items,
                 // _.unionBy(LOCATION_POPULAR, LOCATION_NEARLY, 'id'),
               )
             }
@@ -127,7 +144,7 @@ export default class NewFeedScreen extends React.PureComponent<
               <TextBase style={[AppStyle.txt_20_bold]}>Phổ biến</TextBase>
               <TouchableOpacity
                 onPress={() =>
-                  this.handleSearch(true, this.state.LOCATION_POPULAR)
+                  this.handleSearch(true, this.state.ITEMS_POPULAR)
                 }>
                 <TextBase style={[AppStyle.txt_18_regular]}>
                   Xem tất cả
@@ -139,9 +156,9 @@ export default class NewFeedScreen extends React.PureComponent<
               contentContainerStyle={{
                 paddingVertical: sizes._16sdp,
               }}
-              data={this.state.LOCATION_POPULAR}
+              data={this.state.ITEMS_POPULAR}
               renderItem={this.renderItemHorizontal}
-              keyExtractor={item => item.id.toString()}
+              keyExtractor={item => item.Id.toString()}
               horizontal={true}
               showsHorizontalScrollIndicator={false}
             />
@@ -153,7 +170,7 @@ export default class NewFeedScreen extends React.PureComponent<
               </TextBase>
               <TouchableOpacity
                 onPress={() =>
-                  this.handleSearch(true, this.state.LOCATION_NEARLY)
+                  this.handleSearch(true, this.state.ITEMS_NEARLY)
                 }>
                 <TextBase
                   style={[
@@ -166,13 +183,13 @@ export default class NewFeedScreen extends React.PureComponent<
             </View>
 
             <FlatList
-              data={this.state.LOCATION_NEARLY}
+              data={this.state.ITEMS_NEARLY}
               renderItem={this.renderItemHorizontal}
-              keyExtractor={item => item.id.toString()}
+              keyExtractor={item => item.Id.toString()}
               horizontal={true}
               showsHorizontalScrollIndicator={false}
             />
-{/* 
+            {/*
             <FlatList
               data={this.state.LOCATION_NEARLY}
               renderItem={this.renderItemLarge}
@@ -181,14 +198,11 @@ export default class NewFeedScreen extends React.PureComponent<
               scrollEnabled={false}
             /> */}
           </View>
-        </ScrollView>          
-
-        
+        </ScrollView>
       </Page>
     );
   }
 }
-
 
 const styles = StyleSheet.create({
   container: {

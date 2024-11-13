@@ -63,13 +63,16 @@ export default class HomeScreen extends React.PureComponent<
       });
     });
 
-    // fetch data by locationApi.getLocations()
-    locationApi.getLocations().then(data => {
-      this.setState({
-        locations: data,
-        locationsNearly: data.slice(10, 20),
-        locationsPopular: data.slice(0, 10),
-      });
+    this.fetchLocations();
+  }
+
+  async fetchLocations() {
+    const data = await locationApi.getLocations();
+    console.log('fetch locations', JSON.stringify(data[0], null, 2));
+    this.setState({
+      locations: data,
+      locationsNearly: data.slice(10, 20),
+      locationsPopular: data.slice(0, 10),
     });
   }
 
@@ -164,7 +167,7 @@ export default class HomeScreen extends React.PureComponent<
             inputStyle={{
               color: colors.black,
               fontFamily: 'GoogleSans_Regular',
-            }}            
+            }}
             onIconPress={() =>
               this.handleSearch(
                 false,
@@ -240,7 +243,7 @@ export default class HomeScreen extends React.PureComponent<
               }}
               data={this.state.locationsPopular}
               renderItem={this.renderItemHorizontal}
-              keyExtractor={item => item.id.toString()}
+              keyExtractor={item => item.Id.toString()}
               horizontal={true}
               showsHorizontalScrollIndicator={false}
             />
@@ -267,7 +270,7 @@ export default class HomeScreen extends React.PureComponent<
             <FlatList
               data={this.state.locationsNearly}
               renderItem={this.renderItemLarge}
-              keyExtractor={item => item.id.toString()}
+              keyExtractor={item => item.Id.toString()}
               showsHorizontalScrollIndicator={false}
               scrollEnabled={false}
             />

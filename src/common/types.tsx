@@ -5,7 +5,7 @@ export interface IAccount {
 }
 
 export interface ILocation {
-  id: number;
+  Id: number;
   name: string;
   avatar: string;
   address: string;
@@ -14,6 +14,8 @@ export interface ILocation {
   long: number;
   haveVoice?: boolean;
   reviews: IReview[];
+  // item?: IItem[];
+  recommendation: string;
   icon?: any;
   voiceName?: string;
   advise?: string[];
@@ -30,4 +32,13 @@ export interface IReview {
   start: number;
   avatar: string;
   location?: ILocation;
+}
+
+export interface IItem {
+  Id: number;
+  name: string;
+  description: string;
+  video?: string;
+  images?: string[];
+  location?: Pick<ILocation, 'Id' | 'name'>;
 }

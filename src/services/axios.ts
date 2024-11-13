@@ -1,11 +1,12 @@
 import axios, {AxiosInstance, AxiosResponse, HttpStatusCode} from 'axios';
+import {DB_URL} from '../utils/configs';
 
 // declare module 'axios' {}
 
 const TIMEOUT = 5 * 60 * 1000; // 5 minutes
 
 const request: AxiosInstance = axios.create({
-  baseURL: 'https://sea-turtle-app-3wdrl.ondigitalocean.app',
+  baseURL: DB_URL,
   timeout: TIMEOUT,
 });
 
@@ -29,10 +30,11 @@ request.interceptors.request.use(async config => {
 
 request.interceptors.response.use(
   (response: AxiosResponse) => {
-    if (response.status === HttpStatusCode.NoContent) {
-      return true;
-    }
-    return response.data;
+    return response;
+    // if (response.status === HttpStatusCode.NoContent) {
+    //   return true;
+    // }
+    // return response.data;
   },
   async error => {
     // if (waitForLogout) return

@@ -1,37 +1,36 @@
 import React from 'react';
-import {ScrollView, View, Image, FlatList} from 'react-native';
-import Page from '../../../component/Page';
-import HeaderBase from '../../../component/HeaderBase';
-import strings from '../../../res/strings';
+import {Image, ScrollView, View} from 'react-native';
 import {BackSvg} from '../../../assets/assets/ImageSvg';
-import sizes from '../../../common/sizes';
-import colors from '../../../common/colors';
-import NavigationService from '../NavigationService';
-import {ILocation, IReview} from '../../../common/types';
-import TextBase from '../../../common/TextBase';
-import {AppStyle} from '../../../common/AppStyle';
-import ReviewItem from '../../../component/ReviewItem';
-import {reviews} from '../../../common/reviewsConstants';
 import {MapSvg} from '../../../assets/ImageSvg';
+import {AppStyle} from '../../../common/AppStyle';
+import colors from '../../../common/colors';
+import sizes from '../../../common/sizes';
+import TextBase from '../../../common/TextBase';
+import {IItem, IReview} from '../../../common/types';
+import HeaderBase from '../../../component/HeaderBase';
+import Page from '../../../component/Page';
+import ReviewItem from '../../../component/ReviewItem';
 import {ScreenName} from '../../AppContainer';
+import NavigationService from '../NavigationService';
+import {DB_URL} from '../../../utils/configs';
 
-interface IDetailLocationScreenProps {
+interface IDetailItemScreenProps {
   navigation: any;
 }
 
-interface IDetailLocationScreenState {}
+interface IDetailItemScreenState {}
 
-export default class DetailLocationScreen extends React.PureComponent<
-  IDetailLocationScreenProps,
-  IDetailLocationScreenState
+export default class DetailItem extends React.PureComponent<
+  IDetailItemScreenProps,
+  IDetailItemScreenState
 > {
-  constructor(props: IDetailLocationScreenProps) {
+  constructor(props: IDetailItemScreenProps) {
     super(props);
     this.state = {};
   }
 
   renderItem = ({item, index}: {item: IReview; index: number}) => {
-    return <ReviewItem review={item} />;
+    return <ReviewItem key={`item-${index}`} review={item} />;
   };
 
   getRandomElements = (arr: IReview[], num: number) => {
@@ -47,7 +46,7 @@ export default class DetailLocationScreen extends React.PureComponent<
   };
 
   render(): React.ReactNode {
-    const location: ILocation = this.props.navigation.state.params?.location;
+    const item: IItem = this.props.navigation.state.params?.item;
     return (
       <Page>
         <HeaderBase
@@ -62,43 +61,48 @@ export default class DetailLocationScreen extends React.PureComponent<
           onLeftIconPress={() => {
             NavigationService.pop();
           }}
-          rightIconSvgOne={
-            <MapSvg
-              width={sizes._24sdp}
-              height={sizes._24sdp}
-              color={colors.primary_950}
-            />
-          }
-          onRightIconOnePress={() => {
-            NavigationService.navigate(ScreenName.MAP_SCREEN, {
-              locations: [location],
-            });
-          }}
+          //   rightIconSvgOne={
+          //     <MapSvg
+          //       width={sizes._24sdp}
+          //       height={sizes._24sdp}
+          //       color={colors.primary_950}
+          //     />
+          //   }
+          //   onRightIconOnePress={() => {
+          //     NavigationService.navigate(ScreenName.MAP_SCREEN, {
+          //       locations: [item],
+          //     });
+          //   }}
         />
         <View style={{flex: 1, backgroundColor: colors.primary_200}}>
           <ScrollView>
             <Image
-              source={{uri: location.avatar}}
+              source={{
+                uri:
+                  item.images && item.images.length > 0
+                    ? // @ts-ignore
+                      `${DB_URL}/${item.images[0]?.path}`
+                    : undefined,
+              }}
               style={{
+                objectFit: 'contain',
                 width: sizes.width,
-                height: sizes._200sdp,
+                height: sizes._400sdp,
               }}
             />
 
             <View style={{flex: 1, padding: sizes._16sdp}}>
-              <TextBase style={[AppStyle.txt_20_bold]}>
-                {location.name}
-              </TextBase>
+              <TextBase style={[AppStyle.txt_20_bold]}>{item.name}</TextBase>
 
               <TextBase
                 style={[AppStyle.txt_16_medium, {marginTop: sizes._12sdp}]}>
-                {location.description}
+                {item.description}
               </TextBase>
 
-              <TextBase
+              {/* <TextBase
                 style={[AppStyle.txt_16_medium, {marginTop: sizes._12sdp}]}>
-                Địa chỉ: {location.address}
-              </TextBase>
+                Địa chỉ: {item.address}
+              </TextBase> */}
 
               <View
                 style={{
@@ -110,17 +114,17 @@ export default class DetailLocationScreen extends React.PureComponent<
                 }}
               />
 
-              <TextBase
+              {/* <TextBase
                 style={[AppStyle.txt_20_bold, {marginBottom: sizes._20sdp}]}>
                 {'Nhận xét của du khách:'}
               </TextBase>
-
-              <FlatList
+ */}
+              {/* <FlatList
                 data={location.reviews}
                 scrollEnabled={false}
                 renderItem={this.renderItem}
                 keyExtractor={(item, index) => index.toString() + item.id}
-              />
+              /> */}
             </View>
           </ScrollView>
         </View>

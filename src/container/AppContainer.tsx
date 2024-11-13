@@ -31,14 +31,13 @@ import MapsScreen from './screens/Maps/MapScreenV2';
 import CameraScreen from './screens/Camera/CameraScreen';
 import ProfileScreen from './screens/Profile/ProfileScreen';
 import ViewAllLocation from './screens/Home/ViewAllLocation';
-import DetailLocationScreen from './screens/Home/DetailLocation';
+import DetailItemScreen from './screens/Home/DetailLocation';
 import PreviewImage from './screens/Camera/PreviewImage';
 import LocationImage from './screens/Home/LocationImage';
 import LocationVideo from './screens/Home/LocationVideo';
 import Personal from './screens/Profile/Personal';
 import Advise from './screens/Maps/Advise';
-
-
+import DetailItem from './screens/NewFeed/DetailItem';
 
 export enum ScreenName {
   SPLASH_SCREEN = 'SplashScreen',
@@ -52,6 +51,7 @@ export enum ScreenName {
   LOCATION_VIDEO = 'LocationVideo',
   PERSONAL = 'Personal',
   ADVISE = 'Advise',
+  DETAIL_ITEM = 'DetailItem',
 }
 function MyTabBar({
   state,
@@ -299,13 +299,14 @@ const AppNavigator = createCompatNavigatorFactory(createStackNavigator)(
     HomeStack: {screen: HomeStack},
     LoginScreen: {screen: LoginScreen},
     ViewAllLocation: {screen: ViewAllLocation},
-    DetailLocationScreen: {screen: DetailLocationScreen},
+    DetailLocationScreen: {screen: DetailItemScreen},
     PreviewImage: {screen: PreviewImage},
     MapsScreen: {screen: MapsScreen},
     LocationImage: {screen: LocationImage},
     LocationVideo: {screen: LocationVideo},
     Personal: {screen: Personal},
     Advise: {screen: Advise},
+    DetailItem: {screen: DetailItem},
   },
   {
     headerMode: 'none',

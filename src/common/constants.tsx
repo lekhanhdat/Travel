@@ -71,5 +71,4 @@ export enum Language {
   ENGLISH = 'en',
 }
 
-
 export const SPACE_WARNING = 1000;

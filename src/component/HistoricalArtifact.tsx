@@ -1,17 +1,16 @@
 import React from 'react';
-import {StyleSheet, TouchableOpacity, Image, View} from 'react-native';
-import {ILocation} from '../common/types';
-import sizes from '../common/sizes';
-import colors from '../common/colors';
-import TextBase from '../common/TextBase';
+import {Image, StyleSheet, TouchableOpacity, View} from 'react-native';
 import {AppStyle} from '../common/AppStyle';
+import colors from '../common/colors';
+import sizes from '../common/sizes';
+import TextBase from '../common/TextBase';
+import {IItem} from '../common/types';
+import {DB_URL} from '../utils/configs';
 import NavigationService from '../container/screens/NavigationService';
 import {ScreenName} from '../container/AppContainer';
-import {Card, Text, Button} from 'react-native-paper';
-import { size } from 'lodash';
 
 interface IHistoricalArtifactProps {
-  location: ILocation;
+  item: IItem;
 }
 
 interface IHistoricalArtifactState {}
@@ -25,20 +24,26 @@ export default class HistoricalArtifact extends React.PureComponent<
     this.state = {};
   }
   render(): React.ReactNode {
-    const {location} = this.props;
+    const {item} = this.props;
     return (
       <TouchableOpacity
         style={styles.container}
         onPress={() => {
-          NavigationService.navigate(ScreenName.DETAIL_LOCATION_SCREEN, {
-            location: location,
+          NavigationService.navigate(ScreenName.DETAIL_ITEM, {
+            item,
           });
         }}>
         <Image
-          source={{uri: location.avatar}}
+          source={{
+            uri:
+              item.images && item.images.length > 0
+                ? // @ts-ignore
+                  `${DB_URL}/${item.images[0]?.path}`
+                : undefined,
+          }}
           style={styles.icon}
-          onError={() => {
-            console.log('errr', location.avatar);
+          onError={err => {
+            console.error(err);
           }}
         />
         <View
@@ -46,20 +51,17 @@ export default class HistoricalArtifact extends React.PureComponent<
             paddingVertical: sizes._12sdp,
             paddingHorizontal: sizes._16sdp,
           }}>
-          <TextBase
-            numberOfLines={1}
-            style={[AppStyle.txt_20_bold]}>
-            {`${location.name}`}
+          <TextBase numberOfLines={1} style={[AppStyle.txt_20_bold]}>
+            {`${item.name}`}
           </TextBase>
           <TextBase
             numberOfLines={2}
             style={[AppStyle.txt_16_regular, {marginTop: sizes._8sdp}]}>
-            {location.description}
+            {item.description}
           </TextBase>
         </View>
       </TouchableOpacity>
     );
-
   }
 }
 
@@ -75,7 +77,7 @@ const styles = StyleSheet.create({
     width: sizes._140sdp,
     elevation: 7, // Tạo độ cao đổ bóng trên Android
     shadowColor: '#000', // Màu của bóng
-    shadowOffset: { width: 2, height: 2 }, // Vị trí bóng (ngang, dọc)
+    shadowOffset: {width: 2, height: 2}, // Vị trí bóng (ngang, dọc)
     shadowOpacity: 0.25, // Độ mờ của bóng
     shadowRadius: 3.84, // Độ lớn của bóng
   },

@@ -162,6 +162,7 @@ export default class CameraScreen extends React.PureComponent<
         resultDescription: content.description,
       });
     } catch (error) {
+      console.log('error', error);
       this.setState({
         isLoading: false,
       });

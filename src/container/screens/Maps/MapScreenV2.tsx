@@ -51,6 +51,9 @@ const styles = StyleSheet.create({
     borderColor: 'green',  // Green border
     borderWidth: 3,  // Border width
   },
+  buttonText: {
+    fontWeight: 'bold',  // Làm đậm chữ
+  },
   touchableText: {
     color: 'white',
     fontWeight: 'bold',
@@ -80,7 +83,7 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
     null,
   );
   const openGoogleForm = () => {
-    const url = 'https://docs.google.com/forms/d/e/1FAIpQLSeX1E_nGFHyvYNVoLiNFrf--wHvTqHlrlPiuR90aTsEM1ZVsw/viewform?vc=0&c=0&w=1&flr=0&usp=mail_form_link'; // Thay bằng link Google Form của bạn
+    const url = 'https://hoanghoatham.edu.vn/'; // Thay bằng link Google Form của bạn
     Linking.openURL(url).catch(err => console.error("Couldn't load page", err));
   };
   
@@ -290,8 +293,8 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
             key={'myLocation'}
             id={'myLocation'}
             coordinate={[currentLong, currentLat]}
-            title={'Vị trí của bạn'}>
-            <MapboxGL.Callout title={'Vị trí của bạn'} />
+            title={'Vị trí của tôi'}>
+            <MapboxGL.Callout title={'Vị trí của tôi'} />
           </MapboxGL.PointAnnotation>
 
           {/* {locationProps.length > 0 && (
@@ -392,11 +395,13 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
             backgroundColor: colors.white,
             borderRadius: sizes._16sdp,
             marginHorizontal: 'auto',
+            borderColor: 'green',  // Green border
+            borderWidth: 3,  // Border width
           }}>
           <ScrollView>
             {selectedLocation && (
               <>
-                <TextBase style={[AppStyle.txt_18_bold, {marginBottom: 10, alignSelf: 'center',}]}>
+                <TextBase style={[AppStyle.txt_18_bold, {marginBottom: 10, textAlign: 'center', alignSelf: 'center',}]}>
                   {selectedLocation.name}
                 </TextBase>
                 <TextBase style={[AppStyle.txt_16_medium, {marginBottom: 10, textAlign: 'justify'}]}>
@@ -452,7 +457,9 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
                         },
                       );
                     }}
-                    style={styles.customButton}>
+                    style={styles.customButton}
+                    labelStyle={styles.buttonText} // Sử dụng labelStyle để chỉnh sửa chữ trong Button
+                    >
                     Quy tắc ứng xử văn minh
                   </Button>
 
@@ -467,7 +474,8 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
                         },
                       );
                     }}
-                    style={styles.customButton}>
+                    style={styles.customButton}
+                    labelStyle={styles.buttonText}>
                     Thông tin chi tiết
                   </Button>                  
 
@@ -481,7 +489,8 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
                         },
                       );
                     }}
-                    style={styles.customButton}>
+                    style={styles.customButton}
+                    labelStyle={styles.buttonText}>
                     Hình ảnh & Video
                   </Button>
 
@@ -507,14 +516,16 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
                         valueSearch: selectedLocation?.relatedKeyWord ?? '',
                       });
                     }}
-                    style={styles.customButton}>
-                    Địa điểm liên quan
+                    style={styles.customButton}
+                    labelStyle={styles.buttonText}>
+                    Hiện vật tại đây
                   </Button>
 
                   <Button
                     mode="outlined"
                     onPress={openGoogleForm}
-                    style={styles.customButton}>
+                    style={styles.customButton}
+                    labelStyle={styles.buttonText}>
                     Trắc nghiệm tìm hiểu
                   </Button>
                 </View>

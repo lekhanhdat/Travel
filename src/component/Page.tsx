@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     // paddingHorizontal: sizes._24sdp,
-    backgroundColor: colors.nen,
+    backgroundColor: colors.background,
   },
 });
 export default withNavigation(Page);

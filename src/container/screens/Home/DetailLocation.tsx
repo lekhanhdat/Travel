@@ -75,7 +75,7 @@ export default class DetailLocationScreen extends React.PureComponent<
             });
           }}
         />
-        <View style={{flex: 1, backgroundColor: colors.background}}>
+        <View style={{flex: 1, backgroundColor: colors.primary_200}}>
           <ScrollView>
             <Image
               source={{uri: location.avatar}}

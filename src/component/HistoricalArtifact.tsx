@@ -66,7 +66,8 @@ export default class HistoricalArtifact extends React.PureComponent<
 const styles = StyleSheet.create({
   container: {
     // padding: sizes._16sdp,
-    backgroundColor: '#CEE8E7',
+    // backgroundColor: '#CEE8E7',
+    backgroundColor: colors.primary_200,
     marginRight: sizes._16sdp,
     borderRadius: sizes._16sdp,
     overflow: 'hidden',

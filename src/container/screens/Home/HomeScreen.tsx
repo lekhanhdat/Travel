@@ -125,7 +125,7 @@ export default class HomeScreen extends React.PureComponent<
               color: colors.black,
             },
           ]}>
-          tại Đà Nẵng
+          tại Đà Nẵng!
         </TextBase>
 
         <View
@@ -156,7 +156,8 @@ export default class HomeScreen extends React.PureComponent<
             }}
             placeholder="Tìm kiếm địa điểm, địa chỉ,..."
             style={{
-              backgroundColor: '#CEE8E7',
+              // backgroundColor: '#CEE8E7',
+              backgroundColor: colors.primary_200,
               color: colors.black,
               flex: 1,
             }}

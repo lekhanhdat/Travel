@@ -23,7 +23,7 @@ import HistoricalArtifact from '../../../component/HistoricalArtifact';
 
 
 
-
+// DAY LA TRANG HIEN VAT, TRANG NEWFEED GOC DOI TEN THANH NewFeedGoc.tsx
 
 
 
@@ -102,7 +102,8 @@ export default class NewFeedScreen extends React.PureComponent<
             }}
             placeholder="Tìm kiếm địa điểm, địa chỉ,..."
             style={{
-              backgroundColor: '#CEE8E7',
+              // backgroundColor: '#CEE8E7',
+              backgroundColor: colors.primary_200,
               color: colors.black,
               flex: 1,
             }}

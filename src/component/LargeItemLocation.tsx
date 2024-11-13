@@ -75,8 +75,8 @@ export default class LargeItemLocation extends React.PureComponent<
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#CEE8E7',
-
+    // backgroundColor: '#CEE8E7',
+    backgroundColor: colors.primary_200,
     marginBottom: sizes._16sdp,
     borderRadius: sizes._16sdp,
     overflow: 'hidden',

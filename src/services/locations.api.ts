@@ -48,5 +48,18 @@ const locationApi = {
     const data = res.data.list ?? [];
     return data;
   },
+
+  getItemsWithLocationId: async (locationId: number) => {
+    const res = await request.get<GetItemsResponse>(URL_GET_ITEMS, {
+      params: {
+        offset: '0',
+        limit: '100',
+        filterByFormula: `FIND('${locationId}', {location})`,
+      },
+    });
+    const data = res.data.list ?? [];
+    // return data.filter(item => item.location?.Id === locationId);
+    return data;
+  },
 };
 export default locationApi;

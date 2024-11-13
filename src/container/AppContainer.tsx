@@ -38,6 +38,7 @@ import LocationVideo from './screens/Home/LocationVideo';
 import Personal from './screens/Profile/Personal';
 import Advise from './screens/Maps/Advise';
 import DetailItem from './screens/NewFeed/DetailItem';
+import AllItemScreen from './screens/NewFeed/AllItemsScreen';
 
 export enum ScreenName {
   SPLASH_SCREEN = 'SplashScreen',
@@ -52,6 +53,7 @@ export enum ScreenName {
   PERSONAL = 'Personal',
   ADVISE = 'Advise',
   DETAIL_ITEM = 'DetailItem',
+  VIEW_ALL_ITEM = 'ViewAllItem',
 }
 function MyTabBar({
   state,
@@ -307,6 +309,7 @@ const AppNavigator = createCompatNavigatorFactory(createStackNavigator)(
     Personal: {screen: Personal},
     Advise: {screen: Advise},
     DetailItem: {screen: DetailItem},
+    ViewAllItem: {screen: AllItemScreen},
   },
   {
     headerMode: 'none',

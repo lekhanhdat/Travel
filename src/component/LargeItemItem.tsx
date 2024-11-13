@@ -1,21 +1,22 @@
 import React from 'react';
 import {Image, StyleSheet, TouchableOpacity, View} from 'react-native';
-import {ILocation} from '../common/types';
+import {IItem, ILocation} from '../common/types';
 import sizes from '../common/sizes';
 import colors from '../common/colors';
 import {AppStyle} from '../common/AppStyle';
 import TextBase from '../common/TextBase';
 import {ScreenName} from '../container/AppContainer';
 import NavigationService from '../container/screens/NavigationService';
+import {DB_URL} from '../utils/configs';
 
 interface ILargeItemLocationProps {
-  location: ILocation;
+  item: IItem;
   onPress?: () => void;
 }
 
 interface ILargeItemLocationState {}
 
-export default class LargeItemLocation extends React.PureComponent<
+export default class LargeItemItem extends React.PureComponent<
   ILargeItemLocationProps,
   ILargeItemLocationState
 > {
@@ -24,7 +25,7 @@ export default class LargeItemLocation extends React.PureComponent<
     this.state = {};
   }
   render(): React.ReactNode {
-    const {location} = this.props;
+    const {item} = this.props;
     return (
       <TouchableOpacity
         style={styles.container}
@@ -33,13 +34,19 @@ export default class LargeItemLocation extends React.PureComponent<
             this.props.onPress();
             return;
           }
-          NavigationService.navigate(ScreenName.DETAIL_LOCATION_SCREEN, {
-            location: location,
+          NavigationService.navigate(ScreenName.DETAIL_ITEM, {
+            item,
           });
         }}>
         <View style={styles.rowCenter}>
           <Image
-            source={{uri: location.avatar}}
+            source={{
+              uri:
+                item.images && item.images.length > 0
+                  ? // @ts-ignore
+                    `${DB_URL}/${item.images[0]?.path}`
+                  : undefined,
+            }}
             style={{
               height: sizes.width * 0.25,
               width: sizes.width * 0.25,
@@ -59,12 +66,12 @@ export default class LargeItemLocation extends React.PureComponent<
               numberOfLines={1} // Thay đổi thành 1 để nội dung không xuống dòng
               ellipsizeMode="tail" // Thêm thuộc tính này để hiển thị dấu '...'
               style={AppStyle.txt_18_bold}>
-              {`${location.name}`}
+              {`${item.name}`}
             </TextBase>
             <TextBase
               numberOfLines={3}
               style={[AppStyle.txt_14_regular, {marginTop: sizes._8sdp}]}>
-              {location.description}
+              {item.description}
             </TextBase>
           </View>
         </View>

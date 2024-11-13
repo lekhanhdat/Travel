@@ -87,12 +87,12 @@ export default class NewFeedScreen extends React.PureComponent<
     return <HistoricalArtifact key={`item-${index}`} item={item} />;
   };
 
-  handleSearch = (isViewAll: boolean, locations: IItem[]) => {
-    // NavigationService.navigate(ScreenName.VIEW_ALL_SCREEN, {
-    //   title: isViewAll ? 'Xem tất cả' : 'Tìm kiếm',
-    //   locations: locations,
-    //   valueSearch: this.state.valueSearch,
-    // });
+  handleSearch = (isViewAll: boolean, items: IItem[]) => {
+    NavigationService.navigate(ScreenName.VIEW_ALL_ITEM, {
+      title: isViewAll ? 'Xem tất cả' : 'Tìm kiếm',
+      items,
+      valueSearch: this.state.valueSearch,
+    });
   };
 
   render(): React.ReactNode {

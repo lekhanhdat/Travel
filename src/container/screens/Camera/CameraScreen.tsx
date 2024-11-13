@@ -154,6 +154,7 @@ export default class CameraScreen extends React.PureComponent<
       this.setState({
         isLoading: false,
       });
+      console.log('data', response?.data);
       const content = JSON.parse(response?.data);
 
       this.setState({

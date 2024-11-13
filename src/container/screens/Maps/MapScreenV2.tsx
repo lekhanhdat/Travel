@@ -30,7 +30,7 @@ import haversineDistance from '../../../utils/haversineDistance';
 import decodePolyline from '../../../utils/decodePolyline';
 import {Button, Modal, Text} from 'react-native-paper';
 import images from '../../../res/images';
-
+import locationApi from '../../../services/locations.api';
 
 MapboxGL.setAccessToken(
   'pk.eyJ1IjoiaG9hbmd0cnVuZzE4MDEiLCJhIjoiY20ybXVpbDJ3MHF6NzJqcHMyOWJnbzQ0OSJ9.eMymOvaYvLYhRhoMTLhPng',
@@ -47,12 +47,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   customButton: {
-    backgroundColor: 'white',  // White background
-    borderColor: 'green',  // Green border
-    borderWidth: 3,  // Border width
+    backgroundColor: 'white', // White background
+    borderColor: 'green', // Green border
+    borderWidth: 3, // Border width
   },
   buttonText: {
-    fontWeight: 'bold',  // Làm đậm chữ
+    fontWeight: 'bold', // Làm đậm chữ
     color: '#F97350',
   },
   touchableText: {
@@ -87,15 +87,21 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
     const url = 'https://hoanghoatham.edu.vn/'; // Thay bằng link Google Form của bạn
     Linking.openURL(url).catch(err => console.error("Couldn't load page", err));
   };
-  
+
   const [visibleSecondModal, setVisibleSecondModal] = useState(false);
   const [isPlayingSuccess, setIsPlayingSuccess] = useState(true);
   const [locationShowWarning, setLocationShowWarning] = useState<
     ILocation | undefined | null
   >(null);
 
+  const [locations, setLocations] = useState<ILocation[]>([]);
+
   useEffect(() => {
-    console.log('restart0-----------')
+    console.log('restart0-----------');
+
+    locationApi.getLocations().then(data => {
+      setLocations(data);
+    });
 
     const onFinishedPlayingSubscription = SoundPlayer.addEventListener(
       'FinishedPlaying',
@@ -117,7 +123,12 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
       ({success, name, type}) => {
         console.log('finished loading file111111', success, name, type);
         SoundPlayer.play();
-        console.log('finished loading file2222', SoundPlayer.play(), name, type);
+        console.log(
+          'finished loading file2222',
+          SoundPlayer.play(),
+          name,
+          type,
+        );
       },
     );
 
@@ -232,9 +243,9 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
 
   const onPressView = () => {
     if (selectedLocation) {
-      if(selectedLocation.voiceName) {
+      if (selectedLocation.voiceName) {
         SoundPlayer.stop();
-        SoundPlayer.loadSoundFile(selectedLocation.voiceName, 'mp3')
+        SoundPlayer.loadSoundFile(selectedLocation.voiceName, 'mp3');
       }
       setVisibleSecondModal(true);
     }
@@ -245,6 +256,7 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
   }, [selectedLocation]);
 
   const locationProps: ILocation[] = navigation?.state?.params?.locations ?? [];
+  console.log({locationProps});
 
   if (currentLat === 0 || currentLong === 0) {
     return (
@@ -275,20 +287,24 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
             zoomLevel={17}
           />
 
-          {(locationProps.length > 0
-            ? locationProps
-            : _.unionBy(LOCATION_POPULAR, LOCATION_NEARLY)
-          ).map((location, index) => (
-            <MapboxGL.PointAnnotation
-              key={String(index)}
-              id={`marker-${index}`}
-              coordinate={[location.long, location.lat]}
-              title={location.name}
-              onSelected={() => onMarkerPress(location)}
-              onDeselected={() => setSelectedLocation(null)}>
-              <MapboxGL.Callout title={location.name} />
-            </MapboxGL.PointAnnotation>
-          ))}
+          {
+            // (
+            //   locationProps.length > 0
+            //   ? locationProps
+            //   : _.unionBy(LOCATION_POPULAR, LOCATION_NEARLY)
+            // )
+            locations.map((location, index) => (
+              <MapboxGL.PointAnnotation
+                key={String(index)}
+                id={`marker-${index}`}
+                coordinate={[location.long, location.lat]}
+                title={location.name}
+                onSelected={() => onMarkerPress(location)}
+                onDeselected={() => setSelectedLocation(null)}>
+                <MapboxGL.Callout title={location.name} />
+              </MapboxGL.PointAnnotation>
+            ))
+          }
 
           <MapboxGL.PointAnnotation
             key={'myLocation'}
@@ -396,19 +412,36 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
             backgroundColor: colors.white,
             borderRadius: sizes._16sdp,
             marginHorizontal: 'auto',
-            borderColor: 'green',  // Green border
-            borderWidth: 3,  // Border width
+            borderColor: 'green', // Green border
+            borderWidth: 3, // Border width
           }}>
           <ScrollView>
             {selectedLocation && (
               <>
-                <TextBase style={[AppStyle.txt_18_bold, {marginBottom: 10, textAlign: 'center', alignSelf: 'center', color: '#F97350'}]}>
+                <TextBase
+                  style={[
+                    AppStyle.txt_18_bold,
+                    {
+                      marginBottom: 10,
+                      textAlign: 'center',
+                      alignSelf: 'center',
+                      color: '#F97350',
+                    },
+                  ]}>
                   {selectedLocation.name}
                 </TextBase>
-                <TextBase style={[AppStyle.txt_16_medium, {marginBottom: 10, textAlign: 'justify'}]}>
+                <TextBase
+                  style={[
+                    AppStyle.txt_16_medium,
+                    {marginBottom: 10, textAlign: 'justify'},
+                  ]}>
                   {selectedLocation.description}
                 </TextBase>
-                <TextBase style={[AppStyle.txt_16_medium, {marginBottom: 10, textAlign: 'justify'}]}>
+                <TextBase
+                  style={[
+                    AppStyle.txt_16_medium,
+                    {marginBottom: 10, textAlign: 'justify'},
+                  ]}>
                   Địa chỉ: {selectedLocation.address}
                 </TextBase>
                 <Image
@@ -421,81 +454,69 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
                   }} // Customize size and style
                   resizeMode="cover" // Image display mode
                 />
-
-                
               </>
             )}
           </ScrollView>
         </View>
 
         <View
-    style={{
-      width: sizes.width - sizes._32sdp,
-      maxHeight: 400,
-      paddingHorizontal: sizes._20sdp,
-      padding: sizes._8sdp,
-      backgroundColor: 'rgba(255, 255, 255, 0.0)', // Nền trong suốt
-      borderRadius: sizes._16sdp,
-      marginHorizontal: 'auto',
-      marginTop: sizes._8sdp,
-      flexDirection: 'row', // Thay đổi chiều hướng của View
-      alignItems: 'center',  // Căn giữa theo chiều dọc
-    }}>
-    <View
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: sizes._12sdp,
-                    flex: 1, // Để View này chiếm phần còn lại
-                  }}>
-                  <Button
-                    mode="outlined"
-                    onPress={() => {
-                      NavigationService.navigate(
-                        ScreenName.ADVISE,
-                        {
-                          location: selectedLocation,
-                        },
-                      );
-                    }}
-                    style={styles.customButton}
-                    labelStyle={styles.buttonText} // Sử dụng labelStyle để chỉnh sửa chữ trong Button
-                    >
-                    Quy tắc ứng xử văn minh
-                  </Button>
+          style={{
+            width: sizes.width - sizes._32sdp,
+            maxHeight: 400,
+            paddingHorizontal: sizes._20sdp,
+            padding: sizes._8sdp,
+            backgroundColor: 'rgba(255, 255, 255, 0.0)', // Nền trong suốt
+            borderRadius: sizes._16sdp,
+            marginHorizontal: 'auto',
+            marginTop: sizes._8sdp,
+            flexDirection: 'row', // Thay đổi chiều hướng của View
+            alignItems: 'center', // Căn giữa theo chiều dọc
+          }}>
+          <View
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: sizes._12sdp,
+              flex: 1, // Để View này chiếm phần còn lại
+            }}>
+            <Button
+              mode="outlined"
+              onPress={() => {
+                NavigationService.navigate(ScreenName.ADVISE, {
+                  location: selectedLocation,
+                });
+              }}
+              style={styles.customButton}
+              labelStyle={styles.buttonText} // Sử dụng labelStyle để chỉnh sửa chữ trong Button
+            >
+              Quy tắc ứng xử văn minh
+            </Button>
 
+            <Button
+              mode="outlined"
+              onPress={() => {
+                NavigationService.navigate(ScreenName.DETAIL_LOCATION_SCREEN, {
+                  location: selectedLocation,
+                });
+              }}
+              style={styles.customButton}
+              labelStyle={styles.buttonText}>
+              Thông tin chi tiết
+            </Button>
 
-                  <Button
-                    mode="outlined"
-                    onPress={() => {
-                      NavigationService.navigate(
-                        ScreenName.DETAIL_LOCATION_SCREEN,
-                        {
-                          location: selectedLocation,
-                        },
-                      );
-                    }}
-                    style={styles.customButton}
-                    labelStyle={styles.buttonText}>
-                    Thông tin chi tiết
-                  </Button>                  
+            <Button
+              mode="outlined"
+              onPress={() => {
+                NavigationService.navigate(ScreenName.LOCATION_IMAGE, {
+                  location: selectedLocation,
+                });
+              }}
+              style={styles.customButton}
+              labelStyle={styles.buttonText}>
+              Hình ảnh & Video
+            </Button>
 
-                  <Button
-                    mode="outlined"
-                    onPress={() => {
-                      NavigationService.navigate(
-                        ScreenName.LOCATION_IMAGE,
-                        {
-                          location: selectedLocation,
-                        },
-                      );
-                    }}
-                    style={styles.customButton}
-                    labelStyle={styles.buttonText}>
-                    Hình ảnh & Video
-                  </Button>
-
-                  {/* <Button
+            {/* <Button
                     mode="contained"
                     onPress={() => {
                       NavigationService.navigate(
@@ -508,39 +529,48 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
                     Xem thêm video
                   </Button> */}
 
-                  <Button
-                    mode="outlined"
-                    onPress={() => {
-                      NavigationService.navigate(ScreenName.VIEW_ALL_SCREEN, {
-                        title:'Tìm kiếm',
-                        locations: _.unionBy(LOCATION_POPULAR, LOCATION_NEARLY, 'id'),
-                        valueSearch: selectedLocation?.relatedKeyWord ?? '',
-                      });
-                    }}
-                    style={styles.customButton}
-                    labelStyle={styles.buttonText}>
-                    Hiện vật tại đây
-                  </Button>
+            <Button
+              mode="outlined"
+              onPress={() => {
+                if (!selectedLocation) {
+                  return;
+                }
+                locationApi
+                  .getItemsWithLocationId(selectedLocation?.Id)
+                  .then(data => {
+                    console.log(JSON.stringify(data, null, 2));
+                    NavigationService.navigate(ScreenName.VIEW_ALL_ITEM, {
+                      title: 'Tìm kiếm',
+                      // items: _.unionBy(LOCATION_POPULAR, LOCATION_NEARLY, 'id'),
+                      items: data,
+                      valueSearch: selectedLocation?.relatedKeyWord ?? '',
+                    });
+                  });
+              }}
+              style={styles.customButton}
+              labelStyle={styles.buttonText}>
+              Hiện vật tại đây
+            </Button>
 
-                  <Button
-                    mode="outlined"
-                    onPress={openGoogleForm}
-                    style={styles.customButton}
-                    labelStyle={styles.buttonText}>
-                    Trắc nghiệm tìm hiểu
-                  </Button>
-                </View>
+            <Button
+              mode="outlined"
+              onPress={openGoogleForm}
+              style={styles.customButton}
+              labelStyle={styles.buttonText}>
+              Trắc nghiệm tìm hiểu
+            </Button>
+          </View>
 
-                    {/* Hình ảnh ở bên phải của các button */}
-    <Image
-        source={images.dantoc}
-        style={{
-          width: 100, // Đặt chiều rộng cho hình ảnh
-          height: 270, // Đặt chiều cao cho hình ảnh
-          marginLeft: sizes._16sdp, // Khoảng cách giữa button và hình ảnh
-        }}
-    />
-  </View>
+          {/* Hình ảnh ở bên phải của các button */}
+          <Image
+            source={images.dantoc}
+            style={{
+              width: 100, // Đặt chiều rộng cho hình ảnh
+              height: 270, // Đặt chiều cao cho hình ảnh
+              marginLeft: sizes._16sdp, // Khoảng cách giữa button và hình ảnh
+            }}
+          />
+        </View>
       </Modal>
     </Page>
   );

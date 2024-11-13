@@ -1,2 +1,2 @@
-export const SERVER_URL = 'https://starfish-app-xn9yr.ondigitalocean.app';
+export const SERVER_URL = 'https://plankton-app-w2j48.ondigitalocean.app';
 export const DB_URL = 'https://sea-turtle-app-3wdrl.ondigitalocean.app';

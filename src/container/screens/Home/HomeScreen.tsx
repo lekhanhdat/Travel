@@ -68,7 +68,6 @@ export default class HomeScreen extends React.PureComponent<
 
   async fetchLocations() {
     const data = await locationApi.getLocations();
-    console.log('fetch locations', JSON.stringify(data[0], null, 2));
     this.setState({
       locations: data,
       locationsNearly: data.slice(10, 20),

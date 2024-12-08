@@ -76,8 +76,8 @@ const AnnotationContent = ({title}: {title: string}) => (
 );
 
 const MapScreenV2 = ({navigation}: {navigation: any}) => {
-  const [currentLat, setCurrentLat] = useState(16.058425754796364);
-  const [currentLong, setCurrentLong] = useState(108.23708583212756);
+  const [currentLat, setCurrentLat] = useState(16.03046986914924);
+  const [currentLong, setCurrentLong] = useState(108.21410387999788);
   const [routeCoordinates, setRouteCoordinates] = useState([]);
   const [visible, setVisible] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState<ILocation | null>(
@@ -284,7 +284,7 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
           onRegionDidChange={onRegionChange}>
           <MapboxGL.Camera
             centerCoordinate={[currentLong, currentLat]}
-            zoomLevel={17}
+            zoomLevel={11}
           />
 
           {
@@ -540,7 +540,7 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
                   .then(data => {
                     console.log(JSON.stringify(data, null, 2));
                     NavigationService.navigate(ScreenName.VIEW_ALL_ITEM, {
-                      title: 'Tìm kiếm',
+                      title: 'Hiện vật',
                       // items: _.unionBy(LOCATION_POPULAR, LOCATION_NEARLY, 'id'),
                       items: data,
                       valueSearch: selectedLocation?.relatedKeyWord ?? '',

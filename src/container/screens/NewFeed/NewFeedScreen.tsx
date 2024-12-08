@@ -1,45 +1,42 @@
 import React from 'react';
-import {
-  FlatList,
-  TouchableOpacity,
-  View,
-  Image,
-  ScrollView,
-  StyleSheet,
-} from 'react-native';
+import {FlatList, TouchableOpacity, View, Image} from 'react-native';
 import Page from '../../../component/Page';
 import HeaderBase from '../../../component/HeaderBase';
 import strings from '../../../res/strings';
-import {IAccount, IItem, ILocation, IReview} from '../../../common/types';
+import {reviews} from '../../../common/reviewsConstants';
+import {IAccount, ILocation, IReview} from '../../../common/types';
+import ReviewItem from '../../../component/ReviewItem';
 import sizes from '../../../common/sizes';
 import BottomSheet from '../../../component/BottomSheet';
+import {Add} from '../../../assets/ImageSvg';
 import colors from '../../../common/colors';
 import TextBase from '../../../common/TextBase';
 import {AppStyle} from '../../../common/AppStyle';
-import {Searchbar, TextInput} from 'react-native-paper';
-import _, {size} from 'lodash';
+import LocalStorageCommon from '../../../utils/LocalStorageCommon';
+import {localStorageKey} from '../../../common/constants';
+import {StarActive, StarInActive} from '../../../assets/assets/ImageSvg';
+import {TextInput} from 'react-native-paper';
+import {random} from 'lodash';
+import moment from 'moment';
+import _ from 'lodash';
 import {
   LOCATION_NEARLY,
   LOCATION_POPULAR,
 } from '../../../common/locationConstants';
 import LargeItemLocation from '../../../component/LargeItemLocation';
-import BigItemLocation from '../../../component/BigItemLocation';
-import NavigationService from '../NavigationService';
-import {ScreenName} from '../../AppContainer';
-import HistoricalArtifact from '../../../component/HistoricalArtifact';
-import locationApi from '../../../services/locations.api';
 
-// DAY LA TRANG HIEN VAT, TRANG NEWFEED GOC DOI TEN THANH NewFeedGoc.tsx
+// ĐÂY LÀ TRANG NEWFEED CHUẨN
+// ĐÂY LÀ TRANG NEWFEED CHUẨN
+// ĐÂY LÀ TRANG NEWFEED CHUẨN
 
-interface INewFeedScreenProps {
-  navigation: any;
-}
+interface INewFeedScreenProps {}
 
 interface INewFeedScreenState {
-  valueSearch: string;
-  items: IItem[];
-  ITEMS_POPULAR: IItem[];
-  ITEMS_NEARLY: IItem[];
+  reviews: IReview[];
+  avt: IAccount | null | undefined;
+  star: number;
+  content: string;
+  location?: ILocation | null | undefined;
 }
 
 export default class NewFeedScreen extends React.PureComponent<
@@ -51,166 +48,341 @@ export default class NewFeedScreen extends React.PureComponent<
   constructor(props: INewFeedScreenProps) {
     super(props);
     this.state = {
-      valueSearch: '',
-      items: [],
-      ITEMS_POPULAR: [],
-      ITEMS_NEARLY: [],
+      reviews: [],
+      avt: null,
+      star: 0,
+      content: '',
+      location: null,
     };
   }
 
   componentDidMount(): void {
-    this.props.navigation.addListener('focus', () => {
-      this.setState({
-        valueSearch: '',
-        // ITEMS_POPULAR: LOCATION_POPULAR,
-        // ITEMS_NEARLY: LOCATION_NEARLY,
+    this.handleGetReviews();
+    this.handleGetAvt();
+  }
+
+  handleGetReviews = () => {
+    const locations: ILocation[] = _.unionBy(
+      LOCATION_POPULAR,
+      LOCATION_NEARLY,
+      'id',
+    );
+    let reviewsLocal: IReview[] = [];
+    locations.forEach(location => {
+      location.reviews.forEach(review => {
+        review.location = location;
+        reviewsLocal = reviewsLocal.concat(review);
       });
     });
-
-    this.fetchItems();
-  }
-
-  async fetchItems() {
-    const data = await locationApi.getItems();
-    console.log(JSON.stringify(data, null, 2));
     this.setState({
-      items: data,
-      ITEMS_POPULAR: data.slice(0, 5),
-      ITEMS_NEARLY: data.slice(0, 5),
+      reviews: reviewsLocal,
     });
-  }
-
-  renderItemHorizontal = ({item, index}: {item: IItem; index: number}) => {
-    return <HistoricalArtifact key={`item-${item}`} item={item} />;
-  };
-  renderItemLarge = ({item, index}: {item: ILocation; index: number}) => {
-    return <HistoricalArtifact key={`item-${index}`} item={item} />;
   };
 
-  handleSearch = (isViewAll: boolean, items: IItem[]) => {
-    NavigationService.navigate(ScreenName.VIEW_ALL_ITEM, {
-      title: isViewAll ? 'Xem tất cả' : 'Tìm kiếm',
-      items,
-      valueSearch: this.state.valueSearch,
+  handleGetAvt = async () => {
+    const avt = await LocalStorageCommon.getItem(localStorageKey.AVT);
+    this.setState({
+      avt: avt,
     });
+  };
+
+  renderItem = ({item, index}: {item: IReview; index: number}) => {
+    return (
+      <ReviewItem key={`feed-${index}`} review={item} isShowLocation={true} />
+    );
   };
 
   render(): React.ReactNode {
     return (
-      <Page style={{backgroundColor: colors.background}}>
+      <Page>
         <HeaderBase hideLeftIcon title={strings.new_feed} />
         <View
           style={{
-            display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            marginVertical: sizes._16sdp,
-            marginHorizontal: sizes._16sdp,
-            marginTop: sizes._24sdp,
-            backgroundColor: '#fff',
-            borderRadius: 30,
-            elevation: 7,
+            flex: 1,
+            padding: sizes._16sdp,
+            backgroundColor: colors.background,
           }}>
-          <Searchbar
-            value={this.state.valueSearch}
-            onChangeText={txt => {
-              this.setState({valueSearch: txt});
-            }}
-            placeholder="Tìm kiếm địa điểm, địa chỉ,..."
-            style={{
-              // backgroundColor: '#CEE8E7',
-              backgroundColor: colors.primary_200,
-              color: colors.black,
-              flex: 1,
-            }}
-            inputStyle={{
-              color: colors.black,
-              fontFamily: 'GoogleSans_Regular',
-            }}
-            onIconPress={() =>
-              this.handleSearch(
-                false,
-                this.state.items,
-                // _.unionBy(LOCATION_POPULAR, LOCATION_NEARLY, 'id'),
-              )
-            }
+          <FlatList
+            data={this.state.reviews}
+            renderItem={this.renderItem}
+            contentContainerStyle={{paddingBottom: sizes._100sdp}}
+            keyExtractor={(item, index) => item.id + item.content + index}
           />
+
+          <TouchableOpacity
+            style={{
+              position: 'absolute',
+              bottom: sizes._16sdp,
+              padding: sizes._8sdp,
+              backgroundColor: colors.primary,
+              borderRadius: sizes._200sdp,
+              right: sizes._16sdp,
+            }}
+            onPress={() => {
+              this.refSheet?.open();
+            }}>
+            <Add
+              width={sizes._40sdp}
+              height={sizes._40sdp}
+              color={colors.primary_950}
+            />
+          </TouchableOpacity>
         </View>
 
-        <ScrollView>
-          <View style={styles.container}>
-            <View style={styles.rowCenter}>
-              <TextBase style={[AppStyle.txt_20_bold]}>Phổ biến</TextBase>
-              <TouchableOpacity
-                onPress={() =>
-                  this.handleSearch(true, this.state.ITEMS_POPULAR)
-                }>
-                <TextBase style={[AppStyle.txt_18_regular]}>
-                  Xem tất cả
-                </TextBase>
-              </TouchableOpacity>
-            </View>
-
-            <FlatList
-              contentContainerStyle={{
+        <BottomSheet
+          height={sizes._csreen_height * 0.8}
+          ref={ref => {
+            this.refSheet = ref;
+          }}>
+          <View style={{flex: 1, alignItems: 'center'}}>
+            <View
+              style={{
+                width: sizes.width,
+                backgroundColor: colors.primary,
                 paddingVertical: sizes._16sdp,
-              }}
-              data={this.state.ITEMS_POPULAR}
-              renderItem={this.renderItemHorizontal}
-              keyExtractor={item => item.Id.toString()}
-              horizontal={true}
-              showsHorizontalScrollIndicator={false}
-            />
-
-            <View style={[styles.rowCenter, {marginTop: sizes._16sdp}]}>
-              <TextBase
-                style={[AppStyle.txt_20_bold, {marginBottom: sizes._16sdp}]}>
-                Gần đây
-              </TextBase>
-              <TouchableOpacity
-                onPress={() =>
-                  this.handleSearch(true, this.state.ITEMS_NEARLY)
-                }>
-                <TextBase
-                  style={[
-                    AppStyle.txt_18_regular,
-                    {marginBottom: sizes._16sdp},
-                  ]}>
-                  Xem tất cả
-                </TextBase>
-              </TouchableOpacity>
+                alignItems: 'center',
+              }}>
+              <TextBase style={AppStyle.txt_20_bold}>Thêm Đánh Giá</TextBase>
             </View>
 
-            <FlatList
-              data={this.state.ITEMS_NEARLY}
-              renderItem={this.renderItemHorizontal}
-              keyExtractor={item => item.Id.toString()}
-              horizontal={true}
-              showsHorizontalScrollIndicator={false}
-            />
-            {/*
-            <FlatList
-              data={this.state.LOCATION_NEARLY}
-              renderItem={this.renderItemLarge}
-              keyExtractor={item => item.id.toString()}
-              showsHorizontalScrollIndicator={false}
-              scrollEnabled={false}
-            /> */}
+            <View
+              style={{
+                flexDirection: 'col',
+                alignItems: 'center',
+                paddingHorizontal: sizes._16sdp,
+                paddingVertical: sizes._16sdp,
+                borderBottomWidth: 1,
+                borderColor: colors.primary,
+              }}>
+              <Image
+                source={{uri: this.state.avt?.avatar}}
+                style={{
+                  width: sizes._40sdp,
+                  height: sizes._40sdp,
+                  borderRadius: sizes._900sdp,
+                }}
+              />
+              <TextBase
+                style={[
+                  AppStyle.txt_18_bold_review,
+                  {marginTop: sizes._8sdp,}
+                  // {marginLeft: sizes._16sdp},
+                ]}>
+                {this.state.avt?.userName}
+              </TextBase>
+            </View>
+
+            <TextBase
+              style={[
+                AppStyle.txt_18_bold,
+                {
+                  // marginLeft: sizes._16sdp,
+                  marginTop: sizes._24sdp,
+                },
+              ]}>
+              Đánh giá
+            </TextBase>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                paddingHorizontal: sizes._40sdp,
+                paddingVertical: sizes._10sdp,
+              }}>
+              {Array.from([1, 2, 3, 4, 5]).map(i => {
+                return (
+                  <TouchableOpacity
+                    onPress={() => {
+                      this.setState({
+                        star: i,
+                      });
+                    }}>
+                    {i <= this.state.star ? (
+                      <StarActive
+                        width={sizes._36sdp}
+                        height={sizes._36sdp}
+                        color={colors.primary}
+                      />
+                    ) : (
+                      <StarInActive
+                        width={sizes._36sdp}
+                        height={sizes._36sdp}
+                        color={colors.primary_950}
+                      />
+                    )}
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+
+            <TextBase
+              style={[
+                AppStyle.txt_18_bold,
+                {
+                  // marginLeft: sizes._16sdp,
+                  marginTop: sizes._16sdp,
+                },
+              ]}>
+              Nội dung
+            </TextBase>
+
+            <View
+              style={{
+                // paddingHorizontal: sizes._8sdp,
+                // paddingVertical: sizes._8sdp,
+                elevation: 4,
+              }}>
+              <TextInput
+                mode="outlined"
+                label="Đánh giá"
+                placeholder="Nhập nội dung"
+                style={{width: sizes.width * 0.4, maxHeight: sizes._180sdp, textAlign: 'center', justifyContent: 'center'}}
+                outlineStyle={{
+                  borderColor: colors.primary,
+                  borderRadius: sizes._16sdp,
+                }}
+                textColor={colors.primary_950}
+                placeholderTextColor={colors.primary_950}
+                onChangeText={txt => {
+                  this.setState({
+                    content: txt,
+                  });
+                }}
+                multiline
+              />
+            </View>
+
+            <TextBase
+              style={[
+                AppStyle.txt_18_bold,
+                {
+                  // marginLeft: sizes._16sdp,
+                  marginTop: sizes._16sdp,
+                  marginBottom: sizes._8sdp,
+                },
+              ]}>
+              Địa điểm
+            </TextBase>
+
+            {this.state.location && (
+              <View style={{paddingHorizontal: sizes._16sdp, width: sizes.width - sizes._16sdp,}}>
+                <LargeItemLocation location={this.state.location} />
+              </View>
+            )}
+            <TouchableOpacity
+              style={{
+                width: sizes.width * 0.4,
+                // marginLeft: sizes._16sdp,
+                height: sizes._50sdp,
+                backgroundColor: colors.primary,
+                borderRadius: sizes._16sdp,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+              onPress={() => {
+                this.refSheetLocation?.open();
+              }}>
+              <TextBase style={AppStyle.txt_18_bold}>
+                {' '}
+                {this.state.location ? 'Chọn lại địa điểm' : 'Chọn địa điểm'}
+              </TextBase>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => {
+                const newReview: IReview = {
+                  id: random(),
+                  content: this.state.content,
+                  name_user_review: this.state.avt?.userName ?? '',
+                  time_review: moment().format('dd/mm/yyyy hh:mm'),
+                  start: this.state.star,
+                  avatar: this.state.avt?.avatar ?? '',
+                  //@ts-ignore
+                  location: this.state.location,
+                };
+                this.setState(
+                  {
+                    reviews: [...[newReview], ...this.state.reviews],
+                  },
+                  () => {
+                    this.setState({
+                      content: '',
+                      star: 0,
+                      location: null,
+                    });
+                  },
+                );
+                this.refSheet?.close();
+              }}
+              disabled={this.state.content.length === 0 || !this.state.location}
+              style={{
+                position: 'absolute',
+                bottom: sizes._32sdp,
+                width: sizes.width - sizes._32sdp,
+                left: sizes._16sdp,
+                backgroundColor:
+                  this.state.content.length === 0 || !this.state.location
+                    ? colors.primary_100
+                    : colors.primary,
+                alignItems: 'center',
+                justifyContent: 'center',
+                height: sizes._50sdp,
+                borderRadius: sizes._16sdp,
+              }}>
+              <TextBase
+                //@ts-ignore
+                style={[
+                  AppStyle.txt_18_bold,
+                  (this.state.content.length === 0 || !this.state.location) && {
+                    color: colors.primary_400,
+                  },
+                ]}>
+                Đăng
+              </TextBase>
+            </TouchableOpacity>
           </View>
-        </ScrollView>
+        </BottomSheet>
+
+        <BottomSheet
+          height={sizes._csreen_height * 0.6}
+          ref={ref => {
+            this.refSheetLocation = ref;
+          }}>
+          <View
+            style={{
+              width: sizes.width,
+              backgroundColor: colors.primary,
+              paddingVertical: sizes._16sdp,
+              alignItems: 'center',
+            }}>
+            <TextBase style={AppStyle.txt_20_bold}>Chọn địa điểm</TextBase>
+          </View>
+          <View style={{padding: sizes._16sdp}}>
+            <FlatList
+              contentContainerStyle={{paddingBottom: sizes._100sdp}}
+              data={_.unionBy(LOCATION_POPULAR, LOCATION_NEARLY, 'id')}
+              renderItem={({item, index}) => {
+                return (
+                  <LargeItemLocation
+                    location={item}
+                    onPress={() => {
+                      this.setState(
+                        {
+                          location: item,
+                        },
+                        () => {
+                          this.refSheetLocation?.close();
+                        },
+                      );
+                    }}
+                  />
+                );
+              }}
+            />
+          </View>
+        </BottomSheet>
       </Page>
     );
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    padding: sizes._16sdp,
-  },
-  rowCenter: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-});

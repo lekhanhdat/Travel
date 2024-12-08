@@ -53,11 +53,11 @@ export default class LocationImage extends React.PureComponent<Props, States> {
 
 
             <Text style={styles.sectionTitle}>Video</Text>
-            {location.videos?.map((video, index) => (
-              <View key={index} style={styles.videoContainer}>
-                <ChildVideo videoId={video} />
-              </View>
-            ))}
+            {/* // {location.videos?.map((video, index) => (
+            //   <View key={index} style={styles.videoContainer}>
+            //     <ChildVideo videoId={video} />
+            //   </View>
+            // ))} */}
           </ScrollView>
         </View>
       </Page>

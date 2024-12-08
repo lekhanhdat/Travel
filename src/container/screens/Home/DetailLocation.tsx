@@ -86,7 +86,7 @@ export default class DetailLocationScreen extends React.PureComponent<
             />
 
             <View style={{flex: 1, padding: sizes._16sdp}}>
-              <TextBase style={[AppStyle.txt_20_bold]}>
+              <TextBase style={[AppStyle.txt_20_bold, {textAlign: 'center',}]}>
                 {location.name}
               </TextBase>
 

@@ -19,6 +19,7 @@ import {
   ChartsSvg,
   TranslateSvg,
   VipSvg,
+  SearchSvg,
   NewFeed,
   MapSvg,
   CameraSvg,
@@ -39,6 +40,9 @@ import Personal from './screens/Profile/Personal';
 import Advise from './screens/Maps/Advise';
 import DetailItem from './screens/NewFeed/DetailItem';
 import AllItemScreen from './screens/NewFeed/AllItemsScreen';
+import SearchScreen from './screens/NewFeed/SearchScreen';
+
+
 
 export enum ScreenName {
   SPLASH_SCREEN = 'SplashScreen',
@@ -54,6 +58,7 @@ export enum ScreenName {
   ADVISE = 'Advise',
   DETAIL_ITEM = 'DetailItem',
   VIEW_ALL_ITEM = 'ViewAllItem',
+  SEARCH_sCREEN = 'SearchScreen',
 }
 function MyTabBar({
   state,
@@ -130,6 +135,17 @@ function getSourceWithIndex(key: number, isFocused: boolean) {
     case 1:
       if (isFocused) {
         return {
+          icon: <SearchSvg width={24} height={24} fill={colors.black} />,
+          name: strings.search,
+        };
+      }
+      return {
+        icon: <SearchSvg width={24} height={24} />,
+        name: strings.search,
+      };
+    case 2:
+      if (isFocused) {
+        return {
           icon: <NewFeed width={24} height={24} fill={colors.black} />,
           name: strings.new_feed,
         };
@@ -137,8 +153,8 @@ function getSourceWithIndex(key: number, isFocused: boolean) {
       return {
         icon: <NewFeed width={24} height={24} />,
         name: strings.new_feed,
-      };
-    case 2:
+      };      
+    case 3:
       if (isFocused) {
         return {
           icon: <MapSvg width={24} height={24} fill={colors.black} />,
@@ -149,7 +165,7 @@ function getSourceWithIndex(key: number, isFocused: boolean) {
         icon: <MapSvg width={24} height={24} fill={'#DDDDDD'} />,
         name: strings.map,
       };
-    case 3:
+    case 4:
       if (isFocused) {
         return {
           icon: <CameraSvg width={24} height={24} fill={colors.black} />,
@@ -160,7 +176,7 @@ function getSourceWithIndex(key: number, isFocused: boolean) {
         icon: <CameraSvg width={24} height={24} />,
         name: strings.camera,
       };
-    case 4:
+    case 5:
       if (isFocused) {
         return {
           icon: <ProfileSvg width={24} height={24} fill={colors.black} />,
@@ -195,15 +211,18 @@ function HomeStack() {
         return strings.home_page;
       }
       case 1: {
-        return strings.new_feed;
+        return strings.search;
       }
       case 2: {
-        return strings.map;
+        return strings.new_feed;
       }
       case 3: {
-        return strings.camera;
+        return strings.map;
       }
       case 4: {
+        return strings.camera;
+      }
+      case 5: {
         return strings.profile;
       }
       default: {
@@ -237,6 +256,21 @@ function HomeStack() {
             ),
           }}
         />
+        <Tabs.Screen
+          name={strings.search}
+          component={SearchScreen}
+          options={{
+            tabBarIcon: ({focused}) => (
+              <View>
+                <Image
+                  source={
+                    focused ? images.tab_add_friends : images.tab_add_friends
+                  }
+                />
+              </View>
+            ),
+          }}
+        />        
         <Tabs.Screen
           name={strings.new_feed}
           component={NewFeedScreen}
@@ -310,6 +344,7 @@ const AppNavigator = createCompatNavigatorFactory(createStackNavigator)(
     Advise: {screen: Advise},
     DetailItem: {screen: DetailItem},
     ViewAllItem: {screen: AllItemScreen},
+    SearchScreen: {screen: SearchScreen},
   },
   {
     headerMode: 'none',
@@ -337,7 +372,7 @@ const styles = StyleSheet.create({
     fontFamily: fonts.GoogleSans_Regular,
   },
   containerTouch: {
-    width: sizes.width / 5,
+    width: sizes.width / 6,
     height: sizes._49sdp,
     alignItems: 'center',
     justifyContent: 'center',

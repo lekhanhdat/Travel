@@ -1,6 +1,7 @@
 const strings = {
   home_page: 'Địa điểm',
-  new_feed: 'Hiện vật',
+  search: 'Tìm kiếm',
+  new_feed: 'Bảng tin',
   map: 'Bản đồ',
   camera: 'Camera',
   profile: 'Cá nhân',

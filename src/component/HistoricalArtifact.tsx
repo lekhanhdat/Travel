@@ -25,6 +25,7 @@ export default class HistoricalArtifact extends React.PureComponent<
   }
   render(): React.ReactNode {
     const {item} = this.props;
+    console.log('item', item.images);
     return (
       <TouchableOpacity
         style={styles.container}
@@ -36,15 +37,17 @@ export default class HistoricalArtifact extends React.PureComponent<
         <Image
           source={{
             uri:
-              item.images && item.images.length > 0
+              typeof item.images === 'object' &&
+              item.images &&
+              item.images?.length > 0
                 ? // @ts-ignore
                   `${DB_URL}/${item.images[0]?.path}`
                 : undefined,
           }}
           style={styles.icon}
-          onError={err => {
-            console.error(err);
-          }}
+          // onError={err => {
+          //   console.error(err);
+          // }}
         />
         <View
           style={{

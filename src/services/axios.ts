@@ -23,7 +23,7 @@ request.interceptors.request.use(async config => {
   //     request.headers.Authorization = `Bearer ${token}`;
   //   }
 
-  config.headers['xc-token'] = 'wq-ABISx8gtwEXsr0HgnBxaMMBY-O3v8bXP-VVSc';
+  config.headers['xc-token'] = 'br8_3oqLxAD3-yihnr_A0G7s4hFt_nKd1qO_xEZq';
 
   return config;
 });

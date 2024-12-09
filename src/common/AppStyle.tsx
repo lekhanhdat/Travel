@@ -104,10 +104,10 @@ export const AppStyle = StyleSheet.create({
     fontFamily: fonts.GoogleSans_Bold,
     color: colors.black,
   },
-  txt_16_medium_review: {
-    fontSize: sizes._18sdp,
-    lineHeight: sizes._20sdp,
-    fontFamily: fonts.GoogleSans_Bold,
+  txt_16_medium_detail: {
+    fontSize: sizes._17sdp,
+    lineHeight: sizes._24sdp,
+    fontFamily: fonts.GoogleSans_Medium,
     color: colors.black,
   },
 });

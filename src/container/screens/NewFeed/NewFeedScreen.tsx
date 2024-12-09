@@ -142,7 +142,7 @@ export default class NewFeedScreen extends React.PureComponent<
                 paddingVertical: sizes._16sdp,
                 alignItems: 'center',
               }}>
-              <TextBase style={AppStyle.txt_20_bold}>Thêm Đánh Giá</TextBase>
+              <TextBase style={AppStyle.txt_20_bold}>Thêm Bình Luận</TextBase>
             </View>
 
             <View

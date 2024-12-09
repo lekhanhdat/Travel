@@ -450,7 +450,6 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
                     width: '100%',
                     height: 200,
                     borderRadius: 8,
-                    marginBottom: 10,
                   }} // Customize size and style
                   resizeMode="cover" // Image display mode
                 />

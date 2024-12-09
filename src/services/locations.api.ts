@@ -54,10 +54,15 @@ const locationApi = {
       params: {
         offset: '0',
         limit: '100',
-        filterByFormula: `FIND('${locationId}', {location})`,
+        // filterByFormula: `FIND('${locationId}', {location})`,
       },
     });
-    const data = res.data.list ?? [];
+    let data = res.data.list ?? [];
+
+    data = data.filter(
+      item => item.location && item.location?.Id === locationId,
+    );
+
     // return data.filter(item => item.location?.Id === locationId);
     return data;
   },

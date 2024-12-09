@@ -538,7 +538,6 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
                 locationApi
                   .getItemsWithLocationId(selectedLocation?.Id)
                   .then(data => {
-                    console.log(JSON.stringify(data, null, 2));
                     NavigationService.navigate(ScreenName.VIEW_ALL_ITEM, {
                       title: 'Hiện vật',
                       // items: _.unionBy(LOCATION_POPULAR, LOCATION_NEARLY, 'id'),

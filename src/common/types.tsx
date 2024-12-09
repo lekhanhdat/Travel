@@ -19,8 +19,8 @@ export interface ILocation {
   icon?: any;
   voiceName?: string;
   advise?: string[];
-  images?: string[];
-  videos?: string[];
+  images?: any[];
+  videos?: string;
   relatedKeyWord?: string;
 }
 
@@ -39,6 +39,6 @@ export interface IItem {
   name: string;
   description: string;
   video?: string;
-  images?: string[];
+  images?: any[];
   location?: Pick<ILocation, 'Id' | 'name'>;
 }

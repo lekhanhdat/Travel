@@ -1,13 +1,14 @@
-import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
+import {Image, ScrollView, StyleSheet, Text, View} from 'react-native';
 import React from 'react';
 import Page from '../../../component/Page';
 import HeaderBase from '../../../component/HeaderBase';
-import { BackSvg } from '../../../assets/assets/ImageSvg';
+import {BackSvg} from '../../../assets/assets/ImageSvg';
 import sizes from '../../../common/sizes';
 import colors from '../../../common/colors';
 import NavigationService from '../NavigationService';
-import { ILocation } from '../../../common/types';
+import {ILocation} from '../../../common/types';
 import YoutubePlayer from 'react-native-youtube-iframe';
+import {DB_URL} from '../../../utils/configs';
 
 interface Props {
   navigation: any;
@@ -37,27 +38,35 @@ export default class LocationImage extends React.PureComponent<Props, States> {
           <ScrollView>
             <Text style={styles.sectionTitle}>Hình ảnh</Text>
             {location.images?.map((image, index) => (
-              <Image key={index} source={{ uri: image }} style={styles.img} />
+              <Image
+                key={index}
+                source={{uri: `${DB_URL}/${image?.path}`}}
+                style={styles.img}
+              />
             ))}
 
-
-          <View
-            style={{
-              width: '100%',
-              height: 3,
-              backgroundColor: colors.xam,
-              marginTop: sizes._8sdp,
-              marginBottom: sizes._16sdp,
-            }}
-          />
-
+            <View
+              style={{
+                width: '100%',
+                height: 3,
+                backgroundColor: colors.xam,
+                marginTop: sizes._8sdp,
+                marginBottom: sizes._16sdp,
+              }}
+            />
 
             <Text style={styles.sectionTitle}>Video</Text>
-            {/* // {location.videos?.map((video, index) => (
-            //   <View key={index} style={styles.videoContainer}>
-            //     <ChildVideo videoId={video} />
-            //   </View>
-            // ))} */}
+            {/* {location?.videos &&
+              location.videos?.map((video, index) => (
+                <View key={index} style={styles.videoContainer}>
+                  <ChildVideo videoId={video} />
+                </View>
+              ))} */}
+            {location?.videos && (
+              <View style={styles.videoContainer}>
+                <ChildVideo videoId={location?.videos as unknown as string} />
+              </View>
+            )}
           </ScrollView>
         </View>
       </Page>
@@ -76,7 +85,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: colors.primary_950,
     marginBottom: sizes._16sdp,
-    textAlign: 'center', 
+    textAlign: 'center',
   },
   img: {
     width: sizes.width - sizes._32sdp,
@@ -86,7 +95,7 @@ const styles = StyleSheet.create({
   },
   videoContainer: {
     borderRadius: sizes._16sdp,
-    overflow: 'hidden', 
+    overflow: 'hidden',
   },
 });
 

@@ -1,13 +1,13 @@
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import {ScrollView, StyleSheet, Text, View} from 'react-native';
 import React from 'react';
 import Page from '../../../component/Page';
 import HeaderBase from '../../../component/HeaderBase';
-import { BackSvg } from '../../../assets/assets/ImageSvg';
+import {BackSvg} from '../../../assets/assets/ImageSvg';
 import colors from '../../../common/colors';
 import sizes from '../../../common/sizes';
 import NavigationService from '../NavigationService';
-import { ILocation } from '../../../common/types';
-import { AppStyle } from '../../../common/AppStyle';
+import {ILocation} from '../../../common/types';
+import {AppStyle} from '../../../common/AppStyle';
 
 interface Props {
   navigation: any;
@@ -17,6 +17,7 @@ interface States {}
 export default class Advise extends React.PureComponent<Props, States> {
   render(): React.ReactNode {
     const location: ILocation = this.props.navigation.state.params?.location;
+    console.log(111, JSON.stringify(location, null, 2));
     return (
       <Page style={styles.pageContainer}>
         <HeaderBase
@@ -39,11 +40,12 @@ export default class Advise extends React.PureComponent<Props, States> {
           </Text>
         </View>
 
-        {location.advise?.map((item, index) => (
-          <View key={index} style={styles.adviseItem}>
-            <Text style={styles.adviseText}>{index + 1}. {item}</Text>
-          </View>
-        ))}
+        {location?.advise &&
+          location.advise.split('\n').map((item, index) => (
+            <View key={index} style={styles.adviseItem}>
+              <Text style={styles.adviseText}>- {item}</Text>
+            </View>
+          ))}
 
         {/* <View style={styles.contentContainer}>
           <Text style={[AppStyle.txt_20_bold, styles.titleText]}>

@@ -18,7 +18,7 @@ export interface ILocation {
   recommendation: string;
   icon?: any;
   voiceName?: string;
-  advise?: string[];
+  advise?: string;
   images?: any[];
   videos?: string;
   relatedKeyWord?: string;

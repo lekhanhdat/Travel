@@ -4,7 +4,7 @@ import Page from '../../../component/Page';
 import HeaderBase from '../../../component/HeaderBase';
 import strings from '../../../res/strings';
 import {reviews} from '../../../common/reviewsConstants';
-import {IAccount, ILocation, IReview} from '../../../common/types';
+import {IAccount, ILocation, IReview,} from '../../../common/types';
 import ReviewItem from '../../../component/ReviewItem';
 import sizes from '../../../common/sizes';
 import BottomSheet from '../../../component/BottomSheet';
@@ -24,12 +24,16 @@ import {
   LOCATION_POPULAR,
 } from '../../../common/locationConstants';
 import LargeItemLocation from '../../../component/LargeItemLocation';
+import locationApi from '../../../services/locations.api';
+
 
 // ĐÂY LÀ TRANG NEWFEED CHUẨN
 // ĐÂY LÀ TRANG NEWFEED CHUẨN
 // ĐÂY LÀ TRANG NEWFEED CHUẨN
 
-interface INewFeedScreenProps {}
+interface INewFeedScreenProps {
+  navigation: any;
+}
 
 interface INewFeedScreenState {
   reviews: IReview[];
@@ -37,6 +41,10 @@ interface INewFeedScreenState {
   star: number;
   content: string;
   location?: ILocation | null | undefined;
+  valueSearch: string;
+  locations: ILocation[];
+  locationsPopular: ILocation[];
+  locationsNearly: ILocation[];
 }
 
 export default class NewFeedScreen extends React.PureComponent<
@@ -53,12 +61,26 @@ export default class NewFeedScreen extends React.PureComponent<
       star: 0,
       content: '',
       location: null,
+      valueSearch: '',
+      locations: [],
+      locationsNearly: [],
+      locationsPopular: [],
     };
   }
 
   componentDidMount(): void {
     this.handleGetReviews();
     this.handleGetAvt();
+    this.fetchLocations();
+  }
+
+  async fetchLocations() {
+    const data = await locationApi.getLocations();
+    this.setState({
+      locations: data,
+      locationsNearly: data.slice(10, 20),
+      locationsPopular: data.slice(0, 10),
+    });
   }
 
   handleGetReviews = () => {
@@ -84,6 +106,21 @@ export default class NewFeedScreen extends React.PureComponent<
     this.setState({
       avt: avt,
     });
+  };
+  
+  renderItemLarge = ({item, index}: {item: ILocation; index: number}) => {
+    return <LargeItemLocation location={item} 
+    onPress={() => {
+      this.setState(
+        {
+          location: item,
+        },
+        () => {
+          this.refSheetLocation?.close();
+        },
+      );
+    }}
+    />;
   };
 
   renderItem = ({item, index}: {item: IReview; index: number}) => {
@@ -360,25 +397,30 @@ export default class NewFeedScreen extends React.PureComponent<
           </View>
           <View style={{padding: sizes._16sdp}}>
             <FlatList
-              contentContainerStyle={{paddingBottom: sizes._100sdp}}
-              data={_.unionBy(LOCATION_POPULAR, LOCATION_NEARLY, 'id')}
-              renderItem={({item, index}) => {
-                return (
-                  <LargeItemLocation
-                    location={item}
-                    onPress={() => {
-                      this.setState(
-                        {
-                          location: item,
-                        },
-                        () => {
-                          this.refSheetLocation?.close();
-                        },
-                      );
-                    }}
-                  />
-                );
-              }}
+              data={this.state.locations}
+              renderItem={this.renderItemLarge}
+              contentContainerStyle={{paddingBottom: sizes._60sdp}}
+              keyExtractor={item => item.Id.toString()}
+              scrollEnabled={true}
+              showsHorizontalScrollIndicator={false}
+              
+              // renderItem={({item, index}) => {
+              //   return (
+              //     <LargeItemLocation
+              //       location={item}
+              //       onPress={() => {
+              //         this.setState(
+              //           {
+              //             location: item,
+              //           },
+              //           () => {
+              //             this.refSheetLocation?.close();
+              //           },
+              //         );
+              //       }}
+              //     />
+              //   );
+              // }}
             />
           </View>
         </BottomSheet>

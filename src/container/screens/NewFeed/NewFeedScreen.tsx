@@ -79,7 +79,7 @@ export default class NewFeedScreen extends React.PureComponent<
     this.setState({
       locations: data,
       locationsNearly: data.slice(10, 20),
-      locationsPopular: data.slice(0, 10),
+      locationsPopular: data.slice(36, 47),
     });
   }
 
@@ -397,7 +397,7 @@ export default class NewFeedScreen extends React.PureComponent<
           </View>
           <View style={{padding: sizes._16sdp}}>
             <FlatList
-              data={this.state.locations}
+              data={this.state.locationsPopular}
               renderItem={this.renderItemLarge}
               contentContainerStyle={{paddingBottom: sizes._60sdp}}
               keyExtractor={item => item.Id.toString()}

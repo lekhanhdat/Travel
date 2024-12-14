@@ -36,6 +36,11 @@ export const accounts: IAccount[] = [
   {
     userName: 'a',
     password: 'a',
-    avatar: 'https://ss-images.saostar.vn/wwebp1200/pc/1613810558698/Facebook-Avatar_3.png'
+    avatar: 'https://isontra.vn/uploads/article/truong-thpt-hoang-hoa-tham-1670464457.jpg'
+  },
+  {
+    userName: 'HHT',
+    password: 'HHT',
+    avatar: 'https://isontra.vn/uploads/article/truong-thpt-hoang-hoa-tham-1670464457.jpg'
   }
 ];

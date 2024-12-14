@@ -19,8 +19,8 @@ export type GetItemsResponse = {
   };
 };
 
-export const URL_GET_LOCATIONS = '/api/v2/tables/mji9739oa80msk2/records';
-export const URL_GET_ITEMS = '/api/v2/tables/mw9f2fa130osrez/records';
+export const URL_GET_LOCATIONS = '/api/v2/tables/myyqk2s9dxvqpxa/records';
+export const URL_GET_ITEMS = '/api/v2/tables/m0s4uwjesun4rl9/records';
 
 const locationApi = {
   getLocations: async () => {

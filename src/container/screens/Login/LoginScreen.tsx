@@ -128,9 +128,14 @@ export default class LoginScreen extends React.PureComponent<ILoginScreenProps, 
           />
 
         <View>
-          <Text style={{color: colors.primary, marginTop: sizes._10sdp, marginLeft: sizes._10sdp}}>
-            Quên mật khẩu?
-          </Text>
+          <TouchableOpacity
+          onPress={() => {
+            NavigationService.reset(ScreenName.FORGOT_PASSWORD);            
+          }}>
+            <Text style={{color: colors.primary, marginTop: sizes._10sdp, marginLeft: sizes._10sdp}}>
+              Quên mật khẩu?
+            </Text>
+          </TouchableOpacity>          
         </View>
 
           <TouchableOpacity style={[styles.btn, (this.state.userName.length === 0 || this.state.password.length === 0) && {
@@ -147,9 +152,14 @@ export default class LoginScreen extends React.PureComponent<ILoginScreenProps, 
 
           <Text style={{color: colors.primary, marginTop: sizes._10sdp, textAlign: 'center'}}>
             Chưa có tài khoản? {' '}
+            <TouchableOpacity 
+              onPress={() => {
+                NavigationService.reset(ScreenName.SIGN_UP);            
+              }}>
             <Text style={{fontWeight: 'bold'}}>
                 Đăng ký
             </Text>
+            </TouchableOpacity>
           </Text>
 
 

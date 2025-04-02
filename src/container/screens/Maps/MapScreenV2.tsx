@@ -33,7 +33,7 @@ import images from '../../../res/images';
 import locationApi from '../../../services/locations.api';
 
 MapboxGL.setAccessToken(
-  'pk.eyJ1IjoiaG9hbmd0cnVuZzE4MDEiLCJhIjoiY20ybXVpbDJ3MHF6NzJqcHMyOWJnbzQ0OSJ9.eMymOvaYvLYhRhoMTLhPng',
+  'pk.eyJ1IjoibGVraGFuaGRhdCIsImEiOiJjbTh0cDY4a3EwZmFxMm1zamZoYmVnd2JzIn0.9kuRDX63f6v1B6s-XGwmwA',
 );
 
 const styles = StyleSheet.create({
@@ -76,8 +76,8 @@ const AnnotationContent = ({title}: {title: string}) => (
 );
 
 const MapScreenV2 = ({navigation}: {navigation: any}) => {
-  const [currentLat, setCurrentLat] = useState(16.03046986914924);
-  const [currentLong, setCurrentLong] = useState(108.21410387999788);
+  const [currentLat, setCurrentLat] = useState(16.026084727153087);
+  const [currentLong, setCurrentLong] = useState(108.23980496658481);
   const [routeCoordinates, setRouteCoordinates] = useState([]);
   const [visible, setVisible] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState<ILocation | null>(

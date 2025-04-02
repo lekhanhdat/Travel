@@ -77,8 +77,8 @@ export default class SearchScreen extends React.PureComponent<
     console.log(JSON.stringify(data, null, 2));
     this.setState({
       items: data,
-      ITEMS_POPULAR: data.slice(0, 10),
-      ITEMS_NEARLY: data.slice(15, 25),
+      ITEMS_POPULAR: data.slice(10, 40),
+      ITEMS_NEARLY: data.slice(0, 15),
     });
   }
 

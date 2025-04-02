@@ -41,6 +41,8 @@ import Advise from './screens/Maps/Advise';
 import DetailItem from './screens/NewFeed/DetailItem';
 import AllItemScreen from './screens/NewFeed/AllItemsScreen';
 import SearchScreen from './screens/NewFeed/SearchScreen';
+import SignUpScreen from './screens/Login/SignUpScreen';
+import ForgotPasswordScreen from './screens/Login/ForgotPasswordScreen';
 
 
 
@@ -59,6 +61,9 @@ export enum ScreenName {
   DETAIL_ITEM = 'DetailItem',
   VIEW_ALL_ITEM = 'ViewAllItem',
   SEARCH_sCREEN = 'SearchScreen',
+  SIGN_UP = 'SignUpScreen',
+  FORGOT_PASSWORD = 'ForgotPasswordScreen',
+
 }
 function MyTabBar({
   state,
@@ -234,7 +239,7 @@ function HomeStack() {
     <View style={styles.container}>
       <Tabs.Navigator
         key={getRouterFromProp()}
-        initialRouteName={strings.map}
+        initialRouteName={strings.home_page}
         screenOptions={{
           headerShown: false,
         }}
@@ -345,6 +350,8 @@ const AppNavigator = createCompatNavigatorFactory(createStackNavigator)(
     DetailItem: {screen: DetailItem},
     ViewAllItem: {screen: AllItemScreen},
     SearchScreen: {screen: SearchScreen},
+    SignUpScreen: {screen: SignUpScreen},
+    ForgotPasswordScreen: {screen: ForgotPasswordScreen},
   },
   {
     headerMode: 'none',

@@ -1,15 +1,16 @@
 import React from 'react';
-import Page from '../../../component/Page';
 import { View, StyleSheet, Image, Text, TouchableOpacity } from 'react-native';
-import { TextInput, Button } from 'react-native-paper';
+import { TextInput } from 'react-native-paper';
+import Swiper from 'react-native-swiper';
+import Toast from 'react-native-toast-message';
+
+import Page from '../../../component/Page';
 import sizes from '../../../common/sizes';
 import colors from '../../../common/colors';
 import images from '../../../res/images';
 import { AppStyle } from '../../../common/AppStyle';
-import Toast from 'react-native-toast-message';
 import NavigationService from '../NavigationService';
 import { ScreenName } from '../../AppContainer';
-import Swiper from 'react-native-swiper';
 
 interface ISignUpScreenState {
   userName: string;
@@ -44,20 +45,29 @@ export default class SignUpScreen extends React.PureComponent<{}, ISignUpScreenS
     NavigationService.push(ScreenName.LOGIN);
   };
 
-  render(): React.ReactNode {
+  toggleSecureEntry = () => {
+    this.setState(prevState => ({ isSecureTextEntry: !prevState.isSecureTextEntry }));
+  };
+
+  renderBanner = (banner: any, index: number) => (
+    <View key={index} style={styles.bannerContainer}>
+      <Image source={banner} style={styles.bannerImage} />
+    </View>
+  );
+
+  render() {
+    const { userName, password, confirmPassword, isSecureTextEntry } = this.state;
+    const isSignUpDisabled = !userName || !password || !confirmPassword;
+
     return (
       <Page>
         <View style={styles.wrapper}>
           <Swiper height={sizes._400sdp} autoplay activeDotColor={colors.primary}>
-            {[images.caurong, images.cauvang, images.dienhai, images.nharong].map((banner, index) => (
-              <View key={index} style={{ flex: 1 }}>
-                <Image source={banner} style={styles.bannerImage} />
-              </View>
-            ))}
+            {[images.caurong, images.cauvang, images.dienhai, images.nharong].map(this.renderBanner)}
           </Swiper>
         </View>
 
-        <View style={{ alignItems: 'center' }}>
+        <View style={styles.titleContainer}>
           <Text style={styles.title}>Đăng ký</Text>
         </View>
 
@@ -68,7 +78,7 @@ export default class SignUpScreen extends React.PureComponent<{}, ISignUpScreenS
             placeholder="Nhập tên đăng nhập"
             style={styles.input}
             outlineStyle={styles.inputOutline}
-            onChangeText={(txt) => this.setState({ userName: txt })}
+            onChangeText={userName => this.setState({ userName })}
           />
 
           <TextInput
@@ -77,9 +87,9 @@ export default class SignUpScreen extends React.PureComponent<{}, ISignUpScreenS
             placeholder="Nhập mật khẩu"
             style={styles.input}
             outlineStyle={styles.inputOutline}
-            secureTextEntry={this.state.isSecureTextEntry}
-            right={<TextInput.Icon icon={this.state.isSecureTextEntry ? images.eye_open : images.eye_close} onPress={() => this.setState({ isSecureTextEntry: !this.state.isSecureTextEntry })} />}
-            onChangeText={(txt) => this.setState({ password: txt })}
+            secureTextEntry={isSecureTextEntry}
+            right={<TextInput.Icon icon={isSecureTextEntry ? images.eye_open : images.eye_close} onPress={this.toggleSecureEntry} />}
+            onChangeText={password => this.setState({ password })}
           />
 
           <TextInput
@@ -88,24 +98,29 @@ export default class SignUpScreen extends React.PureComponent<{}, ISignUpScreenS
             placeholder="Nhập lại mật khẩu"
             style={styles.input}
             outlineStyle={styles.inputOutline}
-            secureTextEntry={this.state.isSecureTextEntry}
-            onChangeText={(txt) => this.setState({ confirmPassword: txt })}
+            secureTextEntry={isSecureTextEntry}
+            right={<TextInput.Icon icon={isSecureTextEntry ? images.eye_open : images.eye_close} onPress={this.toggleSecureEntry} />}
+            onChangeText={confirmPassword => this.setState({ confirmPassword })}
           />
 
           <TouchableOpacity
-            style={[styles.btn, (!this.state.userName || !this.state.password || !this.state.confirmPassword) && { backgroundColor: colors.primary_100 }]}
+            style={[styles.btn, isSignUpDisabled && { backgroundColor: colors.primary_100 }]}
             onPress={this.handleSignUp}
-            disabled={!this.state.userName || !this.state.password || !this.state.confirmPassword}
+            disabled={isSignUpDisabled}
           >
-            <Text style={[AppStyle.txt_20_bold, { color: !this.state.userName || !this.state.password || !this.state.confirmPassword ? colors.primary_400 : '#F7F2E5' }]}>Đăng ký</Text>
+            <Text style={[AppStyle.txt_20_bold, { color: isSignUpDisabled ? colors.primary_400 : '#F7F2E5' }]}>
+              Đăng ký
+            </Text>
           </TouchableOpacity>
 
-          <Text style={styles.loginText}>
-            Đã có tài khoản? {' '}
-            <TouchableOpacity onPress={() => NavigationService.reset(ScreenName.LOGIN_SCREEN)}>
-              <Text style={{ fontWeight: 'bold' }}>Đăng nhập</Text>
-            </TouchableOpacity>
-          </Text>
+          <View style={styles.loginContainer}>
+            <Text style={styles.loginText}>
+              Đã có tài khoản?{' '}
+              <TouchableOpacity onPress={() => NavigationService.reset(ScreenName.LOGIN_SCREEN)}>
+                <Text style={styles.loginLink}>Đăng nhập</Text>
+              </TouchableOpacity>
+            </Text>
+          </View>
         </View>
       </Page>
     );
@@ -113,10 +128,45 @@ export default class SignUpScreen extends React.PureComponent<{}, ISignUpScreenS
 }
 
 const styles = StyleSheet.create({
+  wrapper: {
+    width: '100%',
+    height: sizes._320sdp,
+    marginBottom: sizes._30sdp,
+    borderBottomLeftRadius: sizes._50sdp,
+    borderBottomRightRadius: sizes._50sdp,
+    overflow: 'hidden',
+  },
+  bannerContainer: {
+    flex: 1,
+  },
+  bannerImage: {
+    width: sizes.width,
+    height: sizes._400sdp,
+    borderBottomLeftRadius: sizes._50sdp,
+    borderBottomRightRadius: sizes._50sdp,
+    alignSelf: 'center',
+  },
+  titleContainer: {
+    alignItems: 'center',
+  },
+  title: {
+    color: colors.black,
+    fontSize: sizes._25sdp,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
   container: {
     flex: 1,
     paddingHorizontal: sizes._16sdp,
     marginTop: sizes._10sdp,
+  },
+  input: {
+    width: '100%',
+    marginBottom: sizes._16sdp,
+  },
+  inputOutline: {
+    borderColor: colors.primary,
+    borderRadius: sizes._16sdp,
   },
   btn: {
     width: '100%',
@@ -127,39 +177,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginTop: sizes._40sdp,
   },
-  wrapper: {
-    width: '100%',
-    height: sizes._320sdp,
-    marginBottom: sizes._30sdp,
-    borderBottomLeftRadius: sizes._50sdp,
-    borderBottomRightRadius: sizes._50sdp,
-    overflow: 'hidden',
-  },
-  bannerImage: {
-    width: sizes.width,
-    height: sizes._400sdp,
-    borderBottomLeftRadius: sizes._50sdp,
-    borderBottomRightRadius: sizes._50sdp,
-    alignSelf: 'center',
-  },
-  title: {
-    color: '#F97350',
-    fontSize: sizes._25sdp,
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  input: {
-    width: '100%',
-    marginBottom: sizes._16sdp,
-    backgroundColor: '#F7F2E5',
-  },
-  inputOutline: {
-    borderColor: colors.primary,
-    borderRadius: sizes._16sdp,
+  loginContainer: {
+    marginTop: sizes._10sdp,
   },
   loginText: {
     color: colors.primary,
-    marginTop: sizes._10sdp,
     textAlign: 'center',
+  },
+  loginLink: {
+    fontWeight: 'bold',
   },
 });

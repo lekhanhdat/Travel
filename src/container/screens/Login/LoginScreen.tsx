@@ -1,168 +1,153 @@
 import React from 'react';
-import Page from '../../../component/Page';
 import { View, StyleSheet, Image, Text, TouchableOpacity } from 'react-native';
-import { TextInput, Button } from 'react-native-paper';
+import { TextInput } from 'react-native-paper';
+import Swiper from 'react-native-swiper';
+import Toast from 'react-native-toast-message';
+
+import Page from '../../../component/Page';
 import sizes from '../../../common/sizes';
 import colors from '../../../common/colors';
 import images from '../../../res/images';
 import { AppStyle } from '../../../common/AppStyle';
 import { accounts } from '../../../common/authConstants';
-import Toast from 'react-native-toast-message';
 import NavigationService from '../NavigationService';
 import { ScreenName } from '../../AppContainer';
-import Swiper from 'react-native-swiper'
 import { localStorageKey } from '../../../common/constants';
 import LocalStorageCommon from '../../../utils/LocalStorageCommon';
-
-interface ILoginScreenProps {
-
-}
 
 interface ILoginScreenState {
   isSecureTextEntry: boolean;
   userName: string;
   password: string;
-  banners: any[]
+  banners: any[];
 }
 
-export default class LoginScreen extends React.PureComponent<ILoginScreenProps, ILoginScreenState> {
-  constructor(props: ILoginScreenProps) {
+export default class LoginScreen extends React.PureComponent<{}, ILoginScreenState> {
+  constructor(props: {}) {
     super(props);
     this.state = {
       isSecureTextEntry: true,
       userName: '',
       password: '',
-      banners: [
-        images.caurong,
-        images.cauvang,
-        images.dienhai,
-        images.nharong,
-      ]
-    }
+      banners: [images.caurong, images.cauvang, images.dienhai, images.nharong],
+    };
   }
 
   handleLogin = () => {
-    const findExitsAccount = accounts.find(account => account.userName === this.state.userName && account.password === this.state.password)
-    if (!findExitsAccount) {
+    const account = accounts.find(
+      acc => acc.userName === this.state.userName && acc.password === this.state.password
+    );
+
+    if (!account) {
       Toast.show({
         type: 'error',
         text1: 'Tên tài khoản hoặc mật khẩu không chính xác',
-      })
+      });
       return;
     }
-    LocalStorageCommon.setItem(localStorageKey.USERNAME, findExitsAccount.userName);
-    LocalStorageCommon.setItem(localStorageKey.PASSWORD, findExitsAccount.password);
-    LocalStorageCommon.setItem(localStorageKey.AVT, findExitsAccount);
-    NavigationService.push(ScreenName.HOME_STACK_SCREEN);
-  }
 
-  render(): React.ReactNode {
+    LocalStorageCommon.setItem(localStorageKey.USERNAME, account.userName);
+    LocalStorageCommon.setItem(localStorageKey.PASSWORD, account.password);
+    LocalStorageCommon.setItem(localStorageKey.AVT, account);
+    NavigationService.push(ScreenName.HOME_STACK_SCREEN);
+  };
+
+  toggleSecureEntry = () => {
+    this.setState(prevState => ({
+      isSecureTextEntry: !prevState.isSecureTextEntry,
+    }));
+  };
+
+  renderBanner = (banner: any, index: number) => (
+    <View key={index} style={styles.bannerContainer}>
+      <Image
+        source={banner}
+        style={styles.bannerImage}
+      />
+    </View>
+  );
+
+  render() {
+    const { userName, password, isSecureTextEntry, banners } = this.state;
+    const isLoginDisabled = !userName || !password;
+
     return (
-      <Page >
-        <View style={[styles.wrapper]}>  
-        <Swiper
+      <Page>
+        <View style={styles.wrapper}>
+          <Swiper
             height={sizes._400sdp}
             autoplay
-            activeDotColor={colors.primary}
-          >        
-            {
-              this.state.banners.map(banner => {
-                return <View style={{ flex: 1 }}>
-                  <Image source={banner} style={{ width: sizes.width, height: sizes._400sdp, borderBottomLeftRadius: sizes._50sdp, borderBottomRightRadius: sizes._50sdp, alignSelf: 'center' }} />
-                </View>
-              })
-            }
+            activeDotColor={colors.white}
+          >
+            {banners.map(this.renderBanner)}
           </Swiper>
         </View>
 
-        <View style={{ alignItems: 'center'}}>
-          <Text
-            style={{
-              // color: colors.primary,
-              color: '#F97350',
-              fontSize: sizes._25sdp,
-              fontWeight: 'bold', // In đậm
-              textAlign: 'center', // Căn giữa văn bản
-            }}>
-            Đăng nhập
-          </Text>
+        <View style={styles.titleContainer}>
+          <Text style={styles.title}>Đăng nhập</Text>
         </View>
 
-        
         <View style={styles.container}>
-
           <TextInput
             mode="outlined"
             label="Tên đăng nhập"
             placeholder="Nhập tên đăng nhập"
-            style={{ width: '100%', marginBottom: sizes._16sdp, backgroundColor: '#F7F2E5' }}
-            outlineStyle={{ borderColor: colors.primary, borderRadius: sizes._16sdp }}
+            style={styles.textInput}
+            outlineStyle={styles.inputOutline}
             textColor={colors.primary_950}
-            placeholderTextColor={'#F97350'}
-            onChangeText={(txt) => {
-              this.setState({
-                userName: txt
-              })
-            }}
+            placeholderTextColor={colors.black}
+            onChangeText={userName => this.setState({ userName })}
           />
 
           <TextInput
             mode="outlined"
             label="Mật khẩu"
             placeholder="Nhập mật khẩu"
-            style={{ width: '100%', backgroundColor: '#F7F2E5' }}
-            outlineStyle={{ borderColor: colors.primary, borderRadius: sizes._16sdp }}
+            style={styles.textInput}
+            outlineStyle={styles.inputOutline}
             textColor={colors.primary_950}
-            placeholderTextColor={'#F97350'}
-            right={<TextInput.Icon icon={this.state.isSecureTextEntry ? images.eye_open : images.eye_close} onPress={() => {
-              this.setState({
-                isSecureTextEntry: !this.state.isSecureTextEntry
-              })
-            }} />}
-            secureTextEntry={this.state.isSecureTextEntry}
-            onChangeText={(txt) => {
-              this.setState({
-                password: txt
-              })
-            }}
+            placeholderTextColor={colors.black}
+            secureTextEntry={isSecureTextEntry}
+            right={
+              <TextInput.Icon
+                icon={isSecureTextEntry ? images.eye_open : images.eye_close}
+                onPress={this.toggleSecureEntry}
+              />
+            }
+            onChangeText={password => this.setState({ password })}
           />
 
-        <View>
           <TouchableOpacity
-          onPress={() => {
-            NavigationService.reset(ScreenName.FORGOT_PASSWORD);            
-          }}>
-            <Text style={{color: colors.primary, marginTop: sizes._10sdp, marginLeft: sizes._10sdp}}>
-              Quên mật khẩu?
-            </Text>
-          </TouchableOpacity>          
-        </View>
-
-          <TouchableOpacity style={[styles.btn, (this.state.userName.length === 0 || this.state.password.length === 0) && {
-            backgroundColor: colors.primary_100
-          }]}
-            onPress={this.handleLogin}
-            disabled={this.state.userName.length === 0 || this.state.password.length === 0}
+            onPress={() => NavigationService.reset(ScreenName.FORGOT_PASSWORD)}
           >
-            <Text style={[AppStyle.txt_20_bold, {
-              color: (this.state.userName.length === 0 || this.state.password.length === 0) ?
-                colors.primary_400 : '#F7F2E5'
-            }]}>Đăng nhập</Text>
+            <Text style={styles.forgotPassword}>Quên mật khẩu?</Text>
           </TouchableOpacity>
 
-          <Text style={{color: colors.primary, marginTop: sizes._10sdp, textAlign: 'center'}}>
-            Chưa có tài khoản? {' '}
-            <TouchableOpacity 
-              onPress={() => {
-                NavigationService.reset(ScreenName.SIGN_UP);            
-              }}>
-            <Text style={{fontWeight: 'bold'}}>
-                Đăng ký
+          <TouchableOpacity
+            style={[styles.loginButton, isLoginDisabled && styles.disabledButton]}
+            onPress={this.handleLogin}
+            disabled={isLoginDisabled}
+          >
+            <Text
+              style={[
+                AppStyle.txt_20_bold,
+                { color: isLoginDisabled ? colors.primary_400 : colors.white },
+              ]}
+            >
+              Đăng nhập
             </Text>
-            </TouchableOpacity>
-          </Text>
+          </TouchableOpacity>
 
-
+          <View style={styles.signupContainer}>
+            <Text style={styles.signupText}>
+              Chưa có tài khoản?{' '}
+              <TouchableOpacity
+                onPress={() => NavigationService.reset(ScreenName.SIGN_UP)}
+              >
+                <Text style={styles.signupLink}>Đăng ký</Text>
+              </TouchableOpacity>
+            </Text>
+          </View>
         </View>
       </Page>
     );
@@ -170,27 +155,71 @@ export default class LoginScreen extends React.PureComponent<ILoginScreenProps, 
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingHorizontal: sizes._16sdp,
-    marginTop: sizes._10sdp,
-  },
-  btn: {
-    width: '100%',
-    paddingVertical: sizes._16sdp,
-    borderRadius: sizes._16sdp,
-    backgroundColor: colors.primary,
-    // backgroundColor: '#FAD06C',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: sizes._40sdp
-  },
   wrapper: {
     width: '100%',
     height: sizes._320sdp,
     marginBottom: sizes._30sdp,
     borderBottomLeftRadius: sizes._50sdp,
     borderBottomRightRadius: sizes._50sdp,
-    overflow: 'hidden',  // Clips content to the rounded corners
+    overflow: 'hidden',
   },
-})
+  bannerContainer: {
+    flex: 1,
+  },
+  bannerImage: {
+    width: sizes.width,
+    height: sizes._400sdp,
+    borderBottomLeftRadius: sizes._50sdp,
+    borderBottomRightRadius: sizes._50sdp,
+    alignSelf: 'center',
+  },
+  titleContainer: {
+    alignItems: 'center',
+  },
+  title: {
+    color: colors.black,
+    fontSize: sizes._25sdp,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  container: {
+    flex: 1,
+    paddingHorizontal: sizes._16sdp,
+    marginTop: sizes._10sdp,
+  },
+  textInput: {
+    width: '100%',
+    marginBottom: sizes._16sdp,
+  },
+  inputOutline: {
+    borderColor: colors.black,
+    borderRadius: sizes._16sdp,
+  },
+  forgotPassword: {
+    color: colors.primary,
+    marginTop: sizes._10sdp,
+    marginLeft: sizes._10sdp,
+  },
+  loginButton: {
+    width: '100%',
+    paddingVertical: sizes._16sdp,
+    borderRadius: sizes._16sdp,
+    backgroundColor: colors.black,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: sizes._40sdp,
+  },
+  disabledButton: {
+    backgroundColor: colors.primary_200,
+  },
+  signupContainer: {
+    marginTop: sizes._10sdp,
+  },
+  signupText: {
+    color: colors.primary,
+    textAlign: 'center',
+  },
+  signupLink: {
+    fontWeight: 'bold',
+  },
+});

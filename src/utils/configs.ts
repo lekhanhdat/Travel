@@ -1,3 +1,3 @@
-export const SERVER_URL = 'https://whale-app-oazhf.ondigitalocean.app';
-export const DB_URL = 'https://digital-ocean-fast-api-4qi9t.ondigitalocean.app/';
+export const SERVER_URL = 'https://digital-ocean-fast-api-h9zys.ondigitalocean.app';
+export const DB_URL = 'https://digital-ocean-fast-api-h9zys.ondigitalocean.app/';
 

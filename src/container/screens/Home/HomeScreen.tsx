@@ -71,7 +71,7 @@ export default class HomeScreen extends React.PureComponent<
     this.setState({
       locations: data,
       locationsNearly: data.slice(10, 20),
-      locationsPopular: data.slice(36, 47),
+      locationsPopular: data.slice(0, 10),
     });
   }
 

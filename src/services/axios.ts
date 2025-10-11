@@ -23,7 +23,7 @@ request.interceptors.request.use(async config => {
   //     request.headers.Authorization = `Bearer ${token}`;
   //   }
 
-  config.headers['xc-token'] = 'hwOWpRhvNjzxMnl7TbNN73O6GtFr9tLiakAR2dBx';
+  config.headers['xc-token'] = 'r_Y3AT7KqLHkKLRWYoa1WzsKNn5S0KKhm1ue4Uja'; // NocoDB API Token
 
   return config;
 });

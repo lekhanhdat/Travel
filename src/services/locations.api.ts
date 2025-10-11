@@ -19,8 +19,8 @@ export type GetItemsResponse = {
   };
 };
 
-export const URL_GET_LOCATIONS = '/api/v2/tables/myyqk2s9dxvqpxa/records';
-export const URL_GET_ITEMS = '/api/v2/tables/m0s4uwjesun4rl9/records';
+export const URL_GET_LOCATIONS = '/api/v2/tables/m9x4suuh5ufxi1n/records'; // NocoDB Locations Table
+export const URL_GET_ITEMS = '/api/v2/tables/m0s4uwjesun4rl9/records'; // Items - chưa setup
 
 const locationApi = {
   getLocations: async () => {

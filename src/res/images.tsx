@@ -16,6 +16,7 @@
     tab_add_friends: require('../assets/images/tab_add_friends.png'),
     tab_add_friends_focus: require('../assets/images/tab_add_friends_focus.png'),
     danang: require('../assets/images/danang.jpg'),
+    danang_logo: require('../assets/images/danang_logo.png'),
     search: require('../assets/images/search.png'),
     chibi: require('../assets/images/chibi.png'),
     dantoc: require('../assets/images/dantoc.png'),

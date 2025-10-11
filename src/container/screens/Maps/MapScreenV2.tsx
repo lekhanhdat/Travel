@@ -7,7 +7,10 @@ import {
   Image,
   StyleSheet,
   Linking,
+  PermissionsAndroid,
+  Platform,
 } from 'react-native';
+import Geolocation from '@react-native-community/geolocation';
 import MapboxGL from '@rnmapbox/maps';
 import Page from '../../../component/Page';
 import colors from '../../../common/colors';
@@ -33,7 +36,7 @@ import images from '../../../res/images';
 import locationApi from '../../../services/locations.api';
 
 MapboxGL.setAccessToken(
-  'pk.eyJ1IjoibGVraGFuaGRhdCIsImEiOiJjbTh0cDY4a3EwZmFxMm1zamZoYmVnd2JzIn0.9kuRDX63f6v1B6s-XGwmwA',
+  'sk.eyJ1IjoibGVraGFuaGRhdCIsImEiOiJjbWdsdTdpOXIwOW43MmpyNTB3cGhyNWd0In0.Ddl4CSNIDIjkqGMEz-cS4A',
 );
 
 const styles = StyleSheet.create({
@@ -76,16 +79,94 @@ const AnnotationContent = ({title}: {title: string}) => (
 );
 
 const MapScreenV2 = ({navigation}: {navigation: any}) => {
-  const [currentLat, setCurrentLat] = useState(16.026084727153087);
-  const [currentLong, setCurrentLong] = useState(108.23980496658481);
+  const [currentLat, setCurrentLat] = useState(0);
+  const [currentLong, setCurrentLong] = useState(0);
   const [routeCoordinates, setRouteCoordinates] = useState([]);
   const [visible, setVisible] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState<ILocation | null>(
     null,
   );
+  const [locationPermission, setLocationPermission] = useState(false);
   const openGoogleForm = () => {
     const url = 'https://hoanghoatham.edu.vn/'; // Thay bằng link Google Form của bạn
     Linking.openURL(url).catch(err => console.error("Couldn't load page", err));
+  };
+
+  const requestLocationPermission = async () => {
+    if (Platform.OS === 'android') {
+      try {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+          {
+            title: 'Location Permission',
+            message: 'This app needs access to location to show your current position on the map.',
+            buttonNeutral: 'Ask Me Later',
+            buttonNegative: 'Cancel',
+            buttonPositive: 'OK',
+          },
+        );
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          setLocationPermission(true);
+          getCurrentLocation();
+        } else {
+          console.log('Location permission denied');
+          // Fallback to default Đà Nẵng coordinates
+          setCurrentLat(16.026084727153087);
+          setCurrentLong(108.23980496658481);
+        }
+      } catch (err) {
+        console.warn(err);
+        // Fallback to default Đà Nẵng coordinates
+        setCurrentLat(16.026084727153087);
+        setCurrentLong(108.23980496658481);
+      }
+    } else {
+      // iOS
+      getCurrentLocation();
+    }
+  };
+
+  const getCurrentLocation = () => {
+    Geolocation.getCurrentPosition(
+      (position) => {
+        const {latitude, longitude} = position.coords;
+        setCurrentLat(latitude);
+        setCurrentLong(longitude);
+        console.log('Current location:', latitude, longitude);
+      },
+      (error) => {
+        console.log('Error getting location:', error);
+        // Fallback to default Đà Nẵng coordinates
+        setCurrentLat(16.026084727153087);
+        setCurrentLong(108.23980496658481);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 15000,
+        maximumAge: 10000,
+      },
+    );
+  };
+
+  const watchUserLocation = () => {
+    const watchId = Geolocation.watchPosition(
+      (position) => {
+        const {latitude, longitude} = position.coords;
+        setCurrentLat(latitude);
+        setCurrentLong(longitude);
+        console.log('Location updated:', latitude, longitude);
+      },
+      (error) => {
+        console.log('Error watching location:', error);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 15000,
+        maximumAge: 10000,
+        distanceFilter: 10, // Update only when user moves 10 meters
+      },
+    );
+    return watchId;
   };
 
   const [visibleSecondModal, setVisibleSecondModal] = useState(false);
@@ -98,6 +179,9 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
 
   useEffect(() => {
     console.log('restart0-----------');
+
+    // Request location permission and get current location
+    requestLocationPermission();
 
     locationApi.getLocations().then(data => {
       setLocations(data);
@@ -201,15 +285,36 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
     //   fetchRoute();
     // }
 
+    // Start watching user location for real-time updates
+    const watchId = watchUserLocation();
+
+    const focusListener = navigation.addListener('focus', () => {
+      // Refresh location when screen comes into focus
+      if (locationPermission) {
+        getCurrentLocation();
+      }
+    });
+
     return () => {
-      // onFinishedPlayingSubscription.remove();
-      // onFinishedLoadingSubscription.remove();
-      // onFinishedLoadingFileSubscription.remove();
-      // focusListener();
-      // blurListener();
-      // BackgroundGeolocation.stopWatchPosition();
+      onFinishedPlayingSubscription.remove();
+      onFinishedLoadingSubscription.remove();
+      onFinishedLoadingFileSubscription.remove();
+      // Clear location watch
+      Geolocation.clearWatch(watchId);
+      // Remove focus listener
+      focusListener();
     };
   }, []);
+
+  useEffect(() => {
+    // Start watching location when permission is granted
+    if (locationPermission) {
+      const watchId = watchUserLocation();
+      return () => {
+        Geolocation.clearWatch(watchId);
+      };
+    }
+  }, [locationPermission]);
 
   // const fetchRoute = async () => {
   //   const locationProps: ILocation[] =

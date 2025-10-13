@@ -1,5 +1,5 @@
 import React from 'react';
-import {ScrollView, View, Image, FlatList} from 'react-native';
+import {ScrollView, View, Image, FlatList, TouchableOpacity, StyleSheet} from 'react-native';
 import Page from '../../../component/Page';
 import HeaderBase from '../../../component/HeaderBase';
 import strings from '../../../res/strings';
@@ -14,6 +14,7 @@ import ReviewItem from '../../../component/ReviewItem';
 import {reviews} from '../../../common/reviewsConstants';
 import {MapSvg} from '../../../assets/ImageSvg';
 import {ScreenName} from '../../AppContainer';
+import {Button} from 'react-native-paper';
 
 interface IDetailLocationScreenProps {
   navigation: any;
@@ -99,6 +100,52 @@ export default class DetailLocationScreen extends React.PureComponent<
                 style={[AppStyle.txt_16_medium_detail, {marginTop: sizes._12sdp}]}>
                 Địa chỉ: {location.address}
               </TextBase>
+
+              {/* Buttons: Xem trên bản đồ và Chỉ đường */}
+              <View style={{
+                flexDirection: 'row',
+                gap: sizes._12sdp,
+                marginTop: sizes._16sdp,
+              }}>
+                <Button
+                  mode="contained"
+                  icon="map-marker"
+                  onPress={() => {
+                    NavigationService.navigate(ScreenName.MAP_SCREEN, {
+                      locations: [location],
+                    });
+                  }}
+                  style={{
+                    flex: 1,
+                    backgroundColor: colors.primary,
+                  }}
+                  labelStyle={{fontSize: 14}}
+                >
+                  Xem trên bản đồ
+                </Button>
+
+                <Button
+                  mode="outlined"
+                  icon="directions"
+                  onPress={() => {
+                    NavigationService.navigate(ScreenName.MAP_SCREEN, {
+                      locations: [location],
+                      showRoute: true, // Flag để hiển thị đường đi
+                    });
+                  }}
+                  style={{
+                    flex: 1,
+                    borderColor: colors.primary,
+                    borderWidth: 2,
+                  }}
+                  labelStyle={{
+                    fontSize: 14,
+                    color: colors.primary,
+                  }}
+                >
+                  Chỉ đường
+                </Button>
+              </View>
 
               <View
                 style={{

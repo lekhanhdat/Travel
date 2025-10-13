@@ -13,6 +13,8 @@ import {
 import Geolocation from '@react-native-community/geolocation';
 import MapboxGL from '@rnmapbox/maps';
 import Page from '../../../component/Page';
+import HeaderBase from '../../../component/HeaderBase';
+import {BackSvg} from '../../../assets/assets/ImageSvg';
 import colors from '../../../common/colors';
 import sizes from '../../../common/sizes';
 import {
@@ -28,6 +30,7 @@ import _ from 'lodash';
 // import BackgroundGeolocation from 'react-native-background-geolocation';
 import SoundPlayer from 'react-native-sound-player';
 import AIApi from '../../../services/AIApi';
+import mapboxApi from '../../../services/mapbox.api';
 import {SPACE_WARNING} from '../../../common/constants';
 import haversineDistance from '../../../utils/haversineDistance';
 import decodePolyline from '../../../utils/decodePolyline';
@@ -81,7 +84,7 @@ const AnnotationContent = ({title}: {title: string}) => (
 const MapScreenV2 = ({navigation}: {navigation: any}) => {
   const [currentLat, setCurrentLat] = useState(0);
   const [currentLong, setCurrentLong] = useState(0);
-  const [routeCoordinates, setRouteCoordinates] = useState([]);
+  const [routeCoordinates, setRouteCoordinates] = useState<{latitude: number; longitude: number}[]>([]);
   const [visible, setVisible] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState<ILocation | null>(
     null,
@@ -176,6 +179,8 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
   >(null);
 
   const [locations, setLocations] = useState<ILocation[]>([]);
+  const [focusLocation, setFocusLocation] = useState<ILocation | null>(null);
+  const [shouldShowRoute, setShouldShowRoute] = useState(false);
 
   useEffect(() => {
     console.log('restart0-----------');
@@ -183,9 +188,26 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
     // Request location permission and get current location
     requestLocationPermission();
 
-    locationApi.getLocations().then(data => {
-      setLocations(data);
-    });
+    // Kiểm tra xem có location được truyền vào từ DetailLocation không
+    const locationProps: ILocation[] = navigation?.state?.params?.locations ?? [];
+    const showRoute = navigation?.state?.params?.showRoute ?? false;
+
+    if (locationProps.length > 0) {
+      // Nếu có location được truyền vào, dùng nó
+      setLocations(locationProps);
+      setFocusLocation(locationProps[0]); // Focus vào location đầu tiên
+      setShouldShowRoute(showRoute); // Set flag để vẽ đường đi
+      console.log('Using location from params:', locationProps[0]);
+      console.log('Show route:', showRoute);
+
+      // KHÔNG fetch route ở đây vì currentLat/currentLong chưa có
+      // Sẽ fetch trong useEffect riêng khi đã có vị trí
+    } else {
+      // Nếu không, fetch từ NocoDB
+      locationApi.getLocations().then(data => {
+        setLocations(data);
+      });
+    }
 
     const onFinishedPlayingSubscription = SoundPlayer.addEventListener(
       'FinishedPlaying',
@@ -316,28 +338,59 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
     }
   }, [locationPermission]);
 
-  // const fetchRoute = async () => {
-  //   const locationProps: ILocation[] =
-  //     navigation.state?.params?.locations ?? [];
-  //   const first = locationProps[0];
-  //   try {
-  //     const params = {
-  //       key: 'AIzaSyBex7Qrp4f4xvQYnChRpe6o7wV7KurxzUE',
-  //       mode: 'walking',
-  //       origin: [currentLat, currentLong].toString(),
-  //       destination: [first.lat, first.long].toString(),
-  //     };
-  //     const response = await AIApi.getLine(params);
-  //     if (response.data.routes.length) {
-  //       const points = decodePolyline(
-  //         response.data.routes[0].overview_polyline.points,
-  //       );
-  //       setRouteCoordinates(points);
-  //     }
-  //   } catch (error: any) {
-  //     console.error('Error fetching route:', error);
-  //   }
-  // };
+  // Fetch route khi đã có vị trí hiện tại và cần hiển thị đường đi
+  useEffect(() => {
+    if (shouldShowRoute && focusLocation && currentLat !== 0 && currentLong !== 0) {
+      console.log('🚗 Ready to fetch route - current location available');
+      fetchRouteToLocation(focusLocation);
+    }
+  }, [shouldShowRoute, focusLocation, currentLat, currentLong]);
+
+  const fetchRouteToLocation = async (location: ILocation) => {
+    try {
+      console.log('=== FETCHING ROUTE WITH MAPBOX ===');
+      console.log('From:', currentLat, currentLong);
+      console.log('To:', location.name, location.lat, location.long);
+
+      // Kiểm tra vị trí hiện tại đã có chưa
+      if (currentLat === 0 || currentLong === 0) {
+        console.log('❌ Current location not available yet');
+        return;
+      }
+
+      // Mapbox format: "long1,lat1;long2,lat2"
+      const coordinates = `${currentLong},${currentLat};${location.long},${location.lat}`;
+
+      console.log('Mapbox coordinates:', coordinates);
+
+      const response = await mapboxApi.getDirections({
+        profile: 'driving', // driving = xe máy/ô tô
+        coordinates,
+        geometries: 'geojson',
+        overview: 'full',
+      });
+
+      console.log('Mapbox response:', response);
+
+      if (response && response.routes && response.routes.length > 0) {
+        const route = response.routes[0];
+
+        // Mapbox trả về GeoJSON format: coordinates là array of [longitude, latitude]
+        const geoJsonCoordinates = route.geometry.coordinates;
+        console.log('✅ GeoJSON coordinates count:', geoJsonCoordinates.length);
+
+        // Convert sang format {latitude, longitude}
+        const points = mapboxApi.convertGeoJSONToCoordinates(geoJsonCoordinates);
+        console.log('✅ Route points converted:', points.length);
+
+        setRouteCoordinates(points);
+      } else {
+        console.log('❌ No routes found in response');
+      }
+    } catch (error: any) {
+      console.error('❌ Error fetching route:', error);
+    }
+  };
 
   const onMarkerPress = (location: ILocation) => {
     setSelectedLocation(location);
@@ -363,6 +416,14 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
   const locationProps: ILocation[] = navigation?.state?.params?.locations ?? [];
   console.log({locationProps});
 
+  // Xác định tọa độ để focus camera
+  const focusCoordinate =
+    locationProps.length > 0
+      ? [locationProps[0].long, locationProps[0].lat]
+      : [currentLong, currentLat];
+
+  const focusZoomLevel = locationProps.length > 0 ? 14 : 11; // Zoom gần hơn khi focus vào địa điểm cụ thể
+
   if (currentLat === 0 || currentLong === 0) {
     return (
       <Page>
@@ -379,17 +440,34 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
   }
 
   console.log([currentLong, currentLat]);
+  console.log('Focus coordinate:', focusCoordinate);
+  console.log('🗺️ Route coordinates count:', routeCoordinates.length);
+  console.log('🚗 Should show route:', shouldShowRoute);
 
   return (
     <Page>
+      <HeaderBase
+        title={'Bản đồ'}
+        leftIconSvg={
+          <BackSvg
+            width={sizes._24sdp}
+            height={sizes._24sdp}
+            color={colors.primary_950}
+          />
+        }
+        onLeftIconPress={() => {
+          NavigationService.pop();
+        }}
+      />
       <View style={{flex: 1}}>
         <MapboxGL.MapView
           style={{flex: 1}}
           styleURL={MapboxGL.StyleURL.Satellite}
           onRegionDidChange={onRegionChange}>
           <MapboxGL.Camera
-            centerCoordinate={[currentLong, currentLat]}
-            zoomLevel={11}
+            centerCoordinate={focusCoordinate}
+            zoomLevel={focusZoomLevel}
+            animationDuration={1000}
           />
 
           {
@@ -419,26 +497,33 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
             <MapboxGL.Callout title={'Vị trí của tôi'} />
           </MapboxGL.PointAnnotation>
 
-          {/* {locationProps.length > 0 && (
+          {/* Vẽ đường đi nếu có routeCoordinates */}
+          {routeCoordinates.length > 0 && (
             <MapboxGL.ShapeSource
-              id="line1"
+              id="routeLine"
               shape={{
                 type: 'Feature',
                 geometry: {
                   type: 'LineString',
-                  coordinates: [
-                    [currentLong, currentLat],
-                    [locationProps[0].long, locationProps[0].lat],
-                  ],
+                  coordinates: routeCoordinates.map(point => [
+                    point.longitude,
+                    point.latitude,
+                  ]),
                 },
-                properties: {}, // Add an empty properties object
+                properties: {},
               }}>
               <MapboxGL.LineLayer
-                id="linelayer1"
-                style={{lineWidth: 4, lineColor: colors.primary}}
+                id="routeLineLayer"
+                style={{
+                  lineWidth: 6,
+                  lineColor: '#0000FF', // Đổi sang màu đỏ để dễ thấy
+                  lineOpacity: 0.9,
+                  lineCap: 'round',
+                  lineJoin: 'round',
+                }}
               />
             </MapboxGL.ShapeSource>
-          )} */}
+          )}
         </MapboxGL.MapView>
       </View>
 
@@ -636,11 +721,11 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
             <Button
               mode="outlined"
               onPress={() => {
-                if (!selectedLocation) {
+                if (!selectedLocation || !selectedLocation.Id) {
                   return;
                 }
                 locationApi
-                  .getItemsWithLocationId(selectedLocation?.Id)
+                  .getItemsWithLocationId(selectedLocation.Id)
                   .then(data => {
                     NavigationService.navigate(ScreenName.VIEW_ALL_ITEM, {
                       title: 'Hiện vật',

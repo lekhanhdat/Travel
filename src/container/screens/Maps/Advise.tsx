@@ -40,12 +40,25 @@ export default class Advise extends React.PureComponent<Props, States> {
           </Text>
         </View>
 
-        {location?.advise &&
-          location.advise.split('\n').map((item, index) => (
-            <View key={index} style={styles.adviseItem}>
-              <Text style={styles.adviseText}>- {item}</Text>
+        <ScrollView style={styles.scrollContainer}>
+          {location?.advise ? (
+            // Kiểm tra xem advise là string hay array
+            (Array.isArray(location.advise)
+              ? location.advise
+              : location.advise.split('\n')
+            ).map((item, index) => (
+              <View key={index} style={styles.adviseItem}>
+                <Text style={styles.adviseText}>• {item.trim()}</Text>
+              </View>
+            ))
+          ) : (
+            <View style={styles.adviseItem}>
+              <Text style={styles.noContentText}>
+                Không có thông tin quy tắc ứng xử
+              </Text>
             </View>
-          ))}
+          )}
+        </ScrollView>
 
         {/* <View style={styles.contentContainer}>
           <Text style={[AppStyle.txt_20_bold, styles.titleText]}>
@@ -79,6 +92,10 @@ const styles = StyleSheet.create({
     // padding: sizes._16sdp,
     backgroundColor: colors.white,
   },
+  scrollContainer: {
+    flex: 1,
+    paddingBottom: sizes._16sdp,
+  },
   titleText: {
     textAlign: 'center',
     marginTop: sizes._24sdp,
@@ -96,5 +113,13 @@ const styles = StyleSheet.create({
   adviseText: {
     fontSize: 16,
     color: '#333',
+    lineHeight: 24,
+    textAlign: 'justify',
+  },
+  noContentText: {
+    fontSize: 16,
+    color: colors.xam,
+    textAlign: 'center',
+    fontStyle: 'italic',
   },
 });

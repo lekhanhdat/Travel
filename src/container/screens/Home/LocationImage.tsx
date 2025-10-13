@@ -18,6 +18,37 @@ interface States {}
 export default class LocationImage extends React.PureComponent<Props, States> {
   render(): React.ReactNode {
     const location: ILocation = this.props.navigation.state.params?.location;
+
+    // Debug log
+    console.log('LocationImage - location:', location);
+    console.log('LocationImage - images:', location?.images);
+    console.log('LocationImage - images type:', typeof location?.images);
+    console.log('LocationImage - is array:', Array.isArray(location?.images));
+
+    // Kiểm tra location có tồn tại không
+    if (!location) {
+      return (
+        <Page>
+          <HeaderBase
+            title={'Hình ảnh & Video'}
+            leftIconSvg={
+              <BackSvg
+                width={sizes._24sdp}
+                height={sizes._24sdp}
+                color={colors.primary_950}
+              />
+            }
+            onLeftIconPress={() => {
+              NavigationService.pop();
+            }}
+          />
+          <View style={styles.container}>
+            <Text style={styles.noContentText}>Không tìm thấy thông tin địa điểm</Text>
+          </View>
+        </Page>
+      );
+    }
+
     return (
       <Page>
         <HeaderBase
@@ -37,13 +68,25 @@ export default class LocationImage extends React.PureComponent<Props, States> {
         <View style={styles.container}>
           <ScrollView>
             <Text style={styles.sectionTitle}>Hình ảnh</Text>
-            {location.images?.map((image, index) => (
-              <Image
-                key={index}
-                source={{uri: `${DB_URL}/${image?.path}`}}
-                style={styles.img}
-              />
-            ))}
+            {location?.images && Array.isArray(location.images) && location.images.length > 0 ? (
+              location.images.map((image, index) => {
+                // Kiểm tra xem image là string (URL) hay object có path
+                const imageUri = typeof image === 'string'
+                  ? image
+                  : `${DB_URL}/${image?.path}`;
+
+                return (
+                  <Image
+                    key={index}
+                    source={{uri: imageUri}}
+                    style={styles.img}
+                    resizeMode="cover"
+                  />
+                );
+              })
+            ) : (
+              <Text style={styles.noContentText}>Không có hình ảnh nào</Text>
+            )}
 
             <View
               style={{
@@ -56,16 +99,14 @@ export default class LocationImage extends React.PureComponent<Props, States> {
             />
 
             <Text style={styles.sectionTitle}>Video</Text>
-            {/* {location?.videos &&
-              location.videos?.map((video, index) => (
+            {location?.videos && Array.isArray(location.videos) && location.videos.length > 0 ? (
+              location.videos.map((video, index) => (
                 <View key={index} style={styles.videoContainer}>
                   <ChildVideo videoId={video} />
                 </View>
-              ))} */}
-            {location?.videos && (
-              <View style={styles.videoContainer}>
-                <ChildVideo videoId={location?.videos as unknown as string} />
-              </View>
+              ))
+            ) : (
+              <Text style={styles.noContentText}>Không có video nào</Text>
             )}
           </ScrollView>
         </View>
@@ -96,6 +137,13 @@ const styles = StyleSheet.create({
   videoContainer: {
     borderRadius: sizes._16sdp,
     overflow: 'hidden',
+    marginBottom: sizes._16sdp, // Thêm khoảng cách giữa các video
+  },
+  noContentText: {
+    fontSize: sizes._16sdp,
+    color: colors.xam,
+    textAlign: 'center',
+    marginVertical: sizes._16sdp,
   },
 });
 

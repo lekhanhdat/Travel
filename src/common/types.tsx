@@ -5,22 +5,23 @@ export interface IAccount {
 }
 
 export interface ILocation {
-  Id: number;
+  Id?: number; // Optional vì data có cả 'id' và 'Id'
+  id?: number; // Optional vì data có cả 'id' và 'Id'
   name: string;
   avatar: string;
   address: string;
   description: string;
   lat: number;
   long: number;
-  haveVoice?: boolean;
+  haveVoice?: boolean; // DƯ THỪA - chỉ cần check voiceName
   reviews: IReview[];
   // item?: IItem[];
-  recommendation: string;
+  recommendation?: string; // KHÔNG ĐƯỢC SỬ DỤNG - nên là optional
   icon?: any;
   voiceName?: string;
-  advise?: string;
+  advise?: string | string[]; // Có thể là string hoặc array of strings
   images?: any[];
-  videos?: string;
+  videos?: string[]; // Array of video IDs (YouTube video IDs)
   relatedKeyWord?: string;
 }
 

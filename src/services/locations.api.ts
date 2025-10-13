@@ -31,10 +31,57 @@ const locationApi = {
       },
     });
     let data = res.data.list ?? [];
-    data = data.map(location => ({
-      ...location,
-      reviews: JSON.parse(location.reviews as unknown as string),
-    }));
+
+    // Parse JSON fields từ NocoDB
+    data = data.map(location => {
+      const parsed: any = {
+        ...location,
+      };
+
+      // Parse reviews (luôn là JSON string từ NocoDB)
+      if (typeof location.reviews === 'string') {
+        try {
+          parsed.reviews = JSON.parse(location.reviews);
+        } catch (e) {
+          console.error('Error parsing reviews:', e);
+          parsed.reviews = [];
+        }
+      }
+
+      // Parse images (có thể là JSON string từ NocoDB)
+      if (typeof location.images === 'string') {
+        try {
+          parsed.images = JSON.parse(location.images);
+        } catch (e) {
+          console.error('Error parsing images:', e);
+          parsed.images = [];
+        }
+      }
+
+      // Parse videos (có thể là JSON string từ NocoDB)
+      if (typeof location.videos === 'string') {
+        try {
+          parsed.videos = JSON.parse(location.videos);
+        } catch (e) {
+          console.error('Error parsing videos:', e);
+          parsed.videos = [];
+        }
+      }
+
+      // Parse advise (có thể là JSON string từ NocoDB)
+      if (typeof location.advise === 'string') {
+        try {
+          // Thử parse JSON trước
+          parsed.advise = JSON.parse(location.advise);
+        } catch (e) {
+          // Nếu không phải JSON, giữ nguyên string
+          parsed.advise = location.advise;
+        }
+      }
+
+      return parsed;
+    });
+
     return data;
   },
 

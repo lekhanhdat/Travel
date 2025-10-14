@@ -33,6 +33,7 @@ export interface IReview {
   id: number;
   content: string;
   name_user_review: string;
+  fullName?: string; // Full name of user (preferred over name_user_review)
   time_review: string;
   start: number;
   avatar: string;

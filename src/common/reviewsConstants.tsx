@@ -5,6 +5,7 @@ export const reviews: IReview[] = [
     id: 1,
     content: 'Cảnh quan nơi đây trên cả mong đợi, khung cảnh thiên nhiên hùng vĩ và không khí trong lành.',
     name_user_review: 'Ngô Châu Bảo Khanh',
+    fullName: 'Ngô Châu Bảo Khanh',
     time_review: '1/10/2024 13:45',
     start: 5,
     avatar: 'https://banahills.sunworld.vn/wp-content/uploads/2024/04/DJI_0004-1-scaled.jpg'
@@ -13,6 +14,7 @@ export const reviews: IReview[] = [
     id: 2,
     content: 'Mình thích cái cách người dân nơi đây tiếp đón mình thật sự, họ tử tế và vui vẻ lắm.',
     name_user_review: 'Trần Đình Quý',
+    fullName: 'Trần Đình Quý',
     time_review: '23/9/2024 8:32',
     start: 5,
     avatar: 'https://vietsensetravel.com/view/at_tong-hop-cac-tour-du-lich-da-nang-hap-dan_58e99afe10c4c5479a1c5d1ba68b9b97.jpg'
@@ -21,6 +23,7 @@ export const reviews: IReview[] = [
     id: 3,
     content: 'Mình thắc mắc tại sao nơi đây vẫn chưa được mệnh danh là thiên đường ẩm thực nhỉ, dường như sơn hào hải vị trên thế gian đều có thể được tìm thấy ở đây ấy',
     name_user_review: 'Ngô Ngọc Hoàng Vương',
+    fullName: 'Ngô Ngọc Hoàng Vương',
     time_review: '1/7/2024  9:28',
     start: 5,
     avatar: 'https://res.klook.com/image/upload/q_85/c_fill,w_750/v1705907713/ikh5vbdiprroxn5fadnd.jpg'
@@ -29,6 +32,7 @@ export const reviews: IReview[] = [
     id: 4,
     content: 'chắc chắn mình sẽ quay lại đây nhiều lần nữa, chất lượng thật sự rất tương xứng với giá tiền bỏ ra',
     name_user_review: 'Ngô Bảo Khang',
+    fullName: 'Ngô Bảo Khang',
     time_review: '5/7/2024 16:02',
     start: 5,
     avatar: 'https://duonggiahotel.vn/wp-content/uploads/2023/11/dia-diem-du-lich-da-nang-avt.jpg'
@@ -37,6 +41,7 @@ export const reviews: IReview[] = [
     id: 5,
     content: 'Tôi rất hứng thú với nền văn hóa nơi đây, đa dạng và mang đậm bản sắc người Việt',
     name_user_review: 'Châu Thị Diễm',
+    fullName: 'Châu Thị Diễm',
     time_review: ' 10/2/2024 20:08',
     start: 5,
     avatar: 'https://statics.vinpearl.com/le-hoi-da-nang-3_1632922702.jpg'
@@ -45,6 +50,7 @@ export const reviews: IReview[] = [
     id: 6,
     content: 'Quả thật là một thành phố hiện đại và đáng sống, cơ sở hạ tầng rất thuận lợi cho di chuyển, tham quan và du lịch',
     name_user_review: 'Nguyễn Ngọc Mai Khanh',
+    fullName: 'Nguyễn Ngọc Mai Khanh',
     time_review: ' 6/9/2024 7:30',
     start: 5,
     avatar: 'https://thuexemaydanang.com.vn/wp-content/uploads/2021/04/maxresdefault-0946.jpg'

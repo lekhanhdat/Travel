@@ -10,6 +10,7 @@ import sizes from '../../../common/sizes';
 import BottomSheet from '../../../component/BottomSheet';
 import {Add} from '../../../assets/ImageSvg';
 import colors from '../../../common/colors';
+import {Avatar, getDisplayName} from '../../../utils/avatarUtils';
 import TextBase from '../../../common/TextBase';
 import {AppStyle} from '../../../common/AppStyle';
 import LocalStorageCommon from '../../../utils/LocalStorageCommon';
@@ -240,6 +241,7 @@ export default class NewFeedScreen extends React.PureComponent<
         id: Date.now(), // Timestamp unique ID
         content: this.state.content,
         name_user_review: this.state.avt?.userName ?? '',
+        fullName: this.state.avt?.fullName, // Add fullName field
         time_review: moment().format('HH:mm DD/MM/YYYY'), // Format: "HH:mm DD/MM/YYYY"
         start: this.state.star,
         avatar: this.state.avt?.avatar ?? '',
@@ -515,20 +517,13 @@ export default class NewFeedScreen extends React.PureComponent<
                   borderColor: colors.primary_200,
                   marginBottom: sizes._16sdp,
                 }}>
-                <Image
-                  source={{uri: this.state.avt?.avatar}}
-                  style={{
-                    width: sizes._50sdp,
-                    height: sizes._50sdp,
-                    borderRadius: sizes._900sdp,
-                  }}
-                />
+                <Avatar avatarUrl={this.state.avt?.avatar} size={sizes._50sdp} />
                 <TextBase
                   style={[
                     AppStyle.txt_18_bold_review,
                     {marginTop: sizes._8sdp}
                   ]}>
-                  {this.state.avt?.userName}
+                  {getDisplayName(this.state.avt)}
                 </TextBase>
               </View>
 

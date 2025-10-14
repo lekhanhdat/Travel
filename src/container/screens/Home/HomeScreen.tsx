@@ -14,7 +14,7 @@ import sizes from '../../../common/sizes';
 import colors from '../../../common/colors';
 import TextBase from '../../../common/TextBase';
 import {AppStyle} from '../../../common/AppStyle';
-import {ILocation} from '../../../common/types';
+import {ILocation, IAccount} from '../../../common/types';
 import BigItemLocation from '../../../component/BigItemLocation';
 import {
   LOCATION_NEARLY,
@@ -29,6 +29,8 @@ import {Text} from 'react-native-paper';
 import {Image} from 'react-native-svg';
 import locationApi from '../../../services/locations.api';
 import fonts from '../../../common/fonts';
+import LocalStorageCommon from '../../../utils/LocalStorageCommon';
+import {localStorageKey} from '../../../common/constants';
 
 interface IHomeScreenProps {
   navigation: any;
@@ -39,6 +41,7 @@ interface IHomeScreenState {
   locations: ILocation[];
   locationsPopular: ILocation[];
   locationsNearly: ILocation[];
+  account: IAccount | null;
 }
 
 export default class HomeScreen extends React.PureComponent<
@@ -53,6 +56,7 @@ export default class HomeScreen extends React.PureComponent<
       locations: [],
       locationsNearly: [],
       locationsPopular: [],
+      account: null,
     };
   }
 
@@ -64,7 +68,17 @@ export default class HomeScreen extends React.PureComponent<
     });
 
     this.fetchLocations();
+    this.handleGetUser();
   }
+
+  handleGetUser = async () => {
+    const response: IAccount = await LocalStorageCommon.getItem(
+      localStorageKey.AVT,
+    );
+    this.setState({
+      account: response,
+    });
+  };
 
   async fetchLocations() {
     const data = await locationApi.getLocations();
@@ -105,7 +119,7 @@ export default class HomeScreen extends React.PureComponent<
               color: colors.black,
             },
           ]}>
-          Xin chào,
+          Xin chào{this.state.account?.fullName ? `, ${this.state.account.fullName}` : ''}
         </TextBase>
         <TextBase
           style={[

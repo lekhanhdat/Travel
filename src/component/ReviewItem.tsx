@@ -6,6 +6,7 @@ import TextBase from '../common/TextBase';
 import {AppStyle} from '../common/AppStyle';
 import {StarActive} from '../assets/assets/ImageSvg';
 import colors from '../common/colors';
+import {Avatar, getReviewAuthorName} from '../utils/avatarUtils';
 
 interface IReviewItemProps {
   review: IReview;
@@ -55,17 +56,10 @@ export default class ReviewItem extends React.PureComponent<
             width: sizes.width - sizes._32sdp,
             marginBottom: sizes._12sdp,
           }}>
-          <Image
-            source={{uri: review.avatar}}
-            style={{
-              width: sizes._36sdp,
-              height: sizes._36sdp,
-              borderRadius: 99,
-            }}
-          />
+          <Avatar avatarUrl={review.avatar} size={sizes._36sdp} />
           <TextBase
             style={[AppStyle.txt_18_regular, {marginLeft: sizes._8sdp}]}>
-            {review.name_user_review ?? '-'}
+            {getReviewAuthorName(review)}
           </TextBase>
         </View>
         <View

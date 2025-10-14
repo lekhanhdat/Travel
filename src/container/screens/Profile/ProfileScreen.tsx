@@ -14,12 +14,13 @@ import TextBase from '../../../common/TextBase';
 import sizes from '../../../common/sizes';
 import colors from '../../../common/colors';
 import {AppStyle} from '../../../common/AppStyle';
-import {Call, FAQ, Policy, ProfileSvg, Setting} from '../../../assets/ImageSvg';
+import {Call, FAQ, Policy, Setting} from '../../../assets/ImageSvg';
 import NavigationService from '../NavigationService';
 import {ScreenName} from '../../AppContainer';
 import {IAccount} from '../../../common/types';
 import LocalStorageCommon from '../../../utils/LocalStorageCommon';
 import {localStorageKey} from '../../../common/constants';
+import {Avatar, getDisplayName} from '../../../utils/avatarUtils';
 import {UserSvg} from '../../../assets/assets/ImageSvg';
 import {Button} from 'react-native-paper';
 
@@ -71,32 +72,9 @@ export default class ProfileScreen extends React.PureComponent<
         <View style={styles.container}>
           {/* <TextBase style={[AppStyle.txt_20_bold]}>Thông tin cá nhân</TextBase> */}
 
-          {/* Avatar - Show ProfileSvg if no avatar */}
-          {account?.avatar ? (
-            <Image
-              source={{uri: account.avatar}}
-              alt="avatar"
-              width={sizes._60sdp}
-              height={sizes._60sdp}
-              style={{
-                borderRadius: 100,
-                alignSelf: 'center',
-                marginBottom: sizes._10sdp,
-              }}
-            />
-          ) : (
-            <View
-              style={{
-                alignSelf: 'center',
-                marginBottom: sizes._10sdp,
-              }}>
-              <ProfileSvg
-                width={sizes._60sdp}
-                height={sizes._60sdp}
-                color={colors.primary}
-              />
-            </View>
-          )}
+          <View style={{alignSelf: 'center', marginBottom: sizes._10sdp}}>
+            <Avatar avatarUrl={account?.avatar} size={sizes._60sdp} />
+          </View>
 
           {/* Display fullName instead of userName */}
           <TextBase
@@ -104,7 +82,7 @@ export default class ProfileScreen extends React.PureComponent<
               AppStyle.txt_18_bold_review,
               {alignSelf: 'center'},
             ]}>
-            {this.state.account?.fullName || this.state.account?.userName}
+            {getDisplayName(this.state.account)}
           </TextBase>
 
           <View

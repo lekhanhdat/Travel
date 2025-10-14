@@ -33,6 +33,7 @@ export interface IReview {
   start: number;
   avatar: string;
   location?: ILocation;
+  images?: string[]; // Array of image URLs uploaded by user
 }
 
 export interface IItem {

@@ -12,6 +12,8 @@ import TextBase from '../../../common/TextBase';
 import {AppStyle} from '../../../common/AppStyle';
 import ReviewItem from '../../../component/ReviewItem';
 import {reviews} from '../../../common/reviewsConstants';
+import locationApi from '../../../services/locations.api';
+import {StarActive, StarInActive} from '../../../assets/assets/ImageSvg';
 import {MapSvg} from '../../../assets/ImageSvg';
 import {ScreenName} from '../../AppContainer';
 import {Button} from 'react-native-paper';
@@ -90,6 +92,38 @@ export default class DetailLocationScreen extends React.PureComponent<
               <TextBase style={[AppStyle.txt_20_bold, {textAlign: 'center',}]}>
                 {location.name}
               </TextBase>
+
+              {/* Average Rating Display */}
+              {location.reviews && location.reviews.length > 0 && (
+                <View style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginTop: sizes._12sdp,
+                }}>
+                  {Array.from([1, 2, 3, 4, 5]).map((i) => {
+                    const avgRating = locationApi.calculateAverageRating(location.reviews);
+                    return i <= Math.round(avgRating) ? (
+                      <StarActive
+                        key={i}
+                        width={sizes._20sdp}
+                        height={sizes._20sdp}
+                        color={colors.primary}
+                      />
+                    ) : (
+                      <StarInActive
+                        key={i}
+                        width={sizes._20sdp}
+                        height={sizes._20sdp}
+                        color={colors.primary_950}
+                      />
+                    );
+                  })}
+                  <TextBase style={[AppStyle.txt_16_regular, {marginLeft: sizes._8sdp}]}>
+                    {locationApi.calculateAverageRating(location.reviews).toFixed(1)} ({location.reviews.length} đánh giá)
+                  </TextBase>
+                </View>
+              )}
 
               <TextBase
                 style={[AppStyle.txt_16_medium_detail, {marginTop: sizes._12sdp}]}>

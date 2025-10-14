@@ -73,27 +73,41 @@ export default class ProfileScreen extends React.PureComponent<
 
         <View style={styles.container}>
 
-          <Image
-            source={{uri: account?.avatar}}
-            alt="avatar"
-            width={sizes._60sdp}
-            height={sizes._60sdp}
-            style={{
-              borderRadius: 100,
-              alignSelf: 'center',
-              marginBottom: sizes._10sdp,
-            }}
-          />
+          {/* Avatar - Show ProfileSvg if no avatar */}
+          {account?.avatar ? (
+            <Image
+              source={{uri: account.avatar}}
+              alt="avatar"
+              width={sizes._60sdp}
+              height={sizes._60sdp}
+              style={{
+                borderRadius: 100,
+                alignSelf: 'center',
+                marginBottom: sizes._10sdp,
+              }}
+            />
+          ) : (
+            <View
+              style={{
+                alignSelf: 'center',
+                marginBottom: sizes._10sdp,
+              }}>
+              <ProfileSvg
+                width={sizes._60sdp}
+                height={sizes._60sdp}
+                color={colors.primary}
+              />
+            </View>
+          )}
 
-              <TextBase
-                style={[
-                  AppStyle.txt_18_bold_review,
-                  {alignSelf: 'center',},
-                  
-                  // {marginLeft: sizes._16sdp},
-                ]}>
-                {this.state.account?.userName}
-              </TextBase>
+          {/* Display fullName instead of userName */}
+          <TextBase
+            style={[
+              AppStyle.txt_18_bold_review,
+              {alignSelf: 'center'},
+            ]}>
+            {this.state.account?.fullName || this.state.account?.userName}
+          </TextBase>
 
           <View
             style={{
@@ -105,54 +119,74 @@ export default class ProfileScreen extends React.PureComponent<
             }}
           />
 
-          <TextBase
-            style={[
-              AppStyle.txt_20_bold,
-              {
-                marginTop: sizes._12sdp,
-                fontSize: sizes._20sdp,
-                marginBottom: sizes._16sdp,
-              },
-            ]}>
-            Họ và tên
-          </TextBase>
-          
-          <TextBase
-            style={[
-              AppStyle.txt_20_bold,
-              {
-                marginTop: sizes._12sdp,
-                fontSize: sizes._20sdp,
-                marginBottom: sizes._16sdp,
-              },
-            ]}>
-            Ngày sinh
-          </TextBase>
+          {/* Họ và tên */}
+          <View style={{marginBottom: sizes._16sdp}}>
+            <TextBase
+              style={[
+                AppStyle.txt_16_bold,
+                {
+                  color: colors.primary_400,
+                  marginBottom: sizes._4sdp,
+                },
+              ]}>
+              Họ và tên
+            </TextBase>
+            <TextBase
+              style={[
+                AppStyle.txt_18_bold,
+                {
+                  color: colors.primary_950,
+                },
+              ]}>
+              {account?.fullName || 'Chưa cập nhật'}
+            </TextBase>
+          </View>
 
-          <TextBase
-            style={[
-              AppStyle.txt_20_bold,
-              {
-                marginTop: sizes._12sdp,
-                fontSize: sizes._20sdp,
-                marginBottom: sizes._16sdp,
-              },
-            ]}>
-            Email
-          </TextBase>
-          
+          {/* Tên đăng nhập */}
+          <View style={{marginBottom: sizes._16sdp}}>
+            <TextBase
+              style={[
+                AppStyle.txt_16_bold,
+                {
+                  color: colors.primary_400,
+                  marginBottom: sizes._4sdp,
+                },
+              ]}>
+              Tên đăng nhập
+            </TextBase>
+            <TextBase
+              style={[
+                AppStyle.txt_18_bold,
+                {
+                  color: colors.primary_950,
+                },
+              ]}>
+              {account?.userName || 'Chưa cập nhật'}
+            </TextBase>
+          </View>
 
-          <TextBase
-            style={[
-              AppStyle.txt_20_bold,
-              {
-                marginTop: sizes._12sdp,
-                fontSize: sizes._20sdp,
-                marginBottom: sizes._16sdp,
-              },
-            ]}>
-            Số điện thoại
-          </TextBase>
+          {/* Email */}
+          <View style={{marginBottom: sizes._16sdp}}>
+            <TextBase
+              style={[
+                AppStyle.txt_16_bold,
+                {
+                  color: colors.primary_400,
+                  marginBottom: sizes._4sdp,
+                },
+              ]}>
+              Email
+            </TextBase>
+            <TextBase
+              style={[
+                AppStyle.txt_18_bold,
+                {
+                  color: colors.primary_950,
+                },
+              ]}>
+              {account?.email || 'Chưa cập nhật'}
+            </TextBase>
+          </View>
 
 
 

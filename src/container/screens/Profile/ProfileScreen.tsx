@@ -71,28 +71,41 @@ export default class ProfileScreen extends React.PureComponent<
         <View style={styles.container}>
           {/* <TextBase style={[AppStyle.txt_20_bold]}>Thông tin cá nhân</TextBase> */}
 
-          <Image
-            source={{uri: account?.avatar}}
-            alt="avatar"
-            width={sizes._60sdp}
-            height={sizes._60sdp}
-            style={{
-              borderRadius: 100,
-              alignSelf: 'center',
-              // marginTop: sizes._16sdp,
-              marginBottom: sizes._10sdp,
-            }}
-          />
+          {/* Avatar - Show ProfileSvg if no avatar */}
+          {account?.avatar ? (
+            <Image
+              source={{uri: account.avatar}}
+              alt="avatar"
+              width={sizes._60sdp}
+              height={sizes._60sdp}
+              style={{
+                borderRadius: 100,
+                alignSelf: 'center',
+                marginBottom: sizes._10sdp,
+              }}
+            />
+          ) : (
+            <View
+              style={{
+                alignSelf: 'center',
+                marginBottom: sizes._10sdp,
+              }}>
+              <ProfileSvg
+                width={sizes._60sdp}
+                height={sizes._60sdp}
+                color={colors.primary}
+              />
+            </View>
+          )}
 
-              <TextBase
-                style={[
-                  AppStyle.txt_18_bold_review,
-                  {alignSelf: 'center',},
-                  
-                  // {marginLeft: sizes._16sdp},
-                ]}>
-                {this.state.account?.userName}
-              </TextBase>
+          {/* Display fullName instead of userName */}
+          <TextBase
+            style={[
+              AppStyle.txt_18_bold_review,
+              {alignSelf: 'center'},
+            ]}>
+            {this.state.account?.fullName || this.state.account?.userName}
+          </TextBase>
 
           <View
             style={{

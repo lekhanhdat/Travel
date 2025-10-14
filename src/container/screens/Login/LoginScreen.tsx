@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, Image, Text, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, Image, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { TextInput } from 'react-native-paper';
 import Swiper from 'react-native-swiper';
 import Toast from 'react-native-toast-message';
@@ -9,17 +9,18 @@ import sizes from '../../../common/sizes';
 import colors from '../../../common/colors';
 import images from '../../../res/images';
 import { AppStyle } from '../../../common/AppStyle';
-import { accounts } from '../../../common/authConstants';
 import NavigationService from '../NavigationService';
 import { ScreenName } from '../../AppContainer';
 import { localStorageKey } from '../../../common/constants';
 import LocalStorageCommon from '../../../utils/LocalStorageCommon';
+import authApi from '../../../services/auth.api';
 
 interface ILoginScreenState {
   isSecureTextEntry: boolean;
   userName: string;
   password: string;
   banners: any[];
+  loading: boolean;
 }
 
 export default class LoginScreen extends React.PureComponent<{}, ILoginScreenState> {
@@ -30,26 +31,57 @@ export default class LoginScreen extends React.PureComponent<{}, ILoginScreenSta
       userName: '',
       password: '',
       banners: [images.caurong, images.cauvang, images.dienhai, images.nharong],
+      loading: false,
     };
   }
 
-  handleLogin = () => {
-    const account = accounts.find(
-      acc => acc.userName === this.state.userName && acc.password === this.state.password
-    );
+  handleLogin = async () => {
+    const {userName, password} = this.state;
 
-    if (!account) {
+    if (!userName || !password) {
       Toast.show({
         type: 'error',
-        text1: 'Tên tài khoản hoặc mật khẩu không chính xác',
+        text1: 'Vui lòng nhập đầy đủ thông tin',
       });
       return;
     }
 
-    LocalStorageCommon.setItem(localStorageKey.USERNAME, account.userName);
-    LocalStorageCommon.setItem(localStorageKey.PASSWORD, account.password);
-    LocalStorageCommon.setItem(localStorageKey.AVT, account);
-    NavigationService.push(ScreenName.HOME_STACK_SCREEN);
+    this.setState({loading: true});
+
+    try {
+      const account = await authApi.login(userName, password);
+
+      if (!account) {
+        Toast.show({
+          type: 'error',
+          text1: 'Tên tài khoản hoặc mật khẩu không chính xác',
+        });
+        this.setState({loading: false});
+        return;
+      }
+
+      // Save to local storage
+      await LocalStorageCommon.setItem(localStorageKey.USERNAME, account.userName);
+      await LocalStorageCommon.setItem(localStorageKey.PASSWORD, account.password);
+      await LocalStorageCommon.setItem(localStorageKey.AVT, account);
+
+      Toast.show({
+        type: 'success',
+        text1: 'Đăng nhập thành công!',
+      });
+
+      this.setState({loading: false});
+      NavigationService.push(ScreenName.HOME_STACK_SCREEN);
+    } catch (error: any) {
+      console.error('❌ Login error:', error);
+      this.setState({loading: false});
+
+      Toast.show({
+        type: 'error',
+        text1: 'Lỗi kết nối',
+        text2: 'Không thể kết nối đến server. Vui lòng thử lại sau.',
+      });
+    }
   };
 
   toggleSecureEntry = () => {
@@ -68,8 +100,8 @@ export default class LoginScreen extends React.PureComponent<{}, ILoginScreenSta
   );
 
   render() {
-    const { userName, password, isSecureTextEntry, banners } = this.state;
-    const isLoginDisabled = !userName || !password;
+    const { userName, password, isSecureTextEntry, banners, loading } = this.state;
+    const isLoginDisabled = !userName || !password || loading;
 
     return (
       <Page>
@@ -128,14 +160,18 @@ export default class LoginScreen extends React.PureComponent<{}, ILoginScreenSta
             onPress={this.handleLogin}
             disabled={isLoginDisabled}
           >
-            <Text
-              style={[
-                AppStyle.txt_20_bold,
-                { color: isLoginDisabled ? colors.primary_400 : colors.white },
-              ]}
-            >
-              Đăng nhập
-            </Text>
+            {loading ? (
+              <ActivityIndicator size="small" color={colors.white} />
+            ) : (
+              <Text
+                style={[
+                  AppStyle.txt_20_bold,
+                  { color: isLoginDisabled ? colors.primary_400 : colors.white },
+                ]}
+              >
+                Đăng nhập
+              </Text>
+            )}
           </TouchableOpacity>
 
           <View style={styles.signupContainer}>

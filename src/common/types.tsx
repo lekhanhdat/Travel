@@ -1,7 +1,11 @@
 export interface IAccount {
+  Id?: number; // NocoDB primary key
   userName: string;
   password: string;
-  avatar: string;
+  fullName?: string; // Họ và tên đầy đủ
+  email?: string; // Email for password recovery
+  avatar?: string; // Avatar URL (optional, default to ProfileSvg)
+  CreatedAt?: string; // Timestamp
 }
 
 export interface ILocation {

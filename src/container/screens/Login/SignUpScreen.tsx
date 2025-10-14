@@ -1,190 +1,354 @@
 import React from 'react';
-import { View, StyleSheet, Image, Text, TouchableOpacity } from 'react-native';
-import { TextInput } from 'react-native-paper';
-import Swiper from 'react-native-swiper';
+import {
+  View,
+  StyleSheet,
+  Image,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  ActivityIndicator,
+} from 'react-native';
+import {TextInput} from 'react-native-paper';
 import Toast from 'react-native-toast-message';
 
 import Page from '../../../component/Page';
 import sizes from '../../../common/sizes';
 import colors from '../../../common/colors';
 import images from '../../../res/images';
-import { AppStyle } from '../../../common/AppStyle';
+import {AppStyle} from '../../../common/AppStyle';
 import NavigationService from '../NavigationService';
-import { ScreenName } from '../../AppContainer';
+import {ScreenName} from '../../AppContainer';
+import authApi from '../../../services/auth.api';
 
 interface ISignUpScreenState {
   userName: string;
   password: string;
   confirmPassword: string;
+  fullName: string;
+  email: string;
   isSecureTextEntry: boolean;
+  isSecureTextEntryConfirm: boolean;
+  loading: boolean;
 }
 
-export default class SignUpScreen extends React.PureComponent<{}, ISignUpScreenState> {
+export default class SignUpScreen extends React.PureComponent<
+  {},
+  ISignUpScreenState
+> {
   constructor(props: {}) {
     super(props);
     this.state = {
       userName: '',
       password: '',
       confirmPassword: '',
+      fullName: '',
+      email: '',
       isSecureTextEntry: true,
+      isSecureTextEntryConfirm: true,
+      loading: false,
     };
   }
 
-  handleSignUp = () => {
-    const { userName, password, confirmPassword } = this.state;
+  handleSignUp = async () => {
+    const {userName, password, confirmPassword, fullName, email} = this.state;
 
-    if (!userName || !password || !confirmPassword) {
-      Toast.show({ type: 'error', text1: 'Vui lòng nhập đầy đủ thông tin' });
+    // Validation
+    if (!userName || !password || !confirmPassword || !fullName || !email) {
+      Toast.show({type: 'error', text1: 'Vui lòng nhập đầy đủ thông tin'});
       return;
     }
+
     if (password !== confirmPassword) {
-      Toast.show({ type: 'error', text1: 'Mật khẩu nhập lại không khớp' });
+      Toast.show({type: 'error', text1: 'Mật khẩu nhập lại không khớp'});
       return;
     }
-    Toast.show({ type: 'success', text1: 'Đăng ký thành công!' });
-    NavigationService.push(ScreenName.LOGIN);
+
+    if (password.length < 6) {
+      Toast.show({
+        type: 'error',
+        text1: 'Mật khẩu phải có ít nhất 6 ký tự',
+      });
+      return;
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      Toast.show({type: 'error', text1: 'Email không hợp lệ'});
+      return;
+    }
+
+    this.setState({loading: true});
+
+    try {
+      await authApi.signUp(userName, password, fullName, email);
+
+      Toast.show({
+        type: 'success',
+        text1: 'Đăng ký thành công!',
+        text2: 'Vui lòng đăng nhập',
+      });
+
+      this.setState({loading: false});
+      NavigationService.reset(ScreenName.LOGIN_SCREEN);
+    } catch (error: any) {
+      console.error('❌ Sign up error:', error);
+      this.setState({loading: false});
+
+      Toast.show({
+        type: 'error',
+        text1: 'Đăng ký thất bại',
+        text2: error.message || 'Vui lòng thử lại sau',
+      });
+    }
   };
 
   toggleSecureEntry = () => {
-    this.setState(prevState => ({ isSecureTextEntry: !prevState.isSecureTextEntry }));
+    this.setState(prevState => ({
+      isSecureTextEntry: !prevState.isSecureTextEntry,
+    }));
   };
 
-  renderBanner = (banner: any, index: number) => (
-    <View key={index} style={styles.bannerContainer}>
-      <Image source={banner} style={styles.bannerImage} />
-    </View>
-  );
+  toggleSecureEntryConfirm = () => {
+    this.setState(prevState => ({
+      isSecureTextEntryConfirm: !prevState.isSecureTextEntryConfirm,
+    }));
+  };
 
   render() {
-    const { userName, password, confirmPassword, isSecureTextEntry } = this.state;
-    const isSignUpDisabled = !userName || !password || !confirmPassword;
+    const {
+      userName,
+      password,
+      confirmPassword,
+      fullName,
+      email,
+      isSecureTextEntry,
+      isSecureTextEntryConfirm,
+      loading,
+    } = this.state;
+
+    const isSignUpDisabled =
+      !userName ||
+      !password ||
+      !confirmPassword ||
+      !fullName ||
+      !email ||
+      loading;
 
     return (
       <Page>
-        <View style={styles.wrapper}>
-          <Swiper height={sizes._400sdp} autoplay activeDotColor={colors.primary}>
-            {[images.caurong, images.cauvang, images.dienhai, images.nharong].map(this.renderBanner)}
-          </Swiper>
-        </View>
+        <ScrollView
+          contentContainerStyle={styles.scrollContainer}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Illustration */}
+          <View style={styles.illustrationContainer}>
+            <Image
+              source={images.cauvang}
+              style={styles.illustration}
+              resizeMode="contain"
+            />
+          </View>
 
-        <View style={styles.titleContainer}>
-          <Text style={styles.title}>Đăng ký</Text>
-        </View>
+          {/* Title */}
+          <View style={styles.titleContainer}>
+            <Text style={styles.title}>Đăng ký</Text>
+            <Text style={styles.subtitle}>Tạo tài khoản mới</Text>
+          </View>
 
-        <View style={styles.container}>
-          <TextInput
-            mode="outlined"
-            label="Tên đăng nhập"
-            placeholder="Nhập tên đăng nhập"
-            style={styles.input}
-            outlineStyle={styles.inputOutline}
-            onChangeText={userName => this.setState({ userName })}
-          />
+          {/* Form */}
+          <View style={styles.formContainer}>
+            {/* Full Name */}
+            <TextInput
+              mode="outlined"
+              label="Họ và tên"
+              placeholder="Nhập họ và tên đầy đủ"
+              style={styles.input}
+              outlineStyle={styles.inputOutline}
+              textColor={colors.primary_950}
+              placeholderTextColor={colors.primary_400}
+              value={fullName}
+              onChangeText={fullName => this.setState({fullName})}
+            />
 
-          <TextInput
-            mode="outlined"
-            label="Mật khẩu"
-            placeholder="Nhập mật khẩu"
-            style={styles.input}
-            outlineStyle={styles.inputOutline}
-            secureTextEntry={isSecureTextEntry}
-            right={<TextInput.Icon icon={isSecureTextEntry ? images.eye_open : images.eye_close} onPress={this.toggleSecureEntry} />}
-            onChangeText={password => this.setState({ password })}
-          />
+            {/* Username */}
+            <TextInput
+              mode="outlined"
+              label="Tên đăng nhập"
+              placeholder="Nhập tên đăng nhập"
+              style={styles.input}
+              outlineStyle={styles.inputOutline}
+              textColor={colors.primary_950}
+              placeholderTextColor={colors.primary_400}
+              value={userName}
+              onChangeText={userName => this.setState({userName})}
+            />
 
-          <TextInput
-            mode="outlined"
-            label="Xác nhận mật khẩu"
-            placeholder="Nhập lại mật khẩu"
-            style={styles.input}
-            outlineStyle={styles.inputOutline}
-            secureTextEntry={isSecureTextEntry}
-            right={<TextInput.Icon icon={isSecureTextEntry ? images.eye_open : images.eye_close} onPress={this.toggleSecureEntry} />}
-            onChangeText={confirmPassword => this.setState({ confirmPassword })}
-          />
+            {/* Email */}
+            <TextInput
+              mode="outlined"
+              label="Email"
+              placeholder="Nhập email"
+              style={styles.input}
+              outlineStyle={styles.inputOutline}
+              textColor={colors.primary_950}
+              placeholderTextColor={colors.primary_400}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              value={email}
+              onChangeText={email => this.setState({email})}
+            />
 
-          <TouchableOpacity
-            style={[styles.btn, isSignUpDisabled && { backgroundColor: colors.primary_100 }]}
-            onPress={this.handleSignUp}
-            disabled={isSignUpDisabled}
-          >
-            <Text style={[AppStyle.txt_20_bold, { color: isSignUpDisabled ? colors.primary_400 : '#F7F2E5' }]}>
-              Đăng ký
-            </Text>
-          </TouchableOpacity>
+            {/* Password */}
+            <TextInput
+              mode="outlined"
+              label="Mật khẩu"
+              placeholder="Nhập mật khẩu (tối thiểu 6 ký tự)"
+              style={styles.input}
+              outlineStyle={styles.inputOutline}
+              textColor={colors.primary_950}
+              placeholderTextColor={colors.primary_400}
+              secureTextEntry={isSecureTextEntry}
+              value={password}
+              onChangeText={password => this.setState({password})}
+              right={
+                <TextInput.Icon
+                  icon={isSecureTextEntry ? images.eye_open : images.eye_close}
+                  onPress={this.toggleSecureEntry}
+                />
+              }
+            />
 
-          <View style={styles.loginContainer}>
-            <Text style={styles.loginText}>
-              Đã có tài khoản?{' '}
-              <TouchableOpacity onPress={() => NavigationService.reset(ScreenName.LOGIN_SCREEN)}>
+            {/* Confirm Password */}
+            <TextInput
+              mode="outlined"
+              label="Xác nhận mật khẩu"
+              placeholder="Nhập lại mật khẩu"
+              style={styles.input}
+              outlineStyle={styles.inputOutline}
+              textColor={colors.primary_950}
+              placeholderTextColor={colors.primary_400}
+              secureTextEntry={isSecureTextEntryConfirm}
+              value={confirmPassword}
+              onChangeText={confirmPassword => this.setState({confirmPassword})}
+              right={
+                <TextInput.Icon
+                  icon={
+                    isSecureTextEntryConfirm
+                      ? images.eye_open
+                      : images.eye_close
+                  }
+                  onPress={this.toggleSecureEntryConfirm}
+                />
+              }
+            />
+
+            {/* Sign Up Button */}
+            <TouchableOpacity
+              style={[styles.btn, isSignUpDisabled && styles.disabledButton]}
+              onPress={this.handleSignUp}
+              disabled={isSignUpDisabled}
+            >
+              {loading ? (
+                <ActivityIndicator size="small" color={colors.white} />
+              ) : (
+                <Text
+                  style={[
+                    AppStyle.txt_20_bold,
+                    {
+                      color: isSignUpDisabled
+                        ? colors.primary_400
+                        : colors.white,
+                    },
+                  ]}
+                >
+                  Đăng ký
+                </Text>
+              )}
+            </TouchableOpacity>
+
+            {/* Login Link */}
+            <View style={styles.loginContainer}>
+              <Text style={styles.loginText}>Đã có tài khoản? </Text>
+              <TouchableOpacity
+                onPress={() => NavigationService.reset(ScreenName.LOGIN_SCREEN)}
+              >
                 <Text style={styles.loginLink}>Đăng nhập</Text>
               </TouchableOpacity>
-            </Text>
+            </View>
           </View>
-        </View>
+        </ScrollView>
       </Page>
     );
   }
 }
 
 const styles = StyleSheet.create({
-  wrapper: {
+  scrollContainer: {
+    flexGrow: 1,
+    paddingBottom: sizes._32sdp,
+  },
+  illustrationContainer: {
+    height: sizes._250sdp,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: colors.primary_100,
+  },
+  illustration: {
     width: '100%',
-    height: sizes._320sdp,
-    marginBottom: sizes._30sdp,
-    borderBottomLeftRadius: sizes._50sdp,
-    borderBottomRightRadius: sizes._50sdp,
-    overflow: 'hidden',
-  },
-  bannerContainer: {
-    flex: 1,
-  },
-  bannerImage: {
-    width: sizes.width,
-    height: sizes._400sdp,
-    borderBottomLeftRadius: sizes._50sdp,
-    borderBottomRightRadius: sizes._50sdp,
-    alignSelf: 'center',
+    height: '100%',
   },
   titleContainer: {
-    alignItems: 'center',
+    paddingHorizontal: sizes._24sdp,
+    paddingTop: sizes._24sdp,
+    paddingBottom: sizes._16sdp,
   },
   title: {
-    color: colors.black,
-    fontSize: sizes._25sdp,
+    fontSize: sizes._32sdp,
     fontWeight: 'bold',
-    textAlign: 'center',
+    color: colors.primary_950,
+    marginBottom: sizes._8sdp,
   },
-  container: {
-    flex: 1,
-    paddingHorizontal: sizes._16sdp,
-    marginTop: sizes._10sdp,
+  subtitle: {
+    fontSize: sizes._16sdp,
+    color: colors.primary_400,
+  },
+  formContainer: {
+    paddingHorizontal: sizes._24sdp,
   },
   input: {
-    width: '100%',
     marginBottom: sizes._16sdp,
+    backgroundColor: colors.white,
   },
   inputOutline: {
     borderColor: colors.primary,
-    borderRadius: sizes._16sdp,
+    borderRadius: sizes._12sdp,
   },
   btn: {
     width: '100%',
     paddingVertical: sizes._16sdp,
     borderRadius: sizes._16sdp,
-    backgroundColor: colors.primary,
+    backgroundColor: colors.black,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: sizes._40sdp,
+    marginTop: sizes._24sdp,
+  },
+  disabledButton: {
+    backgroundColor: colors.primary_200,
   },
   loginContainer: {
-    marginTop: sizes._10sdp,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: sizes._16sdp,
   },
   loginText: {
-    color: colors.primary,
-    textAlign: 'center',
+    color: colors.primary_400,
+    fontSize: sizes._16sdp,
   },
   loginLink: {
+    color: colors.primary,
+    fontSize: sizes._16sdp,
     fontWeight: 'bold',
   },
 });
+

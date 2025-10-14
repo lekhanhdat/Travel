@@ -81,10 +81,21 @@ const AnnotationContent = ({title}: {title: string}) => (
   </View>
 );
 
+interface RouteInfo {
+  distance: number; // meters
+  duration: number; // seconds
+  coordinates: {latitude: number; longitude: number}[];
+}
+
 const MapScreenV2 = ({navigation}: {navigation: any}) => {
   const [currentLat, setCurrentLat] = useState(0);
   const [currentLong, setCurrentLong] = useState(0);
   const [routeCoordinates, setRouteCoordinates] = useState<{latitude: number; longitude: number}[]>([]);
+  const [routes, setRoutes] = useState<RouteInfo[]>([]); // Lưu tất cả routes (main + alternatives)
+  const [selectedRouteIndex, setSelectedRouteIndex] = useState(0); // Route đang được chọn
+  const [routeDistance, setRouteDistance] = useState<number>(0); // Distance in meters
+  const [routeDuration, setRouteDuration] = useState<number>(0); // Duration in seconds
+  const [routeSteps, setRouteSteps] = useState<any[]>([]); // Turn-by-turn steps
   const [visible, setVisible] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState<ILocation | null>(
     null,
@@ -368,22 +379,57 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
         coordinates,
         geometries: 'geojson',
         overview: 'full',
+        steps: true, // ✅ Bật turn-by-turn navigation
+        alternatives: true, // ✅ Bật alternative routes
+        banner_instructions: true,
+        voice_instructions: true,
       });
 
       console.log('Mapbox response:', response);
 
       if (response && response.routes && response.routes.length > 0) {
-        const route = response.routes[0];
+        // Lưu tất cả routes (main + alternatives)
+        const allRoutes: RouteInfo[] = response.routes.map((route: any) => {
+          const geoJsonCoordinates = route.geometry.coordinates;
+          const points = mapboxApi.convertGeoJSONToCoordinates(geoJsonCoordinates);
 
-        // Mapbox trả về GeoJSON format: coordinates là array of [longitude, latitude]
-        const geoJsonCoordinates = route.geometry.coordinates;
-        console.log('✅ GeoJSON coordinates count:', geoJsonCoordinates.length);
+          return {
+            distance: route.distance,
+            duration: route.duration,
+            coordinates: points,
+          };
+        });
 
-        // Convert sang format {latitude, longitude}
+        setRoutes(allRoutes);
+        console.log('✅ Total routes:', allRoutes.length);
+
+        // Hiển thị route đầu tiên (fastest)
+        const mainRoute = response.routes[0];
+        const geoJsonCoordinates = mainRoute.geometry.coordinates;
         const points = mapboxApi.convertGeoJSONToCoordinates(geoJsonCoordinates);
-        console.log('✅ Route points converted:', points.length);
+
+        console.log('✅ Main route - Distance:', mainRoute.distance, 'meters');
+        console.log('✅ Main route - Duration:', mainRoute.duration, 'seconds');
+        console.log('✅ Main route - Points:', points.length);
 
         setRouteCoordinates(points);
+        setRouteDistance(mainRoute.distance);
+        setRouteDuration(mainRoute.duration);
+
+        // Lưu turn-by-turn steps
+        if (mainRoute.legs && mainRoute.legs[0] && mainRoute.legs[0].steps) {
+          const steps = mainRoute.legs[0].steps;
+          console.log('✅ Turn-by-turn steps:', steps.length);
+          console.log('📋 First step example:', steps[0]);
+          setRouteSteps(steps);
+        } else {
+          console.log('❌ No steps found in route');
+          console.log('Route structure:', {
+            hasLegs: !!mainRoute.legs,
+            legsLength: mainRoute.legs?.length,
+            hasSteps: !!mainRoute.legs?.[0]?.steps,
+          });
+        }
       } else {
         console.log('❌ No routes found in response');
       }
@@ -516,7 +562,7 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
                 id="routeLineLayer"
                 style={{
                   lineWidth: 6,
-                  lineColor: '#0000FF', // Đổi sang màu đỏ để dễ thấy
+                  lineColor: '#0000FF', 
                   lineOpacity: 0.9,
                   lineCap: 'round',
                   lineJoin: 'round',
@@ -527,6 +573,79 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
         </MapboxGL.MapView>
       </View>
 
+      {/* Hiển thị Distance & Duration */}
+      {routeDistance > 0 && routeDuration > 0 && (
+        <View style={{
+          position: 'absolute',
+          top: 80,
+          left: 10,
+          right: 10,
+          backgroundColor: 'white',
+          borderRadius: 10,
+          padding: 12,
+          elevation: 5,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.25,
+          shadowRadius: 3.84,
+        }}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+            <View style={{ flex: 1 }}>
+              <TextBase style={{ fontSize: 16, fontWeight: 'bold', color: colors.primary }}>
+                📍 {mapboxApi.formatDistance(routeDistance)}
+              </TextBase>
+              <TextBase style={{ fontSize: 14, color: colors.primary_950, marginTop: 4 }}>
+                ⏱️ {mapboxApi.formatDuration(routeDuration)}
+              </TextBase>
+            </View>
+
+            {routes.length > 1 && (
+              <View style={{ marginLeft: 10 }}>
+                <TextBase style={{ fontSize: 12, color: colors.primary_700 }}>
+                  {routes.length} tuyến đường
+                </TextBase>
+              </View>
+            )}
+          </View>
+
+          {/* Alternative Routes Buttons */}
+          {routes.length > 1 && (
+            <View style={{
+              flexDirection: 'row',
+              marginTop: 10,
+              flexWrap: 'wrap',
+            }}>
+              {routes.map((route, index) => {
+                const routeDist = route?.distance != null ? route.distance : 0;
+                return (
+                  <Button
+                    key={index}
+                    mode={selectedRouteIndex === index ? 'contained' : 'outlined'}
+                    compact
+                    onPress={() => {
+                      setSelectedRouteIndex(index);
+                      setRouteCoordinates(route.coordinates);
+                      setRouteDistance(route.distance);
+                      setRouteDuration(route.duration);
+                      console.log(`Switched to route ${index + 1}`);
+                    }}
+                    style={{
+                      borderColor: colors.primary,
+                      marginRight: 8,
+                      marginBottom: 8,
+                    }}
+                    labelStyle={{ fontSize: 12 }}
+                  >
+                    Tuyến {index + 1}: {mapboxApi.formatDistance(routeDist)}
+                  </Button>
+                );
+              })}
+            </View>
+          )}
+        </View>
+      )}
+
+      {/* Button Xem chi tiết địa điểm */}
       {selectedLocation && (
         <View style={{position: 'absolute', right: 10, bottom: 10}}>
           <Button
@@ -540,52 +659,193 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
         </View>
       )}
 
-      <Modal visible={visible}>
-        <View
-          onStartShouldSetResponder={() => {
-            setVisible(false);
-            return true;
-          }}
+      {/* Button Xem hướng dẫn từng bước */}
+      {routeSteps.length > 0 && (
+        <View style={{position: 'absolute', left: 10, bottom: 10}}>
+          <Button
+            icon="directions"
+            mode="contained"
+            onPress={() => {
+              console.log('🧭 Opening turn-by-turn modal');
+              console.log('Route steps count:', routeSteps.length);
+              console.log('Route distance:', routeDistance);
+              console.log('Route duration:', routeDuration);
+              setVisible(true);
+            }}
+            style={{ backgroundColor: colors.primary_700 }}
+          >
+            Hướng dẫn
+          </Button>
+        </View>
+      )}
+
+      {/* Modal Turn-by-Turn Navigation */}
+      <Modal
+        visible={visible}
+        onDismiss={() => setVisible(false)}
+        contentContainerStyle={{
+          flex: 1,
+          justifyContent: 'flex-end',
+        }}
+      >
+        <TouchableOpacity
+          activeOpacity={1}
+          onPress={() => setVisible(false)}
           style={{
             flex: 1,
-            backgroundColor: 'rgba(255,255,255,0.5)',
-            alignItems: 'center',
-            justifyContent: 'center',
+            backgroundColor: 'rgba(0,0,0,0.5)',
+            justifyContent: 'flex-end',
           }}>
-          <View
-            style={{
-              width: sizes.width - sizes._32sdp,
-              padding: sizes._16sdp,
-              backgroundColor: colors.white,
-              borderRadius: sizes._8sdp,
-            }}>
-            <TextBase style={AppStyle.txt_16_bold}>
-              Người dân và du khách hãy chung tay giữ gìn lá phổi xanh Sơn Trà -
-              Đà Nẵng bằng cách:
-            </TextBase>
-            <View style={{height: sizes._16sdp}} />
-            <TextBase style={AppStyle.txt_14_regular}>
-              - Bỏ rác vào thùng hoặc mang rác về sau khi tham quan tại Bán đảo
-              Sơn Trà.
-            </TextBase>
-            <View style={{height: sizes._8sdp}} />
-            <TextBase style={AppStyle.txt_14_regular}>
-              - Không cho khỉ ăn bằng bất kỳ hình thức nào hoặc tiếp xúc gần với
-              khỉ, điều này giúp bảo vệ đàn khỉ và tránh các nguy cơ gây hại cho
-              con người, vì khỉ có thể tấn công hoặc lây nhiễm các bệnh do vi
-              khuẩn và vi-rút sang con người.
-            </TextBase>
-            <View style={{height: sizes._8sdp}} />
-            <TextBase style={AppStyle.txt_14_regular}>
-              Tham quan trải nghiệm cho chúng ta
-            </TextBase>
-            <View style={{height: sizes._8sdp}} />
-            <TextBase style={AppStyle.txt_14_regular}>
-              Bảo vệ cảnh quan thiên nhiên và đa dạng sinh học cho Bán đảo Sơn
-              Trà.
-            </TextBase>
-          </View>
-        </View>
+          <TouchableOpacity activeOpacity={1} onPress={(e) => e.stopPropagation()}>
+            <View
+              style={{
+                backgroundColor: colors.white,
+                borderTopLeftRadius: 20,
+                borderTopRightRadius: 20,
+                maxHeight: 600,
+              }}>
+              {/* Header */}
+              <View style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                padding: sizes._16sdp,
+                borderBottomWidth: 1,
+                borderBottomColor: colors.primary_200,
+              }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <TextBase style={[AppStyle.txt_18_bold, { color: colors.primary }]}>
+                    🧭 Hướng dẫn từng bước
+                  </TextBase>
+                  {routeSteps.length > 0 && (
+                    <View style={{
+                      marginLeft: 10,
+                      backgroundColor: colors.primary_100,
+                      paddingHorizontal: 8,
+                      paddingVertical: 4,
+                      borderRadius: 12,
+                    }}>
+                      <TextBase style={{ fontSize: 12, color: colors.primary, fontWeight: 'bold' }}>
+                        {routeSteps.length} bước
+                      </TextBase>
+                    </View>
+                  )}
+                </View>
+                <TouchableOpacity onPress={() => setVisible(false)}>
+                  <TextBase style={{ fontSize: 28, color: colors.primary_700, fontWeight: 'bold' }}>×</TextBase>
+                </TouchableOpacity>
+              </View>
+
+              {/* Steps List */}
+              {routeSteps.length > 0 ? (
+                <ScrollView
+                  style={{ padding: sizes._16sdp }}
+                  showsVerticalScrollIndicator={true}
+                >
+                  {routeSteps.map((step: any, index: number) => {
+                    // Kiểm tra và xử lý data
+                    const distance = step?.distance != null ? mapboxApi.formatDistance(step.distance) : '0 m';
+                    const instruction = step?.maneuver?.instruction || 'Tiếp tục đi';
+                    const maneuverType = step?.maneuver?.type || '';
+                    const modifier = step?.maneuver?.modifier || '';
+                    const stepName = step?.name || '';
+                    const stepDuration = step?.duration != null ? step.duration : 0;
+
+                    // Icon dựa trên maneuver type
+                    let icon = '➡️';
+                    if (maneuverType === 'depart') icon = '🚗';
+                    else if (maneuverType === 'arrive') icon = '🏁';
+                    else if (maneuverType === 'turn') {
+                      if (modifier.includes('left')) icon = '↰';
+                      else if (modifier.includes('right')) icon = '↱';
+                      else if (modifier === 'straight') icon = '⬆️';
+                    } else if (maneuverType === 'roundabout') icon = '🔄';
+                    else if (maneuverType === 'merge') icon = '🔀';
+
+                    return (
+                      <View
+                        key={index}
+                        style={{
+                          flexDirection: 'row',
+                          marginBottom: sizes._12sdp,
+                          paddingBottom: sizes._12sdp,
+                          borderBottomWidth: index < routeSteps.length - 1 ? 1 : 0,
+                          borderBottomColor: colors.primary_100,
+                        }}
+                      >
+                        {/* Step Number & Icon */}
+                        <View style={{ alignItems: 'center', marginRight: 12 }}>
+                          <View style={{
+                            width: 36,
+                            height: 36,
+                            borderRadius: 18,
+                            backgroundColor: index === 0 ? colors.primary : colors.primary_200,
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                            <TextBase style={{
+                              color: index === 0 ? colors.white : colors.primary_700,
+                              fontWeight: 'bold',
+                              fontSize: 14,
+                            }}>
+                              {index + 1}
+                            </TextBase>
+                          </View>
+                          <TextBase style={{ fontSize: 20, marginTop: 4 }}>
+                            {icon}
+                          </TextBase>
+                        </View>
+
+                        {/* Step Info */}
+                        <View style={{ flex: 1 }}>
+                          <TextBase style={[AppStyle.txt_14_medium, { color: colors.primary_950, lineHeight: 20 }]}>
+                            {instruction}
+                          </TextBase>
+                          <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 6 }}>
+                            <TextBase style={[AppStyle.txt_12_regular, { color: colors.primary_700 }]}>
+                              📍 {distance}
+                            </TextBase>
+                            {stepDuration > 0 && (
+                              <TextBase style={[AppStyle.txt_12_regular, { color: colors.primary_600, marginLeft: 12 }]}>
+                                ⏱️ {mapboxApi.formatDuration(stepDuration)}
+                              </TextBase>
+                            )}
+                          </View>
+                          {stepName && (
+                            <TextBase style={[AppStyle.txt_12_regular, { color: colors.primary_600, marginTop: 4 }]}>
+                              🛣️ {stepName}
+                            </TextBase>
+                          )}
+                        </View>
+                      </View>
+                    );
+                  })}
+
+                  {/* Footer */}
+                  {routeDistance > 0 && routeDuration > 0 && (
+                    <View style={{
+                      marginTop: 10,
+                      padding: 12,
+                      backgroundColor: colors.primary_50,
+                      borderRadius: 8,
+                      alignItems: 'center',
+                    }}>
+                      <TextBase style={{ fontSize: 14, color: colors.primary_700, textAlign: 'center' }}>
+                        🎯 Tổng cộng: {mapboxApi.formatDistance(routeDistance)} • {mapboxApi.formatDuration(routeDuration)}
+                      </TextBase>
+                    </View>
+                  )}
+                </ScrollView>
+              ) : (
+                <View style={{ padding: sizes._32sdp, alignItems: 'center' }}>
+                  <TextBase style={{ fontSize: 16, color: colors.primary_700, textAlign: 'center' }}>
+                    Không có hướng dẫn chi tiết
+                  </TextBase>
+                </View>
+              )}
+            </View>
+          </TouchableOpacity>
+        </TouchableOpacity>
       </Modal>
 
       <Modal
@@ -665,7 +925,6 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
             style={{
               display: 'flex',
               flexDirection: 'column',
-              gap: sizes._12sdp,
               flex: 1, // Để View này chiếm phần còn lại
             }}>
             <Button
@@ -675,7 +934,7 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
                   location: selectedLocation,
                 });
               }}
-              style={styles.customButton}
+              style={[styles.customButton, { marginBottom: sizes._12sdp }]}
               labelStyle={styles.buttonText} // Sử dụng labelStyle để chỉnh sửa chữ trong Button
             >
               Quy tắc ứng xử văn minh
@@ -688,7 +947,7 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
                   location: selectedLocation,
                 });
               }}
-              style={styles.customButton}
+              style={[styles.customButton, { marginBottom: sizes._12sdp }]}
               labelStyle={styles.buttonText}>
               Thông tin chi tiết
             </Button>

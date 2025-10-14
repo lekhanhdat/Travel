@@ -9,6 +9,9 @@ interface DirectionsParams {
   geometries?: 'geojson' | 'polyline' | 'polyline6';
   overview?: 'full' | 'simplified' | 'false';
   steps?: boolean;
+  alternatives?: boolean;
+  banner_instructions?: boolean;
+  voice_instructions?: boolean;
 }
 
 class MapboxApi {
@@ -24,23 +27,41 @@ class MapboxApi {
       geometries = 'geojson',
       overview = 'full',
       steps = false,
+      alternatives = false,
+      banner_instructions = false,
+      voice_instructions = false,
     } = params;
 
     const url = `${MAPBOX_BASE_URL}/directions/v5/mapbox/${profile}/${coordinates}`;
 
     try {
       console.log('🗺️ Mapbox Directions API Request:', url);
-      
+
       const response = await axios.get(url, {
         params: {
           access_token: MAPBOX_ACCESS_TOKEN,
           geometries,
           overview,
           steps,
+          alternatives,
+          banner_instructions,
+          voice_instructions,
         },
       });
 
       console.log('✅ Mapbox Directions API Response:', response.data);
+      console.log('📊 Routes count:', response.data.routes?.length || 0);
+
+      if (response.data.routes && response.data.routes.length > 0) {
+        response.data.routes.forEach((route: any, index: number) => {
+          console.log(`Route ${index + 1}:`, {
+            distance: route.distance,
+            duration: route.duration,
+            steps: route.legs?.[0]?.steps?.length || 0,
+          });
+        });
+      }
+
       return response.data;
     } catch (error: any) {
       console.error('❌ Mapbox Directions API Error:', error.response?.data || error.message);
@@ -58,6 +79,47 @@ class MapboxApi {
       longitude: coord[0],
       latitude: coord[1],
     }));
+  }
+
+  /**
+   * Format distance from meters to human-readable string
+   * @param meters Distance in meters
+   * @returns Formatted string (e.g., "1.5 km" or "500 m")
+   */
+  formatDistance(meters: number | null | undefined): string {
+    if (meters == null || isNaN(meters)) {
+      return '0 m';
+    }
+    if (meters >= 1000) {
+      return `${(meters / 1000).toFixed(1)} km`;
+    }
+    return `${Math.round(meters)} m`;
+  }
+
+  /**
+   * Format duration from seconds to human-readable string
+   * @param seconds Duration in seconds
+   * @returns Formatted string (e.g., "1 giờ 30 phút" or "45 phút")
+   */
+  formatDuration(seconds: number | null | undefined): string {
+    if (seconds == null || isNaN(seconds)) {
+      return '0 giây';
+    }
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+
+    if (hours > 0) {
+      if (minutes > 0) {
+        return `${hours} giờ ${minutes} phút`;
+      }
+      return `${hours} giờ`;
+    }
+
+    if (minutes > 0) {
+      return `${minutes} phút`;
+    }
+
+    return `${Math.round(seconds)} giây`;
   }
 }
 

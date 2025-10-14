@@ -33,11 +33,22 @@ export default class ViewAllLocation extends React.PureComponent<
     const locationsIn: ILocation[] = this.props.navigation.state.params?.locations ?? [];
     const valueSearch: string = this.props.navigation.state.params?.valueSearch;
     let locationOut: ILocation[] = [];
+
     locationsIn.forEach(location => {
-      if (convertCitationVietnameseUnsigned(location.name ?? '')?.toLowerCase()?.includes(convertCitationVietnameseUnsigned(valueSearch)?.toLowerCase())) {
-        locationOut = locationOut.concat(location)
+      // Search by both name and address
+      const nameMatch = convertCitationVietnameseUnsigned(location.name ?? '')
+        ?.toLowerCase()
+        ?.includes(convertCitationVietnameseUnsigned(valueSearch)?.toLowerCase());
+
+      const addressMatch = convertCitationVietnameseUnsigned(location.address ?? '')
+        ?.toLowerCase()
+        ?.includes(convertCitationVietnameseUnsigned(valueSearch)?.toLowerCase());
+
+      if (nameMatch || addressMatch) {
+        locationOut = locationOut.concat(location);
       }
-    })
+    });
+
     this.setState({
       locations: locationOut
     })

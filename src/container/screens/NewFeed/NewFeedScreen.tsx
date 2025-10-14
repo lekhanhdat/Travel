@@ -25,6 +25,7 @@ import {
 import LargeItemLocation from '../../../component/LargeItemLocation';
 import locationApi from '../../../services/locations.api';
 import {launchImageLibrary} from 'react-native-image-picker';
+import {convertCitationVietnameseUnsigned} from '../../../utils/Utils';
 
 
 // ĐÂY LÀ TRANG NEWFEED CHUẨN
@@ -382,12 +383,15 @@ export default class NewFeedScreen extends React.PureComponent<
                       ? this.state.locations
                       : [...this.state.locationsPopular, ...this.state.locationsNearly];
 
-                    // Filter by query
+                    // Filter by query (support Vietnamese with/without accents)
                     const filteredLocations = this.state.filterLocationQuery.trim().length > 0
-                      ? allLocations.filter(loc =>
-                          loc.name.toLowerCase().includes(this.state.filterLocationQuery.toLowerCase()) ||
-                          loc.address.toLowerCase().includes(this.state.filterLocationQuery.toLowerCase())
-                        )
+                      ? allLocations.filter(loc => {
+                          const query = convertCitationVietnameseUnsigned(this.state.filterLocationQuery)?.toLowerCase() || '';
+                          const name = convertCitationVietnameseUnsigned(loc.name ?? '')?.toLowerCase() || '';
+                          const address = convertCitationVietnameseUnsigned(loc.address ?? '')?.toLowerCase() || '';
+
+                          return name.includes(query) || address.includes(query);
+                        })
                       : allLocations.slice(0, 3); // Show top 3 by default
 
                     if (filteredLocations.length === 0) {
@@ -812,13 +816,15 @@ export default class NewFeedScreen extends React.PureComponent<
                     ? this.state.locations
                     : [...this.state.locationsPopular, ...this.state.locationsNearly];
 
-                  // Filter by search query
+                  // Filter by search query (support Vietnamese with/without accents)
                   if (this.state.locationSearchQuery.trim().length > 0) {
-                    const query = this.state.locationSearchQuery.toLowerCase();
-                    return allLocations.filter(loc =>
-                      loc.name.toLowerCase().includes(query) ||
-                      loc.address.toLowerCase().includes(query)
-                    );
+                    const query = convertCitationVietnameseUnsigned(this.state.locationSearchQuery)?.toLowerCase() || '';
+                    return allLocations.filter(loc => {
+                      const name = convertCitationVietnameseUnsigned(loc.name ?? '')?.toLowerCase() || '';
+                      const address = convertCitationVietnameseUnsigned(loc.address ?? '')?.toLowerCase() || '';
+
+                      return name.includes(query) || address.includes(query);
+                    });
                   }
 
                   return allLocations;

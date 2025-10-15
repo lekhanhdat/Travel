@@ -199,6 +199,9 @@ export default class ProfileScreen extends React.PureComponent<
                 borderRadius: sizes._1000sdp,
                 alignItems: 'center',
                 justifyContent: 'center',
+              }}
+              onPress={() => {
+                NavigationService.navigate(ScreenName.SETTINGS);
               }}>
               <Setting
                 width={sizes._20sdp}
@@ -226,6 +229,9 @@ export default class ProfileScreen extends React.PureComponent<
                 borderRadius: sizes._1000sdp,
                 alignItems: 'center',
                 justifyContent: 'center',
+              }}
+              onPress={() => {
+                NavigationService.navigate(ScreenName.FAQ);
               }}>
               <FAQ
                 width={sizes._20sdp}
@@ -253,12 +259,45 @@ export default class ProfileScreen extends React.PureComponent<
                 borderRadius: sizes._1000sdp,
                 alignItems: 'center',
                 justifyContent: 'center',
+              }}
+              onPress={() => {
+                NavigationService.navigate(ScreenName.POLICY);
               }}>
               <Policy
                 width={sizes._20sdp}
                 height={sizes._20sdp}
                 color={colors.primary_950}
               />
+            </TouchableOpacity>
+          </View>
+
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginTop: sizes._16sdp,
+            }}>
+            <TextBase style={AppStyle.txt_18_bold}>
+              {'Thông tin ứng dụng'}
+            </TextBase>
+            <TouchableOpacity
+              style={{
+                width: sizes._56sdp,
+                height: sizes._40sdp,
+                backgroundColor: colors.primary,
+                borderRadius: sizes._1000sdp,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+              onPress={() => {
+                NavigationService.navigate(ScreenName.ABOUT);
+              }}>
+              <TextBase style={{
+                fontSize: sizes._16sdp,
+                fontWeight: 'bold',
+                color: colors.primary_950,
+              }}>i</TextBase>
             </TouchableOpacity>
           </View>
 

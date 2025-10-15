@@ -31,8 +31,10 @@ import locationApi from '../../../services/locations.api';
 import fonts from '../../../common/fonts';
 import LocalStorageCommon from '../../../utils/LocalStorageCommon';
 import {localStorageKey} from '../../../common/constants';
+import {withTranslation, WithTranslationProps} from '../../../i18n/withTranslation';
+import LanguageDropdown from '../../../component/LanguageDropdown';
 
-interface IHomeScreenProps {
+interface IHomeScreenProps extends WithTranslationProps {
   navigation: any;
 }
 
@@ -44,7 +46,7 @@ interface IHomeScreenState {
   account: IAccount | null;
 }
 
-export default class HomeScreen extends React.PureComponent<
+class HomeScreen extends React.PureComponent<
   IHomeScreenProps,
   IHomeScreenState
 > {
@@ -110,17 +112,23 @@ export default class HomeScreen extends React.PureComponent<
       <Page style={{backgroundColor: colors.background}}>
         {/* <HeaderBase hideLeftIcon title={strings.home_page} /> */}
 
-        <TextBase
-          style={[
-            AppStyle.txt_18_bold,
-            {
-              marginTop: sizes._36sdp,
-              marginLeft: sizes._16sdp,
-              color: colors.black,
-            },
-          ]}>
-          Xin chào{this.state.account?.fullName ? `, ${this.state.account.fullName}` : ''}
-        </TextBase>
+        <View style={styles.headerContainer}>
+          <TextBase
+            style={[
+              AppStyle.txt_18_bold,
+              {
+                marginTop: sizes._36sdp,
+                marginLeft: sizes._16sdp,
+                color: colors.black,
+                flex: 1,
+              },
+            ]}>
+            {this.props.t('home.greeting')}{this.state.account?.fullName ? `, ${this.state.account.fullName}` : ''}
+          </TextBase>
+          <View style={styles.languageDropdownContainer}>
+            <LanguageDropdown compact={true} showFlag={true} showNativeName={false} />
+          </View>
+        </View>
         <TextBase
           style={[
             AppStyle.txt_20_bold,
@@ -294,6 +302,8 @@ export default class HomeScreen extends React.PureComponent<
   }
 }
 
+export default withTranslation(HomeScreen);
+
 const styles = StyleSheet.create({
   container: {
     padding: sizes._16sdp,
@@ -302,5 +312,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+  },
+  headerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingRight: sizes._16sdp,
+  },
+  languageDropdownContainer: {
+    marginTop: sizes._36sdp,
   },
 });

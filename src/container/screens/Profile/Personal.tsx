@@ -70,6 +70,7 @@ export default class ProfileScreen extends React.PureComponent<
               color={colors.primary_950}
             />
           }
+          onLeftIconPress={() => NavigationService.pop()}
           />
 
         <View style={styles.container}>

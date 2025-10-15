@@ -5,6 +5,7 @@ import {createStackNavigator} from '@react-navigation/stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {useRoute} from '@react-navigation/native';
 import {StyleSheet, View, Image, TouchableOpacity} from 'react-native';
+import {LanguageProvider} from '../i18n';
 import images from '../res/images';
 import strings from '../res/strings';
 import sizes from '../common/sizes';
@@ -37,6 +38,10 @@ import PreviewImage from './screens/Camera/PreviewImage';
 import LocationImage from './screens/Home/LocationImage';
 import LocationVideo from './screens/Home/LocationVideo';
 import Personal from './screens/Profile/Personal';
+import Settings from './screens/Profile/Settings';
+import FAQ from './screens/Profile/FAQ';
+import Policy from './screens/Profile/Policy';
+import About from './screens/Profile/About';
 import Advise from './screens/Maps/Advise';
 import DetailItem from './screens/NewFeed/DetailItem';
 import AllItemScreen from './screens/NewFeed/AllItemsScreen';
@@ -57,6 +62,10 @@ export enum ScreenName {
   LOCATION_IMAGE = 'LocationImage',
   LOCATION_VIDEO = 'LocationVideo',
   PERSONAL = 'Personal',
+  SETTINGS = 'Settings',
+  FAQ = 'FAQ',
+  POLICY = 'Policy',
+  ABOUT = 'About',
   ADVISE = 'Advise',
   DETAIL_ITEM = 'DetailItem',
   VIEW_ALL_ITEM = 'ViewAllItem',
@@ -346,6 +355,10 @@ const AppNavigator = createCompatNavigatorFactory(createStackNavigator)(
     LocationImage: {screen: LocationImage},
     LocationVideo: {screen: LocationVideo},
     Personal: {screen: Personal},
+    Settings: {screen: Settings},
+    FAQ: {screen: FAQ},
+    Policy: {screen: Policy},
+    About: {screen: About},
     Advise: {screen: Advise},
     DetailItem: {screen: DetailItem},
     ViewAllItem: {screen: AllItemScreen},
@@ -414,4 +427,11 @@ const styles = StyleSheet.create({
     marginTop: sizes._4sdp,
   },
 });
-export default AppContainer;
+// Wrap AppContainer with LanguageProvider
+const AppWithLanguage = () => (
+  <LanguageProvider>
+    <AppContainer />
+  </LanguageProvider>
+);
+
+export default AppWithLanguage;

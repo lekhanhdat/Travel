@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useCallback} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   ScrollView,
   View,
@@ -63,6 +63,23 @@ interface RouteInfo {
   coordinates: {latitude: number; longitude: number}[];
 }
 
+// Map style types
+type MapStyle = 'satellite' | 'outdoors' | 'dark' | 'terrain';
+
+interface MapStyleOption {
+  id: MapStyle;
+  name: string;
+  url: string;
+  icon: string;
+}
+
+const MAP_STYLES: MapStyleOption[] = [
+  { id: 'outdoors', name: 'Outdoors', url: MapboxGL.StyleURL.Outdoors, icon: '🏞️' },
+  { id: 'satellite', name: 'Satellite', url: MapboxGL.StyleURL.Satellite, icon: '🛰️' },
+  { id: 'dark', name: 'Dark', url: MapboxGL.StyleURL.Dark, icon: '🌙' },
+  { id: 'terrain', name: 'Terrain', url: 'mapbox://styles/mapbox/satellite-streets-v12', icon: '⛰️' },
+];
+
 const MapScreenV2 = ({navigation}: {navigation: any}) => {
   const [currentLat, setCurrentLat] = useState(0);
   const [currentLong, setCurrentLong] = useState(0);
@@ -77,6 +94,13 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
     null,
   );
   const [locationPermission, setLocationPermission] = useState(false);
+
+  // Map style state
+  const [currentMapStyle, setCurrentMapStyle] = useState<MapStyle>('outdoors');
+  const [showStyleSelector, setShowStyleSelector] = useState(false);
+
+  // Offline state
+  const [isOffline, setIsOffline] = useState(false);
 
   const requestLocationPermission = async () => {
     if (Platform.OS === 'android') {
@@ -355,6 +379,9 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
 
       console.log('Mapbox response:', response);
 
+      // Reset offline state nếu request thành công
+      setIsOffline(false);
+
       if (response && response.routes && response.routes.length > 0) {
         // Lưu tất cả routes (main + alternatives)
         const allRoutes: RouteInfo[] = response.routes.map((route: any) => {
@@ -403,7 +430,45 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
       }
     } catch (error: any) {
       console.error('❌ Error fetching route:', error);
+
+      // Xử lý offline - vẽ đường thẳng từ vị trí hiện tại đến đích
+      if (error.message?.includes('Network') || error.code === 'ECONNABORTED' || !error.response) {
+        console.log('🔌 Offline mode - Drawing straight line');
+        setIsOffline(true);
+
+        // Vẽ đường thẳng đơn giản
+        const straightLineRoute: RouteInfo = {
+          distance: calculateDistance(currentLat, currentLong, location.lat, location.long),
+          duration: 0, // Không tính được thời gian khi offline
+          coordinates: [
+            { latitude: currentLat, longitude: currentLong },
+            { latitude: location.lat, longitude: location.long },
+          ],
+        };
+
+        setRoutes([straightLineRoute]);
+        setRouteCoordinates(straightLineRoute.coordinates);
+        setRouteDistance(straightLineRoute.distance);
+        setRouteDuration(0);
+        setRouteSteps([]);
+      }
     }
+  };
+
+  // Hàm tính khoảng cách Haversine (đơn giản)
+  const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+    const R = 6371e3; // Bán kính trái đất (mét)
+    const φ1 = lat1 * Math.PI / 180;
+    const φ2 = lat2 * Math.PI / 180;
+    const Δφ = (lat2 - lat1) * Math.PI / 180;
+    const Δλ = (lon2 - lon1) * Math.PI / 180;
+
+    const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+              Math.cos(φ1) * Math.cos(φ2) *
+              Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    return R * c; // Khoảng cách tính bằng mét
   };
 
   const onMarkerPress = (location: ILocation) => {
@@ -461,7 +526,7 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
   return (
     <Page>
       <HeaderBase
-        title={'Bản đồ'}
+        title={'Map'}
         leftIconSvg={
           <BackSvg
             width={sizes._24sdp}
@@ -476,8 +541,20 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
       <View style={{flex: 1}}>
         <MapboxGL.MapView
           style={{flex: 1}}
-          styleURL={MapboxGL.StyleURL.Satellite}
-          onRegionDidChange={onRegionChange}>
+          styleURL={MAP_STYLES.find(s => s.id === currentMapStyle)?.url || MapboxGL.StyleURL.Satellite}
+          onRegionDidChange={onRegionChange}
+          onPress={() => {
+            // Bỏ chọn marker khi ấn ra ngoài
+            setSelectedLocation(null);
+            setFocusLocation(null);
+            setShouldShowRoute(false);
+            setRouteCoordinates([]);
+            setRouteDistance(0);
+            setRouteDuration(0);
+            setRouteSteps([]);
+            setRoutes([]);
+          }}
+          logoEnabled={false}>
           <MapboxGL.Camera
             centerCoordinate={focusCoordinate}
             zoomLevel={focusZoomLevel}
@@ -491,25 +568,51 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
             //   : _.unionBy(LOCATION_POPULAR, LOCATION_NEARLY)
             // )
             locations.map((location, index) => (
-              <MapboxGL.PointAnnotation
+              <MapboxGL.MarkerView
                 key={String(index)}
                 id={`marker-${index}`}
-                coordinate={[location.long, location.lat]}
-                title={location.name}
-                onSelected={() => onMarkerPress(location)}
-                onDeselected={() => setSelectedLocation(null)}>
-                <MapboxGL.Callout title={location.name} />
-              </MapboxGL.PointAnnotation>
+                coordinate={[location.long, location.lat]}>
+                <TouchableOpacity
+                  onPress={() => onMarkerPress(location)}
+                  style={{ alignItems: 'center' }}>
+                  {/* Marker Icon */}
+                  <TextBase style={{ fontSize: 20 }}>📍</TextBase>
+                  {/* Location Name Label */}
+                  <TextBase style={{
+                    fontSize: 11,
+                    fontWeight: 'bold',
+                    color: '#4A90E2',
+                    textShadowColor: 'rgba(255, 255, 255, 0.9)',
+                    textShadowOffset: { width: 0, height: 0 },
+                    textShadowRadius: 3,
+                    marginTop: -2,
+                  }}>
+                    {location.name}
+                  </TextBase>
+                </TouchableOpacity>
+              </MapboxGL.MarkerView>
             ))
           }
 
-          <MapboxGL.PointAnnotation
+          <MapboxGL.MarkerView
             key={'myLocation'}
             id={'myLocation'}
-            coordinate={[currentLong, currentLat]}
-            title={'Vị trí của tôi'}>
-            <MapboxGL.Callout title={'Vị trí của tôi'} />
-          </MapboxGL.PointAnnotation>
+            coordinate={[currentLong, currentLat]}>
+            <View style={{ alignItems: 'center' }}>
+              <TextBase style={{ fontSize: 20 }}>📍</TextBase>
+              <TextBase style={{
+                fontSize: 11,
+                fontWeight: 'bold',
+                color: '#4A90E2',
+                textShadowColor: 'rgba(255, 255, 255, 0.9)',
+                textShadowOffset: { width: 0, height: 0 },
+                textShadowRadius: 3,
+                marginTop: -2,
+              }}>
+                You're here!
+              </TextBase>
+            </View>
+          </MapboxGL.MarkerView>
 
           {/* Vẽ đường đi nếu có routeCoordinates */}
           {routeCoordinates.length > 0 && (
@@ -530,22 +633,123 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
                 id="routeLineLayer"
                 style={{
                   lineWidth: 6,
-                  lineColor: '#0000FF', 
+                  lineColor: isOffline ? '#FFA500' : '#0000FF', // Cam khi offline, xanh khi online
                   lineOpacity: 0.9,
                   lineCap: 'round',
                   lineJoin: 'round',
+                  lineDasharray: isOffline ? [2, 2] : undefined, // Đường đứt nét khi offline
                 }}
               />
             </MapboxGL.ShapeSource>
           )}
         </MapboxGL.MapView>
+
+        {/* Layer Selector Button */}
+        <View style={{
+          position: 'absolute',
+          top: 10,
+          right: 10,
+        }}>
+          <TouchableOpacity
+            onPress={() => setShowStyleSelector(!showStyleSelector)}
+            style={{
+              backgroundColor: colors.white,
+              borderRadius: 8,
+              padding: 10,
+              elevation: 5,
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.25,
+              shadowRadius: 3.84,
+              minWidth: 150,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}>
+            <TextBase style={{ fontSize: 20, marginRight: 8 }}>
+              {MAP_STYLES.find(s => s.id === currentMapStyle)?.icon || '🏞️'}
+            </TextBase>
+            <TextBase style={{ fontSize: 14, fontWeight: '600', color: colors.primary_950 }}>
+              {MAP_STYLES.find(s => s.id === currentMapStyle)?.name || 'Outdoors'}
+            </TextBase>
+          </TouchableOpacity>
+
+          {/* Layer Selector Dropdown */}
+          {showStyleSelector && (
+            <View style={{
+              marginTop: 8,
+              backgroundColor: colors.white,
+              borderRadius: 8,
+              padding: 8,
+              elevation: 5,
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.25,
+              shadowRadius: 3.84,
+              minWidth: 150,
+            }}>
+              {MAP_STYLES.map((style) => (
+                <TouchableOpacity
+                  key={style.id}
+                  onPress={() => {
+                    setCurrentMapStyle(style.id);
+                    setShowStyleSelector(false);
+                  }}
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    padding: 10,
+                    backgroundColor: currentMapStyle === style.id ? colors.primary_100 : 'transparent',
+                    borderRadius: 6,
+                    marginBottom: 4,
+                  }}>
+                  <TextBase style={{ fontSize: 20, marginRight: 8 }}>
+                    {style.icon}
+                  </TextBase>
+                  <TextBase style={{
+                    fontSize: 14,
+                    color: currentMapStyle === style.id ? colors.primary : colors.primary_950,
+                    fontWeight: currentMapStyle === style.id ? 'bold' : 'normal',
+                  }}>
+                    {style.name}
+                  </TextBase>
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
+        </View>
+
+        {/* Offline Warning Banner */}
+        {isOffline && (
+          <View style={{
+            position: 'absolute',
+            top: 10,
+            left: 10,
+            right: 170,
+            backgroundColor: '#FFA500',
+            borderRadius: 8,
+            padding: 12,
+            elevation: 5,
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.25,
+            shadowRadius: 3.84,
+          }}>
+            <TextBase style={{ fontSize: 14, color: colors.white, fontWeight: 'bold' }}>
+              🔌 Offline Mode
+            </TextBase>
+            <TextBase style={{ fontSize: 12, color: colors.white, marginTop: 4 }}>
+              Route is approximate
+            </TextBase>
+          </View>
+        )}
       </View>
 
       {/* Hiển thị Distance & Duration */}
-      {routeDistance > 0 && routeDuration > 0 && (
+      {routeDistance > 0 && (
         <View style={{
           position: 'absolute',
-          top: 80,
+          top: isOffline ? 125 : ((focusLocation || selectedLocation) ? 50 : 80),
           left: 10,
           right: 10,
           backgroundColor: 'white',
@@ -562,22 +766,29 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
               <TextBase style={{ fontSize: 16, fontWeight: 'bold', color: colors.primary }}>
                 📍 {mapboxApi.formatDistance(routeDistance)}
               </TextBase>
-              <TextBase style={{ fontSize: 14, color: colors.primary_950, marginTop: 4 }}>
-                ⏱️ {mapboxApi.formatDuration(routeDuration)}
-              </TextBase>
+              {routeDuration > 0 && (
+                <TextBase style={{ fontSize: 14, color: colors.primary_950, marginTop: 4 }}>
+                  ⏱️ {mapboxApi.formatDuration(routeDuration)}
+                </TextBase>
+              )}
+              {isOffline && (
+                <TextBase style={{ fontSize: 12, color: '#FFA500', marginTop: 4, fontStyle: 'italic' }}>
+                  As the crow flies
+                </TextBase>
+              )}
             </View>
 
-            {routes.length > 1 && (
+            {routes.length > 1 && !isOffline && (
               <View style={{ marginLeft: 10 }}>
                 <TextBase style={{ fontSize: 12, color: colors.primary_700 }}>
-                  {routes.length} tuyến đường
+                  {routes.length} routes
                 </TextBase>
               </View>
             )}
           </View>
 
           {/* Alternative Routes Buttons */}
-          {routes.length > 1 && (
+          {routes.length > 1 && !isOffline && (
             <View style={{
               flexDirection: 'row',
               marginTop: 10,
@@ -604,7 +815,7 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
                     }}
                     labelStyle={{ fontSize: 12 }}
                   >
-                    Tuyến {index + 1}: {mapboxApi.formatDistance(routeDist)}
+                    Route {index + 1}: {mapboxApi.formatDistance(routeDist)}
                   </Button>
                 );
               })}
@@ -641,7 +852,7 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
               color: colors.primary,
             }}
           >
-            Chỉ đường
+            Directions
           </Button>
 
           <Button
@@ -654,7 +865,7 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
               backgroundColor: colors.primary,
             }}
           >
-            Xem
+            View
           </Button>
         </View>
       )}
@@ -674,7 +885,7 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
             }}
             style={{ backgroundColor: colors.primary_700 }}
           >
-            Hướng dẫn
+            Guide
           </Button>
         </View>
       )}
@@ -715,7 +926,7 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
               }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                   <TextBase style={[AppStyle.txt_18_bold, { color: colors.primary }]}>
-                    🧭 Hướng dẫn từng bước
+                    🧭 Turn-by-Turn Navigation
                   </TextBase>
                   {routeSteps.length > 0 && (
                     <View style={{
@@ -745,22 +956,9 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
                   {routeSteps.map((step: any, index: number) => {
                     // Kiểm tra và xử lý data
                     const distance = step?.distance != null ? mapboxApi.formatDistance(step.distance) : '0 m';
-                    const instruction = step?.maneuver?.instruction || 'Tiếp tục đi';
-                    const maneuverType = step?.maneuver?.type || '';
-                    const modifier = step?.maneuver?.modifier || '';
+                    const instruction = step?.maneuver?.instruction || 'Continue';
                     const stepName = step?.name || '';
                     const stepDuration = step?.duration != null ? step.duration : 0;
-
-                    // Icon dựa trên maneuver type
-                    let icon = '➡️';
-                    if (maneuverType === 'depart') icon = '🚗';
-                    else if (maneuverType === 'arrive') icon = '🏁';
-                    else if (maneuverType === 'turn') {
-                      if (modifier.includes('left')) icon = '↰';
-                      else if (modifier.includes('right')) icon = '↱';
-                      else if (modifier === 'straight') icon = '⬆️';
-                    } else if (maneuverType === 'roundabout') icon = '🔄';
-                    else if (maneuverType === 'merge') icon = '🔀';
 
                     return (
                       <View
@@ -773,12 +971,12 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
                           borderBottomColor: colors.primary_100,
                         }}
                       >
-                        {/* Step Number & Icon */}
-                        <View style={{ alignItems: 'center', marginRight: 12 }}>
+                        {/* Step Number */}
+                        <View style={{ alignItems: 'center', marginRight: 12, width: 40 }}>
                           <View style={{
-                            width: 36,
-                            height: 36,
-                            borderRadius: 18,
+                            width: 32,
+                            height: 32,
+                            borderRadius: 16,
                             backgroundColor: index === 0 ? colors.primary : colors.primary_200,
                             justifyContent: 'center',
                             alignItems: 'center',
@@ -791,9 +989,6 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
                               {index + 1}
                             </TextBase>
                           </View>
-                          <TextBase style={{ fontSize: 20, marginTop: 4 }}>
-                            {icon}
-                          </TextBase>
                         </View>
 
                         {/* Step Info */}
@@ -831,7 +1026,7 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
                       alignItems: 'center',
                     }}>
                       <TextBase style={{ fontSize: 14, color: colors.primary_700, textAlign: 'center' }}>
-                        🎯 Tổng cộng: {mapboxApi.formatDistance(routeDistance)} • {mapboxApi.formatDuration(routeDuration)}
+                        🎯 Total: {mapboxApi.formatDistance(routeDistance)} • {mapboxApi.formatDuration(routeDuration)}
                       </TextBase>
                     </View>
                   )}
@@ -839,7 +1034,7 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
               ) : (
                 <View style={{ padding: sizes._32sdp, alignItems: 'center' }}>
                   <TextBase style={{ fontSize: 16, color: colors.primary_700, textAlign: 'center' }}>
-                    Không có hướng dẫn chi tiết
+                    No detailed instructions available
                   </TextBase>
                 </View>
               )}
@@ -892,7 +1087,7 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
                     AppStyle.txt_16_medium,
                     {marginBottom: 10, textAlign: 'justify'},
                   ]}>
-                  Địa chỉ: {selectedLocation.address}
+                  Address: {selectedLocation.address}
                 </TextBase>
                 <Image
                   source={{uri: selectedLocation.avatar}} // Image URL
@@ -949,7 +1144,7 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
               }}
               style={[styles.customButton, { marginBottom: sizes._12sdp }]}
               labelStyle={styles.buttonText}>
-              Thông tin chi tiết
+              Details
             </Button>
 
             <Button
@@ -996,16 +1191,16 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
               }}
               style={styles.customButton}
               labelStyle={styles.buttonText}>
-              Hiện vật tại đây
+              Artifacts here
             </Button>
 
             <Button
               mode="outlined"
               onPress={() => {
-                console.log('🧭 Chỉ đường đến:', selectedLocation?.name);
-                // Đóng modal
+                console.log('🧭 Directions to:', selectedLocation?.name);
+                // Close modal
                 setVisibleSecondModal(false);
-                // Fetch route và hiển thị
+                // Fetch route and display
                 if (selectedLocation) {
                   setFocusLocation(selectedLocation);
                   setShouldShowRoute(true);
@@ -1014,17 +1209,17 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
               }}
               style={styles.customButton}
               labelStyle={styles.buttonText}>
-              Chỉ đường
+              Directions
             </Button>
           </View>
 
-          {/* Hình ảnh ở bên phải của các button */}
+          {/* Image on the right side of buttons */}
           <Image
             source={images.dantoc}
             style={{
-              width: 100, // Đặt chiều rộng cho hình ảnh
-              height: 270, // Đặt chiều cao cho hình ảnh
-              marginLeft: sizes._16sdp, // Khoảng cách giữa button và hình ảnh
+              width: 100,
+              height: 270,
+              marginLeft: sizes._16sdp,
             }}
           />
         </View>

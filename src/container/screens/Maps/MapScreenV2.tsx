@@ -581,7 +581,7 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
                   <TextBase style={{
                     fontSize: 11,
                     fontWeight: 'bold',
-                    color: '#4A90E2',
+                    color: '#00CED1',
                     textShadowColor: 'rgba(255, 255, 255, 0.9)',
                     textShadowOffset: { width: 0, height: 0 },
                     textShadowRadius: 3,
@@ -603,7 +603,7 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
               <TextBase style={{
                 fontSize: 11,
                 fontWeight: 'bold',
-                color: '#4A90E2',
+                color: '#00CED1',
                 textShadowColor: 'rgba(255, 255, 255, 0.9)',
                 textShadowOffset: { width: 0, height: 0 },
                 textShadowRadius: 3,

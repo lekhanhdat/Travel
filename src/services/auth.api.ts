@@ -15,8 +15,7 @@ const URL_CREATE_ACCOUNT = `/api/v2/tables/${ACCOUNTS_TABLE_ID}/records`;
 const URL_UPDATE_ACCOUNT = `/api/v2/tables/${ACCOUNTS_TABLE_ID}/records`;
 
 // SendGrid API Key
-const SENDGRID_API_KEY =
-  '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';
+const SENDGRID_API_KEY = '';
 const SENDGRID_API_URL = 'https://api.sendgrid.com/v3/mail/send';
 
 // OTP Configuration

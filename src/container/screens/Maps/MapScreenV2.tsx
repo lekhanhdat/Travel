@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   Image,
   StyleSheet,
-  Linking,
   PermissionsAndroid,
   Platform,
 } from 'react-native';
@@ -17,24 +16,14 @@ import HeaderBase from '../../../component/HeaderBase';
 import {BackSvg} from '../../../assets/assets/ImageSvg';
 import colors from '../../../common/colors';
 import sizes from '../../../common/sizes';
-import {
-  LOCATION_POPULAR,
-  LOCATION_NEARLY,
-} from '../../../common/locationConstants';
 import {ILocation} from '../../../common/types';
 import {AppStyle} from '../../../common/AppStyle';
 import TextBase from '../../../common/TextBase';
 import NavigationService from '../NavigationService';
 import {ScreenName} from '../../AppContainer';
-import _ from 'lodash';
-// import BackgroundGeolocation from 'react-native-background-geolocation';
 import SoundPlayer from 'react-native-sound-player';
-import AIApi from '../../../services/AIApi';
 import mapboxApi from '../../../services/mapbox.api';
-import {SPACE_WARNING} from '../../../common/constants';
-import haversineDistance from '../../../utils/haversineDistance';
-import decodePolyline from '../../../utils/decodePolyline';
-import {Button, Modal, Text} from 'react-native-paper';
+import {Button, Modal} from 'react-native-paper';
 import images from '../../../res/images';
 import locationApi from '../../../services/locations.api';
 
@@ -68,19 +57,6 @@ const styles = StyleSheet.create({
   matchParent: {flex: 1},
 });
 
-const AnnotationContent = ({title}: {title: string}) => (
-  <View style={styles.touchableContainer}>
-    <Text>{title}</Text>
-    <TouchableOpacity
-      style={styles.touchable}
-      onPress={() => {
-        console.log('1234');
-      }}>
-      <Text style={styles.touchableText}>Btn</Text>
-    </TouchableOpacity>
-  </View>
-);
-
 interface RouteInfo {
   distance: number; // meters
   duration: number; // seconds
@@ -101,10 +77,6 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
     null,
   );
   const [locationPermission, setLocationPermission] = useState(false);
-  const openGoogleForm = () => {
-    const url = 'https://hoanghoatham.edu.vn/'; // Thay bằng link Google Form của bạn
-    Linking.openURL(url).catch(err => console.error("Couldn't load page", err));
-  };
 
   const requestLocationPermission = async () => {
     if (Platform.OS === 'android') {
@@ -168,27 +140,24 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
         const {latitude, longitude} = position.coords;
         setCurrentLat(latitude);
         setCurrentLong(longitude);
-        console.log('Location updated:', latitude, longitude);
+        console.log('📍 Location updated:', latitude, longitude);
       },
       (error) => {
-        console.log('Error watching location:', error);
+        console.log('❌ Error watching location:', error);
       },
       {
         enableHighAccuracy: true,
-        timeout: 15000,
-        maximumAge: 10000,
-        distanceFilter: 10, // Update only when user moves 10 meters
+        timeout: 20000,
+        maximumAge: 0, // Không dùng cache, luôn lấy vị trí mới
+        distanceFilter: 5, // Cập nhật khi di chuyển 5 mét (giảm từ 10m)
+        interval: 5000, // Cập nhật mỗi 5 giây
+        fastestInterval: 3000, // Nhanh nhất 3 giây
       },
     );
     return watchId;
   };
 
   const [visibleSecondModal, setVisibleSecondModal] = useState(false);
-  const [isPlayingSuccess, setIsPlayingSuccess] = useState(true);
-  const [locationShowWarning, setLocationShowWarning] = useState<
-    ILocation | undefined | null
-  >(null);
-
   const [locations, setLocations] = useState<ILocation[]>([]);
   const [focusLocation, setFocusLocation] = useState<ILocation | null>(null);
   const [shouldShowRoute, setShouldShowRoute] = useState(false);
@@ -224,7 +193,6 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
       'FinishedPlaying',
       ({success}) => {
         console.log('finished playing', success);
-        setIsPlayingSuccess(true);
       },
     );
 
@@ -645,15 +613,47 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
         </View>
       )}
 
-      {/* Button Xem chi tiết địa điểm */}
+      {/* Buttons khi chọn địa điểm */}
       {selectedLocation && (
-        <View style={{position: 'absolute', right: 10, bottom: 10}}>
+        <View style={{
+          position: 'absolute',
+          right: 10,
+          bottom: 10,
+          flexDirection: 'row',
+          gap: 10,
+        }}>
+          <Button
+            icon="directions"
+            mode="outlined"
+            onPress={() => {
+              console.log('🧭 Chỉ đường đến:', selectedLocation.name);
+              // Fetch route và hiển thị
+              setFocusLocation(selectedLocation);
+              setShouldShowRoute(true);
+              fetchRouteToLocation(selectedLocation);
+            }}
+            style={{
+              backgroundColor: colors.white,
+              borderColor: colors.primary,
+              borderWidth: 2,
+            }}
+            labelStyle={{
+              color: colors.primary,
+            }}
+          >
+            Chỉ đường
+          </Button>
+
           <Button
             icon="arrow-up"
             mode="contained"
             onPress={() => {
               onPressView();
-            }}>
+            }}
+            style={{
+              backgroundColor: colors.primary,
+            }}
+          >
             Xem
           </Button>
         </View>
@@ -1001,10 +1001,20 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
 
             <Button
               mode="outlined"
-              onPress={openGoogleForm}
+              onPress={() => {
+                console.log('🧭 Chỉ đường đến:', selectedLocation?.name);
+                // Đóng modal
+                setVisibleSecondModal(false);
+                // Fetch route và hiển thị
+                if (selectedLocation) {
+                  setFocusLocation(selectedLocation);
+                  setShouldShowRoute(true);
+                  fetchRouteToLocation(selectedLocation);
+                }
+              }}
               style={styles.customButton}
               labelStyle={styles.buttonText}>
-              Trắc nghiệm tìm hiểu
+              Chỉ đường
             </Button>
           </View>
 

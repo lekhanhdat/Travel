@@ -364,6 +364,24 @@ const authApi = {
   },
 
   /**
+   * Get user by ID from NocoDB
+   */
+  getUserById: async (userId: number): Promise<IAccount | null> => {
+    try {
+      console.log('🔍 Fetching user by ID:', userId);
+
+      const url = `${URL_GET_ACCOUNTS}/${userId}`;
+      const res = await request.get<IAccount>(url);
+
+      console.log('✅ User fetched:', res.data);
+      return res.data;
+    } catch (error) {
+      console.error('❌ Error fetching user by ID:', error);
+      return null;
+    }
+  },
+
+  /**
    * Verify OTP code
    * Returns true if OTP is valid and not expired
    */

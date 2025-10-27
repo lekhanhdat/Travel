@@ -15,6 +15,7 @@ import LocalStorageCommon from '../../../utils/LocalStorageCommon';
 import {localStorageKey} from '../../../common/constants';
 import {IAccount} from '../../../common/types';
 import QRCode from 'react-native-qrcode-svg';
+import authApi from '../../../services/auth.api';
 
 const styles = StyleSheet.create({
   container: {flex: 1, backgroundColor: colors.background},
@@ -32,13 +33,26 @@ const Donation = () => {
   const pollRef = useRef<number | null>(null);
 
   useEffect(() => {
-    // Load current user id from local storage
+    // Load current user id from local storage and fetch latest data from NocoDB
     (async () => {
       try {
         const acc: IAccount = await LocalStorageCommon.getItem(localStorageKey.AVT);
-        if (acc?.Id) setUserId(acc.Id);
-        setUserAccount(acc);
-      } catch {}
+        if (acc?.Id) {
+          setUserId(acc.Id);
+          // Fetch latest user data from NocoDB to get updated balance
+          const latestUserData = await authApi.getUserById(acc.Id);
+          if (latestUserData) {
+            setUserAccount(latestUserData);
+            // Update LocalStorage with latest data
+            await LocalStorageCommon.setItem(localStorageKey.AVT, latestUserData);
+          } else {
+            // Fallback to cached data if fetch fails
+            setUserAccount(acc);
+          }
+        }
+      } catch (e) {
+        console.error('Error loading user data:', e);
+      }
     })();
     return () => {
       if (pollRef.current != null) clearInterval(pollRef.current as any);

@@ -5,6 +5,7 @@ export interface IAccount {
   fullName?: string; // Họ và tên đầy đủ
   email?: string; // Email for password recovery
   avatar?: string; // Avatar URL (optional, default to ProfileSvg)
+  balance?: number; // Số dư ví
   CreatedAt?: string; // Timestamp
 }
 
@@ -49,3 +50,15 @@ export interface IItem {
   images?: any[];
   location?: Pick<ILocation, 'Id' | 'name'>;
 }
+
+export interface ITransaction {
+  Id?: number;
+  accountId?: number;
+  amount: number;
+  description?: string;
+  paymentLinkId?: string;
+  orderCode?: number;
+  status: 'PENDING' | 'PAID' | 'CANCELLED' | 'EXPIRED';
+  createdAt?: string;
+}
+

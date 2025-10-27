@@ -1,5 +1,6 @@
 import axios, {AxiosInstance, AxiosResponse, HttpStatusCode} from 'axios';
 import {DB_URL} from '../utils/configs';
+import {env} from '../utils/env';
 
 // declare module 'axios' {}
 
@@ -23,7 +24,9 @@ request.interceptors.request.use(async config => {
   //     request.headers.Authorization = `Bearer ${token}`;
   //   }
 
-  config.headers['xc-token'] = 'r_Y3AT7KqLHkKLRWYoa1WzsKNn5S0KKhm1ue4Uja'; // NocoDB API Token
+  if (env.NOCODB_TOKEN) {
+    config.headers['xc-token'] = env.NOCODB_TOKEN; // NocoDB API Token
+  }
 
   return config;
 });

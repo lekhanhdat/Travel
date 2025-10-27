@@ -26,10 +26,9 @@ import mapboxApi from '../../../services/mapbox.api';
 import {Button, Modal} from 'react-native-paper';
 import images from '../../../res/images';
 import locationApi from '../../../services/locations.api';
+import {env} from '../../../utils/env';
 
-MapboxGL.setAccessToken(
-  'sk.eyJ1IjoibGVraGFuaGRhdCIsImEiOiJjbWdsdTdpOXIwOW43MmpyNTB3cGhyNWd0In0.Ddl4CSNIDIjkqGMEz-cS4A',
-);
+MapboxGL.setAccessToken(env.MAPBOX_ACCESS_TOKEN || '');
 
 const styles = StyleSheet.create({
   touchableContainer: {borderColor: 'black', borderWidth: 1.0, width: 60},

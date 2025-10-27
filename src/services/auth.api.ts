@@ -2,6 +2,7 @@ import {request} from './axios';
 import {IAccount} from '../common/types';
 import CryptoJS from 'crypto-js';
 import axios from 'axios';
+import {env} from '../utils/env';
 
 // ========================================
 // CONFIGURATION
@@ -24,7 +25,7 @@ const OTP_RATE_LIMIT_COUNT = 3; // Giới hạn 3 lần gửi
 const OTP_RATE_LIMIT_WINDOW_MINUTES = 10; // Trong 10 phút
 
 // Password hashing configuration
-const PASSWORD_SALT = 'TravelApp_Secret_Salt_2025'; // Secret salt (nên lưu trong env)
+const PASSWORD_SALT = env.PASSWORD_SALT || 'TravelApp_Secret_Salt_2025'; // Secret salt (nên lưu trong env)
 
 // Helper function to hash password using SHA256
 const hashPassword = (password: string): string => {

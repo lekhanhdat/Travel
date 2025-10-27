@@ -163,6 +163,35 @@ export default class ProfileScreen extends React.PureComponent<
               />
             </TouchableOpacity>
           </View>
+          {/* Nạp tiền */}
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginTop: sizes._16sdp,
+            }}>
+            <TextBase style={AppStyle.txt_18_bold}>{'Donation'}</TextBase>
+            <TouchableOpacity
+              style={{
+                width: sizes._56sdp,
+                height: sizes._40sdp,
+                backgroundColor: colors.primary,
+                borderRadius: sizes._1000sdp,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+              onPress={() => {
+                NavigationService.navigate(ScreenName.DONATION);
+              }}>
+              <TextBase style={{
+                fontSize: sizes._16sdp,
+                fontWeight: 'bold',
+                color: colors.primary_950,
+              }}>₫</TextBase>
+            </TouchableOpacity>
+          </View>
+
           <View
             style={{
               width: '100%',

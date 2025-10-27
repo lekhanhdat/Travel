@@ -1,6 +1,7 @@
 import axios from 'axios';
+import {env} from '../utils/env';
 
-const MAPBOX_ACCESS_TOKEN = 'sk.eyJ1IjoibGVraGFuaGRhdCIsImEiOiJjbWdsdTdpOXIwOW43MmpyNTB3cGhyNWd0In0.Ddl4CSNIDIjkqGMEz-cS4A';
+const MAPBOX_ACCESS_TOKEN = env.MAPBOX_ACCESS_TOKEN || '';
 const MAPBOX_BASE_URL = 'https://api.mapbox.com';
 
 interface DirectionsParams {

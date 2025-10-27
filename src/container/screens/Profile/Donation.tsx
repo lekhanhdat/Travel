@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {Image, StyleSheet, View} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 import Page from '../../../component/Page';
 import HeaderBase from '../../../component/HeaderBase';
 import {BackSvg} from '../../../assets/assets/ImageSvg';
@@ -14,6 +14,7 @@ import {env} from '../../../utils/env';
 import LocalStorageCommon from '../../../utils/LocalStorageCommon';
 import {localStorageKey} from '../../../common/constants';
 import {IAccount} from '../../../common/types';
+import QRCode from 'react-native-qrcode-svg';
 
 const styles = StyleSheet.create({
   container: {flex: 1, backgroundColor: colors.background},
@@ -27,6 +28,7 @@ const Donation = () => {
   const [qrCode, setQrCode] = useState<string | undefined>(undefined);
   const [orderCode, setOrderCode] = useState<number | undefined>(undefined);
   const [userId, setUserId] = useState<number | undefined>(undefined);
+  const [userAccount, setUserAccount] = useState<IAccount | undefined>(undefined);
   const pollRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -35,6 +37,7 @@ const Donation = () => {
       try {
         const acc: IAccount = await LocalStorageCommon.getItem(localStorageKey.AVT);
         if (acc?.Id) setUserId(acc.Id);
+        setUserAccount(acc);
       } catch {}
     })();
     return () => {
@@ -68,6 +71,9 @@ const Donation = () => {
               if (pollRef.current != null) clearInterval(pollRef.current as any);
               pollRef.current = null;
               alert('Thanh toán thành công! Số dư sẽ được cộng tự động.');
+              // Quay về trang Profile
+              // @ts-ignore
+              require('../NavigationService').default.pop();
             }
           } catch (e) {
             // ignore temporary errors
@@ -93,6 +99,12 @@ const Donation = () => {
         }}
       />
       <View style={styles.content}>
+        {userAccount && (
+          <TextBase style={[AppStyle.txt_16_medium, {color: colors.primary_700, marginBottom: sizes._8sdp}]}>
+            Cảm ơn {userAccount.fullName || userAccount.userName} đã ủng hộ (
+            {userAccount.balance?.toLocaleString('vi-VN') || '0'} VND)
+          </TextBase>
+        )}
         <TextBase style={[AppStyle.txt_18_bold]}>Enter amount (VND)</TextBase>
         <InputBase
           placeHolder={'Example: 50000'}
@@ -106,11 +118,7 @@ const Donation = () => {
         {qrCode && (
           <View style={{marginTop: sizes._16sdp, alignItems: 'center'}}>
             <TextBase style={[AppStyle.txt_16_medium, {marginBottom: sizes._8sdp}]}>Scan QR to donate</TextBase>
-            <Image
-              style={styles.qr}
-              resizeMode="contain"
-              source={{uri: qrCode.startsWith('data:image') ? qrCode : `data:image/png;base64,${qrCode}`}}
-            />
+            <QRCode value={qrCode} size={sizes.width - sizes._64sdp} />
             {!!orderCode && (
               <TextBase style={{marginTop: sizes._8sdp, color: colors.primary_700}}>
                 Order code: {orderCode}

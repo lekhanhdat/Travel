@@ -14,7 +14,7 @@ import TextBase from '../../../common/TextBase';
 import sizes from '../../../common/sizes';
 import colors from '../../../common/colors';
 import {AppStyle} from '../../../common/AppStyle';
-import {Call, FAQ, Policy, Setting} from '../../../assets/ImageSvg';
+import {Call, FAQ, Policy, Setting, ChatBotSvg} from '../../../assets/ImageSvg';
 import NavigationService from '../NavigationService';
 import {ScreenName} from '../../AppContainer';
 import {IAccount} from '../../../common/types';
@@ -95,7 +95,7 @@ export default class ProfileScreen extends React.PureComponent<
             }}
           />
 
-          <TextBase
+          {/* <TextBase
             style={[
               AppStyle.txt_20_bold,
               {
@@ -105,12 +105,42 @@ export default class ProfileScreen extends React.PureComponent<
               },
             ]}>
             Account
-          </TextBase>
+          </TextBase> */}
           <View
             style={{
               flexDirection: 'row',
               alignItems: 'center',
               justifyContent: 'space-between',
+            }}>
+            <TextBase style={AppStyle.txt_18_bold}>
+              {'Trợ lý AI'}
+            </TextBase>
+            <TouchableOpacity
+              style={{
+                width: sizes._56sdp,
+                height: sizes._40sdp,
+                backgroundColor: colors.primary,
+                borderRadius: sizes._1000sdp,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+              onPress={() => {
+                NavigationService.navigate(ScreenName.CHATBOT);
+              }}>
+              <ChatBotSvg
+                width={sizes._20sdp}
+                height={sizes._20sdp}
+                color={colors.primary_950}
+              />
+            </TouchableOpacity>
+          </View>
+
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginTop: sizes._16sdp,
             }}>
             <TextBase style={AppStyle.txt_18_bold}>
               {'Gọi hỗ trợ / khẩn cấp SOS'}
@@ -202,7 +232,7 @@ export default class ProfileScreen extends React.PureComponent<
             }}
           />
 
-          <TextBase
+          {/* <TextBase
             style={[
               AppStyle.txt_20_bold,
               {
@@ -212,7 +242,7 @@ export default class ProfileScreen extends React.PureComponent<
               },
             ]}>
             Other
-          </TextBase>
+          </TextBase> */}
           <View
             style={{
               flexDirection: 'row',

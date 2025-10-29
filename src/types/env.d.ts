@@ -6,5 +6,8 @@ declare module '@env' {
   export const PAYOS_BACKEND_URL: string;
   export const SENDGRID_API_KEY: string;
   export const PASSWORD_SALT: string;
+  export const OPENAI_API_KEY: string;
+  export const UNSPLASH_ACCESS_KEY: string;
+  export const SERPAPI_KEY: string;
 }
 

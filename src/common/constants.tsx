@@ -11,6 +11,8 @@ export const localStorageKey = {
   USERNAME: 'USERNAME',
   PASSWORD: 'PASSWORD',
   AVT: 'AVT',
+
+  CHAT_HISTORY: 'CHAT_HISTORY',
 };
 
 export const CONTENT_SPACING = 15;

@@ -8,6 +8,7 @@ import {RootSiblingParent} from 'react-native-root-siblings';
 import {MD3LightTheme as DefaultTheme, PaperProvider} from 'react-native-paper';
 import colors from './src/common/colors';
 import Toast from 'react-native-toast-message';
+import FloatingChatBubble from './src/component/FloatingChatBubble';
 
 interface Props {}
 interface States {}
@@ -49,6 +50,7 @@ class App extends React.PureComponent<Props, States> {
               }}>
               <AppContainer />
             </NavigationContainer>
+            <FloatingChatBubble />
           </View>
         </PaperProvider>
         <Toast />

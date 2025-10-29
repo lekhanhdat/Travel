@@ -8,6 +8,7 @@ import Call from './svg/Call.svg';
 import CameraSvg from './svg/CameraSvg.svg';
 import CategorySvg from './svg/CategorySvg.svg';
 import ChartsSvg from './svg/ChartsSvg.svg';
+import ChatBotSvg from './svg/ChatBotSvg.svg';
 import FAQ from './svg/FAQ.svg';
 import Frame from './svg/Frame.svg';
 import FriendsSvg from './svg/FriendsSvg.svg';
@@ -32,6 +33,7 @@ Call,
 CameraSvg,
 CategorySvg,
 ChartsSvg,
+ChatBotSvg,
 FAQ,
 Frame,
 FriendsSvg,

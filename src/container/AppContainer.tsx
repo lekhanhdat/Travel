@@ -49,6 +49,7 @@ import SearchScreen from './screens/NewFeed/SearchScreen';
 import SignUpScreen from './screens/Login/SignUpScreen';
 import ForgotPasswordScreen from './screens/Login/ForgotPasswordScreen';
 import Donation from './screens/Profile/Donation';
+import ChatBotScreen from './screens/Profile/ChatbotScreen';
 
 export enum ScreenName {
   SPLASH_SCREEN = 'SplashScreen',
@@ -72,6 +73,7 @@ export enum ScreenName {
   SIGN_UP = 'SignUpScreen',
   FORGOT_PASSWORD = 'ForgotPasswordScreen',
   DONATION = 'Donation',
+  CHATBOT = 'ChatBotScreen',
 
 }
 function MyTabBar({
@@ -366,6 +368,7 @@ const AppNavigator = createCompatNavigatorFactory(createStackNavigator)(
     SignUpScreen: {screen: SignUpScreen},
     ForgotPasswordScreen: {screen: ForgotPasswordScreen},
     Donation: {screen: Donation},
+    ChatBotScreen: {screen: ChatBotScreen},
   },
   {
     headerMode: 'none',

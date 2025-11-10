@@ -28,7 +28,7 @@ export type GetReviewsResponse = {
   };
 };
 
-export const URL_GET_LOCATIONS = '/api/v2/tables/m9x4suuh5ufxi1n/records'; // NocoDB Locations Table
+export const URL_GET_LOCATIONS = '/api/v2/tables/ms8dba67j6cfox4/records'; // NocoDB Locations_New Table
 export const URL_GET_ITEMS = '/api/v2/tables/m0s4uwjesun4rl9/records'; // Items - chưa setup
 // Reviews nằm TRONG bảng Locations (field 'reviews' với ID 'c6dl7ge9cr1azqk')
 // Không cần URL_REVIEWS riêng vì reviews là field trong Locations

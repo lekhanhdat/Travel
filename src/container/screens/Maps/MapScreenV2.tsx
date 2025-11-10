@@ -73,11 +73,46 @@ interface MapStyleOption {
 }
 
 const MAP_STYLES: MapStyleOption[] = [
+  // Outdoors style - will hide POI layers programmatically
   { id: 'outdoors', name: 'Outdoors', url: MapboxGL.StyleURL.Outdoors, icon: '🏞️' },
+
+  // Satellite style - naturally has no POIs, only satellite imagery
   { id: 'satellite', name: 'Satellite', url: MapboxGL.StyleURL.Satellite, icon: '🛰️' },
+
+  // Dark style - minimal POIs
   { id: 'dark', name: 'Dark', url: MapboxGL.StyleURL.Dark, icon: '🌙' },
+
+  // Satellite Streets - shows roads on satellite imagery
   { id: 'terrain', name: 'Terrain', url: 'mapbox://styles/mapbox/satellite-streets-v12', icon: '⛰️' },
 ];
+
+// Helper function to get text color based on map style
+const getTextColorForMapStyle = (mapStyle: MapStyle): string => {
+  // Outdoors has light background -> use dark text
+  if (mapStyle === 'outdoors') {
+    return '#000000'; // Black text
+  }
+  // Satellite, Dark, Terrain have dark backgrounds -> use light text
+  return '#FFFFFF'; // White text
+};
+
+// Helper function to get text shadow based on map style
+const getTextShadowForMapStyle = (mapStyle: MapStyle) => {
+  // Outdoors has light background -> use light shadow for contrast
+  if (mapStyle === 'outdoors') {
+    return {
+      textShadowColor: 'rgba(255, 255, 255, 0.9)',
+      textShadowOffset: { width: 0, height: 0 },
+      textShadowRadius: 3,
+    };
+  }
+  // Dark backgrounds -> use dark shadow for contrast
+  return {
+    textShadowColor: 'rgba(0, 0, 0, 0.9)',
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 3,
+  };
+};
 
 const MapScreenV2 = ({navigation}: {navigation: any}) => {
   const [currentLat, setCurrentLat] = useState(0);
@@ -100,6 +135,9 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
 
   // Offline state
   const [isOffline, setIsOffline] = useState(false);
+
+  // Map ref to access map instance
+  const mapRef = React.useRef<MapboxGL.MapView>(null);
 
   const requestLocationPermission = async () => {
     if (Platform.OS === 'android') {
@@ -178,6 +216,46 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
       },
     );
     return watchId;
+  };
+
+  // Function to handle map style loaded - hide POI layers
+  const onMapStyleLoaded = async () => {
+    console.log('🗺️ Map style loaded, hiding POI layers...');
+
+    try {
+      // Get the native map instance
+      if (mapRef.current) {
+        // Use type assertion to access native map methods
+        const map = await (mapRef.current as any).getMap();
+
+        if (map) {
+          // List of POI layers to hide
+          const poiLayers = [
+            'poi-label',
+            'transit-label',
+            'airport-label',
+            'settlement-subdivision-label',
+            'settlement-minor-label',
+          ];
+
+          // Hide each POI layer
+          poiLayers.forEach(layerId => {
+            try {
+              if (map.getLayer && map.getLayer(layerId)) {
+                map.setLayoutProperty(layerId, 'visibility', 'none');
+                console.log(`✅ Hidden layer: ${layerId}`);
+              }
+            } catch (error) {
+              console.log(`⚠️ Could not hide layer ${layerId}:`, error);
+            }
+          });
+
+          console.log('✅ POI layers hidden successfully!');
+        }
+      }
+    } catch (error) {
+      console.log('⚠️ Error hiding POI layers:', error);
+    }
   };
 
   const [visibleSecondModal, setVisibleSecondModal] = useState(false);
@@ -539,9 +617,11 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
       />
       <View style={{flex: 1}}>
         <MapboxGL.MapView
+          ref={mapRef}
           style={{flex: 1}}
           styleURL={MAP_STYLES.find(s => s.id === currentMapStyle)?.url || MapboxGL.StyleURL.Satellite}
           onRegionDidChange={onRegionChange}
+          onDidFinishLoadingMap={onMapStyleLoaded}
           onPress={() => {
             // Bỏ chọn marker khi ấn ra ngoài
             setSelectedLocation(null);
@@ -566,47 +646,62 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
             //   ? locationProps
             //   : _.unionBy(LOCATION_POPULAR, LOCATION_NEARLY)
             // )
-            locations.map((location, index) => (
-              <MapboxGL.MarkerView
-                key={String(index)}
-                id={`marker-${index}`}
-                coordinate={[location.long, location.lat]}>
-                <TouchableOpacity
-                  onPress={() => onMarkerPress(location)}
-                  style={{ alignItems: 'center' }}>
-                  {/* Marker Icon */}
-                  <TextBase style={{ fontSize: 20 }}>📍</TextBase>
-                  {/* Location Name Label */}
-                  <TextBase style={{
-                    fontSize: 11,
-                    fontWeight: 'bold',
-                    color: '#00CED1',
-                    textShadowColor: 'rgba(255, 255, 255, 0.9)',
-                    textShadowOffset: { width: 0, height: 0 },
-                    textShadowRadius: 3,
-                    marginTop: -2,
-                  }}>
-                    {location.name}
-                  </TextBase>
-                </TouchableOpacity>
-              </MapboxGL.MarkerView>
-            ))
+            locations.map((location, index) => {
+              const textColor = getTextColorForMapStyle(currentMapStyle);
+              const textShadow = getTextShadowForMapStyle(currentMapStyle);
+
+              return (
+                <MapboxGL.MarkerView
+                  key={String(index)}
+                  id={`marker-${index}`}
+                  coordinate={[location.long, location.lat]}>
+                  <TouchableOpacity
+                    onPress={() => onMarkerPress(location)}
+                    style={{ alignItems: 'center' }}>
+                    {/* Marker Icon */}
+                    <TextBase style={{ fontSize: 20 }}>📍</TextBase>
+                    {/* Location Name Label - Dynamic color based on map style */}
+                    <TextBase style={{
+                      fontSize: 11,
+                      fontWeight: 'bold',
+                      color: textColor,
+                      ...textShadow,
+                      marginTop: -2,
+                    }}>
+                      {location.name}
+                    </TextBase>
+                  </TouchableOpacity>
+                </MapboxGL.MarkerView>
+              );
+            })
           }
 
+          {/* Current Location Marker - Blue circle like Google Maps */}
           <MapboxGL.MarkerView
             key={'myLocation'}
             id={'myLocation'}
             coordinate={[currentLong, currentLat]}>
             <View style={{ alignItems: 'center' }}>
-              <TextBase style={{ fontSize: 20 }}>📍</TextBase>
+              {/* Blue circle marker like Google Maps - 20% larger */}
+              <View style={{
+                width: 24, // 20% larger than typical 20px
+                height: 24,
+                borderRadius: 12, // Half of width/height for perfect circle
+                backgroundColor: '#4285F4', // Google Maps blue
+                borderWidth: 3,
+                borderColor: '#FFFFFF', // White border
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.3,
+                shadowRadius: 3,
+                elevation: 5, // Android shadow
+              }} />
               <TextBase style={{
                 fontSize: 11,
                 fontWeight: 'bold',
-                color: '#00CED1',
-                textShadowColor: 'rgba(255, 255, 255, 0.9)',
-                textShadowOffset: { width: 0, height: 0 },
-                textShadowRadius: 3,
-                marginTop: -2,
+                color: getTextColorForMapStyle(currentMapStyle),
+                ...getTextShadowForMapStyle(currentMapStyle),
+                marginTop: 2,
               }}>
                 You're here!
               </TextBase>

@@ -158,14 +158,14 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
         } else {
           console.log('Location permission denied');
           // Fallback to default Đà Nẵng coordinates
-          setCurrentLat(16.026084727153087);
-          setCurrentLong(108.23980496658481);
+          setCurrentLat(15.974620784990472);
+          setCurrentLong(108.25290513035998);
         }
       } catch (err) {
         console.warn(err);
         // Fallback to default Đà Nẵng coordinates
-        setCurrentLat(16.026084727153087);
-        setCurrentLong(108.23980496658481);
+        setCurrentLat(15.974620784990472);
+        setCurrentLong(108.25290513035998);
       }
     } else {
       // iOS

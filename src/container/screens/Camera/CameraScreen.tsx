@@ -1,11 +1,11 @@
 import React from 'react';
-import {Platform, TouchableOpacity, View} from 'react-native';
+import {Platform, TouchableOpacity, View, Image} from 'react-native';
 import {launchImageLibrary} from 'react-native-image-picker';
-import {ActivityIndicator} from 'react-native-paper';
+import {ActivityIndicator, Modal, Portal} from 'react-native-paper';
 import Toast from 'react-native-toast-message';
 import {Camera} from 'react-native-vision-camera';
 import RNFetchBlob from 'rn-fetch-blob';
-import {CameraSvg, Lightning, LightningOff} from '../../../assets/ImageSvg';
+import {CameraSvg, Lightning, LightningOff, SendSvg} from '../../../assets/ImageSvg';
 import colors from '../../../common/colors';
 import sizes from '../../../common/sizes';
 import Page from '../../../component/Page';
@@ -13,6 +13,7 @@ import {SERVER_URL} from '../../../utils/configs';
 // @ts-ignore
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import CameraResultModal from '../../../component/CameraResultModal';
+import TextBase from '../../../common/TextBase';
 
 interface ICameraScreenProps {
   navigation: any;
@@ -29,10 +30,10 @@ interface ICameraScreenState {
   resultName: string;
   resultDescription: string;
   resultPhotoPath: string;
-  // content: {
-  //   name: string;
-  //   description: string;
-  // };
+  // Preview modal states
+  showPreviewModal: boolean;
+  previewImagePath: string;
+  isDetecting: boolean;
 }
 const defaultSize = sizes.width * 0.7;
 
@@ -51,10 +52,12 @@ export default class CameraScreen extends React.PureComponent<
       isLoading: false,
       isShowLightning: false,
       visible: false,
-      // content: {name: '', description: ''},
       resultName: '',
       resultDescription: '',
       resultPhotoPath: '',
+      showPreviewModal: false,
+      previewImagePath: '',
+      isDetecting: false,
     };
   }
 
@@ -141,7 +144,7 @@ export default class CameraScreen extends React.PureComponent<
             });
 
             console.log('Photo captured:', photo);
-            
+
             if (!photo.path) {
               console.log('No photo path received');
               this.setState({
@@ -156,11 +159,13 @@ export default class CameraScreen extends React.PureComponent<
             }
 
             console.log('Photo path:', photo.path);
-            this.setState({
-              resultPhotoPath: photo.path,
-            });
 
-            await this.uploadImage(photo.path);
+            // Show preview modal instead of uploading immediately
+            this.setState({
+              isLoading: false,
+              showPreviewModal: true,
+              previewImagePath: photo.path,
+            });
           } catch (error) {
             console.log('Camera error:', error);
             this.setState({
@@ -182,6 +187,8 @@ export default class CameraScreen extends React.PureComponent<
     console.log('=== UPLOAD IMAGE START ===');
     console.log('Uploading image to:', url);
     console.log('File path:', filePath);
+
+    this.setState({ isDetecting: true });
 
     try {
       const response = await RNFetchBlob.fetch(
@@ -212,6 +219,8 @@ export default class CameraScreen extends React.PureComponent<
             visible: true,
             resultName: content.name || 'Không xác định',
             resultDescription: content.description || 'Không có mô tả',
+            resultPhotoPath: filePath,
+            showPreviewModal: false, // Hide preview modal when showing result
           });
 
           Toast.show({
@@ -246,7 +255,7 @@ export default class CameraScreen extends React.PureComponent<
       });
     } finally {
       this.setState({
-        isLoading: false,
+        isDetecting: false,
       });
       console.log('=== UPLOAD IMAGE END ===');
     }
@@ -274,18 +283,17 @@ export default class CameraScreen extends React.PureComponent<
           if (response.assets && response.assets.length > 0) {
             const img = response.assets[0];
             console.log('Selected image:', img);
-            
-            this.setState({
-              isLoading: true,
-              resultPhotoPath: img.uri!,
-            });
-            
+
             // Xử lý URI cho Android và iOS
-            const filePath = Platform.OS === 'android' 
-              ? img.uri!.replace('file://', '') 
+            const filePath = Platform.OS === 'android'
+              ? img.uri!.replace('file://', '')
               : img.uri!;
-              
-            this.uploadImage(filePath);
+
+            // Show preview modal instead of uploading immediately
+            this.setState({
+              showPreviewModal: true,
+              previewImagePath: filePath,
+            });
           }
         }
       },
@@ -521,6 +529,129 @@ export default class CameraScreen extends React.PureComponent<
           <Icon name="wifi" color="white" size={24} />
         </TouchableOpacity>
 
+        {/* Preview Modal */}
+        <Portal>
+          <Modal
+            visible={this.state.showPreviewModal}
+            onDismiss={() => {
+              this.setState({ showPreviewModal: false });
+            }}
+            contentContainerStyle={{
+              height: 500,
+            }}>
+            <View
+              style={{
+                flex: 1,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}>
+              <View
+                style={{
+                  width: sizes.width - sizes._32sdp,
+                  backgroundColor: colors.white,
+                  borderRadius: sizes._16sdp,
+                  overflow: 'hidden',
+                  shadowColor: '#000',
+                  shadowOffset: {width: 0, height: 2},
+                  shadowOpacity: 0.8,
+                  shadowRadius: 2,
+                  elevation: 5,
+                }}>
+                {/* Preview Image */}
+                <Image
+                  source={{
+                    uri: Platform.OS === 'android'
+                      ? `file://${this.state.previewImagePath}`
+                      : this.state.previewImagePath
+                  }}
+                  style={{
+                    width: sizes.width - sizes._32sdp,
+                    height: 300,
+                    resizeMode: 'cover',
+                  }}
+                />
+
+                {/* Send Button Footer */}
+                <View style={{
+                  width: '100%',
+                  paddingVertical: sizes._16sdp,
+                  backgroundColor: colors.primary,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}>
+                  <TouchableOpacity
+                    style={{
+                      width: sizes._50sdp,
+                      height: sizes._50sdp,
+                      borderRadius: 25,
+                      borderWidth: 2,
+                      borderColor: colors.white,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      backgroundColor: this.state.isDetecting ? 'rgba(255,255,255,0.3)' : 'transparent',
+                    }}
+                    onPress={() => {
+                      if (this.state.previewImagePath) {
+                        this.uploadImage(this.state.previewImagePath);
+                      }
+                    }}
+                    disabled={this.state.isDetecting}
+                  >
+                    {this.state.isDetecting ? (
+                      <ActivityIndicator size="small" color={colors.white} />
+                    ) : (
+                      <SendSvg width={sizes._28sdp} height={sizes._28sdp} color={colors.white} />
+                    )}
+                  </TouchableOpacity>
+                </View>
+
+                {/* Loading Overlay */}
+                {this.state.isDetecting && (
+                  <View style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 999,
+                    borderRadius: sizes._16sdp,
+                  }}>
+                    <View style={{
+                      backgroundColor: colors.white,
+                      padding: sizes._24sdp,
+                      borderRadius: sizes._12sdp,
+                      alignItems: 'center',
+                      minWidth: 200,
+                    }}>
+                      <ActivityIndicator size="large" color={colors.primary} />
+                      <TextBase style={{
+                        marginTop: sizes._16sdp,
+                        fontSize: sizes._16sdp,
+                        fontWeight: 'bold',
+                        textAlign: 'center',
+                      }}>
+                        Đang nhận diện địa điểm...
+                      </TextBase>
+                      <TextBase style={{
+                        marginTop: sizes._8sdp,
+                        fontSize: sizes._14sdp,
+                        color: colors.gray,
+                        textAlign: 'center',
+                      }}>
+                        Vui lòng đợi trong giây lát
+                      </TextBase>
+                    </View>
+                  </View>
+                )}
+              </View>
+            </View>
+          </Modal>
+        </Portal>
+
+        {/* Result Modal */}
         <CameraResultModal
           visible={this.state.visible}
           onClose={() => {

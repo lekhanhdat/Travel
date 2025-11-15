@@ -93,6 +93,23 @@ const locationApi = {
         }
       }
 
+      // Parse types (có thể là JSON string từ NocoDB)
+      if (typeof (location as any).types === 'string') {
+        try {
+          parsed.types = JSON.parse((location as any).types);
+          console.log(`✅ Parsed types for "${parsed.name}":`, parsed.types);
+        } catch (e) {
+          console.error('Error parsing types:', e);
+          parsed.types = [];
+        }
+      } else if (Array.isArray((location as any).types)) {
+        // Nếu đã là array, copy trực tiếp
+        parsed.types = (location as any).types;
+        console.log(`✅ Types already array for "${parsed.name}":`, parsed.types);
+      } else {
+        console.log(`⚠️ No types field for "${parsed.name}"`);
+      }
+
       // ✨ AUTO-GENERATE AVATAR: Lấy ảnh đầu tiên từ mảng images làm avatar
       // Nếu không có trường avatar hoặc avatar rỗng, tự động lấy ảnh đầu tiên
       if (!parsed.avatar || parsed.avatar === '') {

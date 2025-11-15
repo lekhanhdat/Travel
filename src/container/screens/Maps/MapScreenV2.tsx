@@ -139,6 +139,9 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
   // Map ref to access map instance
   const mapRef = React.useRef<MapboxGL.MapView>(null);
 
+  // Camera ref to control camera programmatically
+  const cameraRef = React.useRef<MapboxGL.Camera>(null);
+
   const requestLocationPermission = async () => {
     if (Platform.OS === 'android') {
       try {
@@ -565,6 +568,18 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
     }
   };
 
+  // Function to recenter map to current location
+  const recenterToMyLocation = () => {
+    if (cameraRef.current && currentLat !== 0 && currentLong !== 0) {
+      cameraRef.current.setCamera({
+        centerCoordinate: [currentLong, currentLat],
+        zoomLevel: 14,
+        animationDuration: 1000,
+      });
+      console.log('📍 Recentered to current location:', currentLat, currentLong);
+    }
+  };
+
   useEffect(() => {
     console.log({selectedLocation});
   }, [selectedLocation]);
@@ -635,6 +650,7 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
           }}
           logoEnabled={false}>
           <MapboxGL.Camera
+            ref={cameraRef}
             centerCoordinate={focusCoordinate}
             zoomLevel={focusZoomLevel}
             animationDuration={1000}
@@ -857,7 +873,7 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
       {routeDistance > 0 && (
         <View style={{
           position: 'absolute',
-          top: isOffline ? 125 : ((focusLocation || selectedLocation) ? 50 : 80),
+          top: isOffline ? 155 : ((focusLocation || selectedLocation) ? 90 : 110),
           left: 10,
           right: 10,
           backgroundColor: 'white',
@@ -997,6 +1013,31 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
           </Button>
         </View>
       )}
+
+      {/* My Location Button - Recenter to current position */}
+      <View style={{
+        position: 'absolute',
+        left: 10,
+        bottom: routeSteps.length > 0 ? 80 : 10, // Nâng lên nếu có Guide button
+      }}>
+        <TouchableOpacity
+          onPress={recenterToMyLocation}
+          style={{
+            backgroundColor: colors.white,
+            borderRadius: 30,
+            width: 56,
+            height: 56,
+            justifyContent: 'center',
+            alignItems: 'center',
+            elevation: 5,
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.25,
+            shadowRadius: 3.84,
+          }}>
+          <TextBase style={{ fontSize: 28 }}>📍</TextBase>
+        </TouchableOpacity>
+      </View>
 
       {/* Modal Turn-by-Turn Navigation */}
       <Modal

@@ -18,6 +18,7 @@ export interface ILocation {
   description: string;
   lat: number;
   long: number;
+  types?: string[]; // Array of location types (e.g., ["museum", "attraction", "historical"])
   haveVoice?: boolean; // DƯ THỪA - chỉ cần check voiceName
   reviews: IReview[];
   // item?: IItem[];

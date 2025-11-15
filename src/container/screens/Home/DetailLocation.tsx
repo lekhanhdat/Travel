@@ -22,7 +22,9 @@ interface IDetailLocationScreenProps {
   navigation: any;
 }
 
-interface IDetailLocationScreenState {}
+interface IDetailLocationScreenState {
+  allLocations: ILocation[];
+}
 
 export default class DetailLocationScreen extends React.PureComponent<
   IDetailLocationScreenProps,
@@ -30,7 +32,15 @@ export default class DetailLocationScreen extends React.PureComponent<
 > {
   constructor(props: IDetailLocationScreenProps) {
     super(props);
-    this.state = {};
+    this.state = {
+      allLocations: [],
+    };
+  }
+
+  async componentDidMount() {
+    // Load all locations để filter theo types
+    const locations = await locationApi.getLocations();
+    this.setState({ allLocations: locations });
   }
 
   renderItem = ({item, index}: {item: IReview; index: number}) => {
@@ -47,6 +57,36 @@ export default class DetailLocationScreen extends React.PureComponent<
     }
     // Trả về `num` phần tử đầu tiên
     return shuffled.slice(0, num);
+  };
+
+  // Tìm các địa điểm có cùng types (tối đa 10 locations)
+  getSimilarLocations = (currentLocation: ILocation) => {
+    const currentTypes = currentLocation.types || [];
+
+    if (currentTypes.length === 0) {
+      console.log('⚠️ Current location has no types');
+      return [];
+    }
+
+    // Filter locations có ít nhất 1 type trùng với current location
+    const similarLocations = this.state.allLocations.filter(loc => {
+      const locTypes = loc.types || [];
+
+      // Không include chính location hiện tại (so sánh bằng name vì ID có thể khác nhau)
+      if (loc.name === currentLocation.name) {
+        return false;
+      }
+
+      // Check xem có type nào trùng không
+      const hasCommonType = locTypes.some(type => currentTypes.includes(type));
+      return hasCommonType;
+    });
+
+    // Chỉ lấy 10 locations đầu tiên
+    const limitedLocations = similarLocations.slice(0, 10);
+
+    console.log(`🔍 Found ${similarLocations.length} similar locations, showing ${limitedLocations.length}`);
+    return limitedLocations;
   };
 
   render(): React.ReactNode {
@@ -135,37 +175,27 @@ export default class DetailLocationScreen extends React.PureComponent<
                 Địa chỉ: {location.address}
               </TextBase>
 
-              {/* Buttons: Xem trên bản đồ và Chỉ đường */}
+              {/* Buttons: Địa điểm tương tự và Chỉ đường */}
               <View style={{
                 flexDirection: 'row',
                 gap: sizes._12sdp,
                 marginTop: sizes._16sdp,
               }}>
                 <Button
-                  mode="contained"
-                  icon="map-marker"
-                  onPress={() => {
-                    NavigationService.navigate(ScreenName.MAP_SCREEN, {
-                      locations: [location],
-                    });
-                  }}
-                  style={{
-                    flex: 1,
-                    backgroundColor: colors.primary,
-                  }}
-                  labelStyle={{fontSize: 14}}
-                >
-                  Xem trên bản đồ
-                </Button>
-
-                <Button
                   mode="outlined"
-                  icon="directions"
+                  icon="map-search"
                   onPress={() => {
-                    NavigationService.navigate(ScreenName.MAP_SCREEN, {
-                      locations: [location],
-                      showRoute: true, // Flag để hiển thị đường đi
-                    });
+                    const similarLocations = this.getSimilarLocations(location);
+                    if (similarLocations.length > 0) {
+                      NavigationService.navigate(ScreenName.VIEW_ALL_SCREEN, {
+                        title: 'Địa điểm tương tự',
+                        locations: similarLocations,
+                        valueSearch: '', // Không cần search
+                      });
+                    } else {
+                      console.log('⚠️ No similar locations found');
+                      // TODO: Show toast/alert to user
+                    }
                   }}
                   style={{
                     flex: 1,
@@ -176,6 +206,24 @@ export default class DetailLocationScreen extends React.PureComponent<
                     fontSize: 14,
                     color: colors.primary,
                   }}
+                >
+                  Địa điểm tương tự
+                </Button>
+
+                <Button
+                  mode="contained"
+                  icon="directions"
+                  onPress={() => {
+                    NavigationService.navigate(ScreenName.MAP_SCREEN, {
+                      locations: [location],
+                      showRoute: true, // Flag để hiển thị đường đi
+                    });
+                  }}
+                  style={{
+                    flex: 1,
+                    backgroundColor: colors.primary,
+                  }}
+                  labelStyle={{fontSize: 14}}
                 >
                   Chỉ đường
                 </Button>

@@ -28,7 +28,7 @@ export type GetReviewsResponse = {
   };
 };
 
-export const URL_GET_LOCATIONS = '/api/v2/tables/ms8dba67j6cfox4/records'; // NocoDB Locations_New Table
+export const URL_GET_LOCATIONS = '/api/v2/tables/mfz84cb0t9a84jt/records'; // NocoDB Base_Locations Table
 export const URL_GET_ITEMS = '/api/v2/tables/m0s4uwjesun4rl9/records'; // Items - chưa setup
 // Reviews nằm TRONG bảng Locations (field 'reviews' với ID 'c6dl7ge9cr1azqk')
 // Không cần URL_REVIEWS riêng vì reviews là field trong Locations
@@ -90,6 +90,19 @@ const locationApi = {
         } catch (e) {
           // Nếu không phải JSON, giữ nguyên string
           parsed.advise = location.advise;
+        }
+      }
+
+      // ✨ AUTO-GENERATE AVATAR: Lấy ảnh đầu tiên từ mảng images làm avatar
+      // Nếu không có trường avatar hoặc avatar rỗng, tự động lấy ảnh đầu tiên
+      if (!parsed.avatar || parsed.avatar === '') {
+        if (parsed.images && Array.isArray(parsed.images) && parsed.images.length > 0) {
+          parsed.avatar = parsed.images[0];
+          console.log(`✅ Auto-set avatar for "${parsed.name}": ${parsed.avatar}`);
+        } else {
+          // Fallback: nếu không có images, set avatar rỗng
+          parsed.avatar = '';
+          console.log(`⚠️ No images available for "${parsed.name}", avatar set to empty`);
         }
       }
 

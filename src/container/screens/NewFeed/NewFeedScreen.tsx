@@ -244,7 +244,7 @@ export default class NewFeedScreen extends React.PureComponent<
         fullName: this.state.avt?.fullName, // Add fullName field
         time_review: moment().format('HH:mm DD/MM/YYYY'), // Format: "HH:mm DD/MM/YYYY"
         start: this.state.star,
-        avatar: this.state.avt?.avatar ?? '',
+        avatar: '', // Luôn dùng ProfileSvg mặc định
         //@ts-ignore
         location: this.state.location,
         images: imageUrls,

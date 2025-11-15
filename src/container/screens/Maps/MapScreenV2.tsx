@@ -650,6 +650,9 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
               const textColor = getTextColorForMapStyle(currentMapStyle);
               const textShadow = getTextShadowForMapStyle(currentMapStyle);
 
+              // Kiểm tra xem location này có được chọn không
+              const isSelected = selectedLocation?.Id === location.Id || focusLocation?.Id === location.Id;
+
               return (
                 <MapboxGL.MarkerView
                   key={String(index)}
@@ -658,15 +661,26 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
                   <TouchableOpacity
                     onPress={() => onMarkerPress(location)}
                     style={{ alignItems: 'center' }}>
-                    {/* Marker Icon */}
-                    <TextBase style={{ fontSize: 20 }}>📍</TextBase>
+                    {/* Marker Icon - Red marker nếu được chọn, emoji nếu không */}
+                    {isSelected ? (
+                      <Image
+                        source={images.red_marker}
+                        style={{
+                          width: 40,
+                          height: 40,
+                          resizeMode: 'contain',
+                        }}
+                      />
+                    ) : (
+                      <TextBase style={{ fontSize: 20 }}>📍</TextBase>
+                    )}
                     {/* Location Name Label - Dynamic color based on map style */}
                     <TextBase style={{
-                      fontSize: 11,
+                      fontSize: isSelected ? 12 : 11,
                       fontWeight: 'bold',
-                      color: textColor,
+                      color: isSelected ? '#FF0000' : textColor,
                       ...textShadow,
-                      marginTop: -2,
+                      marginTop: isSelected ? 2 : -2,
                     }}>
                       {location.name}
                     </TextBase>

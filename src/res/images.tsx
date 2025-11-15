@@ -24,5 +24,6 @@
     cauvang: require('../assets/images/cauvang.jpg'),
     dienhai: require('../assets/images/dienhai.jpeg'),
     nguhanhson: require('../assets/images/nguhanhson.png'),
+    red_marker: require('../assets/images/red_marker.png'),
  }
  export default images

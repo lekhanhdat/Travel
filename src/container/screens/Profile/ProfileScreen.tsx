@@ -188,7 +188,7 @@ export default class ProfileScreen extends React.PureComponent<
                 height={sizes._20sdp}
                 color={colors.primary_950}
                 onPress={() => {
-                  NavigationService.reset(ScreenName.PERSONAL);            
+                  NavigationService.navigate(ScreenName.PERSONAL);
                 }}
               />
             </TouchableOpacity>

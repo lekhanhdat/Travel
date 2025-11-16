@@ -11,6 +11,7 @@ import Page from '../../../component/Page';
 import HeaderBase from '../../../component/HeaderBase';
 import strings from '../../../res/strings';
 import {IAccount, IItem, ILocation, IReview} from '../../../common/types';
+import {IFestival} from '../../../services/festivals.api';
 import sizes from '../../../common/sizes';
 import BottomSheet from '../../../component/BottomSheet';
 import colors from '../../../common/colors';
@@ -28,35 +29,40 @@ import NavigationService from '../NavigationService';
 import {ScreenName} from '../../AppContainer';
 import HistoricalArtifact from '../../../component/HistoricalArtifact';
 import locationApi from '../../../services/locations.api';
+import festivalsApi from '../../../services/festivals.api';
 
-// DAY LA TRANG HIEN VAT, TRANG NEWFEED GOC DOI TEN THANH NewFeedScreen.tsx
-// DAY LA TRANG HIEN VAT, TRANG NEWFEED GOC DOI TEN THANH NewFeedScreen.tsx
-// DAY LA TRANG HIEN VAT, TRANG NEWFEED GOC DOI TEN THANH NewFeedScreen.tsx
+// TRANG FESTIVALS - Tìm kiếm và hiển thị lễ hội
+// TRANG FESTIVALS - Tìm kiếm và hiển thị lễ hội
+// TRANG FESTIVALS - Tìm kiếm và hiển thị lễ hội
 
-interface INewFeedScreenProps {
+interface IFestivalsScreenProps {
   navigation: any;
 }
 
-interface INewFeedScreenState {
+interface IFestivalsScreenState {
   valueSearch: string;
   items: IItem[];
   ITEMS_POPULAR: IItem[];
   ITEMS_NEARLY: IItem[];
+  festivals: IFestival[];
+  FESTIVALS_POPULAR: IFestival[];
 }
 
-export default class SearchScreen extends React.PureComponent<
-  INewFeedScreenProps,
-  INewFeedScreenState
+export default class FestivalsScreen extends React.PureComponent<
+  IFestivalsScreenProps,
+  IFestivalsScreenState
 > {
   refSheet: BottomSheet | null | undefined;
   refSheetLocation: BottomSheet | null | undefined;
-  constructor(props: INewFeedScreenProps) {
+  constructor(props: IFestivalsScreenProps) {
     super(props);
     this.state = {
       valueSearch: '',
       items: [],
       ITEMS_POPULAR: [],
       ITEMS_NEARLY: [],
+      festivals: [],
+      FESTIVALS_POPULAR: [],
     };
   }
 
@@ -64,17 +70,16 @@ export default class SearchScreen extends React.PureComponent<
     this.props.navigation.addListener('focus', () => {
       this.setState({
         valueSearch: '',
-        // ITEMS_POPULAR: LOCATION_POPULAR,
-        // ITEMS_NEARLY: LOCATION_NEARLY,
       });
     });
 
     this.fetchItems();
+    this.fetchFestivals();
   }
 
   async fetchItems() {
     const data = await locationApi.getItems();
-    console.log(JSON.stringify(data, null, 2));
+    console.log('📦 Items loaded:', data.length);
     this.setState({
       items: data,
       ITEMS_POPULAR: data.slice(10, 40),
@@ -82,11 +87,62 @@ export default class SearchScreen extends React.PureComponent<
     });
   }
 
-  renderItemHorizontal = ({item, index}: {item: IItem; index: number}) => {
-    return <HistoricalArtifact key={`item-${item}`} item={item} />;
+  async fetchFestivals() {
+    const data = await festivalsApi.getFestivals();
+    console.log('🎉 Festivals loaded:', data.length);
+    this.setState({
+      festivals: data,
+      FESTIVALS_POPULAR: data.slice(0, 10),
+    });
+  }
+
+  renderItemHorizontal = ({item}: {item: IItem}) => {
+    return <HistoricalArtifact key={`item-${item.Id}`} item={item} />;
   };
-  renderItemLarge = ({item, index}: {item: ILocation; index: number}) => {
-    return <HistoricalArtifact key={`item-${index}`} item={item} />;
+
+  renderFestivalHorizontal = ({item}: {item: IFestival}) => {
+    // TODO: Tạo component FestivalCard để hiển thị festival
+    return (
+      <TouchableOpacity
+        key={`festival-${item.Id}`}
+        style={styles.festivalCard}
+        onPress={() => {
+          // TODO: Navigate to festival detail
+          console.log('Festival clicked:', item.name);
+        }}>
+        <View style={styles.festivalInfo}>
+          <TextBase numberOfLines={2} style={[AppStyle.txt_18_bold]}>
+            {item.name}
+          </TextBase>
+          <TextBase
+            numberOfLines={1}
+            style={[AppStyle.txt_14_regular, {marginTop: sizes._4sdp}]}>
+            ⏰ {item.event_time}
+          </TextBase>
+          <TextBase
+            numberOfLines={1}
+            style={[AppStyle.txt_14_regular, {marginTop: sizes._4sdp}]}>
+            📍 {item.location}
+          </TextBase>
+          <View style={{flexDirection: 'row', marginTop: sizes._8sdp}}>
+            <TextBase style={[AppStyle.txt_14_bold]}>
+              ⭐ {item.rating.toFixed(1)}
+            </TextBase>
+            <TextBase
+              style={[
+                AppStyle.txt_14_regular,
+                {marginLeft: sizes._12sdp, color: colors.primary_600},
+              ]}>
+              {item.price_level === 0
+                ? '🆓 Miễn phí'
+                : item.price_level === 1
+                ? '💰 Có phí'
+                : '💰💰 Cao cấp'}
+            </TextBase>
+          </View>
+        </View>
+      </TouchableOpacity>
+    );
   };
 
   handleSearch = (isViewAll: boolean, items: IItem[]) => {
@@ -121,7 +177,6 @@ export default class SearchScreen extends React.PureComponent<
             }}
             placeholder="Tìm kiếm các hiện vật, lễ hội, di tích,..."
             style={{
-              // backgroundColor: '#CEE8E7',
               backgroundColor: colors.primary_200,
               color: colors.black,
               flex: 1,
@@ -134,7 +189,6 @@ export default class SearchScreen extends React.PureComponent<
               this.handleSearch(
                 false,
                 this.state.items,
-                // _.unionBy(LOCATION_POPULAR, LOCATION_NEARLY, 'id'),
               )
             }
           />
@@ -142,8 +196,34 @@ export default class SearchScreen extends React.PureComponent<
 
         <ScrollView>
           <View style={styles.container}>
+            {/* FESTIVALS SECTION */}
             <View style={styles.rowCenter}>
-              <TextBase style={[AppStyle.txt_20_bold]}>Phổ biến</TextBase>
+              <TextBase style={[AppStyle.txt_20_bold]}>🎉 Lễ hội</TextBase>
+              <TouchableOpacity
+                onPress={() => {
+                  // TODO: Navigate to all festivals
+                  console.log('View all festivals');
+                }}>
+                <TextBase style={[AppStyle.txt_18_regular]}>
+                  Xem tất cả
+                </TextBase>
+              </TouchableOpacity>
+            </View>
+
+            <FlatList
+              contentContainerStyle={{
+                paddingVertical: sizes._16sdp,
+              }}
+              data={this.state.FESTIVALS_POPULAR}
+              renderItem={this.renderFestivalHorizontal}
+              keyExtractor={item => item.Id!.toString()}
+              horizontal={true}
+              showsHorizontalScrollIndicator={false}
+            />
+
+            {/* ITEMS SECTION */}
+            <View style={[styles.rowCenter, {marginTop: sizes._16sdp}]}>
+              <TextBase style={[AppStyle.txt_20_bold]}>📦 Hiện vật phổ biến</TextBase>
               <TouchableOpacity
                 onPress={() =>
                   this.handleSearch(true, this.state.ITEMS_POPULAR)
@@ -168,7 +248,7 @@ export default class SearchScreen extends React.PureComponent<
             <View style={[styles.rowCenter, {marginTop: sizes._16sdp}]}>
               <TextBase
                 style={[AppStyle.txt_20_bold, {marginBottom: sizes._16sdp}]}>
-                Gần đây
+                📦 Hiện vật gần đây
               </TextBase>
               <TouchableOpacity
                 onPress={() =>
@@ -191,14 +271,6 @@ export default class SearchScreen extends React.PureComponent<
               horizontal={true}
               showsHorizontalScrollIndicator={false}
             />
-            {/*
-            <FlatList
-              data={this.state.LOCATION_NEARLY}
-              renderItem={this.renderItemLarge}
-              keyExtractor={item => item.id.toString()}
-              showsHorizontalScrollIndicator={false}
-              scrollEnabled={false}
-            /> */}
           </View>
         </ScrollView>
       </Page>
@@ -215,4 +287,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
   },
+  festivalCard: {
+    width: 280,
+    marginRight: sizes._12sdp,
+    borderRadius: sizes._12sdp,
+    backgroundColor: colors.white,
+    padding: sizes._16sdp,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  festivalInfo: {
+    flex: 1,
+  },
 });
+

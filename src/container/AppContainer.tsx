@@ -45,7 +45,7 @@ import About from './screens/Profile/About';
 import Advise from './screens/Maps/Advise';
 import DetailItem from './screens/NewFeed/DetailItem';
 import AllItemScreen from './screens/NewFeed/AllItemsScreen';
-import SearchScreen from './screens/NewFeed/SearchScreen';
+import FestivalsScreen from './screens/Festival/FestivalsScreen';
 import SignUpScreen from './screens/Login/SignUpScreen';
 import ForgotPasswordScreen from './screens/Login/ForgotPasswordScreen';
 import Donation from './screens/Profile/Donation';
@@ -274,7 +274,7 @@ function HomeStack() {
         />
         <Tabs.Screen
           name={strings.search}
-          component={SearchScreen}
+          component={FestivalsScreen}
           options={{
             tabBarIcon: ({focused}) => (
               <View>
@@ -286,7 +286,7 @@ function HomeStack() {
               </View>
             ),
           }}
-        />        
+        />
         <Tabs.Screen
           name={strings.new_feed}
           component={NewFeedScreen}
@@ -364,7 +364,7 @@ const AppNavigator = createCompatNavigatorFactory(createStackNavigator)(
     Advise: {screen: Advise},
     DetailItem: {screen: DetailItem},
     ViewAllItem: {screen: AllItemScreen},
-    SearchScreen: {screen: SearchScreen},
+    SearchScreen: {screen: FestivalsScreen},
     SignUpScreen: {screen: SignUpScreen},
     ForgotPasswordScreen: {screen: ForgotPasswordScreen},
     Donation: {screen: Donation},

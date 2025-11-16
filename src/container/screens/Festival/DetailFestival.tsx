@@ -3,102 +3,120 @@ import {ScrollView, View, Image, FlatList, TouchableOpacity, StyleSheet, Modal, 
 import Page from '../../../component/Page';
 import HeaderBase from '../../../component/HeaderBase';
 import strings from '../../../res/strings';
-import {BackSvg} from '../../../assets/assets/ImageSvg';
+import {BackSvg, Clock, CardSvg, ThunderSvg} from '../../../assets/assets/ImageSvg';
 import sizes from '../../../common/sizes';
 import colors from '../../../common/colors';
 import NavigationService from '../NavigationService';
-import {ILocation, IReview} from '../../../common/types';
+import {IFestival, IFestivalReview} from '../../../services/festivals.api';
+import {IReview} from '../../../common/types';
 import TextBase from '../../../common/TextBase';
 import {AppStyle} from '../../../common/AppStyle';
 import ReviewItem from '../../../component/ReviewItem';
-import {reviews} from '../../../common/reviewsConstants';
-import locationApi from '../../../services/locations.api';
+import festivalsApi from '../../../services/festivals.api';
 import {StarActive, StarInActive} from '../../../assets/assets/ImageSvg';
 import {MapSvg} from '../../../assets/ImageSvg';
 import {ScreenName} from '../../AppContainer';
 import {Button} from 'react-native-paper';
 
-interface IDetailLocationScreenProps {
+interface IDetailFestivalScreenProps {
   navigation: any;
 }
 
-interface IDetailLocationScreenState {
-  allLocations: ILocation[];
+interface IDetailFestivalScreenState {
+  allFestivals: IFestival[];
   showImageModal: boolean;
   selectedImageIndex: number;
 }
 
-export default class DetailLocationScreen extends React.PureComponent<
-  IDetailLocationScreenProps,
-  IDetailLocationScreenState
+export default class DetailFestivalScreen extends React.PureComponent<
+  IDetailFestivalScreenProps,
+  IDetailFestivalScreenState
 > {
-  constructor(props: IDetailLocationScreenProps) {
+  constructor(props: IDetailFestivalScreenProps) {
     super(props);
     this.state = {
-      allLocations: [],
+      allFestivals: [],
       showImageModal: false,
       selectedImageIndex: 0,
     };
   }
 
   async componentDidMount() {
-    // Load all locations để filter theo types
-    const locations = await locationApi.getLocations();
-    this.setState({ allLocations: locations });
+    // Load all festivals để filter theo types
+    const festivals = await festivalsApi.getFestivals();
+    this.setState({ allFestivals: festivals });
   }
 
-  renderItem = ({item, index}: {item: IReview; index: number}) => {
-    return <ReviewItem review={item} />;
+  // Convert IFestivalReview to IReview for ReviewItem component
+  convertToReview = (festivalReview: IFestivalReview): IReview => {
+    return {
+      id: festivalReview.id,
+      content: festivalReview.content,
+      name_user_review: festivalReview.name_user_review,
+      fullName: festivalReview.fullName,
+      time_review: festivalReview.time_review,
+      start: festivalReview.start,
+      avatar: festivalReview.avatar,
+      images: festivalReview.images,
+    };
   };
 
-  getRandomElements = (arr: IReview[], num: number) => {
-    // Copy mảng gốc để tránh thay đổi
-    const shuffled = [...arr];
-    // Sắp xếp lại mảng một cách ngẫu nhiên
-    for (let i = shuffled.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-    }
-    // Trả về `num` phần tử đầu tiên
-    return shuffled.slice(0, num);
+  renderReviewItem = ({item, index}: {item: IFestivalReview; index: number}) => {
+    const review = this.convertToReview(item);
+    return <ReviewItem review={review} />;
   };
 
-  // Tìm các địa điểm có cùng types (tối đa 10 locations)
-  getSimilarLocations = (currentLocation: ILocation) => {
-    const currentTypes = currentLocation.types || [];
+  // Tính rating trung bình
+  calculateAverageRating = (reviews: IFestivalReview[]) => {
+    if (!reviews || reviews.length === 0) return 0;
+    const sum = reviews.reduce((acc, review) => acc + review.start, 0);
+    return sum / reviews.length;
+  };
+
+  // Tìm các lễ hội có cùng types (tối đa 10 festivals)
+  getSimilarFestivals = (currentFestival: IFestival) => {
+    const currentTypes = currentFestival.types || [];
 
     if (currentTypes.length === 0) {
-      console.log('⚠️ Current location has no types');
+      console.log('⚠️ Current festival has no types');
       return [];
     }
 
-    // Filter locations có ít nhất 1 type trùng với current location
-    const similarLocations = this.state.allLocations.filter(loc => {
-      const locTypes = loc.types || [];
+    // Filter festivals có ít nhất 1 type trùng với current festival
+    const similarFestivals = this.state.allFestivals.filter(fest => {
+      const festTypes = fest.types || [];
 
-      // Không include chính location hiện tại (so sánh bằng name vì ID có thể khác nhau)
-      if (loc.name === currentLocation.name) {
+      // Không include chính festival hiện tại
+      if (fest.Id === currentFestival.Id) {
         return false;
       }
 
       // Check xem có type nào trùng không
-      const hasCommonType = locTypes.some(type => currentTypes.includes(type));
+      const hasCommonType = festTypes.some(type => currentTypes.includes(type));
       return hasCommonType;
     });
 
-    // Chỉ lấy 10 locations đầu tiên
-    const limitedLocations = similarLocations.slice(0, 10);
+    // Chỉ lấy 10 festivals đầu tiên
+    const limitedFestivals = similarFestivals.slice(0, 10);
 
-    console.log(`🔍 Found ${similarLocations.length} similar locations, showing ${limitedLocations.length}`);
-    return limitedLocations;
+    console.log(`🔍 Found ${similarFestivals.length} similar festivals, showing ${limitedFestivals.length}`);
+    return limitedFestivals;
   };
 
   render(): React.ReactNode {
-    const location: ILocation = this.props.navigation.state.params?.location;
+    const festival: IFestival = this.props.navigation.state.params?.festival;
+    
+    // Get first image or use placeholder
+    const festivalImage = festival.images && festival.images.length > 0 
+      ? festival.images[0] 
+      : 'https://via.placeholder.com/400x200?text=Festival';
+
+    const avgRating = this.calculateAverageRating(festival.reviews);
+
     return (
       <Page>
         <HeaderBase
-          title={'Xem chi tiết'}
+          title={'Chi tiết lễ hội'}
           leftIconSvg={
             <BackSvg
               width={sizes._24sdp}
@@ -109,23 +127,11 @@ export default class DetailLocationScreen extends React.PureComponent<
           onLeftIconPress={() => {
             NavigationService.pop();
           }}
-          rightIconSvgOne={
-            <MapSvg
-              width={sizes._24sdp}
-              height={sizes._24sdp}
-              color={colors.primary_950}
-            />
-          }
-          onRightIconOnePress={() => {
-            NavigationService.navigate(ScreenName.MAP_SCREEN, {
-              locations: [location],
-            });
-          }}
         />
         <View style={{flex: 1, backgroundColor: colors.primary_200}}>
           <ScrollView>
             <Image
-              source={{uri: location.avatar}}
+              source={{uri: festivalImage}}
               style={{
                 width: sizes.width,
                 height: sizes._200sdp,
@@ -133,12 +139,12 @@ export default class DetailLocationScreen extends React.PureComponent<
             />
 
             <View style={{flex: 1, padding: sizes._16sdp}}>
-              <TextBase style={[AppStyle.txt_20_bold, {textAlign: 'center',}]}>
-                {location.name}
+              <TextBase style={[AppStyle.txt_20_bold, {textAlign: 'center'}]}>
+                {festival.name}
               </TextBase>
 
               {/* Average Rating Display */}
-              {location.reviews && location.reviews.length > 0 && (
+              {festival.reviews && festival.reviews.length > 0 && (
                 <View style={{
                   flexDirection: 'row',
                   alignItems: 'center',
@@ -146,7 +152,6 @@ export default class DetailLocationScreen extends React.PureComponent<
                   marginTop: sizes._12sdp,
                 }}>
                   {Array.from([1, 2, 3, 4, 5]).map((i) => {
-                    const avgRating = locationApi.calculateAverageRating(location.reviews);
                     return i <= Math.round(avgRating) ? (
                       <StarActive
                         key={i}
@@ -164,17 +169,31 @@ export default class DetailLocationScreen extends React.PureComponent<
                     );
                   })}
                   <TextBase style={[AppStyle.txt_16_regular, {marginLeft: sizes._8sdp}]}>
-                    {locationApi.calculateAverageRating(location.reviews).toFixed(1)} ({location.reviews.length} đánh giá)
+                    {avgRating.toFixed(1)} ({festival.reviews.length} đánh giá)
                   </TextBase>
                 </View>
               )}
 
+              {/* Description */}
               <TextBase
                 style={[AppStyle.txt_16_medium_detail, {marginTop: sizes._12sdp, textAlign: 'justify'}]}>
-                {location.description}
+                {festival.description}
               </TextBase>
 
-              {/* Address with Icon */}
+              {/* Event Time */}
+              <View style={{flexDirection: 'row', alignItems: 'center', marginTop: sizes._12sdp}}>
+                <Clock
+                  width={sizes._20sdp}
+                  height={sizes._20sdp}
+                  color={colors.primary}
+                />
+                <TextBase
+                  style={[AppStyle.txt_16_medium_detail, {marginLeft: sizes._8sdp, flex: 1, textAlign: 'justify'}]}>
+                  Thời gian: {festival.event_time}
+                </TextBase>
+              </View>
+
+              {/* Location */}
               <View style={{flexDirection: 'row', alignItems: 'center', marginTop: sizes._12sdp}}>
                 <MapSvg
                   width={sizes._20sdp}
@@ -183,24 +202,62 @@ export default class DetailLocationScreen extends React.PureComponent<
                 />
                 <TextBase
                   style={[AppStyle.txt_16_medium_detail, {marginLeft: sizes._8sdp, flex: 1, textAlign: 'justify'}]}>
-                  Địa chỉ: {location.address}
+                  Địa điểm: {festival.location}
                 </TextBase>
               </View>
 
-              {/* Location Images Gallery */}
-              {location.images && location.images.length > 0 && (
+              {/* Price Level */}
+              <View style={{flexDirection: 'row', alignItems: 'center', marginTop: sizes._12sdp}}>
+                <CardSvg
+                  width={sizes._20sdp}
+                  height={sizes._20sdp}
+                  color={colors.primary}
+                />
+                <TextBase
+                  style={[AppStyle.txt_16_medium_detail, {marginLeft: sizes._8sdp, flex: 1, textAlign: 'justify'}]}>
+                  Phí: {festival.price_level === 0 ? 'Miễn phí' :
+                       festival.price_level === 1 ? 'Có phí' : 'Cao cấp'}
+                  {festival.ticket_info && ` (${festival.ticket_info})`}
+                </TextBase>
+              </View>
+
+              {/* Advise Section */}
+              {festival.advise && festival.advise.length > 0 && (
+                <View style={{marginTop: sizes._12sdp}}>
+                  <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                    <ThunderSvg
+                      width={sizes._20sdp}
+                      height={sizes._20sdp}
+                      color={colors.primary}
+                    />
+                    <TextBase style={[AppStyle.txt_16_medium_detail, {marginLeft: sizes._8sdp}]}>
+                      Lời khuyên:
+                    </TextBase>
+                  </View>
+                  {festival.advise.map((advice, index) => (
+                    <TextBase
+                      key={`advice-${index}`}
+                      style={[AppStyle.txt_16_medium_detail, {marginTop: sizes._4sdp, marginLeft: sizes._28sdp, textAlign: 'justify'}]}>
+                      • {advice}
+                    </TextBase>
+                  ))}
+                </View>
+              )}
+
+              {/* Festival Images Gallery */}
+              {festival.images && festival.images.length > 0 && (
                 <View style={{marginTop: sizes._16sdp}}>
                   <TextBase style={[AppStyle.txt_20_bold, {marginBottom: sizes._12sdp}]}>
-                    Hình ảnh địa điểm
+                    Hình ảnh lễ hội
                   </TextBase>
                   <ScrollView
                     horizontal
                     showsHorizontalScrollIndicator={false}
                     style={{marginBottom: sizes._8sdp}}
                   >
-                    {location.images.map((imageUrl, index) => (
+                    {festival.images.map((imageUrl, index) => (
                       <TouchableOpacity
-                        key={`location-image-${index}`}
+                        key={`festival-image-${index}`}
                         onPress={() => {
                           this.setState({
                             showImageModal: true,
@@ -226,30 +283,27 @@ export default class DetailLocationScreen extends React.PureComponent<
                 </View>
               )}
 
-              {/* Buttons: Địa điểm tương tự và Chỉ đường */}
+              {/* Buttons: Lễ hội tương tự */}
               <View style={{
-                flexDirection: 'row',
-                gap: sizes._12sdp,
                 marginTop: sizes._16sdp,
               }}>
                 <Button
                   mode="outlined"
-                  icon="map-search"
+                  icon="calendar-search"
                   onPress={() => {
-                    const similarLocations = this.getSimilarLocations(location);
-                    if (similarLocations.length > 0) {
-                      NavigationService.navigate(ScreenName.VIEW_ALL_SCREEN, {
-                        title: 'Địa điểm tương tự',
-                        locations: similarLocations,
+                    const similarFestivals = this.getSimilarFestivals(festival);
+                    if (similarFestivals.length > 0) {
+                      NavigationService.navigate(ScreenName.VIEW_ALL_FESTIVALS, {
+                        title: 'Lễ hội tương tự',
+                        festivals: similarFestivals,
                         valueSearch: '', // Không cần search
                       });
                     } else {
-                      console.log('⚠️ No similar locations found');
+                      console.log('⚠️ No similar festivals found');
                       // TODO: Show toast/alert to user
                     }
                   }}
                   style={{
-                    flex: 1,
                     borderColor: colors.primary,
                     borderWidth: 2,
                   }}
@@ -258,25 +312,7 @@ export default class DetailLocationScreen extends React.PureComponent<
                     color: colors.primary,
                   }}
                 >
-                  Địa điểm tương tự
-                </Button>
-
-                <Button
-                  mode="contained"
-                  icon="directions"
-                  onPress={() => {
-                    NavigationService.navigate(ScreenName.MAP_SCREEN, {
-                      locations: [location],
-                      showRoute: true, // Flag để hiển thị đường đi
-                    });
-                  }}
-                  style={{
-                    flex: 1,
-                    backgroundColor: colors.primary,
-                  }}
-                  labelStyle={{fontSize: 14}}
-                >
-                  Chỉ đường
+                  Lễ hội tương tự
                 </Button>
               </View>
 
@@ -296,9 +332,9 @@ export default class DetailLocationScreen extends React.PureComponent<
               </TextBase>
 
               <FlatList
-                data={location.reviews}
+                data={festival.reviews}
                 scrollEnabled={false}
-                renderItem={this.renderItem}
+                renderItem={this.renderReviewItem}
                 keyExtractor={(item, index) => index.toString() + item.id}
               />
             </View>
@@ -341,7 +377,7 @@ export default class DetailLocationScreen extends React.PureComponent<
             </TouchableOpacity>
 
             {/* Image counter */}
-            {location.images && location.images.length > 1 && (
+            {festival.images && festival.images.length > 1 && (
               <View
                 style={{
                   position: 'absolute',
@@ -355,7 +391,7 @@ export default class DetailLocationScreen extends React.PureComponent<
                 }}
               >
                 <TextBase style={{color: colors.white, fontSize: 16}}>
-                  {this.state.selectedImageIndex + 1} / {location.images.length}
+                  {this.state.selectedImageIndex + 1} / {festival.images.length}
                 </TextBase>
               </View>
             )}
@@ -373,7 +409,7 @@ export default class DetailLocationScreen extends React.PureComponent<
                 this.setState({selectedImageIndex: newIndex});
               }}
             >
-              {location.images && location.images.map((imageUrl, index) => (
+              {festival.images && festival.images.map((imageUrl, index) => (
                 <View
                   key={`modal-image-${index}`}
                   style={{
@@ -400,3 +436,4 @@ export default class DetailLocationScreen extends React.PureComponent<
     );
   }
 }
+

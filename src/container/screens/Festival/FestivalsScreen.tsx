@@ -101,14 +101,14 @@ export default class FestivalsScreen extends React.PureComponent<
   };
 
   renderFestivalHorizontal = ({item}: {item: IFestival}) => {
-    // TODO: Tạo component FestivalCard để hiển thị festival
     return (
       <TouchableOpacity
         key={`festival-${item.Id}`}
         style={styles.festivalCard}
         onPress={() => {
-          // TODO: Navigate to festival detail
-          console.log('Festival clicked:', item.name);
+          NavigationService.navigate(ScreenName.DETAIL_FESTIVAL_SCREEN, {
+            festival: item,
+          });
         }}>
         <View style={styles.festivalInfo}>
           <TextBase numberOfLines={2} style={[AppStyle.txt_18_bold]}>
@@ -175,7 +175,7 @@ export default class FestivalsScreen extends React.PureComponent<
             onChangeText={txt => {
               this.setState({valueSearch: txt});
             }}
-            placeholder="Tìm kiếm các hiện vật, lễ hội, di tích,..."
+            placeholder="Tìm kiếm các lễ hội tại Đà Nẵng..."
             style={{
               backgroundColor: colors.primary_200,
               color: colors.black,
@@ -201,8 +201,11 @@ export default class FestivalsScreen extends React.PureComponent<
               <TextBase style={[AppStyle.txt_20_bold]}>🎉 Lễ hội</TextBase>
               <TouchableOpacity
                 onPress={() => {
-                  // TODO: Navigate to all festivals
-                  console.log('View all festivals');
+                  NavigationService.navigate(ScreenName.VIEW_ALL_FESTIVALS, {
+                    title: 'Tất cả lễ hội',
+                    festivals: this.state.festivals,
+                    valueSearch: '',
+                  });
                 }}>
                 <TextBase style={[AppStyle.txt_18_regular]}>
                   Xem tất cả
@@ -217,57 +220,6 @@ export default class FestivalsScreen extends React.PureComponent<
               data={this.state.FESTIVALS_POPULAR}
               renderItem={this.renderFestivalHorizontal}
               keyExtractor={item => item.Id!.toString()}
-              horizontal={true}
-              showsHorizontalScrollIndicator={false}
-            />
-
-            {/* ITEMS SECTION */}
-            <View style={[styles.rowCenter, {marginTop: sizes._16sdp}]}>
-              <TextBase style={[AppStyle.txt_20_bold]}>📦 Hiện vật phổ biến</TextBase>
-              <TouchableOpacity
-                onPress={() =>
-                  this.handleSearch(true, this.state.ITEMS_POPULAR)
-                }>
-                <TextBase style={[AppStyle.txt_18_regular]}>
-                  Xem tất cả
-                </TextBase>
-              </TouchableOpacity>
-            </View>
-
-            <FlatList
-              contentContainerStyle={{
-                paddingVertical: sizes._16sdp,
-              }}
-              data={this.state.ITEMS_POPULAR}
-              renderItem={this.renderItemHorizontal}
-              keyExtractor={item => item.Id.toString()}
-              horizontal={true}
-              showsHorizontalScrollIndicator={false}
-            />
-
-            <View style={[styles.rowCenter, {marginTop: sizes._16sdp}]}>
-              <TextBase
-                style={[AppStyle.txt_20_bold, {marginBottom: sizes._16sdp}]}>
-                📦 Hiện vật gần đây
-              </TextBase>
-              <TouchableOpacity
-                onPress={() =>
-                  this.handleSearch(true, this.state.ITEMS_NEARLY)
-                }>
-                <TextBase
-                  style={[
-                    AppStyle.txt_18_regular,
-                    {marginBottom: sizes._16sdp},
-                  ]}>
-                  Xem tất cả
-                </TextBase>
-              </TouchableOpacity>
-            </View>
-
-            <FlatList
-              data={this.state.ITEMS_NEARLY}
-              renderItem={this.renderItemHorizontal}
-              keyExtractor={item => item.Id.toString()}
               horizontal={true}
               showsHorizontalScrollIndicator={false}
             />

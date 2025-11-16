@@ -46,6 +46,8 @@ import Advise from './screens/Maps/Advise';
 import DetailItem from './screens/NewFeed/DetailItem';
 import AllItemScreen from './screens/NewFeed/AllItemsScreen';
 import FestivalsScreen from './screens/Festival/FestivalsScreen';
+import DetailFestivalScreen from './screens/Festival/DetailFestival';
+import ViewAllFestivals from './screens/Festival/ViewAllFestivals';
 import SignUpScreen from './screens/Login/SignUpScreen';
 import ForgotPasswordScreen from './screens/Login/ForgotPasswordScreen';
 import Donation from './screens/Profile/Donation';
@@ -70,6 +72,8 @@ export enum ScreenName {
   DETAIL_ITEM = 'DetailItem',
   VIEW_ALL_ITEM = 'ViewAllItem',
   SEARCH_sCREEN = 'SearchScreen',
+  DETAIL_FESTIVAL_SCREEN = 'DetailFestivalScreen',
+  VIEW_ALL_FESTIVALS = 'ViewAllFestivals',
   SIGN_UP = 'SignUpScreen',
   FORGOT_PASSWORD = 'ForgotPasswordScreen',
   DONATION = 'Donation',
@@ -365,6 +369,8 @@ const AppNavigator = createCompatNavigatorFactory(createStackNavigator)(
     DetailItem: {screen: DetailItem},
     ViewAllItem: {screen: AllItemScreen},
     SearchScreen: {screen: FestivalsScreen},
+    DetailFestivalScreen: {screen: DetailFestivalScreen},
+    ViewAllFestivals: {screen: ViewAllFestivals},
     SignUpScreen: {screen: SignUpScreen},
     ForgotPasswordScreen: {screen: ForgotPasswordScreen},
     Donation: {screen: Donation},

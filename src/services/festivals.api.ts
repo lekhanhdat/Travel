@@ -19,9 +19,11 @@ export interface IFestivalReview {
   id: number;
   content: string;
   name_user_review: string;
+  fullName?: string; // Full name of user (preferred over name_user_review)
   time_review: string;
   start: number; // rating 1-5
   avatar: string;
+  images?: string[]; // Array of image URLs uploaded by user
 }
 
 export interface IFestival {

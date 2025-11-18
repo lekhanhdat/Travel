@@ -13,7 +13,7 @@ import {AppStyle} from '../../../common/AppStyle';
 import ReviewItem from '../../../component/ReviewItem';
 import {reviews} from '../../../common/reviewsConstants';
 import locationApi from '../../../services/locations.api';
-import {StarActive, StarInActive} from '../../../assets/assets/ImageSvg';
+import {StarActive, StarInActive, ThunderSvg} from '../../../assets/assets/ImageSvg';
 import {MapSvg} from '../../../assets/ImageSvg';
 import {ScreenName} from '../../AppContainer';
 import {Button} from 'react-native-paper';
@@ -135,6 +135,7 @@ export default class DetailLocationScreen extends React.PureComponent<
           onRightIconOnePress={() => {
             NavigationService.navigate(ScreenName.MAP_SCREEN, {
               locations: [location],
+              showRoute: true, // ✅ Bật chỉ đường
             });
           }}
         />
@@ -328,6 +329,27 @@ export default class DetailLocationScreen extends React.PureComponent<
                       </TouchableOpacity>
                     ))}
                   </ScrollView>
+                </View>
+              )}
+
+              {/* Advise Section - Lời khuyên */}
+              {location.advise && (
+                <View style={{marginTop: sizes._16sdp}}>
+                  <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                    <TextBase style={[AppStyle.txt_20_bold]}>
+                      Lời khuyên:
+                    </TextBase>
+                  </View>
+                  {(Array.isArray(location.advise)
+                    ? location.advise
+                    : location.advise.split('\n')
+                  ).map((advice, index) => (
+                    <TextBase
+                      key={`advice-${index}`}
+                      style={[AppStyle.txt_16_medium_detail, {marginTop: sizes._4sdp, marginLeft: sizes._8sdp, textAlign: 'justify'}]}>
+                      • {advice.trim()}
+                    </TextBase>
+                  ))}
                 </View>
               )}
 

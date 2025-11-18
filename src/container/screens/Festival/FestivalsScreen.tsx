@@ -147,7 +147,7 @@ export default class FestivalsScreen extends React.PureComponent<
 
   handleSearch = (isViewAll: boolean, items: IItem[]) => {
     NavigationService.navigate(ScreenName.VIEW_ALL_ITEM, {
-      title: isViewAll ? 'Xem tất cả' : 'Tìm kiếm',
+      title: isViewAll ? 'Xem tất cả' : 'Lễ hội',
       items,
       valueSearch: this.state.valueSearch,
     });
@@ -156,7 +156,7 @@ export default class FestivalsScreen extends React.PureComponent<
   render(): React.ReactNode {
     return (
       <Page style={{backgroundColor: colors.background}}>
-        <HeaderBase hideLeftIcon title={strings.search} />
+        <HeaderBase hideLeftIcon title={strings.festival} />
         <View
           style={{
             display: 'flex',

@@ -10,6 +10,7 @@ import CategorySvg from './svg/CategorySvg.svg';
 import ChartsSvg from './svg/ChartsSvg.svg';
 import ChatBotSvg from './svg/ChatBotSvg.svg';
 import FAQ from './svg/FAQ.svg';
+import FireworksSvg from './svg/FireworksSvg.svg';
 import Frame from './svg/Frame.svg';
 import FriendsSvg from './svg/FriendsSvg.svg';
 import HomeSvg from './svg/HomeSvg.svg';
@@ -35,6 +36,7 @@ CategorySvg,
 ChartsSvg,
 ChatBotSvg,
 FAQ,
+FireworksSvg,
 Frame,
 FriendsSvg,
 HomeSvg,

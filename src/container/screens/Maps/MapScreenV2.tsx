@@ -266,6 +266,7 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
   const [focusLocation, setFocusLocation] = useState<ILocation | null>(null);
   const [shouldShowRoute, setShouldShowRoute] = useState(false);
   const [pendingZoomRoute, setPendingZoomRoute] = useState<{latitude: number; longitude: number}[] | null>(null);
+  const [currentZoom, setCurrentZoom] = useState<number>(12); // Track zoom level
 
   useEffect(() => {
     console.log('restart0-----------');
@@ -596,6 +597,47 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
     }
   };
 
+  // ✅ Function to calculate marker size based on zoom level
+  const getMarkerSize = (zoom: number, isSelected: boolean) => {
+    // Zoom range: 10 (far) -> 18 (close)
+    // Base sizes (smaller than before):
+    const baseSize = isSelected ? 28 : 16; // Reduced from 40/20
+    const minSize = isSelected ? 20 : 12;
+    const maxSize = isSelected ? 40 : 24;
+
+    // Scale factor based on zoom (zoom 10 = 0.5x, zoom 14 = 1x, zoom 18 = 1.5x)
+    const scaleFactor = Math.max(0.5, Math.min(1.5, (zoom - 10) / 8 + 0.5));
+    const size = baseSize * scaleFactor;
+
+    return Math.max(minSize, Math.min(maxSize, size));
+  };
+
+  // ✅ Function to calculate text size based on zoom level
+  const getTextSize = (zoom: number, isSelected: boolean) => {
+    // Base sizes (smaller than before):
+    const baseSize = isSelected ? 11 : 9; // Reduced from 12/11
+    const minSize = isSelected ? 9 : 7;
+    const maxSize = isSelected ? 13 : 11;
+
+    // Scale factor based on zoom
+    const scaleFactor = Math.max(0.7, Math.min(1.3, (zoom - 10) / 8 + 0.7));
+    const size = baseSize * scaleFactor;
+
+    return Math.max(minSize, Math.min(maxSize, size));
+  };
+
+  // ✅ Handle camera region change to update zoom level
+  const onRegionDidChange = async (feature: any) => {
+    try {
+      // Get zoom from camera state
+      const zoom = feature?.properties?.zoomLevel || 12;
+      setCurrentZoom(zoom);
+      console.log('📏 Zoom level:', zoom);
+    } catch (error) {
+      console.log('⚠️ Error getting zoom:', error);
+    }
+  };
+
   // ✅ Function to zoom map to fit entire route (immediate - no delay)
   const zoomToFitRouteImmediate = (routePoints: {latitude: number; longitude: number}[]) => {
     if (!cameraRef.current || routePoints.length === 0) {
@@ -710,6 +752,7 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
           style={{flex: 1}}
           styleURL={MAP_STYLES.find(s => s.id === currentMapStyle)?.url || MapboxGL.StyleURL.Satellite}
           onRegionDidChange={onRegionChange}
+          onCameraChanged={onRegionDidChange}
           onDidFinishLoadingMap={onMapStyleLoaded}
           onPress={() => {
             // Bỏ chọn marker khi ấn ra ngoài
@@ -743,6 +786,11 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
               // Kiểm tra xem location này có được chọn không
               const isSelected = selectedLocation?.Id === location.Id || focusLocation?.Id === location.Id;
 
+              // ✅ Calculate dynamic sizes based on zoom level
+              const markerSize = getMarkerSize(currentZoom, isSelected);
+              const textSize = getTextSize(currentZoom, isSelected);
+              const emojiSize = markerSize * 0.8; // Emoji slightly smaller than marker
+
               return (
                 <MapboxGL.MarkerView
                   key={String(index)}
@@ -756,17 +804,17 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
                       <Image
                         source={images.red_marker}
                         style={{
-                          width: 40,
-                          height: 40,
+                          width: markerSize,
+                          height: markerSize,
                           resizeMode: 'contain',
                         }}
                       />
                     ) : (
-                      <TextBase style={{ fontSize: 20 }}>📍</TextBase>
+                      <TextBase style={{ fontSize: emojiSize }}>📍</TextBase>
                     )}
-                    {/* Location Name Label - Dynamic color based on map style */}
+                    {/* Location Name Label - Dynamic size based on zoom */}
                     <TextBase style={{
-                      fontSize: isSelected ? 12 : 11,
+                      fontSize: textSize,
                       fontWeight: 'bold',
                       color: isSelected ? '#FF0000' : textColor,
                       ...textShadow,
@@ -1050,7 +1098,7 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
               color: colors.primary,
             }}
           >
-            Directions
+            Chỉ đường
           </Button>
 
           <Button
@@ -1063,7 +1111,7 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
               backgroundColor: colors.primary,
             }}
           >
-            View
+            Xem
           </Button>
         </View>
       )}
@@ -1432,7 +1480,7 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
               }}
               style={styles.customButton}
               labelStyle={styles.buttonText}>
-              Directions
+              Chỉ đường
             </Button>
           </View>
 

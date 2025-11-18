@@ -265,6 +265,7 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
   const [locations, setLocations] = useState<ILocation[]>([]);
   const [focusLocation, setFocusLocation] = useState<ILocation | null>(null);
   const [shouldShowRoute, setShouldShowRoute] = useState(false);
+  const [pendingZoomRoute, setPendingZoomRoute] = useState<{latitude: number; longitude: number}[] | null>(null);
 
   useEffect(() => {
     console.log('restart0-----------');
@@ -429,6 +430,15 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
     }
   }, [shouldShowRoute, focusLocation, currentLat, currentLong]);
 
+  // ✅ Zoom khi camera đã ready và có pending zoom
+  useEffect(() => {
+    if (pendingZoomRoute && pendingZoomRoute.length > 0 && cameraRef.current) {
+      console.log('🎯 Camera ready - executing pending zoom');
+      zoomToFitRouteImmediate(pendingZoomRoute);
+      setPendingZoomRoute(null); // Clear pending zoom
+    }
+  }, [pendingZoomRoute, cameraRef.current]);
+
   const fetchRouteToLocation = async (location: ILocation) => {
     try {
       console.log('=== FETCHING ROUTE WITH MAPBOX ===');
@@ -505,6 +515,9 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
             hasSteps: !!mainRoute.legs?.[0]?.steps,
           });
         }
+
+        // ✅ Zoom map để xem toàn bộ đường đi
+        zoomToFitRoute(points);
       } else {
         console.log('❌ No routes found in response');
       }
@@ -531,6 +544,9 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
         setRouteDistance(straightLineRoute.distance);
         setRouteDuration(0);
         setRouteSteps([]);
+
+        // ✅ Zoom map để xem toàn bộ đường đi (offline)
+        zoomToFitRoute(straightLineRoute.coordinates);
       }
     }
   };
@@ -577,6 +593,64 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
         animationDuration: 1000,
       });
       console.log('📍 Recentered to current location:', currentLat, currentLong);
+    }
+  };
+
+  // ✅ Function to zoom map to fit entire route (immediate - no delay)
+  const zoomToFitRouteImmediate = (routePoints: {latitude: number; longitude: number}[]) => {
+    if (!cameraRef.current || routePoints.length === 0) {
+      console.log('❌ Cannot zoom to fit route - no camera or no points');
+      return;
+    }
+
+    // Tính bounding box của route
+    const lats = routePoints.map(p => p.latitude);
+    const longs = routePoints.map(p => p.longitude);
+
+    const minLat = Math.min(...lats);
+    const maxLat = Math.max(...lats);
+    const minLong = Math.min(...longs);
+    const maxLong = Math.max(...longs);
+
+    // Tính center point
+    const centerLat = (minLat + maxLat) / 2;
+    const centerLong = (minLong + maxLong) / 2;
+
+    // Tính padding (thêm 20% để route không sát mép)
+    const latPadding = (maxLat - minLat) * 0.2;
+    const longPadding = (maxLong - minLong) * 0.2;
+
+    console.log('🗺️ Zooming to fit route:');
+    console.log('  Center:', centerLat, centerLong);
+    console.log('  Bounds:', {
+      ne: [maxLat + latPadding, maxLong + longPadding],
+      sw: [minLat - latPadding, minLong - longPadding],
+    });
+
+    // Fit camera to bounds
+    cameraRef.current.fitBounds(
+      [maxLong + longPadding, maxLat + latPadding], // northeast
+      [minLong - longPadding, minLat - latPadding], // southwest
+      [50, 50, 50, 50], // padding [top, right, bottom, left]
+      1000, // animation duration
+    );
+  };
+
+  // ✅ Function to zoom map - set pending if camera not ready
+  const zoomToFitRoute = (routePoints: {latitude: number; longitude: number}[]) => {
+    if (routePoints.length === 0) {
+      console.log('❌ No route points to zoom');
+      return;
+    }
+
+    if (cameraRef.current) {
+      // Camera đã sẵn sàng - zoom ngay
+      console.log('✅ Camera ready - zooming immediately');
+      zoomToFitRouteImmediate(routePoints);
+    } else {
+      // Camera chưa sẵn sàng - lưu lại để zoom sau
+      console.log('⏳ Camera not ready - setting pending zoom');
+      setPendingZoomRoute(routePoints);
     }
   };
 

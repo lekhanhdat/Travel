@@ -21,6 +21,7 @@ import {
   TranslateSvg,
   VipSvg,
   SearchSvg,
+  FireworksSvg,
   NewFeed,
   MapSvg,
   CameraSvg,
@@ -155,13 +156,13 @@ function getSourceWithIndex(key: number, isFocused: boolean) {
     case 1:
       if (isFocused) {
         return {
-          icon: <SearchSvg width={24} height={24} fill={colors.black} />,
-          name: strings.search,
+          icon: <FireworksSvg width={24} height={24} fill={colors.black} />,
+          name: strings.festival,
         };
       }
       return {
-        icon: <SearchSvg width={24} height={24} />,
-        name: strings.search,
+        icon: <FireworksSvg width={24} height={24} />,
+        name: strings.festival,
       };
     case 2:
       if (isFocused) {
@@ -231,7 +232,7 @@ function HomeStack() {
         return strings.home_page;
       }
       case 1: {
-        return strings.search;
+        return strings.festival;
       }
       case 2: {
         return strings.new_feed;
@@ -277,14 +278,14 @@ function HomeStack() {
           }}
         />
         <Tabs.Screen
-          name={strings.search}
+          name={strings.festival}
           component={FestivalsScreen}
           options={{
             tabBarIcon: ({focused}) => (
               <View>
                 <Image
                   source={
-                    focused ? images.tab_add_friends : images.tab_add_friends
+                    focused ? images.tab_add_friends_focus : images.tab_add_friends
                   }
                 />
               </View>

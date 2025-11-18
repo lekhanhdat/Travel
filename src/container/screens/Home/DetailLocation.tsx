@@ -17,6 +17,7 @@ import {StarActive, StarInActive} from '../../../assets/assets/ImageSvg';
 import {MapSvg} from '../../../assets/ImageSvg';
 import {ScreenName} from '../../AppContainer';
 import {Button} from 'react-native-paper';
+import festivalsApi, {IFestival} from '../../../services/festivals.api';
 
 interface IDetailLocationScreenProps {
   navigation: any;
@@ -26,6 +27,7 @@ interface IDetailLocationScreenState {
   allLocations: ILocation[];
   showImageModal: boolean;
   selectedImageIndex: number;
+  festivals: IFestival[];
 }
 
 export default class DetailLocationScreen extends React.PureComponent<
@@ -38,6 +40,7 @@ export default class DetailLocationScreen extends React.PureComponent<
       allLocations: [],
       showImageModal: false,
       selectedImageIndex: 0,
+      festivals: [],
     };
   }
 
@@ -45,6 +48,19 @@ export default class DetailLocationScreen extends React.PureComponent<
     // Load all locations để filter theo types
     const locations = await locationApi.getLocations();
     this.setState({ allLocations: locations });
+
+    // Load festivals cho địa điểm này
+    const location: ILocation = this.props.navigation.state.params?.location;
+    if (location.Id || location.id) {
+      const locationId = location.Id || location.id;
+      try {
+        const festivals = await festivalsApi.getFestivalsByLocationId(locationId!);
+        console.log(`🎉 Found ${festivals.length} festivals for location ${locationId}`);
+        this.setState({ festivals });
+      } catch (error) {
+        console.error('❌ Error loading festivals:', error);
+      }
+    }
   }
 
   renderItem = ({item, index}: {item: IReview; index: number}) => {
@@ -220,6 +236,95 @@ export default class DetailLocationScreen extends React.PureComponent<
                           }}
                           resizeMode="cover"
                         />
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
+                </View>
+              )}
+
+              {/* Festivals at Location */}
+              {this.state.festivals && this.state.festivals.length > 0 && (
+                <View style={{marginTop: sizes._16sdp}}>
+                  <TextBase style={[AppStyle.txt_20_bold, {marginBottom: sizes._12sdp}]}>
+                    Lễ hội tại địa điểm
+                  </TextBase>
+                  <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    style={{marginBottom: sizes._8sdp}}
+                  >
+                    {this.state.festivals.map((festival, index) => (
+                      <TouchableOpacity
+                        key={`festival-${festival.Id || index}`}
+                        onPress={() => {
+                          NavigationService.navigate(ScreenName.DETAIL_FESTIVAL_SCREEN, {
+                            festival: festival,
+                          });
+                        }}
+                        activeOpacity={0.8}
+                        style={{
+                          marginRight: sizes._12sdp,
+                          width: sizes._200sdp,
+                          backgroundColor: colors.white,
+                          borderRadius: sizes._8sdp,
+                          overflow: 'hidden',
+                          elevation: 2,
+                          shadowColor: '#000',
+                          shadowOffset: {width: 0, height: 2},
+                          shadowOpacity: 0.1,
+                          shadowRadius: 4,
+                        }}
+                      >
+                        {/* Festival Image */}
+                        {festival.images && festival.images.length > 0 && (
+                          <Image
+                            source={{uri: festival.images[0]}}
+                            style={{
+                              width: sizes._200sdp,
+                              height: sizes._120sdp,
+                              backgroundColor: colors.primary_100,
+                            }}
+                            resizeMode="cover"
+                          />
+                        )}
+
+                        {/* Festival Info */}
+                        <View style={{padding: sizes._12sdp}}>
+                          <TextBase
+                            numberOfLines={2}
+                            style={[AppStyle.txt_16_bold, {marginBottom: sizes._4sdp}]}
+                          >
+                            {festival.name}
+                          </TextBase>
+
+                          {/* Event Time */}
+                          <View style={{flexDirection: 'row', alignItems: 'center', marginTop: sizes._4sdp}}>
+                            <TextBase style={[AppStyle.txt_14_regular, {color: colors.primary}]}>
+                              🗓️ {festival.event_time}
+                            </TextBase>
+                          </View>
+
+                          {/* Price Level */}
+                          <View style={{flexDirection: 'row', alignItems: 'center', marginTop: sizes._4sdp}}>
+                            <TextBase style={[AppStyle.txt_14_regular, {color: colors.primary_700}]}>
+                              💰 {festival.price_level === 0 ? 'Miễn phí' : festival.price_level === 1 ? '$' : '$$'}
+                            </TextBase>
+                          </View>
+
+                          {/* Rating */}
+                          {festival.rating > 0 && (
+                            <View style={{flexDirection: 'row', alignItems: 'center', marginTop: sizes._4sdp}}>
+                              <StarActive
+                                width={sizes._16sdp}
+                                height={sizes._16sdp}
+                                color={colors.primary}
+                              />
+                              <TextBase style={[AppStyle.txt_14_regular, {marginLeft: sizes._4sdp}]}>
+                                {festival.rating.toFixed(1)}
+                              </TextBase>
+                            </View>
+                          )}
+                        </View>
                       </TouchableOpacity>
                     ))}
                   </ScrollView>

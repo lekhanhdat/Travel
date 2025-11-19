@@ -26,7 +26,9 @@ import {Button} from 'react-native-paper';
 
 const {StatusBarManager} = NativeModules;
 
-interface IProfileScreenProps {}
+interface IProfileScreenProps {
+  navigation?: any;
+}
 
 interface IProfileScreenState {
   account?: IAccount | null;
@@ -53,6 +55,14 @@ export default class ProfileScreen extends React.PureComponent<
 
   componentDidMount(): void {
     this.handleGetUser();
+
+    // Add focus listener to refresh user data when returning to this screen
+    if (this.props.navigation) {
+      this.props.navigation.addListener('focus', () => {
+        console.log('ProfileScreen focused - refreshing user data');
+        this.handleGetUser();
+      });
+    }
   }
 
   handleGetUser = async () => {

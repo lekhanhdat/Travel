@@ -229,6 +229,91 @@ const authApi = {
   },
 
   /**
+   * Update user profile (fullName, email, avatar)
+   */
+  updateProfile: async (
+    accountId: number,
+    updates: {
+      fullName?: string;
+      email?: string;
+      avatar?: string;
+    },
+  ): Promise<IAccount> => {
+    try {
+      console.log('📝 Updating profile for account ID:', accountId);
+
+      // Check if email is being updated and if it's already in use
+      if (updates.email) {
+        const accounts = await authApi.getAccounts();
+        const existingUser = accounts.find(
+          acc => acc.email === updates.email && acc.Id !== accountId,
+        );
+
+        if (existingUser) {
+          throw new Error('Email đã được sử dụng bởi tài khoản khác');
+        }
+      }
+
+      // NocoDB PATCH format: array of objects with Id
+      const res = await request.patch(URL_UPDATE_ACCOUNT, [
+        {
+          Id: accountId,
+          ...updates,
+        },
+      ]);
+
+      console.log('✅ Profile updated successfully:', res.data);
+      return res.data;
+    } catch (error: any) {
+      console.error('❌ Error updating profile:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Change password (requires current password verification)
+   */
+  changePassword: async (
+    accountId: number,
+    currentPassword: string,
+    newPassword: string,
+  ): Promise<void> => {
+    try {
+      console.log('🔑 Changing password for account ID:', accountId);
+
+      // Get account to verify current password
+      const accounts = await authApi.getAccounts();
+      const account = accounts.find(acc => acc.Id === accountId);
+
+      if (!account) {
+        throw new Error('Tài khoản không tồn tại');
+      }
+
+      // Verify current password
+      if (!comparePassword(currentPassword, account.password)) {
+        throw new Error('Mật khẩu hiện tại không đúng');
+      }
+
+      // Hash new password
+      console.log('🔒 Hashing new password...');
+      const hashedPassword = hashPassword(newPassword);
+
+      // Update password
+      await request.patch(URL_UPDATE_ACCOUNT, [
+        {
+          Id: accountId,
+          password: hashedPassword,
+        },
+      ]);
+
+      console.log('✅ Password changed successfully');
+    } catch (error: any) {
+      console.error('❌ Error changing password:', error);
+      throw error;
+    }
+  },
+
+  /**
    * Generate random 6-digit OTP code
    */
   generateOTP: (): string => {

@@ -13,7 +13,7 @@ import Geolocation from '@react-native-community/geolocation';
 import MapboxGL from '@rnmapbox/maps';
 import Page from '../../../component/Page';
 import HeaderBase from '../../../component/HeaderBase';
-import {BackSvg} from '../../../assets/assets/ImageSvg';
+import {BackSvg, CirclePlay, CirclePause, Circle, Volume} from '../../../assets/assets/ImageSvg';
 import colors from '../../../common/colors';
 import sizes from '../../../common/sizes';
 import {ILocation} from '../../../common/types';
@@ -29,6 +29,7 @@ import locationApi from '../../../services/locations.api';
 import festivalsApi from '../../../services/festivals.api';
 import Toast from 'react-native-toast-message';
 import {env} from '../../../utils/env';
+import Tts from 'react-native-tts';
 
 MapboxGL.setAccessToken(env.MAPBOX_ACCESS_TOKEN || '');
 
@@ -130,6 +131,13 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
     null,
   );
   const [locationPermission, setLocationPermission] = useState(false);
+
+  // TTS (Text-to-Speech) state
+  const [isTtsPlaying, setIsTtsPlaying] = useState(false);
+  const [isTtsPaused, setIsTtsPaused] = useState(false);
+  const [ttsTextSegments, setTtsTextSegments] = useState<string[]>([]);
+  const [currentSegmentIndex, setCurrentSegmentIndex] = useState(0);
+  const [isTtsInitialized, setIsTtsInitialized] = useState(false);
 
   // Map style state
   const [currentMapStyle, setCurrentMapStyle] = useState<MapStyle>('outdoors');
@@ -587,6 +595,167 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
     }
   };
 
+  // ========== TTS (Text-to-Speech) Functions ==========
+
+  /**
+   * Initialize TTS with Vietnamese language
+   */
+  const initializeTts = async () => {
+    try {
+      // Set default language to Vietnamese
+      await Tts.setDefaultLanguage('vi-VN');
+
+      // Set speech rate (0.5 = slow, 1.0 = normal, 2.0 = fast)
+      await Tts.setDefaultRate(0.5);
+
+      // Set pitch (0.5 = low, 1.0 = normal, 2.0 = high)
+      await Tts.setDefaultPitch(1.0);
+
+      // Add event listeners
+      Tts.addEventListener('tts-start', () => {
+        setIsTtsPlaying(true);
+        setIsTtsPaused(false);
+      });
+
+      Tts.addEventListener('tts-finish', (event) => {
+        // When a segment finishes, play the next one
+        setCurrentSegmentIndex(prevIndex => {
+          const nextIndex = prevIndex + 1;
+          if (nextIndex < ttsTextSegments.length) {
+            // Play next segment
+            setTimeout(() => {
+              Tts.speak(ttsTextSegments[nextIndex]);
+            }, 100);
+            return nextIndex;
+          } else {
+            // All segments finished
+            setIsTtsPlaying(false);
+            setIsTtsPaused(false);
+            return 0; // Reset to beginning
+          }
+        });
+      });
+
+      Tts.addEventListener('tts-cancel', () => {
+        setIsTtsPlaying(false);
+        setIsTtsPaused(false);
+      });
+
+      setIsTtsInitialized(true);
+    } catch (error) {
+      console.error('Error initializing TTS:', error);
+    }
+  };
+
+  /**
+   * Split text into segments (sentences) for better pause/resume control
+   */
+  const splitTextIntoSegments = (text: string): string[] => {
+    // Split by sentence endings (., !, ?)
+    const segments = text
+      .split(/([.!?]+\s+)/)
+      .filter(segment => segment.trim().length > 0)
+      .reduce((acc: string[], curr, index, array) => {
+        // Combine sentence with its punctuation
+        if (index % 2 === 0 && array[index + 1]) {
+          acc.push(curr + array[index + 1]);
+        } else if (index % 2 === 0) {
+          acc.push(curr);
+        }
+        return acc;
+      }, []);
+
+    return segments.length > 0 ? segments : [text];
+  };
+
+  /**
+   * Start reading location description and advise from the beginning
+   */
+  const startTtsReading = async (location: ILocation) => {
+    try {
+      // Stop any ongoing TTS
+      await Tts.stop();
+
+      // Prepare text to read
+      let textToRead = '';
+
+      // 1. Read description first
+      if (location.description) {
+        textToRead += location.description + '. ';
+      }
+
+      // 2. Then read advise
+      if (location.advise) {
+        if (Array.isArray(location.advise)) {
+          // If advise is an array, join with periods
+          textToRead += location.advise.join('. ') + '.';
+        } else {
+          // If advise is a string
+          textToRead += location.advise + '.';
+        }
+      }
+
+      if (textToRead.trim()) {
+        // Split text into segments for pause/resume functionality
+        const segments = splitTextIntoSegments(textToRead);
+        setTtsTextSegments(segments);
+        setCurrentSegmentIndex(0);
+
+        // Start speaking first segment
+        Tts.speak(segments[0]);
+        setIsTtsPlaying(true);
+        setIsTtsPaused(false);
+      }
+    } catch (error) {
+      console.error('Error starting TTS:', error);
+    }
+  };
+
+  /**
+   * Stop TTS reading completely and reset to beginning
+   */
+  const stopTtsReading = async () => {
+    try {
+      await Tts.stop();
+      setIsTtsPlaying(false);
+      setIsTtsPaused(false);
+      setCurrentSegmentIndex(0);
+      setTtsTextSegments([]);
+    } catch (error) {
+      console.error('Error stopping TTS:', error);
+    }
+  };
+
+  /**
+   * Pause TTS reading (saves current position)
+   */
+  const pauseTtsReading = async () => {
+    try {
+      await Tts.stop();
+      setIsTtsPlaying(false);
+      setIsTtsPaused(true);
+      // currentSegmentIndex is preserved, so we can resume from here
+    } catch (error) {
+      console.error('Error pausing TTS:', error);
+    }
+  };
+
+  /**
+   * Resume TTS reading from paused position
+   */
+  const resumeTtsReading = async () => {
+    try {
+      if (ttsTextSegments.length > 0 && currentSegmentIndex < ttsTextSegments.length) {
+        // Resume from current segment
+        Tts.speak(ttsTextSegments[currentSegmentIndex]);
+        setIsTtsPlaying(true);
+        setIsTtsPaused(false);
+      }
+    } catch (error) {
+      console.error('Error resuming TTS:', error);
+    }
+  };
+
   // Function to recenter map to current location
   const recenterToMyLocation = () => {
     if (cameraRef.current && currentLat !== 0 && currentLong !== 0) {
@@ -701,6 +870,34 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
   useEffect(() => {
     console.log({selectedLocation});
   }, [selectedLocation]);
+
+  // Initialize TTS on component mount
+  useEffect(() => {
+    initializeTts();
+
+    // Cleanup TTS on unmount
+    return () => {
+      Tts.stop();
+      Tts.removeAllListeners('tts-start');
+      Tts.removeAllListeners('tts-finish');
+      Tts.removeAllListeners('tts-cancel');
+    };
+  }, []);
+
+  // Auto-start TTS when modal opens
+  useEffect(() => {
+    if (visibleSecondModal && selectedLocation) {
+      // Start reading after a short delay to ensure modal is fully visible
+      const timer = setTimeout(() => {
+        startTtsReading(selectedLocation);
+      }, 500);
+
+      return () => clearTimeout(timer);
+    } else if (!visibleSecondModal) {
+      // Stop TTS when modal closes
+      stopTtsReading();
+    }
+  }, [visibleSecondModal, selectedLocation]);
 
   const locationProps: ILocation[] = navigation?.state?.params?.locations ?? [];
   console.log({locationProps});
@@ -1336,14 +1533,14 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
           <ScrollView>
             {selectedLocation && (
               <>
+                {/* Header with location name */}
                 <TextBase
                   style={[
                     AppStyle.txt_18_bold,
                     {
-                      marginBottom: 10,
                       textAlign: 'center',
-                      alignSelf: 'center',
                       color: '#F97350',
+                      marginBottom: 10,
                     },
                   ]}>
                   {selectedLocation.name}
@@ -1463,6 +1660,85 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
               labelStyle={styles.buttonText}>
               Quy tắc ứng xử văn minh
             </Button>
+
+            {/* TTS Control Buttons - Below the 4 menu buttons */}
+            <View style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginTop: sizes._16sdp,
+              gap: sizes._16sdp,
+            }}>
+              {/* State 1: Playing - Show [Pause] + [Stop] */}
+              {isTtsPlaying && !isTtsPaused && (
+                <>
+                  {/* Pause Button */}
+                  <TouchableOpacity
+                    onPress={pauseTtsReading}
+                    style={{
+                      padding: sizes._8sdp,
+                      backgroundColor: colors.primary_100,
+                      borderRadius: 50,
+                      width: sizes._50sdp,
+                      height: sizes._50sdp,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}>
+                    <CirclePause width={sizes._30sdp} height={sizes._30sdp} fill={colors.primary_600} />
+                  </TouchableOpacity>
+
+                  {/* Stop Button */}
+                  <TouchableOpacity
+                    onPress={stopTtsReading}
+                    style={{
+                      padding: sizes._8sdp,
+                      backgroundColor: '#FFEBEE',
+                      borderRadius: 50,
+                      width: sizes._50sdp,
+                      height: sizes._50sdp,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}>
+                    <Circle width={sizes._30sdp} height={sizes._30sdp} fill="#F44336" />
+                  </TouchableOpacity>
+                </>
+              )}
+
+              {/* State 2: Paused - Show [Resume/Continue] + [Stop] */}
+              {isTtsPaused && (
+                <>
+                  {/* Resume/Continue Button */}
+                  <TouchableOpacity
+                    onPress={resumeTtsReading}
+                    style={{
+                      padding: sizes._8sdp,
+                      backgroundColor: colors.primary_100,
+                      borderRadius: 50,
+                      width: sizes._50sdp,
+                      height: sizes._50sdp,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}>
+                    <Volume width={sizes._30sdp} height={sizes._30sdp} fill={colors.primary_600} />
+                  </TouchableOpacity>
+
+                  {/* Stop Button */}
+                  <TouchableOpacity
+                    onPress={stopTtsReading}
+                    style={{
+                      padding: sizes._8sdp,
+                      backgroundColor: '#FFEBEE',
+                      borderRadius: 50,
+                      width: sizes._50sdp,
+                      height: sizes._50sdp,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}>
+                    <Circle width={sizes._30sdp} height={sizes._30sdp} fill="#F44336" />
+                  </TouchableOpacity>
+                </>
+              )}
+            </View>
           </View>
 
           {/* Image on the right side of buttons */}

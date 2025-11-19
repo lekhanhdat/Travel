@@ -186,10 +186,10 @@ class HomeScreen extends React.PureComponent<
     const sortedByDistance = [...locationsWithDistance].sort((a, b) => a.distance - b.distance);
 
     // Get top 10 nearest locations
-    const nearestLocations = sortedByDistance.slice(0, 10);
+    const nearestLocations = sortedByDistance.slice(0, 20);
 
     // Get popular locations (first 10 from original data)
-    const popularLocations = data.slice(0, 10);
+    const popularLocations = data.slice(0, 20);
 
     this.setState({
       locations: data,

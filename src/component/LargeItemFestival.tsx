@@ -1,6 +1,7 @@
 import React from 'react';
 import {Image, StyleSheet, TouchableOpacity, View} from 'react-native';
 import {IFestival} from '../services/festivals.api';
+import festivalsApi from '../services/festivals.api';
 import sizes from '../common/sizes';
 import colors from '../common/colors';
 import {AppStyle} from '../common/AppStyle';
@@ -26,11 +27,14 @@ export default class LargeItemFestival extends React.PureComponent<
 
   render(): React.ReactNode {
     const {festival} = this.props;
-    
+
     // Get first image or use placeholder
-    const festivalImage = festival.images && festival.images.length > 0 
-      ? festival.images[0] 
+    const festivalImage = festival.images && festival.images.length > 0
+      ? festival.images[0]
       : 'https://via.placeholder.com/200x200?text=Festival';
+
+    // Calculate rating from reviews instead of using static rating field
+    const avgRating = festivalsApi.calculateAverageRating(festival.reviews);
 
     return (
       <TouchableOpacity
@@ -84,7 +88,7 @@ export default class LargeItemFestival extends React.PureComponent<
 
             <View style={{flexDirection: 'row', marginTop: sizes._4sdp}}>
               <TextBase style={[AppStyle.txt_14_bold]}>
-                ⭐ {festival.rating.toFixed(1)}
+                ⭐ {avgRating.toFixed(1)}
               </TextBase>
               <TextBase
                 style={[

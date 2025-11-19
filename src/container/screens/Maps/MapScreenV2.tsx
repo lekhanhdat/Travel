@@ -26,6 +26,8 @@ import mapboxApi from '../../../services/mapbox.api';
 import {Button, Modal} from 'react-native-paper';
 import images from '../../../res/images';
 import locationApi from '../../../services/locations.api';
+import festivalsApi from '../../../services/festivals.api';
+import Toast from 'react-native-toast-message';
 import {env} from '../../../utils/env';
 
 MapboxGL.setAccessToken(env.MAPBOX_ACCESS_TOKEN || '');
@@ -1322,7 +1324,7 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
         <View
           style={{
             width: sizes.width - sizes._32sdp,
-            maxHeight: 300,
+            maxHeight: 350,
             // height: 400, // Fixed height for the modal
             padding: sizes._16sdp,
             backgroundColor: colors.white,
@@ -1393,19 +1395,7 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
               flexDirection: 'column',
               flex: 1, // Để View này chiếm phần còn lại
             }}>
-            <Button
-              mode="outlined"
-              onPress={() => {
-                NavigationService.navigate(ScreenName.ADVISE, {
-                  location: selectedLocation,
-                });
-              }}
-              style={[styles.customButton, { marginBottom: sizes._12sdp }]}
-              labelStyle={styles.buttonText} // Sử dụng labelStyle để chỉnh sửa chữ trong Button
-            >
-              Quy tắc ứng xử văn minh
-            </Button>
-
+            {/* 1. Thông tin chi tiết (Details) */}
             <Button
               mode="outlined"
               onPress={() => {
@@ -1413,11 +1403,42 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
                   location: selectedLocation,
                 });
               }}
-              style={[styles.customButton, { marginBottom: sizes._12sdp }]}
+              style={[styles.customButton, { marginBottom: sizes._14sdp }]}
               labelStyle={styles.buttonText}>
-              Details
+              Thông tin chi tiết
             </Button>
 
+            {/* 2. Lễ hội tại đây (Festivals here) */}
+            <Button
+              mode="outlined"
+              onPress={() => {
+                if (!selectedLocation || !selectedLocation.Id) {
+                  return;
+                }
+                festivalsApi
+                  .getFestivalsByLocationId(selectedLocation.Id)
+                  .then(data => {
+                    if (!data || data.length === 0) {
+                      Toast.show({
+                        type: 'info',
+                        text1: 'Không có lễ hội tại đây',
+                        text2: 'Địa điểm này chưa có lễ hội nào được tổ chức',
+                      });
+                      return;
+                    }
+                    NavigationService.navigate(ScreenName.VIEW_ALL_FESTIVALS, {
+                      title: 'Lễ hội tại đây',
+                      festivals: data,
+                      valueSearch: '',
+                    });
+                  });
+              }}
+              style={[styles.customButton, { marginBottom: sizes._14sdp }]}
+              labelStyle={styles.buttonText}>
+              Lễ hội tại đây
+            </Button>
+
+            {/* 3. Hình ảnh & Video */}
             <Button
               mode="outlined"
               onPress={() => {
@@ -1425,62 +1446,22 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
                   location: selectedLocation,
                 });
               }}
-              style={styles.customButton}
+              style={[styles.customButton, { marginBottom: sizes._14sdp }]}
               labelStyle={styles.buttonText}>
               Hình ảnh & Video
             </Button>
 
-            {/* <Button
-                    mode="contained"
-                    onPress={() => {
-                      NavigationService.navigate(
-                        ScreenName.LOCATION_VIDEO,
-                        {
-                          location: selectedLocation,
-                        },
-                      );
-                    }}>
-                    Xem thêm video
-                  </Button> */}
-
+            {/* 4. Quy tắc ứng xử văn minh */}
             <Button
               mode="outlined"
               onPress={() => {
-                if (!selectedLocation || !selectedLocation.Id) {
-                  return;
-                }
-                locationApi
-                  .getItemsWithLocationId(selectedLocation.Id)
-                  .then(data => {
-                    NavigationService.navigate(ScreenName.VIEW_ALL_ITEM, {
-                      title: 'Hiện vật',
-                      // items: _.unionBy(LOCATION_POPULAR, LOCATION_NEARLY, 'id'),
-                      items: data,
-                      valueSearch: selectedLocation?.relatedKeyWord ?? '',
-                    });
-                  });
+                NavigationService.navigate(ScreenName.ADVISE, {
+                  location: selectedLocation,
+                });
               }}
               style={styles.customButton}
               labelStyle={styles.buttonText}>
-              Artifacts here
-            </Button>
-
-            <Button
-              mode="outlined"
-              onPress={() => {
-                console.log('🧭 Directions to:', selectedLocation?.name);
-                // Close modal
-                setVisibleSecondModal(false);
-                // Fetch route and display
-                if (selectedLocation) {
-                  setFocusLocation(selectedLocation);
-                  setShouldShowRoute(true);
-                  fetchRouteToLocation(selectedLocation);
-                }
-              }}
-              style={styles.customButton}
-              labelStyle={styles.buttonText}>
-              Chỉ đường
+              Quy tắc ứng xử văn minh
             </Button>
           </View>
 

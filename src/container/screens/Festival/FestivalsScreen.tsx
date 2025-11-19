@@ -101,6 +101,9 @@ export default class FestivalsScreen extends React.PureComponent<
   };
 
   renderFestivalHorizontal = ({item}: {item: IFestival}) => {
+    // Calculate rating from reviews instead of using static rating field
+    const avgRating = festivalsApi.calculateAverageRating(item.reviews);
+
     return (
       <TouchableOpacity
         key={`festival-${item.Id}`}
@@ -126,7 +129,7 @@ export default class FestivalsScreen extends React.PureComponent<
           </TextBase>
           <View style={{flexDirection: 'row', marginTop: sizes._8sdp}}>
             <TextBase style={[AppStyle.txt_14_bold]}>
-              ⭐ {item.rating.toFixed(1)}
+              ⭐ {avgRating.toFixed(1)}
             </TextBase>
             <TextBase
               style={[

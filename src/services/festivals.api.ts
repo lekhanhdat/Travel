@@ -284,6 +284,17 @@ const festivalsApi = {
       throw error;
     }
   },
+
+  /**
+   * Calculate average rating from festival reviews
+   */
+  calculateAverageRating: (reviews: IFestivalReview[]): number => {
+    if (!reviews || reviews.length === 0) {
+      return 0;
+    }
+    const total = reviews.reduce((sum, review) => sum + (review.start || 0), 0);
+    return Number((total / reviews.length).toFixed(1));
+  },
 };
 
 export default festivalsApi;

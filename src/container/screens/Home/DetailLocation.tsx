@@ -14,7 +14,7 @@ import ReviewItem from '../../../component/ReviewItem';
 import {reviews} from '../../../common/reviewsConstants';
 import locationApi from '../../../services/locations.api';
 import {StarActive, StarInActive, ThunderSvg} from '../../../assets/assets/ImageSvg';
-import {MapSvg} from '../../../assets/ImageSvg';
+import {MapSvg, Call, GlobeSvg, ClockSvg} from '../../../assets/ImageSvg';
 import {ScreenName} from '../../AppContainer';
 import {Button} from 'react-native-paper';
 import festivalsApi, {IFestival} from '../../../services/festivals.api';
@@ -196,13 +196,58 @@ export default class DetailLocationScreen extends React.PureComponent<
                 <MapSvg
                   width={sizes._20sdp}
                   height={sizes._20sdp}
-                  color={colors.primary}
+                  color={'#000000'}
                 />
                 <TextBase
                   style={[AppStyle.txt_16_medium_detail, {marginLeft: sizes._8sdp, flex: 1, textAlign: 'justify'}]}>
                   Địa chỉ: {location.address}
                 </TextBase>
               </View>
+
+              {/* Phone Number with Icon */}
+              {location.phone && (
+                <View style={{flexDirection: 'row', alignItems: 'center', marginTop: sizes._12sdp}}>
+                  <Call
+                    width={sizes._20sdp}
+                    height={sizes._20sdp}
+                    color={'#000000'}
+                  />
+                  <TextBase
+                    style={[AppStyle.txt_16_medium_detail, {marginLeft: sizes._8sdp, flex: 1, textAlign: 'justify'}]}>
+                    Số điện thoại: {location.phone}
+                  </TextBase>
+                </View>
+              )}
+
+              {/* Website with Icon */}
+              {location.website && (
+                <View style={{flexDirection: 'row', alignItems: 'center', marginTop: sizes._12sdp}}>
+                  <GlobeSvg
+                    width={sizes._24sdp}
+                    height={sizes._24sdp}
+                    color={'#000000'}
+                  />
+                  <TextBase
+                    style={[AppStyle.txt_16_medium_detail, {marginLeft: sizes._8sdp, flex: 1, textAlign: 'justify'}]}>
+                    Website: {location.website}
+                  </TextBase>
+                </View>
+              )}
+
+              {/* Opening Hours with Icon */}
+              {location.opening_hours && (
+                <View style={{flexDirection: 'row', alignItems: 'center', marginTop: sizes._12sdp}}>
+                  <ClockSvg
+                    width={sizes._24sdp}
+                    height={sizes._24sdp}
+                    color={'#000000'}
+                  />
+                  <TextBase
+                    style={[AppStyle.txt_16_medium_detail, {marginLeft: sizes._8sdp, flex: 1, textAlign: 'justify'}]}>
+                    Giờ mở cửa: {location.opening_hours}
+                  </TextBase>
+                </View>
+              )}
 
               {/* Location Images Gallery */}
               {location.images && location.images.length > 0 && (

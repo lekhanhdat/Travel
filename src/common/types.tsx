@@ -29,6 +29,9 @@ export interface ILocation {
   images?: any[];
   videos?: string[]; // Array of video IDs (YouTube video IDs)
   relatedKeyWord?: string;
+  phone?: string; // Phone number
+  website?: string; // Website URL
+  opening_hours?: string; // Opening hours
 }
 
 export interface IReview {

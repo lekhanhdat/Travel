@@ -9,10 +9,12 @@ import CameraSvg from './svg/CameraSvg.svg';
 import CategorySvg from './svg/CategorySvg.svg';
 import ChartsSvg from './svg/ChartsSvg.svg';
 import ChatBotSvg from './svg/ChatBotSvg.svg';
+import ClockSvg from './svg/ClockSvg.svg';
 import FAQ from './svg/FAQ.svg';
 import FireworksSvg from './svg/FireworksSvg.svg';
 import Frame from './svg/Frame.svg';
 import FriendsSvg from './svg/FriendsSvg.svg';
+import GlobeSvg from './svg/GlobeSvg.svg';
 import HomeSvg from './svg/HomeSvg.svg';
 import icon_camera from './svg/icon_camera.svg';
 import LibrarySvg from './svg/LibrarySvg.svg';
@@ -35,10 +37,12 @@ CameraSvg,
 CategorySvg,
 ChartsSvg,
 ChatBotSvg,
+ClockSvg,
 FAQ,
 FireworksSvg,
 Frame,
 FriendsSvg,
+GlobeSvg,
 HomeSvg,
 icon_camera,
 LibrarySvg,

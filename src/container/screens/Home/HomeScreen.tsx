@@ -36,6 +36,7 @@ import {localStorageKey} from '../../../common/constants';
 import {withTranslation, WithTranslationProps} from '../../../i18n/withTranslation';
 import LanguageDropdown from '../../../component/LanguageDropdown';
 import Geolocation from '@react-native-community/geolocation';
+import SearchBarComponent from '../../../component/SearchBarComponent';
 
 interface IHomeScreenProps extends WithTranslationProps {
   navigation: any;
@@ -57,15 +58,18 @@ class HomeScreen extends React.PureComponent<
   IHomeScreenState
 > {
   refInput: any;
+  searchBarRef: React.RefObject<SearchBarComponent<ILocation>>;
+
   constructor(props: IHomeScreenProps) {
     super(props);
+    this.searchBarRef = React.createRef();
     this.state = {
       valueSearch: '',
       locations: [],
       locationsNearly: [],
       locationsPopular: [],
       account: null,
-      currentLat: 15.974620784990472, 
+      currentLat: 15.974620784990472,
       currentLong: 108.25290513035998,
       locationPermission: false,
     };
@@ -76,6 +80,8 @@ class HomeScreen extends React.PureComponent<
       this.setState({
         valueSearch: '',
       });
+      // Reset search bar when screen is focused
+      this.searchBarRef.current?.resetSearch();
     });
 
     this.requestLocationPermission();
@@ -209,10 +215,17 @@ class HomeScreen extends React.PureComponent<
   };
 
   handleSearch = (isViewAll: boolean, locations: ILocation[]) => {
+    const searchValue = this.searchBarRef.current?.getSearchValue() || '';
     NavigationService.navigate(ScreenName.VIEW_ALL_SCREEN, {
       title: isViewAll ? 'Xem tất cả' : 'Tìm kiếm',
       locations: locations,
-      valueSearch: this.state.valueSearch,
+      valueSearch: searchValue,
+    });
+  };
+
+  handleSearchCallback = (filteredData: ILocation[], searchValue: string) => {
+    this.setState({valueSearch: searchValue}, () => {
+      this.handleSearch(false, this.state.locations);
     });
   };
 
@@ -261,98 +274,13 @@ class HomeScreen extends React.PureComponent<
           tại Đà Nẵng!
         </TextBase>
 
-        <View
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            marginVertical: sizes._16sdp,
-            marginHorizontal: sizes._16sdp,
-            backgroundColor: '#fff', // Nền trắng để đổ bóng hiển thị tốt hơn
-            borderRadius: 30, // Bo tròn các góc
-            // Đổ bóng trên Android
-            elevation: 7,
-            // width: sizes.width - sizes._32sdp,
-            // marginBottom: sizes._22sdp,
-            // marginLeft: sizes._16sdp,
-            // marginTop: sizes._16sdp,
-            // display: 'flex',
-            // flexDirection: 'row',
-            // alignItems: 'center',
-            // justifyContent: 'space-between',
-          }}>
-          <Searchbar
-            value={this.state.valueSearch}
-            onChangeText={txt => {
-              this.setState({valueSearch: txt});
-            }}
-            placeholder="Tìm kiếm địa điểm, địa chỉ,..."
-            style={{
-              // backgroundColor: '#CEE8E7',
-              backgroundColor: colors.primary_200,
-              color: colors.black,
-              flex: 1,
-            }}
-            inputStyle={{
-              color: colors.black,
-              fontFamily: 'GoogleSans_Regular',
-            }}
-            onIconPress={() =>
-              this.handleSearch(
-                false,
-                this.state.locations,
-                // _.unionBy(LOCATION_POPULAR, LOCATION_NEARLY, 'id'),
-              )
-            }
-          />
-          {/* <Button
-            mode="contained"
-            onPress={() =>
-              this.handleSearch(
-                false,
-                _.unionBy(LOCATION_POPULAR, LOCATION_NEARLY, 'id'),
-              )
-            }>
-            Tìm kiếm
-          </Button> */}
-          {/* <TextInput
-            mode="outlined"
-            label="Tìm kiếm địa điểm du lịch"
-            placeholder="nhập tên địa điểm, địa chỉ..."
-            outlineStyle={{
-              borderColor: colors.black,
-              borderRadius: sizes._20sdp,
-            }}
-            textColor={colors.black}
-            placeholderTextColor={colors.black}
-            style={{width: sizes.width - sizes._135sdp, color: colors.black}}
-            onChangeText={txt => {
-              this.setState({
-                valueSearch: txt,
-              });
-            }}
-            value={this.state.valueSearch}
-          /> */}
-          {/* <TouchableOpacity
-            style={{
-              paddingVertical: sizes._16sdp,
-              backgroundColor: colors.primary_600,
-              borderRadius: sizes._20sdp,
-              width: sizes._90sdp,
-              height: sizes._54sdp,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-            onPress={() =>
-              this.handleSearch(
-                false,
-                _.unionBy(LOCATION_POPULAR, LOCATION_NEARLY, 'id'),
-              )
-            }>
-            <TextBase style={AppStyle.txt_16_medium}>Tìm kiếm</TextBase>
-          </TouchableOpacity> */}
-        </View>
+        <SearchBarComponent<ILocation>
+          ref={this.searchBarRef}
+          data={this.state.locations}
+          searchFields={['name', 'address', 'description']}
+          onSearch={this.handleSearchCallback}
+          placeholder="Tìm kiếm địa điểm, địa chỉ, mô tả..."
+        />
         <ScrollView>
           <View style={styles.container}>
             <View style={styles.rowCenter}>

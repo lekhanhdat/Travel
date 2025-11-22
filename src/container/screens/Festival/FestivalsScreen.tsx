@@ -30,6 +30,7 @@ import {ScreenName} from '../../AppContainer';
 import HistoricalArtifact from '../../../component/HistoricalArtifact';
 import locationApi from '../../../services/locations.api';
 import festivalsApi from '../../../services/festivals.api';
+import SearchBarComponent from '../../../component/SearchBarComponent';
 
 // TRANG FESTIVALS - Tìm kiếm và hiển thị lễ hội
 // TRANG FESTIVALS - Tìm kiếm và hiển thị lễ hội
@@ -54,8 +55,11 @@ export default class FestivalsScreen extends React.PureComponent<
 > {
   refSheet: BottomSheet | null | undefined;
   refSheetLocation: BottomSheet | null | undefined;
+  searchBarRef: React.RefObject<SearchBarComponent<IFestival>>;
+
   constructor(props: IFestivalsScreenProps) {
     super(props);
+    this.searchBarRef = React.createRef();
     this.state = {
       valueSearch: '',
       items: [],
@@ -71,6 +75,8 @@ export default class FestivalsScreen extends React.PureComponent<
       this.setState({
         valueSearch: '',
       });
+      // Reset search bar when screen is focused
+      this.searchBarRef.current?.resetSearch();
     });
 
     this.fetchItems();
@@ -156,46 +162,28 @@ export default class FestivalsScreen extends React.PureComponent<
     });
   };
 
+  handleFestivalSearch = (filteredData: IFestival[], searchValue: string) => {
+    this.setState({valueSearch: searchValue}, () => {
+      NavigationService.navigate(ScreenName.VIEW_ALL_FESTIVALS, {
+        title: 'Tìm kiếm lễ hội',
+        festivals: this.state.festivals,
+        valueSearch: searchValue,
+      });
+    });
+  };
+
   render(): React.ReactNode {
     return (
       <Page style={{backgroundColor: colors.background}}>
         <HeaderBase hideLeftIcon title={strings.festival} />
-        <View
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            marginVertical: sizes._16sdp,
-            marginHorizontal: sizes._16sdp,
-            marginTop: sizes._24sdp,
-            backgroundColor: '#fff',
-            borderRadius: 30,
-            elevation: 7,
-          }}>
-          <Searchbar
-            value={this.state.valueSearch}
-            onChangeText={txt => {
-              this.setState({valueSearch: txt});
-            }}
-            placeholder="Tìm kiếm các lễ hội tại Đà Nẵng..."
-            style={{
-              backgroundColor: colors.primary_200,
-              color: colors.black,
-              flex: 1,
-            }}
-            inputStyle={{
-              color: colors.black,
-              fontFamily: 'GoogleSans_Regular',
-            }}
-            onIconPress={() =>
-              this.handleSearch(
-                false,
-                this.state.items,
-              )
-            }
-          />
-        </View>
+        <SearchBarComponent<IFestival>
+          ref={this.searchBarRef}
+          data={this.state.festivals}
+          searchFields={['name', 'location', 'description']}
+          onSearch={this.handleFestivalSearch}
+          placeholder="Tìm kiếm các lễ hội tại Đà Nẵng..."
+          containerStyle={{marginTop: sizes._24sdp}}
+        />
 
         <ScrollView>
           <View style={styles.container}>

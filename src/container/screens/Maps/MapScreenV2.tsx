@@ -142,6 +142,9 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
   // Offline state
   const [isOffline, setIsOffline] = useState(false);
 
+  // Traffic layer state
+  const [showTraffic, setShowTraffic] = useState(false);
+
   // Map ref to access map instance
   const mapRef = React.useRef<MapboxGL.MapView>(null);
 
@@ -193,8 +196,8 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
       (error) => {
         console.log('Error getting location:', error);
         // Fallback to default Đà Nẵng coordinates
-        setCurrentLat(16.026084727153087);
-        setCurrentLong(108.23980496658481);
+        setCurrentLat(15.974620784990472);
+        setCurrentLong(108.25290513035998);
       },
       {
         enableHighAccuracy: true,
@@ -445,6 +448,17 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
       setPendingZoomRoute(null); // Clear pending zoom
     }
   }, [pendingZoomRoute, cameraRef.current]);
+
+  // 🚦 Debug traffic layer state changes
+  useEffect(() => {
+    console.log('🚦 Traffic layer state changed:', showTraffic ? 'ENABLED ✅' : 'DISABLED ❌');
+    if (showTraffic) {
+      console.log('🚦 Traffic layer should now be visible on the map');
+      console.log('🚦 Current zoom level:', currentZoom);
+      console.log('🚦 Current location:', { lat: currentLat, long: currentLong });
+      console.log('🚦 Tip: Zoom to level 12+ and navigate to a major city for best results');
+    }
+  }, [showTraffic]);
 
   const fetchRouteToLocation = async (location: ILocation) => {
     try {
@@ -980,6 +994,59 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
             </View>
           </MapboxGL.MarkerView>
 
+          {/* Traffic Layer - Mapbox Traffic v1 Tileset */}
+          {showTraffic && (
+            <MapboxGL.VectorSource
+              id="trafficSource"
+              url="mapbox://mapbox.mapbox-traffic-v1"
+            >
+              <MapboxGL.LineLayer
+                id="trafficLayer"
+                sourceID="trafficSource"
+                sourceLayerID="traffic"
+                filter={['==', ['geometry-type'], 'LineString']}
+                style={{
+                  lineWidth: [
+                    'interpolate',
+                    ['linear'],
+                    ['zoom'],
+                    8, 1,
+                    10, 2,
+                    12, 3,
+                    14, 5,
+                    16, 7,
+                    18, 10,
+                  ],
+                  lineColor: [
+                    'case',
+                    ['has', 'congestion'],
+                    [
+                      'match',
+                      ['get', 'congestion'],
+                      'low', '#4CAF50',      // Green - low congestion
+                      'moderate', '#FFEB3B', // Yellow - moderate congestion
+                      'heavy', '#FF9800',    // Orange - heavy congestion
+                      'severe', '#F44336',   // Red - severe congestion
+                      '#9E9E9E'              // Gray for unknown
+                    ],
+                    '#2196F3'                // Blue if no congestion data
+                  ],
+                  lineOpacity: 0.85,
+                  lineCap: 'round',
+                  lineJoin: 'round',
+                  lineOffset: [
+                    'interpolate',
+                    ['linear'],
+                    ['zoom'],
+                    12, 0,
+                    14, 1,
+                    16, 2,
+                  ],
+                }}
+              />
+            </MapboxGL.VectorSource>
+          )}
+
           {/* Vẽ đường đi nếu có routeCoordinates */}
           {routeCoordinates.length > 0 && (
             <MapboxGL.ShapeSource
@@ -1081,6 +1148,130 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
                   </TextBase>
                 </TouchableOpacity>
               ))}
+            </View>
+          )}
+
+          {/* Traffic Toggle Button */}
+          <TouchableOpacity
+            onPress={() => {
+              setShowTraffic(!showTraffic);
+              if (!showTraffic) {
+                Toast.show({
+                  type: 'info',
+                  text1: '🚦 Traffic Layer Enabled',
+                  text2: 'Zoom to level 12+ in major cities for best results',
+                  position: 'bottom',
+                  visibilityTime: 3000,
+                });
+              }
+            }}
+            style={{
+              backgroundColor: showTraffic ? colors.primary : colors.white,
+              borderRadius: 8,
+              padding: 10,
+              elevation: 5,
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.25,
+              shadowRadius: 3.84,
+              minWidth: 150,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginTop: 8,
+              borderWidth: showTraffic ? 0 : 1,
+              borderColor: colors.primary_200,
+            }}>
+            <TextBase style={{ fontSize: 20, marginRight: 8 }}>
+              🚦
+            </TextBase>
+            <TextBase style={{
+              fontSize: 14,
+              fontWeight: '600',
+              color: showTraffic ? colors.white : colors.primary_950,
+            }}>
+              Mật độ giao thông
+            </TextBase>
+          </TouchableOpacity>
+
+          {/* Traffic Color Legend */}
+          {showTraffic && (
+            <View style={{
+              marginTop: 8,
+              paddingVertical: 8,
+              paddingHorizontal: 10,
+              borderRadius: 8,
+              backgroundColor: 'rgba(255, 255, 255, 0.95)',
+              elevation: 3,
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 1 },
+              shadowOpacity: 0.2,
+              shadowRadius: 2,
+            }}>
+              <TextBase style={{
+                fontSize: 11,
+                fontWeight: 'bold',
+                color: colors.primary_950,
+                marginBottom: 6,
+              }}>
+                Chú thích:
+              </TextBase>
+
+              {/* Low Congestion */}
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 3 }}>
+                <View style={{
+                  width: 12,
+                  height: 12,
+                  borderRadius: 6,
+                  backgroundColor: '#4CAF50',
+                  marginRight: 6,
+                }} />
+                <TextBase style={{ fontSize: 10, color: colors.primary_950 }}>
+                  Thông thoáng
+                </TextBase>
+              </View>
+
+              {/* Moderate Congestion */}
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 3 }}>
+                <View style={{
+                  width: 12,
+                  height: 12,
+                  borderRadius: 6,
+                  backgroundColor: '#FFEB3B',
+                  marginRight: 6,
+                }} />
+                <TextBase style={{ fontSize: 10, color: colors.primary_950 }}>
+                  Vừa phải
+                </TextBase>
+              </View>
+
+              {/* Heavy Congestion */}
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 3 }}>
+                <View style={{
+                  width: 12,
+                  height: 12,
+                  borderRadius: 6,
+                  backgroundColor: '#FF9800',
+                  marginRight: 6,
+                }} />
+                <TextBase style={{ fontSize: 10, color: colors.primary_950 }}>
+                  Đông đúc
+                </TextBase>
+              </View>
+
+              {/* Severe Congestion */}
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <View style={{
+                  width: 12,
+                  height: 12,
+                  borderRadius: 6,
+                  backgroundColor: '#F44336',
+                  marginRight: 6,
+                }} />
+                <TextBase style={{ fontSize: 10, color: colors.primary_950 }}>
+                  Tắc nghẽn
+                </TextBase>
+              </View>
             </View>
           )}
         </View>

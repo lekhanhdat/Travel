@@ -7,6 +7,8 @@ export type GetLocationsResponse = {
     totalRows: number;
     page: number;
     pageSize: number;
+    isFirstPage?: boolean;
+    isLastPage?: boolean;
   };
 };
 
@@ -38,13 +40,54 @@ export const URL_UPLOAD = '/api/v2/storage/upload'; // NocoDB Storage API
 
 const locationApi = {
   getLocations: async () => {
-    const res = await request.get<GetLocationsResponse>(URL_GET_LOCATIONS, {
-      params: {
-        offset: '0',
-        limit: '100',
-      },
-    });
-    let data = res.data.list ?? [];
+    // 🔍 DEBUG: Log API request details
+    console.log('========================================');
+    console.log('🔍 DEBUG: getLocations() - FETCHING ALL PAGES');
+    console.log(`📡 API URL: ${URL_GET_LOCATIONS}`);
+    console.log('========================================');
+
+    // ✨ PAGINATION FIX: NocoDB enforces max pageSize of 100
+    // We need to fetch all pages to get all locations
+    let allData: any[] = [];
+    let currentPage = 1;
+    let hasMorePages = true;
+    const pageSize = 100; // NocoDB's max page size
+
+    while (hasMorePages) {
+      const offset = (currentPage - 1) * pageSize;
+
+      console.log(`📄 Fetching page ${currentPage} (offset: ${offset}, limit: ${pageSize})...`);
+
+      const res = await request.get<GetLocationsResponse>(URL_GET_LOCATIONS, {
+        params: {
+          offset: offset.toString(),
+          limit: pageSize.toString(),
+        },
+      });
+
+      const pageData = res.data.list ?? [];
+      allData = allData.concat(pageData);
+
+      console.log(`   ✅ Page ${currentPage}: ${pageData.length} records`);
+      console.log(`   📊 Total so far: ${allData.length} records`);
+
+      // Check if there are more pages
+      const pageInfo = res.data.pageInfo;
+      hasMorePages = !pageInfo.isLastPage && pageData.length === pageSize;
+
+      if (hasMorePages) {
+        currentPage++;
+      }
+    }
+
+    let data = allData;
+
+    // 🔍 DEBUG: Log total locations fetched from NocoDB
+    console.log('========================================');
+    console.log('🔍 DEBUG: getLocations() - ALL PAGES FETCHED');
+    console.log(`📊 Total locations fetched from NocoDB: ${data.length}`);
+    console.log(`� Total pages fetched: ${currentPage}`);
+    console.log('========================================');
 
     // Parse JSON fields từ NocoDB
     data = data.map(location => {
@@ -123,8 +166,44 @@ const locationApi = {
         }
       }
 
+      // ✨ MARKER FIELD: Handle marker field for map visibility
+      // Default to true for backward compatibility (existing locations without marker field)
+      if (typeof (location as any).marker === 'boolean') {
+        parsed.marker = (location as any).marker;
+      } else if (typeof (location as any).marker === 'string') {
+        // Handle string values (e.g., "true", "false", "1", "0")
+        parsed.marker = (location as any).marker === 'true' || (location as any).marker === '1';
+      } else {
+        // Default to true if marker field is missing (for existing locations)
+        parsed.marker = true;
+      }
+
       return parsed;
     });
+
+    // 🔍 DEBUG: Log marker field statistics
+    const markerTrueCount = data.filter(loc => loc.marker === true).length;
+    const markerFalseCount = data.filter(loc => loc.marker === false).length;
+    const markerUndefinedCount = data.filter(loc => loc.marker === undefined).length;
+
+    console.log('========================================');
+    console.log('🔍 DEBUG: Marker field statistics');
+    console.log(`✅ marker=true: ${markerTrueCount} locations`);
+    console.log(`❌ marker=false: ${markerFalseCount} locations`);
+    console.log(`⚠️  marker=undefined: ${markerUndefinedCount} locations`);
+    console.log(`📊 Total after parsing: ${data.length} locations`);
+
+    // Show sample locations with marker=false
+    const sampleHiddenLocations = data.filter(loc => loc.marker === false).slice(0, 5);
+    if (sampleHiddenLocations.length > 0) {
+      console.log('🏨 Sample locations with marker=false:');
+      sampleHiddenLocations.forEach((loc, idx) => {
+        console.log(`   ${idx + 1}. ${loc.name} (marker=${loc.marker})`);
+      });
+    } else {
+      console.log('⚠️  WARNING: No locations with marker=false found!');
+    }
+    console.log('========================================');
 
     return data;
   },

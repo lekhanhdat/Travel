@@ -32,6 +32,7 @@ export interface ILocation {
   phone?: string; // Phone number
   website?: string; // Website URL
   opening_hours?: string; // Opening hours
+  marker?: boolean; // Whether to display as marker on map (default: true for existing locations, false for hidden locations)
 }
 
 export interface IReview {

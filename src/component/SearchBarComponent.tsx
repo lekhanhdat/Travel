@@ -59,7 +59,7 @@ export default class SearchBarComponent<T> extends React.PureComponent<
       ?.toLowerCase()
       .trim();
 
-    return data.filter(item => {
+    const filtered = data.filter(item => {
       // Check if any of the specified fields match the search
       return searchFields.some(field => {
         const fieldValue = item[field];
@@ -77,6 +77,16 @@ export default class SearchBarComponent<T> extends React.PureComponent<
         return normalizedFieldValue?.includes(normalizedSearch);
       });
     });
+
+    // 🔍 DEBUG: Log search results
+    console.log('========================================');
+    console.log(`✅ Search results: ${filtered.length} items found`);
+    if (filtered.length > 0 && filtered.length <= 5) {
+      console.log('📋 Results:', filtered.map((item: any) => item.name || item.toString()).join(', '));
+    }
+    console.log('========================================');
+
+    return filtered;
   };
 
   /**

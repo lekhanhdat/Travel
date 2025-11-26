@@ -78,13 +78,15 @@ export default class SearchBarComponent<T> extends React.PureComponent<
       });
     });
 
-    // 🔍 DEBUG: Log search results
-    console.log('========================================');
-    console.log(`✅ Search results: ${filtered.length} items found`);
-    if (filtered.length > 0 && filtered.length <= 5) {
-      console.log('📋 Results:', filtered.map((item: any) => item.name || item.toString()).join(', '));
+    // 🔍 DEBUG: Log search results (only in development)
+    if (__DEV__) {
+      console.log('========================================');
+      console.log(`✅ Search results: ${filtered.length} items found`);
+      if (filtered.length > 0 && filtered.length <= 5) {
+        console.log('📋 Results:', filtered.map((item: any) => item.name || item.toString()).join(', '));
+      }
+      console.log('========================================');
     }
-    console.log('========================================');
 
     return filtered;
   };

@@ -7,6 +7,7 @@ import {AppStyle} from '../common/AppStyle';
 import {StarActive} from '../assets/assets/ImageSvg';
 import colors from '../common/colors';
 import {Avatar, getReviewAuthorName} from '../utils/avatarUtils';
+import CachedImage from './CachedImage';
 
 interface IReviewItemProps {
   review: IReview;
@@ -33,14 +34,11 @@ export default class ReviewItem extends React.PureComponent<
   }
 
   componentDidMount(): void {
-    // Debug: Log review images
-    if (this.props.review.images && this.props.review.images.length > 0) {
+    // Debug: Log review images (only in development)
+    if (__DEV__ && this.props.review.images && this.props.review.images.length > 0) {
       console.log('📸 ReviewItem - Review has images:', {
         reviewId: this.props.review.id,
         imagesCount: this.props.review.images.length,
-        images: this.props.review.images,
-        imagesType: typeof this.props.review.images,
-        isArray: Array.isArray(this.props.review.images),
       });
     }
   }
@@ -100,40 +98,30 @@ export default class ReviewItem extends React.PureComponent<
             }}
             showsHorizontalScrollIndicator={false}
           >
-            {review.images.map((imageUrl, index) => {
-              // Debug: Log each image URL
-              console.log(`📸 ReviewItem - Rendering image ${index}:`, imageUrl);
-
-              return (
-                <TouchableOpacity
-                  key={index}
-                  onPress={() => {
-                    this.setState({
-                      showImageModal: true,
-                      selectedImageIndex: index,
-                    });
+            {review.images.map((imageUrl, index) => (
+              <TouchableOpacity
+                key={index}
+                onPress={() => {
+                  this.setState({
+                    showImageModal: true,
+                    selectedImageIndex: index,
+                  });
+                }}
+                activeOpacity={0.8}
+              >
+                <CachedImage
+                  uri={imageUrl}
+                  style={{
+                    width: sizes._100sdp,
+                    height: sizes._100sdp,
+                    borderRadius: sizes._8sdp,
+                    marginRight: sizes._8sdp,
                   }}
-                  activeOpacity={0.8}
-                >
-                  <Image
-                    source={{uri: imageUrl}}
-                    style={{
-                      width: sizes._100sdp,
-                      height: sizes._100sdp,
-                      borderRadius: sizes._8sdp,
-                      marginRight: sizes._8sdp,
-                      backgroundColor: colors.primary_100, // Placeholder color
-                    }}
-                    onError={(error) => {
-                      console.error(`❌ ReviewItem - Image load error ${index}:`, error.nativeEvent.error);
-                    }}
-                    onLoad={() => {
-                      console.log(`✅ ReviewItem - Image loaded ${index}:`, imageUrl.substring(0, 50) + '...');
-                    }}
-                  />
-                </TouchableOpacity>
-              );
-            })}
+                  placeholderColor={colors.primary_100}
+                  showLoader={false}
+                />
+              </TouchableOpacity>
+            ))}
           </ScrollView>
         )}
 

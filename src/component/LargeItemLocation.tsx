@@ -1,5 +1,5 @@
 import React from 'react';
-import {Image, StyleSheet, TouchableOpacity, View} from 'react-native';
+import {StyleSheet, TouchableOpacity, View} from 'react-native';
 import {ILocation} from '../common/types';
 import sizes from '../common/sizes';
 import colors from '../common/colors';
@@ -7,6 +7,7 @@ import {AppStyle} from '../common/AppStyle';
 import TextBase from '../common/TextBase';
 import {ScreenName} from '../container/AppContainer';
 import NavigationService from '../container/screens/NavigationService';
+import CachedImage from './CachedImage';
 
 interface ILargeItemLocationProps {
   location: ILocation;
@@ -38,12 +39,11 @@ export default class LargeItemLocation extends React.PureComponent<
           });
         }}>
         <View style={styles.rowCenter}>
-          <Image
-            source={{uri: location.avatar}}
+          <CachedImage
+            uri={location.avatar}
             style={{
               height: sizes.width * 0.25,
               width: sizes.width * 0.25,
-              resizeMode: 'cover',
               marginRight: sizes._16sdp,
             }}
           />

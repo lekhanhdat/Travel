@@ -43,7 +43,7 @@ export default class ViewAllLocation extends React.PureComponent<
   }
 
   filterLocations = () => {
-    console.log(this.props.navigation.state.params);
+    if (__DEV__) console.log(this.props.navigation.state.params);
     const locationsIn: ILocation[] = this.props.navigation.state.params?.locations ?? [];
     const valueSearch: string = this.props.navigation.state.params?.valueSearch;
     let locationOut: ILocation[] = [];
@@ -171,7 +171,11 @@ export default class ViewAllLocation extends React.PureComponent<
           <FlatList
             data={this.state.locations}
             renderItem={this.renderItem}
-            keyExtractor={(item) => item.name.toString()}
+            keyExtractor={(item) => item.Id?.toString() || item.name.toString()}
+            initialNumToRender={10}
+            maxToRenderPerBatch={5}
+            windowSize={7}
+            removeClippedSubviews={true}
           />
         </View>
 

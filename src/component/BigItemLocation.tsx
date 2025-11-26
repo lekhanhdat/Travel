@@ -1,5 +1,5 @@
 import React from 'react';
-import {StyleSheet, TouchableOpacity, Image, View} from 'react-native';
+import {StyleSheet, TouchableOpacity, View} from 'react-native';
 import {ILocation} from '../common/types';
 import sizes from '../common/sizes';
 import colors from '../common/colors';
@@ -7,7 +7,7 @@ import TextBase from '../common/TextBase';
 import {AppStyle} from '../common/AppStyle';
 import NavigationService from '../container/screens/NavigationService';
 import {ScreenName} from '../container/AppContainer';
-import {Card, Text, Button} from 'react-native-paper';
+import CachedImage from './CachedImage';
 
 interface IBigItemLocationProps {
   location: ILocation;
@@ -33,12 +33,9 @@ export default class BigItemLocation extends React.PureComponent<
             location: location,
           });
         }}>
-        <Image
-          source={{uri: location.avatar}}
+        <CachedImage
+          uri={location.avatar}
           style={styles.icon}
-          onError={() => {
-            console.log('errr', location.avatar);
-          }}
         />
         <View
           style={{

@@ -85,7 +85,7 @@ export default class FestivalsScreen extends React.PureComponent<
 
   async fetchItems() {
     const data = await locationApi.getItems();
-    console.log('📦 Items loaded:', data.length);
+    if (__DEV__) console.log('📦 Items loaded:', data.length);
     this.setState({
       items: data,
       ITEMS_POPULAR: data.slice(10, 40),
@@ -95,7 +95,7 @@ export default class FestivalsScreen extends React.PureComponent<
 
   async fetchFestivals() {
     const data = await festivalsApi.getFestivals();
-    console.log('🎉 Festivals loaded:', data.length);
+    if (__DEV__) console.log('🎉 Festivals loaded:', data.length);
     this.setState({
       festivals: data,
       FESTIVALS_POPULAR: data.slice(0, 10),
@@ -213,6 +213,10 @@ export default class FestivalsScreen extends React.PureComponent<
               keyExtractor={item => item.Id!.toString()}
               horizontal={true}
               showsHorizontalScrollIndicator={false}
+              initialNumToRender={5}
+              maxToRenderPerBatch={5}
+              windowSize={5}
+              removeClippedSubviews={true}
             />
           </View>
         </ScrollView>

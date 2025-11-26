@@ -203,9 +203,10 @@ class HomeScreen extends React.PureComponent<
       locationsPopular: popularLocations,
     });
 
-    console.log('🎯 Nearest location:', nearestLocations[0]?.name, nearestLocations[0]?.distance?.toFixed(2), 'km');
+    if (__DEV__) console.log('🎯 Nearest location:', nearestLocations[0]?.name, nearestLocations[0]?.distance?.toFixed(2), 'km');
   }
 
+  // ============ PERFORMANCE OPTIMIZATION: Memoized render functions ============
   renderItemHorizontal = ({item, index}: {item: ILocation; index: number}) => {
     return <BigItemLocation location={item} />;
   };
@@ -213,6 +214,25 @@ class HomeScreen extends React.PureComponent<
   renderItemLarge = ({item, index}: {item: ILocation; index: number}) => {
     return <LargeItemLocation location={item} />;
   };
+
+  // Stable keyExtractor functions to prevent re-creation
+  keyExtractorById = (item: ILocation) => item.Id.toString();
+
+  // getItemLayout for horizontal FlatList (BigItemLocation)
+  // BigItemLocation width: 200 + marginRight: 12 = 212
+  getItemLayoutHorizontal = (data: ILocation[] | null | undefined, index: number) => ({
+    length: 212,
+    offset: 212 * index,
+    index,
+  });
+
+  // getItemLayout for vertical FlatList (LargeItemLocation)
+  // LargeItemLocation height: approximately 120 (image 80 + padding + text)
+  getItemLayoutVertical = (data: ILocation[] | null | undefined, index: number) => ({
+    length: 120,
+    offset: 120 * index,
+    index,
+  });
 
   handleSearch = (isViewAll: boolean, locations: ILocation[]) => {
     const searchValue = this.searchBarRef.current?.getSearchValue() || '';
@@ -301,9 +321,14 @@ class HomeScreen extends React.PureComponent<
               }}
               data={this.state.locationsPopular}
               renderItem={this.renderItemHorizontal}
-              keyExtractor={item => item.Id.toString()}
+              keyExtractor={this.keyExtractorById}
+              getItemLayout={this.getItemLayoutHorizontal}
               horizontal={true}
               showsHorizontalScrollIndicator={false}
+              initialNumToRender={5}
+              maxToRenderPerBatch={5}
+              windowSize={5}
+              removeClippedSubviews={true}
             />
 
             <View style={[styles.rowCenter, {marginTop: sizes._24sdp}]}>
@@ -328,9 +353,13 @@ class HomeScreen extends React.PureComponent<
             <FlatList
               data={this.state.locationsNearly}
               renderItem={this.renderItemLarge}
-              keyExtractor={item => item.Id.toString()}
+              keyExtractor={this.keyExtractorById}
+              getItemLayout={this.getItemLayoutVertical}
               showsHorizontalScrollIndicator={false}
               scrollEnabled={false}
+              initialNumToRender={5}
+              maxToRenderPerBatch={5}
+              removeClippedSubviews={true}
             />
           </View>
         </ScrollView>

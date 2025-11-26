@@ -101,9 +101,9 @@ export default class NewFeedScreen extends React.PureComponent<
 
   handleGetReviews = async () => {
     try {
-      // 1. Lấy reviews từ cloud NocoDB
+      // 1. Lấy reviews từ cloud NocoDB (uses cache)
       const cloudReviews = await locationApi.getReviews();
-      console.log('✅ Cloud reviews:', cloudReviews.length);
+      if (__DEV__) console.log('✅ Cloud reviews:', cloudReviews.length);
 
       // 2. Lấy reviews từ hardcode (backup)
       const locations: ILocation[] = _.unionBy(
@@ -118,11 +118,11 @@ export default class NewFeedScreen extends React.PureComponent<
           hardcodeReviews = hardcodeReviews.concat(review);
         });
       });
-      console.log('✅ Hardcode reviews:', hardcodeReviews.length);
+      if (__DEV__) console.log('✅ Hardcode reviews:', hardcodeReviews.length);
 
       // 3. Merge: Cloud reviews lên trên, hardcode reviews ở dưới
       const allReviews = [...cloudReviews, ...hardcodeReviews];
-      console.log('✅ Total reviews:', allReviews.length);
+      if (__DEV__) console.log('✅ Total reviews:', allReviews.length);
 
       // 4. Sắp xếp theo thời gian (mới nhất lên trên)
       const sortedReviews = allReviews.sort((a, b) => {
@@ -155,7 +155,7 @@ export default class NewFeedScreen extends React.PureComponent<
         reviews: sortedReviews,
       });
     } catch (error) {
-      console.error('❌ Error fetching reviews:', error);
+      if (__DEV__) console.error('❌ Error fetching reviews:', error);
       // Fallback to hardcode reviews
       const locations: ILocation[] = _.unionBy(
         LOCATION_POPULAR,
@@ -191,15 +191,15 @@ export default class NewFeedScreen extends React.PureComponent<
       },
       (response) => {
         if (response.didCancel) {
-          console.log('User cancelled image picker');
+          if (__DEV__) console.log('User cancelled image picker');
         } else if (response.errorCode) {
-          console.log('ImagePicker Error: ', response.errorMessage);
+          if (__DEV__) console.log('ImagePicker Error: ', response.errorMessage);
           Alert.alert('Lỗi', 'Không thể chọn ảnh. Vui lòng thử lại.');
         } else if (response.assets) {
           this.setState({
             selectedImages: response.assets,
           });
-          console.log('✅ Selected images:', response.assets.length);
+          if (__DEV__) console.log('✅ Selected images:', response.assets.length);
         }
       },
     );
@@ -220,19 +220,17 @@ export default class NewFeedScreen extends React.PureComponent<
       // 1. Upload images nếu có
       let imageUrls: string[] = [];
       if (this.state.selectedImages.length > 0) {
-        console.log('📤 Uploading images...');
+        if (__DEV__) console.log('📤 Uploading images...');
         for (const image of this.state.selectedImages) {
           try {
             const uploadResult = await locationApi.uploadImage(image);
             // uploadResult.url đã là signedUrl từ API
             imageUrls.push(uploadResult.url);
-            console.log('✅ Image URL added:', uploadResult.url);
           } catch (error) {
-            console.error('Error uploading image:', error);
+            if (__DEV__) console.error('Error uploading image:', error);
           }
         }
-        console.log('✅ Images uploaded:', imageUrls.length);
-        console.log('📸 Image URLs:', imageUrls);
+        if (__DEV__) console.log('✅ Images uploaded:', imageUrls.length);
       }
 
       // 2. Create review object
@@ -253,9 +251,9 @@ export default class NewFeedScreen extends React.PureComponent<
       // 3. Save to NocoDB
       try {
         await locationApi.createReview(newReview);
-        console.log('✅ Review saved to cloud');
+        if (__DEV__) console.log('✅ Review saved to cloud');
       } catch (error) {
-        console.error('❌ Error saving review to cloud:', error);
+        if (__DEV__) console.error('❌ Error saving review to cloud:', error);
         Alert.alert('Thông báo', 'Không thể lưu đánh giá lên server, nhưng đã lưu local.');
       }
 
@@ -278,14 +276,14 @@ export default class NewFeedScreen extends React.PureComponent<
 
       this.refSheet?.close();
     } catch (error) {
-      console.error('❌ Error submitting review:', error);
+      if (__DEV__) console.error('❌ Error submitting review:', error);
       this.setState({uploading: false});
       Alert.alert('Lỗi', 'Không thể gửi đánh giá. Vui lòng thử lại.');
     }
   };
 
   renderItemLarge = ({item, index}: {item: ILocation; index: number}) => {
-    return <LargeItemLocation location={item} 
+    return <LargeItemLocation location={item}
     onPress={() => {
       this.setState(
         {
@@ -304,6 +302,24 @@ export default class NewFeedScreen extends React.PureComponent<
       <ReviewItem key={`feed-${index}`} review={item} isShowLocation={true} />
     );
   };
+
+  // ============ PERFORMANCE OPTIMIZATION: Stable keyExtractor functions ============
+  keyExtractorReview = (item: IReview, index: number) => `${item.id}-${index}`;
+  keyExtractorLocation = (item: ILocation) => item.Id?.toString() || item.id?.toString() || '';
+
+  // getItemLayout for reviews FlatList (approximate height)
+  getItemLayoutReview = (data: IReview[] | null | undefined, index: number) => ({
+    length: 200, // Approximate height of ReviewItem
+    offset: 200 * index,
+    index,
+  });
+
+  // getItemLayout for locations FlatList
+  getItemLayoutLocation = (data: ILocation[] | null | undefined, index: number) => ({
+    length: 120, // Approximate height of LargeItemLocation
+    offset: 120 * index,
+    index,
+  });
 
   render(): React.ReactNode {
     // Filter reviews by location if selected
@@ -450,7 +466,12 @@ export default class NewFeedScreen extends React.PureComponent<
                 data={filteredReviews}
                 renderItem={this.renderItem}
                 contentContainerStyle={{paddingBottom: sizes._100sdp}}
-                keyExtractor={(item, index) => item.id + item.content + index}
+                keyExtractor={this.keyExtractorReview}
+                getItemLayout={this.getItemLayoutReview}
+                initialNumToRender={5}
+                maxToRenderPerBatch={5}
+                windowSize={7}
+                removeClippedSubviews={true}
                 ListEmptyComponent={() => (
                   <View style={{padding: sizes._32sdp, alignItems: 'center'}}>
                     <TextBase style={[AppStyle.txt_16_regular, {color: colors.primary_400}]}>
@@ -827,7 +848,12 @@ export default class NewFeedScreen extends React.PureComponent<
               }
               renderItem={this.renderItemLarge}
               contentContainerStyle={{paddingBottom: sizes._60sdp}}
-              keyExtractor={(item, index) => (item.Id || item.id || index).toString()}
+              keyExtractor={this.keyExtractorLocation}
+              getItemLayout={this.getItemLayoutLocation}
+              initialNumToRender={8}
+              maxToRenderPerBatch={5}
+              windowSize={7}
+              removeClippedSubviews={true}
               scrollEnabled={true}
               showsVerticalScrollIndicator={true}
               ListEmptyComponent={() => (

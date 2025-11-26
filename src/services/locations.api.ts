@@ -38,13 +38,57 @@ export const URL_GET_ITEMS = '/api/v2/tables/m0s4uwjesun4rl9/records'; // Items 
 // NocoDB Storage API - Upload file chung (không cần table ID)
 export const URL_UPLOAD = '/api/v2/storage/upload'; // NocoDB Storage API
 
+// ============ PERFORMANCE OPTIMIZATION: Data Caching ============
+// Cache configuration
+const CACHE_DURATION = 10 * 60 * 1000; // 5 minutes cache
+
+interface CacheEntry<T> {
+  data: T;
+  timestamp: number;
+}
+
+// In-memory cache for locations
+let locationsCache: CacheEntry<ILocation[]> | null = null;
+let reviewsCache: CacheEntry<IReview[]> | null = null;
+let itemsCache: CacheEntry<IItem[]> | null = null;
+
+// Check if cache is valid
+const isCacheValid = <T>(cache: CacheEntry<T> | null): boolean => {
+  if (!cache) return false;
+  return Date.now() - cache.timestamp < CACHE_DURATION;
+};
+
+// Clear all caches (useful after creating/updating data)
+const clearCache = () => {
+  locationsCache = null;
+  reviewsCache = null;
+  itemsCache = null;
+};
+
+// Clear only locations cache
+const clearLocationsCache = () => {
+  locationsCache = null;
+  reviewsCache = null; // Reviews depend on locations, so clear both
+};
+
 const locationApi = {
-  getLocations: async () => {
-    // 🔍 DEBUG: Log API request details
-    console.log('========================================');
-    console.log('🔍 DEBUG: getLocations() - FETCHING ALL PAGES');
-    console.log(`📡 API URL: ${URL_GET_LOCATIONS}`);
-    console.log('========================================');
+  // Export cache utilities
+  clearCache,
+  clearLocationsCache,
+
+  getLocations: async (forceRefresh: boolean = false) => {
+    // Return cached data if valid and not forcing refresh
+    if (!forceRefresh && isCacheValid(locationsCache)) {
+      if (__DEV__) console.log('📦 Using cached locations:', locationsCache!.data.length);
+      return locationsCache!.data;
+    }
+    // 🔍 DEBUG: Log API request details (only in development)
+    if (__DEV__) {
+      console.log('========================================');
+      console.log('🔍 DEBUG: getLocations() - FETCHING ALL PAGES');
+      console.log(`📡 API URL: ${URL_GET_LOCATIONS}`);
+      console.log('========================================');
+    }
 
     // ✨ PAGINATION FIX: NocoDB enforces max pageSize of 100
     // We need to fetch all pages to get all locations
@@ -56,7 +100,7 @@ const locationApi = {
     while (hasMorePages) {
       const offset = (currentPage - 1) * pageSize;
 
-      console.log(`📄 Fetching page ${currentPage} (offset: ${offset}, limit: ${pageSize})...`);
+      if (__DEV__) console.log(`📄 Fetching page ${currentPage} (offset: ${offset}, limit: ${pageSize})...`);
 
       const res = await request.get<GetLocationsResponse>(URL_GET_LOCATIONS, {
         params: {
@@ -68,8 +112,10 @@ const locationApi = {
       const pageData = res.data.list ?? [];
       allData = allData.concat(pageData);
 
-      console.log(`   ✅ Page ${currentPage}: ${pageData.length} records`);
-      console.log(`   📊 Total so far: ${allData.length} records`);
+      if (__DEV__) {
+        console.log(`   ✅ Page ${currentPage}: ${pageData.length} records`);
+        console.log(`   📊 Total so far: ${allData.length} records`);
+      }
 
       // Check if there are more pages
       const pageInfo = res.data.pageInfo;
@@ -82,12 +128,14 @@ const locationApi = {
 
     let data = allData;
 
-    // 🔍 DEBUG: Log total locations fetched from NocoDB
-    console.log('========================================');
-    console.log('🔍 DEBUG: getLocations() - ALL PAGES FETCHED');
-    console.log(`📊 Total locations fetched from NocoDB: ${data.length}`);
-    console.log(`� Total pages fetched: ${currentPage}`);
-    console.log('========================================');
+    // 🔍 DEBUG: Log total locations fetched from NocoDB (only in development)
+    if (__DEV__) {
+      console.log('========================================');
+      console.log('🔍 DEBUG: getLocations() - ALL PAGES FETCHED');
+      console.log(`📊 Total locations fetched from NocoDB: ${data.length}`);
+      console.log(`📄 Total pages fetched: ${currentPage}`);
+      console.log('========================================');
+    }
 
     // Parse JSON fields từ NocoDB
     data = data.map(location => {
@@ -100,7 +148,7 @@ const locationApi = {
         try {
           parsed.reviews = JSON.parse(location.reviews);
         } catch (e) {
-          console.error('Error parsing reviews:', e);
+          if (__DEV__) console.error('Error parsing reviews:', e);
           parsed.reviews = [];
         }
       }
@@ -110,7 +158,7 @@ const locationApi = {
         try {
           parsed.images = JSON.parse(location.images);
         } catch (e) {
-          console.error('Error parsing images:', e);
+          if (__DEV__) console.error('Error parsing images:', e);
           parsed.images = [];
         }
       }
@@ -120,7 +168,7 @@ const locationApi = {
         try {
           parsed.videos = JSON.parse(location.videos);
         } catch (e) {
-          console.error('Error parsing videos:', e);
+          if (__DEV__) console.error('Error parsing videos:', e);
           parsed.videos = [];
         }
       }
@@ -140,17 +188,13 @@ const locationApi = {
       if (typeof (location as any).types === 'string') {
         try {
           parsed.types = JSON.parse((location as any).types);
-          console.log(`✅ Parsed types for "${parsed.name}":`, parsed.types);
         } catch (e) {
-          console.error('Error parsing types:', e);
+          if (__DEV__) console.error('Error parsing types:', e);
           parsed.types = [];
         }
       } else if (Array.isArray((location as any).types)) {
         // Nếu đã là array, copy trực tiếp
         parsed.types = (location as any).types;
-        console.log(`✅ Types already array for "${parsed.name}":`, parsed.types);
-      } else {
-        console.log(`⚠️ No types field for "${parsed.name}"`);
       }
 
       // ✨ AUTO-GENERATE AVATAR: Lấy ảnh đầu tiên từ mảng images làm avatar
@@ -158,11 +202,9 @@ const locationApi = {
       if (!parsed.avatar || parsed.avatar === '') {
         if (parsed.images && Array.isArray(parsed.images) && parsed.images.length > 0) {
           parsed.avatar = parsed.images[0];
-          console.log(`✅ Auto-set avatar for "${parsed.name}": ${parsed.avatar}`);
         } else {
           // Fallback: nếu không có images, set avatar rỗng
           parsed.avatar = '';
-          console.log(`⚠️ No images available for "${parsed.name}", avatar set to empty`);
         }
       }
 
@@ -181,34 +223,37 @@ const locationApi = {
       return parsed;
     });
 
-    // 🔍 DEBUG: Log marker field statistics
-    const markerTrueCount = data.filter(loc => loc.marker === true).length;
-    const markerFalseCount = data.filter(loc => loc.marker === false).length;
-    const markerUndefinedCount = data.filter(loc => loc.marker === undefined).length;
+    // 🔍 DEBUG: Log marker field statistics (only in development)
+    if (__DEV__) {
+      const markerTrueCount = data.filter(loc => loc.marker === true).length;
+      const markerFalseCount = data.filter(loc => loc.marker === false).length;
+      const markerUndefinedCount = data.filter(loc => loc.marker === undefined).length;
 
-    console.log('========================================');
-    console.log('🔍 DEBUG: Marker field statistics');
-    console.log(`✅ marker=true: ${markerTrueCount} locations`);
-    console.log(`❌ marker=false: ${markerFalseCount} locations`);
-    console.log(`⚠️  marker=undefined: ${markerUndefinedCount} locations`);
-    console.log(`📊 Total after parsing: ${data.length} locations`);
-
-    // Show sample locations with marker=false
-    const sampleHiddenLocations = data.filter(loc => loc.marker === false).slice(0, 5);
-    if (sampleHiddenLocations.length > 0) {
-      console.log('🏨 Sample locations with marker=false:');
-      sampleHiddenLocations.forEach((loc, idx) => {
-        console.log(`   ${idx + 1}. ${loc.name} (marker=${loc.marker})`);
-      });
-    } else {
-      console.log('⚠️  WARNING: No locations with marker=false found!');
+      console.log('========================================');
+      console.log('🔍 DEBUG: Marker field statistics');
+      console.log(`✅ marker=true: ${markerTrueCount} locations`);
+      console.log(`❌ marker=false: ${markerFalseCount} locations`);
+      console.log(`⚠️  marker=undefined: ${markerUndefinedCount} locations`);
+      console.log(`📊 Total after parsing: ${data.length} locations`);
+      console.log('========================================');
     }
-    console.log('========================================');
+
+    // Store in cache
+    locationsCache = {
+      data: data,
+      timestamp: Date.now(),
+    };
 
     return data;
   },
 
-  getItems: async () => {
+  getItems: async (forceRefresh: boolean = false) => {
+    // Return cached data if valid
+    if (!forceRefresh && isCacheValid(itemsCache)) {
+      if (__DEV__) console.log('📦 Using cached items:', itemsCache!.data.length);
+      return itemsCache!.data;
+    }
+
     const res = await request.get<GetItemsResponse>(URL_GET_ITEMS, {
       params: {
         offset: '0',
@@ -216,6 +261,13 @@ const locationApi = {
       },
     });
     const data = res.data.list ?? [];
+
+    // Store in cache
+    itemsCache = {
+      data: data,
+      timestamp: Date.now(),
+    };
+
     return data;
   },
 
@@ -240,10 +292,17 @@ const locationApi = {
   /**
    * Get all reviews from NocoDB
    * Reviews nằm trong field 'reviews' của bảng Locations
+   * Uses caching to avoid redundant API calls
    */
-  getReviews: async () => {
+  getReviews: async (forceRefresh: boolean = false) => {
     try {
-      // Lấy tất cả locations với reviews
+      // Return cached reviews if valid
+      if (!forceRefresh && isCacheValid(reviewsCache)) {
+        if (__DEV__) console.log('📦 Using cached reviews:', reviewsCache!.data.length);
+        return reviewsCache!.data;
+      }
+
+      // Lấy tất cả locations với reviews (uses location cache)
       const locations = await locationApi.getLocations();
 
       // Extract tất cả reviews từ locations
@@ -251,7 +310,7 @@ const locationApi = {
       locations.forEach(location => {
         if (location.reviews && Array.isArray(location.reviews)) {
           // Gắn location vào mỗi review và parse images nếu cần
-          const reviewsWithLocation = location.reviews.map(review => {
+          const reviewsWithLocation = location.reviews.map((review: IReview) => {
             const parsedReview = {...review};
 
             // Parse images nếu là JSON string
@@ -259,7 +318,7 @@ const locationApi = {
               try {
                 parsedReview.images = JSON.parse(parsedReview.images);
               } catch (e) {
-                console.error('Error parsing review images:', e);
+                if (__DEV__) console.error('Error parsing review images:', e);
                 parsedReview.images = [];
               }
             }
@@ -273,24 +332,17 @@ const locationApi = {
         }
       });
 
-      console.log('✅ Total reviews from cloud:', allReviews.length);
+      if (__DEV__) console.log('✅ Total reviews from cloud:', allReviews.length);
 
-      // Debug: Log reviews with images
-      const reviewsWithImages = allReviews.filter(r => r.images && r.images.length > 0);
-      console.log('📸 Reviews with images count:', reviewsWithImages.length);
-      if (reviewsWithImages.length > 0) {
-        console.log('📸 Sample review with images:', {
-          id: reviewsWithImages[0].id,
-          content: reviewsWithImages[0].content?.substring(0, 30) + '...',
-          images: reviewsWithImages[0].images,
-          imagesType: typeof reviewsWithImages[0].images,
-          imagesIsArray: Array.isArray(reviewsWithImages[0].images),
-        });
-      }
+      // Store in cache
+      reviewsCache = {
+        data: allReviews,
+        timestamp: Date.now(),
+      };
 
       return allReviews;
     } catch (error) {
-      console.error('❌ Error fetching reviews:', error);
+      if (__DEV__) console.error('❌ Error fetching reviews:', error);
       return [];
     }
   },
@@ -309,13 +361,11 @@ const locationApi = {
         throw new Error('Location ID is required');
       }
 
-      console.log('📝 Creating review for location:', locationId);
+      if (__DEV__) console.log('📝 Creating review for location:', locationId);
 
       // 1. Lấy location hiện tại
-      console.log('📥 Fetching location:', `${URL_GET_LOCATIONS}/${locationId}`);
       const res = await request.get(`${URL_GET_LOCATIONS}/${locationId}`);
       const location = res.data;
-      console.log('✅ Location fetched:', location.name || location.Name);
 
       // 2. Parse reviews hiện tại
       let currentReviews: any[] = [];
@@ -324,14 +374,13 @@ const locationApi = {
           try {
             currentReviews = JSON.parse(location.reviews);
           } catch (e) {
-            console.error('Error parsing current reviews:', e);
+            if (__DEV__) console.error('Error parsing current reviews:', e);
             currentReviews = [];
           }
         } else if (Array.isArray(location.reviews)) {
           currentReviews = location.reviews;
         }
       }
-      console.log('📋 Current reviews count:', currentReviews.length);
 
       // 3. Thêm review mới (không bao gồm location để tránh circular reference)
       const newReview = {
@@ -344,8 +393,6 @@ const locationApi = {
         images: review.images || [], // Giữ nguyên array, sẽ stringify khi lưu vào NocoDB
       };
       currentReviews.push(newReview);
-      console.log('📋 New reviews count:', currentReviews.length);
-      console.log('📸 New review images:', newReview.images);
 
       // 4. Update location với reviews mới
       // NocoDB PATCH endpoint: /api/v2/tables/{tableId}/records
@@ -359,18 +406,18 @@ const locationApi = {
         }
       ];
 
-      console.log('📤 Updating location:', updateUrl);
-      console.log('📤 Payload:', JSON.stringify(updatePayload).substring(0, 200) + '...');
-
       const updateRes = await request.patch(updateUrl, updatePayload);
 
-      console.log('✅ Review added to location:', locationId);
-      console.log('✅ Update response:', updateRes.data);
+      // Clear cache after creating review to ensure fresh data
+      clearLocationsCache();
+
+      if (__DEV__) console.log('✅ Review added to location:', locationId);
       return updateRes.data;
     } catch (error: any) {
-      console.error('❌ Error creating review:', error);
-      console.error('❌ Error response:', error.response?.data);
-      console.error('❌ Error status:', error.response?.status);
+      if (__DEV__) {
+        console.error('❌ Error creating review:', error);
+        console.error('❌ Error response:', error.response?.data);
+      }
       throw error;
     }
   },
@@ -391,31 +438,18 @@ const locationApi = {
         name: file.fileName || `photo_${Date.now()}.jpg`,
       } as any);
 
-      console.log('📤 Uploading to:', URL_UPLOAD);
-      console.log('📤 File info:', {
-        uri: file.uri,
-        type: file.type,
-        name: file.fileName,
-      });
-
       const res = await request.post(URL_UPLOAD, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
 
-      console.log('✅ Image uploaded:', res.data);
-
       // NocoDB trả về array of uploaded files
       // Format: [{ url: "...", signedUrl: "...", title: "...", mimetype: "...", size: ... }]
       // ⚠️ QUAN TRỌNG: Phải dùng signedUrl thay vì url để tránh 403 Forbidden
       if (res.data && Array.isArray(res.data) && res.data.length > 0) {
         const uploadedFile = res.data[0];
-        console.log('📸 Uploaded file details:', {
-          url: uploadedFile.url,
-          signedUrl: uploadedFile.signedUrl,
-          title: uploadedFile.title,
-        });
+        if (__DEV__) console.log('📸 Image uploaded successfully');
 
         return {
           // Dùng signedUrl (có quyền truy cập) thay vì url (private)
@@ -426,8 +460,7 @@ const locationApi = {
 
       throw new Error('Upload response invalid');
     } catch (error: any) {
-      console.error('❌ Error uploading image:', error);
-      console.error('❌ Error details:', error.response?.data);
+      if (__DEV__) console.error('❌ Error uploading image:', error);
       throw error;
     }
   },

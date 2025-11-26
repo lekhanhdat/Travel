@@ -55,10 +55,10 @@ export default class DetailLocationScreen extends React.PureComponent<
       const locationId = location.Id || location.id;
       try {
         const festivals = await festivalsApi.getFestivalsByLocationId(locationId!);
-        console.log(`🎉 Found ${festivals.length} festivals for location ${locationId}`);
+        if (__DEV__) console.log(`🎉 Found ${festivals.length} festivals for location ${locationId}`);
         this.setState({ festivals });
       } catch (error) {
-        console.error('❌ Error loading festivals:', error);
+        if (__DEV__) console.error('❌ Error loading festivals:', error);
       }
     }
   }
@@ -79,12 +79,13 @@ export default class DetailLocationScreen extends React.PureComponent<
     return shuffled.slice(0, num);
   };
 
-  // Tìm các địa điểm có cùng types (tối đa 10 locations)
-  getSimilarLocations = (currentLocation: ILocation) => {
+  // Tìm các địa điểm có cùng types (tối đa 20 locations)
+  // Priority: locations matching first type > second type > third type, etc.
+  getSimilarLocations = (currentLocation: ILocation): ILocation[] => {
     const currentTypes = currentLocation.types || [];
 
     if (currentTypes.length === 0) {
-      console.log('⚠️ Current location has no types');
+      if (__DEV__) console.log('⚠️ Current location has no types');
       return [];
     }
 
@@ -92,7 +93,12 @@ export default class DetailLocationScreen extends React.PureComponent<
     const similarLocations = this.state.allLocations.filter(loc => {
       const locTypes = loc.types || [];
 
-      // Không include chính location hiện tại (so sánh bằng name vì ID có thể khác nhau)
+      // Không include chính location hiện tại (so sánh bằng Id/id hoặc name)
+      const currentId = currentLocation.Id || currentLocation.id;
+      const locId = loc.Id || loc.id;
+      if (currentId && locId && currentId === locId) {
+        return false;
+      }
       if (loc.name === currentLocation.name) {
         return false;
       }
@@ -102,10 +108,48 @@ export default class DetailLocationScreen extends React.PureComponent<
       return hasCommonType;
     });
 
-    // Chỉ lấy 10 locations đầu tiên
-    const limitedLocations = similarLocations.slice(0, 10);
+    // Sort by priority: Prioritize locations that match earlier types in the array
+    // Calculate priority score: lower index = higher priority
+    const sortedLocations = similarLocations
+      .map(loc => {
+        const locTypes = loc.types || [];
 
-    console.log(`🔍 Found ${similarLocations.length} similar locations, showing ${limitedLocations.length}`);
+        // Find the best (lowest) matching type index
+        let bestMatchIndex = currentTypes.length; // Default to worst priority
+        let matchCount = 0;
+
+        for (let i = 0; i < currentTypes.length; i++) {
+          if (locTypes.includes(currentTypes[i])) {
+            matchCount++;
+            if (i < bestMatchIndex) {
+              bestMatchIndex = i;
+            }
+          }
+        }
+
+        return {
+          location: loc,
+          bestMatchIndex, // Lower is better (matches earlier type)
+          matchCount,     // Higher is better (more types in common)
+        };
+      })
+      .sort((a, b) => {
+        // Primary sort: by best matching type index (first type match is highest priority)
+        if (a.bestMatchIndex !== b.bestMatchIndex) {
+          return a.bestMatchIndex - b.bestMatchIndex;
+        }
+        // Secondary sort: by number of matching types (more matches = higher priority)
+        return b.matchCount - a.matchCount;
+      })
+      .map(item => item.location);
+
+    // Chỉ lấy 20 locations đầu tiên
+    const limitedLocations = sortedLocations.slice(0, 20);
+
+    if (__DEV__) {
+      console.log(`🔍 Found ${similarLocations.length} similar locations, showing ${limitedLocations.length}`);
+      console.log(`📋 Current types: [${currentTypes.join(', ')}]`);
+    }
     return limitedLocations;
   };
 
@@ -416,7 +460,7 @@ export default class DetailLocationScreen extends React.PureComponent<
                         valueSearch: '', // Không cần search
                       });
                     } else {
-                      console.log('⚠️ No similar locations found');
+                      if (__DEV__) console.log('⚠️ No similar locations found');
                       // TODO: Show toast/alert to user
                     }
                   }}

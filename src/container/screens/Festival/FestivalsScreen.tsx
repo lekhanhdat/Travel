@@ -31,6 +31,7 @@ import HistoricalArtifact from '../../../component/HistoricalArtifact';
 import locationApi from '../../../services/locations.api';
 import festivalsApi from '../../../services/festivals.api';
 import SearchBarComponent from '../../../component/SearchBarComponent';
+import LargeItemFestival from '../../../component/LargeItemFestival';
 
 // TRANG FESTIVALS - Tìm kiếm và hiển thị lễ hội
 // TRANG FESTIVALS - Tìm kiếm và hiển thị lễ hội
@@ -106,53 +107,13 @@ export default class FestivalsScreen extends React.PureComponent<
     return <HistoricalArtifact key={`item-${item.Id}`} item={item} />;
   };
 
-  renderFestivalHorizontal = ({item}: {item: IFestival}) => {
-    // Calculate rating from reviews instead of using static rating field
-    const avgRating = festivalsApi.calculateAverageRating(item.reviews);
-
-    return (
-      <TouchableOpacity
-        key={`festival-${item.Id}`}
-        style={styles.festivalCard}
-        onPress={() => {
-          NavigationService.navigate(ScreenName.DETAIL_FESTIVAL_SCREEN, {
-            festival: item,
-          });
-        }}>
-        <View style={styles.festivalInfo}>
-          <TextBase numberOfLines={2} style={[AppStyle.txt_18_bold]}>
-            {item.name}
-          </TextBase>
-          <TextBase
-            numberOfLines={1}
-            style={[AppStyle.txt_14_regular, {marginTop: sizes._4sdp}]}>
-            ⏰ {item.event_time}
-          </TextBase>
-          <TextBase
-            numberOfLines={1}
-            style={[AppStyle.txt_14_regular, {marginTop: sizes._4sdp}]}>
-            📍 {item.location}
-          </TextBase>
-          <View style={{flexDirection: 'row', marginTop: sizes._8sdp}}>
-            <TextBase style={[AppStyle.txt_14_bold]}>
-              ⭐ {avgRating.toFixed(1)}
-            </TextBase>
-            <TextBase
-              style={[
-                AppStyle.txt_14_regular,
-                {marginLeft: sizes._12sdp, color: colors.primary_600},
-              ]}>
-              {item.price_level === 0
-                ? '🆓 Miễn phí'
-                : item.price_level === 1
-                ? '💰 Có phí'
-                : '💰💰 Cao cấp'}
-            </TextBase>
-          </View>
-        </View>
-      </TouchableOpacity>
-    );
+  // Render festival item using LargeItemFestival (matching "Gần tôi" section layout)
+  renderFestivalItem = ({item}: {item: IFestival}) => {
+    return <LargeItemFestival festival={item} />;
   };
+
+  // Stable keyExtractor function to prevent re-creation
+  keyExtractorById = (item: IFestival) => item.Id!.toString();
 
   handleSearch = (isViewAll: boolean, items: IItem[]) => {
     NavigationService.navigate(ScreenName.VIEW_ALL_ITEM, {
@@ -187,9 +148,12 @@ export default class FestivalsScreen extends React.PureComponent<
 
         <ScrollView>
           <View style={styles.container}>
-            {/* FESTIVALS SECTION */}
-            <View style={styles.rowCenter}>
-              <TextBase style={[AppStyle.txt_20_bold]}>🎉 Lễ hội</TextBase>
+            {/* FESTIVALS SECTION - Matching "Gần tôi" layout */}
+            <View style={[styles.rowCenter]}>
+              <TextBase
+                style={[AppStyle.txt_20_bold, {marginBottom: sizes._16sdp}]}>
+                🎉 Lễ hội
+              </TextBase>
               <TouchableOpacity
                 onPress={() => {
                   NavigationService.navigate(ScreenName.VIEW_ALL_FESTIVALS, {
@@ -198,24 +162,25 @@ export default class FestivalsScreen extends React.PureComponent<
                     valueSearch: '',
                   });
                 }}>
-                <TextBase style={[AppStyle.txt_18_regular]}>
+                <TextBase
+                  style={[
+                    AppStyle.txt_18_regular,
+                    {marginBottom: sizes._16sdp},
+                  ]}>
                   Xem tất cả
                 </TextBase>
               </TouchableOpacity>
             </View>
 
+            {/* Vertical FlatList matching "Gần tôi" section design */}
             <FlatList
-              contentContainerStyle={{
-                paddingVertical: sizes._16sdp,
-              }}
-              data={this.state.FESTIVALS_POPULAR}
-              renderItem={this.renderFestivalHorizontal}
-              keyExtractor={item => item.Id!.toString()}
-              horizontal={true}
-              showsHorizontalScrollIndicator={false}
-              initialNumToRender={5}
+              data={this.state.festivals}
+              renderItem={this.renderFestivalItem}
+              keyExtractor={this.keyExtractorById}
+              showsVerticalScrollIndicator={false}
+              scrollEnabled={false}
+              initialNumToRender={10}
               maxToRenderPerBatch={5}
-              windowSize={5}
               removeClippedSubviews={true}
             />
           </View>
@@ -233,21 +198,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-  },
-  festivalCard: {
-    width: 280,
-    marginRight: sizes._12sdp,
-    borderRadius: sizes._12sdp,
-    backgroundColor: colors.white,
-    padding: sizes._16sdp,
-    elevation: 3,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-  },
-  festivalInfo: {
-    flex: 1,
   },
 });
 

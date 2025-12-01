@@ -16,6 +16,7 @@ export interface ILocation {
   avatar: string;
   address: string;
   description: string;
+  long_description?: string; // Detailed description for DetailLocation screen (falls back to description if empty)
   lat: number;
   long: number;
   types?: string[]; // Array of location types (e.g., ["museum", "attraction", "historical"])

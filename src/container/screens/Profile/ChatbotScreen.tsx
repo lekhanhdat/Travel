@@ -234,14 +234,14 @@ export default class ChatbotScreen extends React.PureComponent<
 
     const wantsImage = isImageSearchRequest(userTextContent);
 
-    // Call OpenAI API
+    // Call OpenAI API directly
     try {
-      const response = await sendChatMessage(newMessages);
-
       let finalMessages = newMessages;
 
+      // Use direct OpenAI chat
+      const response = await sendChatMessage(newMessages);
+
       if (response.error) {
-        // Show error message
         const errorMessage: ChatMessage = {
           role: 'assistant',
           content: `❌ ${response.error}`,
@@ -252,7 +252,6 @@ export default class ChatbotScreen extends React.PureComponent<
           isLoading: false,
         });
       } else {
-        // Add assistant response
         const assistantMessage: ChatMessage = {
           role: 'assistant',
           content: response.message,
@@ -260,46 +259,41 @@ export default class ChatbotScreen extends React.PureComponent<
         finalMessages = [...newMessages, assistantMessage];
         this.setState({
           messages: finalMessages,
-          isLoading: wantsImage, // Keep loading if searching image
+          isLoading: wantsImage,
         });
+      }
 
-        // If user wants to see images, search on SerpAPI
-        if (wantsImage) {
-          console.log('🔍 User wants to see images');
+      // If user wants to see images, search on SerpAPI
+      if (wantsImage) {
+        console.log('🔍 User wants to see images');
+        const imageCount = extractImageCount(userTextContent);
+        console.log(`📊 Requesting ${imageCount} images`);
 
-          // Extract number of images requested (default: 3)
-          const imageCount = extractImageCount(userTextContent);
-          console.log(`📊 Requesting ${imageCount} images`);
+        const imageResponse = await searchImage(userTextContent, imageCount);
 
-          // Search images on SerpAPI
-          const imageResponse = await searchImage(userTextContent, imageCount);
-
-          if (imageResponse.error) {
-            // Show error message
-            const imageErrorMessage: ChatMessage = {
-              role: 'assistant',
-              content: `❌ Lỗi tìm ảnh: ${imageResponse.error}`,
-            };
-            finalMessages = [...finalMessages, imageErrorMessage];
-            this.setState({
-              messages: finalMessages,
-              isLoading: false,
-            });
-          } else if (imageResponse.imageUrls && imageResponse.imageUrls.length > 0) {
-            // Add all found images to chat in ONE message (horizontal scroll)
-            const imageMessage: ChatMessage = {
-              role: 'assistant',
-              content: imageResponse.imageUrls.map(url => ({
-                type: 'image_url',
-                image_url: {url},
-              })),
-            };
-            finalMessages = [...finalMessages, imageMessage];
-            this.setState({
-              messages: finalMessages,
-              isLoading: false,
-            });
-          }
+        if (imageResponse.error) {
+          const imageErrorMessage: ChatMessage = {
+            role: 'assistant',
+            content: `❌ Lỗi tìm ảnh: ${imageResponse.error}`,
+          };
+          finalMessages = [...finalMessages, imageErrorMessage];
+          this.setState({
+            messages: finalMessages,
+            isLoading: false,
+          });
+        } else if (imageResponse.imageUrls && imageResponse.imageUrls.length > 0) {
+          const imageMessage: ChatMessage = {
+            role: 'assistant',
+            content: imageResponse.imageUrls.map(url => ({
+              type: 'image_url',
+              image_url: {url},
+            })),
+          };
+          finalMessages = [...finalMessages, imageMessage];
+          this.setState({
+            messages: finalMessages,
+            isLoading: false,
+          });
         }
       }
 
@@ -340,7 +334,9 @@ export default class ChatbotScreen extends React.PureComponent<
               content:
                 'Xin chào! Tôi là trợ lý AI của ứng dụng du lịch Đà Nẵng. Tôi có thể giúp gì cho bạn? 😊',
             };
-            this.setState({messages: [welcomeMessage]});
+            this.setState({
+              messages: [welcomeMessage],
+            });
             await this.saveChatHistory([welcomeMessage]);
           },
         },

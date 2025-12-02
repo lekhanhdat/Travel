@@ -14,6 +14,7 @@ import TextBase from '../../../common/TextBase';
 import { AppStyle } from '../../../common/AppStyle';
 
 type SearchFilterType = 'all' | 'name' | 'address' | 'description';
+type SearchModeType = 'semantic' | 'keyword';
 
 interface IViewAllLocationProps {
   navigation: any;
@@ -21,8 +22,10 @@ interface IViewAllLocationProps {
 
 interface IViewAllLocationState {
   locations: ILocation[];
+  allLocations: ILocation[]; // Store original locations for mode switching
   filterModalVisible: boolean;
   selectedFilter: SearchFilterType;
+  searchMode: SearchModeType; // Toggle between AI and keyword search
 }
 
 export default class ViewAllLocation extends React.PureComponent<
@@ -31,30 +34,52 @@ export default class ViewAllLocation extends React.PureComponent<
 > {
   constructor(props: IViewAllLocationProps) {
     super(props);
+    // Get initial search mode from navigation params
+    const isSemanticSearch = props.navigation.state.params?.isSemanticSearch ?? true;
     this.state = {
       locations: [],
+      allLocations: [],
       filterModalVisible: false,
       selectedFilter: 'all',
+      searchMode: isSemanticSearch ? 'semantic' : 'keyword',
     };
   }
 
   componentDidMount(): void {
-    this.filterLocations();
+    this.initializeLocations();
   }
 
-  filterLocations = () => {
-    if (__DEV__) console.log(this.props.navigation.state.params);
+  initializeLocations = () => {
     const locationsIn: ILocation[] = this.props.navigation.state.params?.locations ?? [];
-    const valueSearch: string = this.props.navigation.state.params?.valueSearch;
+    // Store all locations for mode switching
+    this.setState({ allLocations: locationsIn }, () => {
+      this.filterLocations();
+    });
+  };
+
+  filterLocations = () => {
+    const {allLocations, searchMode, selectedFilter} = this.state;
+    const valueSearch: string = this.props.navigation.state.params?.valueSearch ?? '';
+
+    if (__DEV__) console.log('📋 Filtering with mode:', searchMode, 'filter:', selectedFilter);
+
+    // If semantic search mode, use pre-filtered results directly (already sorted by AI relevance)
+    if (searchMode === 'semantic') {
+      if (__DEV__) console.log('🧠 Semantic search results - using pre-filtered data:', allLocations.length, 'items');
+      this.setState({ locations: allLocations });
+      return;
+    }
+
+    // For keyword search, apply additional filtering
     let locationOut: ILocation[] = [];
 
-    locationsIn.forEach(location => {
+    allLocations.forEach(location => {
       const normalizedSearch = convertCitationVietnameseUnsigned(valueSearch)?.toLowerCase();
 
       // Apply filter based on selected filter type
       let matches = false;
 
-      if (this.state.selectedFilter === 'all') {
+      if (selectedFilter === 'all') {
         // Search by name, address, and description
         const nameMatch = convertCitationVietnameseUnsigned(location.name ?? '')
           ?.toLowerCase()
@@ -69,15 +94,15 @@ export default class ViewAllLocation extends React.PureComponent<
           ?.includes(normalizedSearch);
 
         matches = nameMatch || addressMatch || descriptionMatch;
-      } else if (this.state.selectedFilter === 'name') {
+      } else if (selectedFilter === 'name') {
         matches = convertCitationVietnameseUnsigned(location.name ?? '')
           ?.toLowerCase()
           ?.includes(normalizedSearch);
-      } else if (this.state.selectedFilter === 'address') {
+      } else if (selectedFilter === 'address') {
         matches = convertCitationVietnameseUnsigned(location.address ?? '')
           ?.toLowerCase()
           ?.includes(normalizedSearch);
-      } else if (this.state.selectedFilter === 'description') {
+      } else if (selectedFilter === 'description') {
         matches = convertCitationVietnameseUnsigned(location.description ?? '')
           ?.toLowerCase()
           ?.includes(normalizedSearch);
@@ -88,9 +113,19 @@ export default class ViewAllLocation extends React.PureComponent<
       }
     });
 
-    this.setState({
-      locations: locationOut
-    });
+    if (__DEV__) console.log('🔤 Keyword search results:', locationOut.length, 'items');
+    this.setState({ locations: locationOut });
+  };
+
+  toggleSearchMode = () => {
+    this.setState(
+      prevState => ({
+        searchMode: prevState.searchMode === 'semantic' ? 'keyword' : 'semantic',
+      }),
+      () => {
+        this.filterLocations();
+      }
+    );
   };
 
   renderItem = ({ item, index }: { item: ILocation, index: number }) => {
@@ -142,6 +177,9 @@ export default class ViewAllLocation extends React.PureComponent<
   };
 
   render(): React.ReactNode {
+    const {searchMode, locations} = this.state;
+    const isSemanticMode = searchMode === 'semantic';
+
     return (
       <Page>
         <HeaderBase
@@ -158,18 +196,43 @@ export default class ViewAllLocation extends React.PureComponent<
           }}
         />
         <View style={{ padding: sizes._16sdp, flex: 1 }}>
-          {/* Filter Button */}
-          <TouchableOpacity
-            style={styles.filterButton}
-            onPress={() => this.setState({ filterModalVisible: true })}>
-            <TextBase style={styles.filterButtonText}>
-              🔍 Tìm kiếm theo: {this.getFilterLabel(this.state.selectedFilter)}
-            </TextBase>
-            <TextBase style={styles.filterButtonIcon}>▼</TextBase>
-          </TouchableOpacity>
+          {/* Search Mode Toggle */}
+          <View style={styles.searchModeContainer}>
+            <TouchableOpacity
+              style={[styles.searchModeButton, isSemanticMode && styles.searchModeButtonActive]}
+              onPress={() => isSemanticMode || this.toggleSearchMode()}>
+              <TextBase style={[styles.searchModeButtonText, isSemanticMode && styles.searchModeButtonTextActive]}>
+                🧠 AI Search
+              </TextBase>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.searchModeButton, !isSemanticMode && styles.searchModeButtonActive]}
+              onPress={() => !isSemanticMode || this.toggleSearchMode()}>
+              <TextBase style={[styles.searchModeButtonText, !isSemanticMode && styles.searchModeButtonTextActive]}>
+                🔤 Keyword
+              </TextBase>
+            </TouchableOpacity>
+          </View>
+
+          {/* Filter Button - only show for keyword search */}
+          {!isSemanticMode && (
+            <TouchableOpacity
+              style={styles.filterButton}
+              onPress={() => this.setState({ filterModalVisible: true })}>
+              <TextBase style={styles.filterButtonText}>
+                🔍 Tìm kiếm theo: {this.getFilterLabel(this.state.selectedFilter)}
+              </TextBase>
+              <TextBase style={styles.filterButtonIcon}>▼</TextBase>
+            </TouchableOpacity>
+          )}
+
+          {/* Results count */}
+          <TextBase style={styles.resultsCount}>
+            {locations.length} kết quả {isSemanticMode ? '(sắp xếp theo độ liên quan)' : ''}
+          </TextBase>
 
           <FlatList
-            data={this.state.locations}
+            data={locations}
             renderItem={this.renderItem}
             keyExtractor={(item) => item.Id?.toString() || item.name.toString()}
             initialNumToRender={10}
@@ -294,5 +357,37 @@ const styles = StyleSheet.create({
     fontSize: sizes._18sdp,
     color: colors.primary_600,
     fontFamily: 'GoogleSans_Bold',
+  },
+  searchModeContainer: {
+    flexDirection: 'row',
+    marginBottom: sizes._12sdp,
+    backgroundColor: colors.primary_100,
+    borderRadius: sizes._8sdp,
+    padding: sizes._4sdp,
+  },
+  searchModeButton: {
+    flex: 1,
+    paddingVertical: sizes._10sdp,
+    paddingHorizontal: sizes._12sdp,
+    borderRadius: sizes._6sdp,
+    alignItems: 'center',
+  },
+  searchModeButtonActive: {
+    backgroundColor: colors.primary,
+  },
+  searchModeButtonText: {
+    fontSize: sizes._14sdp,
+    fontFamily: 'GoogleSans_Medium',
+    color: colors.primary_600,
+  },
+  searchModeButtonTextActive: {
+    color: colors.white,
+    fontFamily: 'GoogleSans_Bold',
+  },
+  resultsCount: {
+    fontSize: sizes._12sdp,
+    color: colors.primary_500,
+    marginBottom: sizes._8sdp,
+    fontFamily: 'GoogleSans_Regular',
   },
 });

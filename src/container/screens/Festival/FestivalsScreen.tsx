@@ -31,6 +31,7 @@ import HistoricalArtifact from '../../../component/HistoricalArtifact';
 import locationApi from '../../../services/locations.api';
 import festivalsApi from '../../../services/festivals.api';
 import SearchBarComponent from '../../../component/SearchBarComponent';
+import SemanticSearchBarComponent from '../../../component/SemanticSearchBarComponent';
 import LargeItemFestival from '../../../component/LargeItemFestival';
 
 // TRANG FESTIVALS - Tìm kiếm và hiển thị lễ hội
@@ -56,7 +57,7 @@ export default class FestivalsScreen extends React.PureComponent<
 > {
   refSheet: BottomSheet | null | undefined;
   refSheetLocation: BottomSheet | null | undefined;
-  searchBarRef: React.RefObject<SearchBarComponent<IFestival>>;
+  searchBarRef: React.RefObject<SemanticSearchBarComponent<IFestival>>;
 
   constructor(props: IFestivalsScreenProps) {
     super(props);
@@ -123,12 +124,31 @@ export default class FestivalsScreen extends React.PureComponent<
     });
   };
 
-  handleFestivalSearch = (filteredData: IFestival[], searchValue: string) => {
+  // Called while typing - just update local state, don't navigate
+  handleFestivalSearch = (filteredData: IFestival[], searchValue: string, isSemanticSearch?: boolean) => {
+    this.setState({valueSearch: searchValue});
+  };
+
+  // Called when user explicitly submits search (Enter key or search button)
+  handleFestivalSearchSubmit = (filteredData: IFestival[], searchValue: string, isSemanticSearch?: boolean) => {
+    console.log('📥 [FestivalsScreen] handleFestivalSearchSubmit received:');
+    console.log('  📋 filteredData.length:', filteredData?.length || 0);
+    console.log('  📋 searchValue:', searchValue);
+    console.log('  📋 isSemanticSearch:', isSemanticSearch);
+
+    if (!searchValue || searchValue.trim().length === 0) {
+      console.log('  ⚠️ Empty search, not navigating');
+      return; // Don't navigate if search is empty
+    }
     this.setState({valueSearch: searchValue}, () => {
+      // ALWAYS use filteredData from the search component - it contains the semantic results
+      const festivalsToShow = filteredData;
+      console.log('  ➡️ Navigating with', festivalsToShow.length, 'festivals');
       NavigationService.navigate(ScreenName.VIEW_ALL_FESTIVALS, {
-        title: 'Tìm kiếm lễ hội',
-        festivals: this.state.festivals,
+        title: isSemanticSearch ? '🧠 Kết quả AI Search' : 'Tìm kiếm lễ hội',
+        festivals: festivalsToShow,
         valueSearch: searchValue,
+        isSemanticSearch: isSemanticSearch,
       });
     });
   };
@@ -137,13 +157,16 @@ export default class FestivalsScreen extends React.PureComponent<
     return (
       <Page style={{backgroundColor: colors.background}}>
         <HeaderBase hideLeftIcon title={strings.festival} />
-        <SearchBarComponent<IFestival>
+        <SemanticSearchBarComponent<IFestival>
           ref={this.searchBarRef}
           data={this.state.festivals}
           searchFields={['name', 'location', 'description']}
           onSearch={this.handleFestivalSearch}
+          onSubmitSearch={this.handleFestivalSearchSubmit}
           placeholder="Tìm kiếm các lễ hội tại Đà Nẵng..."
           containerStyle={{marginTop: sizes._24sdp}}
+          entityType="festival"
+          idField="Id"
         />
 
         <ScrollView>

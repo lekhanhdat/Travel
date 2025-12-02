@@ -37,6 +37,8 @@ import {withTranslation, WithTranslationProps} from '../../../i18n/withTranslati
 import LanguageDropdown from '../../../component/LanguageDropdown';
 import Geolocation from '@react-native-community/geolocation';
 import SearchBarComponent from '../../../component/SearchBarComponent';
+import SemanticSearchBarComponent from '../../../component/SemanticSearchBarComponent';
+import RecommendationsWidget from '../../../component/RecommendationsWidget';
 
 interface IHomeScreenProps extends WithTranslationProps {
   navigation: any;
@@ -58,7 +60,7 @@ class HomeScreen extends React.PureComponent<
   IHomeScreenState
 > {
   refInput: any;
-  searchBarRef: React.RefObject<SearchBarComponent<ILocation>>;
+  searchBarRef: React.RefObject<SemanticSearchBarComponent<ILocation>>;
 
   constructor(props: IHomeScreenProps) {
     super(props);
@@ -243,9 +245,40 @@ class HomeScreen extends React.PureComponent<
     });
   };
 
-  handleSearchCallback = (filteredData: ILocation[], searchValue: string) => {
+  // Called while typing - just update local state, don't navigate
+  handleSearchCallback = (filteredData: ILocation[], searchValue: string, isSemanticSearch?: boolean) => {
+    this.setState({valueSearch: searchValue});
+  };
+
+  // Called when user explicitly submits search (Enter key or search button)
+  handleSearchSubmit = (filteredData: ILocation[], searchValue: string, isSemanticSearch?: boolean) => {
+    console.log('📥 [HomeScreen] handleSearchSubmit received:');
+    console.log('  📋 filteredData.length:', filteredData?.length || 0);
+    console.log('  📋 searchValue:', searchValue);
+    console.log('  📋 isSemanticSearch:', isSemanticSearch);
+
+    if (!searchValue || searchValue.trim().length === 0) {
+      console.log('  ⚠️ Empty search, not navigating');
+      return; // Don't navigate if search is empty
+    }
     this.setState({valueSearch: searchValue}, () => {
-      this.handleSearch(false, this.state.locations);
+      // ALWAYS use filteredData from the search component - it contains the semantic results
+      const locationsToShow = filteredData;
+      console.log('  ➡️ Navigating with', locationsToShow.length, 'locations');
+      this.handleSearchWithFlag(false, locationsToShow, isSemanticSearch || false);
+    });
+  };
+
+  handleSearchWithFlag = (isViewAll: boolean, locations: ILocation[], isSemanticSearch: boolean) => {
+    const searchValue = this.searchBarRef.current?.getSearchValue?.() || this.state.valueSearch || '';
+    console.log('🧭 [HomeScreen] Navigating to ViewAllLocation:');
+    console.log('  📋 locations.length:', locations.length);
+    console.log('  📋 isSemanticSearch:', isSemanticSearch);
+    NavigationService.navigate(ScreenName.VIEW_ALL_SCREEN, {
+      title: isViewAll ? 'Xem tất cả' : isSemanticSearch ? '🧠 Kết quả AI Search' : 'Tìm kiếm',
+      locations: locations,
+      valueSearch: searchValue,
+      isSemanticSearch: isSemanticSearch,
     });
   };
 
@@ -294,16 +327,29 @@ class HomeScreen extends React.PureComponent<
           tại Đà Nẵng!
         </TextBase>
 
-        <SearchBarComponent<ILocation>
+        <SemanticSearchBarComponent<ILocation>
           ref={this.searchBarRef}
           data={this.state.locations}
           searchFields={['name', 'address', 'description']}
           onSearch={this.handleSearchCallback}
+          onSubmitSearch={this.handleSearchSubmit}
           placeholder="Tìm kiếm địa điểm, địa chỉ, mô tả..."
+          entityType="location"
+          idField="Id"
         />
         <ScrollView>
           <View style={styles.container}>
-            <View style={styles.rowCenter}>
+            {/* 1. AI-Powered Recommendations - At the top */}
+            {this.state.account?.Id && (
+              <RecommendationsWidget
+                userId={this.state.account.Id}
+                title="🧠 Đề xuất bởi AI"
+                limit={10}
+              />
+            )}
+
+            {/* 2. Popular Locations */}
+            <View style={[styles.rowCenter, {marginTop: this.state.account?.Id ? sizes._24sdp : 0}]}>
               <TextBase style={[AppStyle.txt_20_bold]}>Phổ biến</TextBase>
               <TouchableOpacity
                 onPress={() =>
@@ -331,6 +377,7 @@ class HomeScreen extends React.PureComponent<
               removeClippedSubviews={true}
             />
 
+            {/* 3. Near Me Locations */}
             <View style={[styles.rowCenter, {marginTop: sizes._24sdp}]}>
               <TextBase
                 style={[AppStyle.txt_20_bold, {marginBottom: sizes._16sdp}]}>

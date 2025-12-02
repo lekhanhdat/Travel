@@ -18,6 +18,7 @@ import {MapSvg, Call, GlobeSvg, ClockSvg} from '../../../assets/ImageSvg';
 import {ScreenName} from '../../AppContainer';
 import {Button} from 'react-native-paper';
 import festivalsApi, {IFestival} from '../../../services/festivals.api';
+import SimilarItemsComponent from '../../../component/SimilarItemsComponent';
 
 interface IDetailLocationScreenProps {
   navigation: any;
@@ -230,9 +231,10 @@ export default class DetailLocationScreen extends React.PureComponent<
                 </View>
               )}
 
+              {/* Description: Use long_description if available, fallback to description */}
               <TextBase
                 style={[AppStyle.txt_16_medium_detail, {marginTop: sizes._12sdp, textAlign: 'justify'}]}>
-                {location.description}
+                {location.long_description || location.description}
               </TextBase>
 
               {/* Address with Icon */}
@@ -495,6 +497,16 @@ export default class DetailLocationScreen extends React.PureComponent<
                   Chỉ đường
                 </Button>
               </View>
+
+              {/* Semantic Similar Items from Backend */}
+              {(location.Id || location.id) && (
+                <SimilarItemsComponent
+                  entityType="location"
+                  entityId={location.Id || location.id!}
+                  title="Địa điểm tương tự (AI gợi ý)"
+                  limit={5}
+                />
+              )}
 
               <View
                 style={{

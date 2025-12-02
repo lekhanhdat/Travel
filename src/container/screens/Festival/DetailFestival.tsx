@@ -17,6 +17,7 @@ import {StarActive, StarInActive} from '../../../assets/assets/ImageSvg';
 import {MapSvg} from '../../../assets/ImageSvg';
 import {ScreenName} from '../../AppContainer';
 import {Button} from 'react-native-paper';
+import SimilarItemsComponent from '../../../component/SimilarItemsComponent';
 
 interface IDetailFestivalScreenProps {
   navigation: any;
@@ -315,6 +316,16 @@ export default class DetailFestivalScreen extends React.PureComponent<
                   Lễ hội tương tự
                 </Button>
               </View>
+
+              {/* Semantic Similar Items from Backend */}
+              {festival.Id && (
+                <SimilarItemsComponent
+                  entityType="festival"
+                  entityId={festival.Id}
+                  title="Lễ hội tương tự (AI gợi ý)"
+                  limit={5}
+                />
+              )}
 
               <View
                 style={{

@@ -1,10 +1,17 @@
 # Semantic Search System - Technical Specification
 
 ## Document Information
-- **Version**: 1.0.0
-- **Date**: 2025-11-28
+- **Version**: 1.1.0
+- **Date**: 2025-11-30
 - **Author**: August (Multi-Language Specification-Driven Development Agent)
-- **Status**: Draft
+- **Last Updated By**: Augment Agent (Troubleshooting Guide Addition)
+- **Status**: Active
+
+### Changelog
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0.0 | 2025-11-28 | August | Initial specification |
+| 1.1.0 | 2025-11-30 | Augment Agent | Added Section 15: Troubleshooting Guide with issue history, debugging checklist, API contract documentation, and configuration reference |
 
 ---
 
@@ -898,6 +905,398 @@ When offline:
 3. User data encrypted at rest in NocoDB
 4. Rate limiting on all endpoints
 5. Input validation and sanitization
+
+---
+
+## 15. Troubleshooting Guide
+
+This section documents common issues encountered during semantic search development, their root causes, and solutions.
+
+### 15.1 Issue History & Fixes
+
+#### Issue #1: `entity_id` vs `id` Field Mismatch (CRITICAL - FIXED)
+
+**Symptom**: Semantic search returns 0 results despite API returning 10+ successful results.
+
+**Console Logs**:
+```
+LOG  📊 API Response: {"success": true, "resultsCount": 10}
+LOG  🔢 API returned IDs: [undefined, undefined, undefined, undefined, ...]
+LOG  ✅ Filtered results: 0
+```
+
+**Root Cause**: Field name mismatch between backend and frontend.
+
+| Field | Backend (Python) | Frontend (TypeScript) - WRONG | Frontend - CORRECT |
+|-------|-----------------|-------------------------------|-------------------|
+| Entity ID | `id` | `entity_id` ❌ | `id` ✅ |
+| Total count | `total_count` | `total` ❌ | `total_count` ✅ |
+
+**Backend Response Structure** (`models/search.py`):
+```python
+class SemanticSearchResult(BaseModel):
+    id: int = Field(..., description="Entity ID")  # Returns "id", NOT "entity_id"
+    entity_type: EntityType
+    title: str
+    description: Optional[str]
+    score: float
+    metadata: Dict[str, Any]
+```
+
+**Files Changed**:
+- `Travel/src/services/semantic.api.ts` - Changed `entity_id` → `id` in `SearchResult` interface
+- `Travel/src/component/SemanticSearchBarComponent.tsx` - Changed `r.entity_id` → `r.id` in all map/filter operations
+
+**Solution Code**:
+```typescript
+// BEFORE (BROKEN):
+const apiResultIds = response.results.map(r => r.entity_id);  // Returns [undefined, ...]
+
+// AFTER (FIXED):
+const apiResultIds = response.results.map(r => r.id);  // Returns [1, 5, 12, ...]
+```
+
+---
+
+#### Issue #2: Search Mode Toggle Not Working (FIXED)
+
+**Symptom**: UI toggle between semantic/keyword search modes doesn't change actual search behavior.
+
+**Root Cause**: HomeScreen and FestivalsScreen were not using `filteredData` from the search component correctly.
+
+**Files Changed**:
+- `Travel/src/container/screens/Home/HomeScreen.tsx`
+- `Travel/src/container/screens/Festival/FestivalsScreen.tsx`
+
+---
+
+#### Issue #3: `min_score` Too Permissive (FIXED)
+
+**Symptom**: Semantic search returns irrelevant results.
+
+**Root Cause**: Frontend was using `min_score: 0.1`, which allows results with only 10% similarity.
+
+**Solution**: Changed to `min_score: 0.5` to match backend default.
+
+```typescript
+// BEFORE:
+const response = await searchSemantic({
+  query: query.trim(),
+  entity_types: [entityType],
+  limit: 20,
+  min_score: 0.1,  // Too permissive - allows irrelevant results
+});
+
+// AFTER:
+const response = await searchSemantic({
+  query: query.trim(),
+  entity_types: [entityType],
+  limit: 15,
+  min_score: 0.5,  // Balanced precision/recall (matches backend default)
+});
+```
+
+---
+
+#### Issue #4: RAG Chat HTTP 422 Error (FIXED)
+
+**Symptom**: Chatbot returns HTTP 422 Unprocessable Entity error.
+
+**Root Cause**: Frontend was sending `query` field but backend expected `message` field.
+
+**Files Changed**: `Travel/src/services/semantic.api.ts`
+
+```typescript
+// BEFORE (BROKEN):
+const response = await axios.post(`${BACKEND_URL}/api/v1/chat/rag`, {
+  query: message,  // Wrong field name
+});
+
+// AFTER (FIXED):
+const response = await axios.post(`${BACKEND_URL}/api/v1/chat/rag`, {
+  message: message,  // Correct field name
+});
+```
+
+---
+
+#### Issue #5: Clear Chat Session HTTP 422 Error (FIXED)
+
+**Symptom**: Clearing chat session fails with HTTP 422 error.
+
+**Root Cause**: Backend expected `session_id` as query parameter, not in request body.
+
+---
+
+### 15.2 Debugging Console Logs Reference
+
+The `SemanticSearchBarComponent` outputs detailed debug logs. Here's how to interpret them:
+
+#### Log Message Reference
+
+| Log Icon | Message | Meaning | What to Check |
+|----------|---------|---------|---------------|
+| 🔍 | `[SemanticSearch] Starting search...` | Search initiated | Query text is being processed |
+| 📋 | `Query: [text]` | Query text | Verify query is not empty |
+| 🌐 | `Calling semantic search API...` | API call starting | Network connectivity |
+| 📊 | `API Response: {...}` | API returned | Check `success`, `resultsCount`, `topScores` |
+| 🔢 | `API returned IDs: [...]` | IDs from backend | **CRITICAL**: Should be numbers, not `undefined` |
+| 📋 | `Local data IDs (first 5): [...]` | Frontend data IDs | Verify IDs match type (number vs string) |
+| ✓ | `Match: "Name" (ID=X, score=Y)` | Match found | Verify score is reasonable (> 0.5) |
+| ✅ | `Filtered results: N` | Final count | Should match API count if all IDs match |
+| 📊 | `Results sorted by relevance:` | Sort confirmation | Results ordered high→low score |
+| ⚠️ | `No semantic results, falling back...` | Fallback triggered | API returned no results, using keyword search |
+| ❌ | `Semantic search error:` | Error occurred | Check error details for cause |
+
+#### Healthy vs Unhealthy Logs
+
+**✅ Healthy Logs (Working)**:
+```
+LOG  🔍 [SemanticSearch] Starting search...
+LOG    📋 Query: bãi biển đẹp
+LOG    🌐 Calling semantic search API...
+LOG    📊 API Response: {"success": true, "resultsCount": 8, "topScores": ["0.78", "0.72", "0.68"]}
+LOG    🔢 API returned IDs: [5, 12, 3, 8, 15, 22, 7, 18]
+LOG    📋 Local data IDs (first 5): [{"id": 1, "type": "number"}, ...]
+LOG      ✓ Match: "Bãi biển Mỹ Khê" (ID=3, score=0.68)
+LOG      ✓ Match: "Cầu Rồng" (ID=5, score=0.78)
+LOG    ✅ Filtered results: 8
+LOG    📊 Results sorted by relevance:
+LOG      1. "Cầu Rồng" (score: 0.78)
+LOG      2. "Bà Nà Hills" (score: 0.72)
+```
+
+**❌ Unhealthy Logs (Issue #1 - Field Mismatch)**:
+```
+LOG  🔍 [SemanticSearch] Starting search...
+LOG    📋 Query: bãi biển đẹp
+LOG    🌐 Calling semantic search API...
+LOG    📊 API Response: {"success": true, "resultsCount": 10}
+LOG    🔢 API returned IDs: [undefined, undefined, undefined, ...]  ⚠️ PROBLEM!
+LOG    📋 Local data IDs (first 5): [{"id": 1, "type": "number"}, ...]
+LOG    ✅ Filtered results: 0  ⚠️ No matches because IDs are undefined!
+```
+
+**❌ Unhealthy Logs (API Error)**:
+```
+LOG  🔍 [SemanticSearch] Starting search...
+LOG    📋 Query: test
+LOG    🌐 Calling semantic search API...
+LOG    📊 API Response: {"success": false, "resultsCount": 0, "error": "Service unavailable"}
+LOG    ⚠️ No semantic results, falling back to keyword search
+```
+
+---
+
+### 15.3 Step-by-Step Debugging Checklist
+
+When semantic search returns 0 results, follow this checklist:
+
+#### Step 1: Check API Response
+```
+Look for: 📊 API Response: {"success": true, "resultsCount": X}
+```
+- [ ] Is `success` = `true`?
+- [ ] Is `resultsCount` > 0?
+- [ ] Is there an `error` message?
+
+**If API fails**: Check backend logs, verify server is running, check network connectivity.
+
+#### Step 2: Check ID Extraction
+```
+Look for: 🔢 API returned IDs: [...]
+```
+- [ ] Are IDs actual numbers (e.g., `[1, 5, 12]`)?
+- [ ] Or are they `undefined` (e.g., `[undefined, undefined]`)?
+
+**If IDs are undefined**: Field name mismatch. Check `semantic.api.ts` interface matches backend response.
+
+#### Step 3: Check ID Type Matching
+```
+Look for: 📋 Local data IDs (first 5): [{"id": 1, "type": "number"}, ...]
+```
+- [ ] Are local IDs the same type as API IDs?
+- [ ] Are local IDs `number` or `string`?
+
+**If types mismatch**: The code handles both via `resultIdSet.add(r.id)` and `resultIdSet.add(String(r.id))`.
+
+#### Step 4: Check Filtering Results
+```
+Look for: ✅ Filtered results: N
+```
+- [ ] Does the count match `resultsCount` from API?
+- [ ] Are there any `✓ Match:` lines before this?
+
+**If no matches**: IDs in API response don't exist in local data. Verify local data is loaded.
+
+#### Step 5: Check Score Threshold
+```
+Look for: topScores: ["0.78", "0.72", "0.68"]
+```
+- [ ] Are scores > 0.5 (minimum threshold)?
+- [ ] If all scores are < 0.5, results will be empty.
+
+**If scores too low**: Query may be too vague. Try more specific search terms.
+
+---
+
+### 15.4 Known Issues & Solutions Reference
+
+| # | Symptom | Possible Cause | How to Verify | Solution |
+|---|---------|---------------|---------------|----------|
+| 1 | Returns 0 results, API shows 10+ | Field name mismatch (`entity_id` vs `id`) | Check log: `🔢 API returned IDs: [undefined, ...]` | Update `semantic.api.ts` interface to match backend |
+| 2 | Returns 0 results, API shows 0 | `min_score` too high | Check log: `topScores` values | Lower `min_score` in API call (try 0.3) |
+| 3 | Returns 0 results, API error | Backend service down | Check log: `"error": "..."` | Check backend server status |
+| 4 | Returns irrelevant results | `min_score` too low | Check log: scores < 0.3 | Increase `min_score` to 0.5+ |
+| 5 | Results not sorted | Score map issue | Check sorted results order | Verify `scoreMap.get()` uses correct ID field |
+| 6 | HTTP 422 on search | Request payload mismatch | Check network tab in debugger | Verify request fields match backend Pydantic model |
+| 7 | Slow search (> 5s) | Large dataset or slow network | Measure API response time | Add timeout, reduce `limit` parameter |
+| 8 | Type mismatch warnings | ID field type inconsistency | TypeScript compiler warnings | Use `Number()` and `String()` coercion |
+
+---
+
+### 15.5 API Contract Documentation
+
+#### Semantic Search Endpoint
+
+**Endpoint**: `POST /api/v1/search/semantic`
+
+**Request** (TypeScript → Python):
+```typescript
+interface SemanticSearchRequest {
+  query: string;           // Required: Search query text
+  entity_types?: string[]; // Optional: ["location", "festival"]
+  limit?: number;          // Optional: Max results (default: 10)
+  min_score?: number;      // Optional: Minimum similarity (default: 0.5)
+}
+```
+
+**Response** (Python → TypeScript):
+```typescript
+interface SemanticSearchResponse {
+  success: boolean;
+  query: string;
+  results: SearchResult[];
+  total_count: number;      // ⚠️ Backend sends "total_count", NOT "total"
+  search_time_ms: number;
+  search_type: string;
+  error?: string;
+}
+
+interface SearchResult {
+  id: number;              // ⚠️ Backend sends "id", NOT "entity_id"
+  entity_type: string;     // "location" | "festival"
+  title: string;
+  description?: string;
+  score: number;           // Cosine similarity: 0.0 - 1.0
+  metadata: {
+    title?: string;
+    description?: string;
+    image_url?: string;
+    [key: string]: any;
+  };
+  image_url?: string;
+  location?: string;
+}
+```
+
+#### Score Interpretation
+
+The `score` field represents cosine similarity between query embedding and entity embedding:
+
+| Score Range | Interpretation | Recommendation |
+|-------------|----------------|----------------|
+| 0.8 - 1.0 | Excellent match | Highly relevant, show first |
+| 0.6 - 0.8 | Good match | Relevant, include in results |
+| 0.5 - 0.6 | Fair match | Marginally relevant, include with caution |
+| 0.3 - 0.5 | Weak match | Loosely related, usually exclude |
+| 0.0 - 0.3 | Poor match | Likely irrelevant, exclude |
+
+---
+
+### 15.6 Configuration Reference
+
+#### SemanticSearchBarComponent Parameters
+
+Located in `Travel/src/component/SemanticSearchBarComponent.tsx`:
+
+```typescript
+const response = await searchSemantic({
+  query: query.trim(),
+  entity_types: [entityType],
+  limit: 15,       // ← CONFIGURABLE
+  min_score: 0.5,  // ← CONFIGURABLE
+});
+```
+
+| Parameter | Default | Range | Description | When to Adjust |
+|-----------|---------|-------|-------------|----------------|
+| `limit` | 15 | 1-100 | Maximum number of results | Increase for comprehensive search, decrease for faster response |
+| `min_score` | 0.5 | 0.0-1.0 | Minimum similarity threshold | Increase (0.7) for precision, decrease (0.3) for recall |
+| `entity_types` | Dynamic | `["location"]`, `["festival"]` | Entity type filter | Based on current screen context |
+
+#### Recommended Configurations
+
+| Use Case | `limit` | `min_score` | Rationale |
+|----------|---------|-------------|-----------|
+| Default search | 15 | 0.5 | Balanced precision/recall |
+| Quick suggestions | 5 | 0.6 | Fast, highly relevant |
+| Comprehensive research | 30 | 0.3 | More results, broader coverage |
+| Precise matching | 10 | 0.7 | Only very relevant results |
+| Similar items | 5-10 | 0.5 | Moderate relevance, limited count |
+
+---
+
+### 15.7 Backend Model Reference
+
+For reference, here are the exact Pydantic models from the backend:
+
+**`models/search.py`**:
+```python
+class SemanticSearchResult(BaseModel):
+    id: int = Field(..., description="Entity ID")
+    entity_type: EntityType
+    title: str = Field(..., description="Entity title")
+    description: Optional[str] = Field(None, description="Entity description")
+    score: float = Field(..., ge=0.0, le=1.0, description="Similarity score")
+    metadata: Dict[str, Any] = Field(default_factory=dict)
+    image_url: Optional[str] = None
+    location: Optional[str] = None
+
+class SemanticSearchRequest(BaseModel):
+    query: str = Field(..., min_length=1, max_length=500)
+    search_type: str = Field(default="text")
+    entity_types: Optional[List[EntityType]] = None
+    top_k: int = Field(default=10, ge=1, le=100, alias="limit")
+    min_score: float = Field(default=0.5, ge=0.0, le=1.0)
+    user_id: Optional[int] = None
+
+class SemanticSearchResponse(BaseModel):
+    success: bool
+    query: str
+    results: List[SemanticSearchResult]
+    total_count: int
+    search_time_ms: float
+    search_type: str
+    error: Optional[str] = None
+```
+
+**`models/chat.py`** (for RAG chat):
+```python
+class ChatSource(BaseModel):
+    entity_id: int  # ⚠️ Note: Chat sources use "entity_id", search results use "id"
+    entity_type: str
+    title: str
+    relevance_score: float
+    snippet: Optional[str] = None
+
+class RAGChatRequest(BaseModel):
+    message: str  # ⚠️ Required field name is "message", not "query"
+    user_id: Optional[int] = None
+    session_id: Optional[str] = None
+    include_sources: bool = True
+    max_context_items: int = 5
+```
 
 ---
 

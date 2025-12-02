@@ -13,6 +13,7 @@ import TextBase from '../../../common/TextBase';
 import {AppStyle} from '../../../common/AppStyle';
 
 type SearchFilterType = 'all' | 'name' | 'location' | 'description';
+type SearchModeType = 'semantic' | 'keyword';
 
 interface IViewAllFestivalsProps {
   navigation: any;
@@ -20,8 +21,10 @@ interface IViewAllFestivalsProps {
 
 interface IViewAllFestivalsState {
   festivals: IFestival[];
+  allFestivals: IFestival[]; // Store original festivals for mode switching
   filterModalVisible: boolean;
   selectedFilter: SearchFilterType;
+  searchMode: SearchModeType; // Toggle between AI and keyword search
 }
 
 export default class ViewAllFestivals extends React.PureComponent<
@@ -30,32 +33,52 @@ export default class ViewAllFestivals extends React.PureComponent<
 > {
   constructor(props: IViewAllFestivalsProps) {
     super(props);
+    // Get initial search mode from navigation params
+    const isSemanticSearch = props.navigation.state.params?.isSemanticSearch ?? true;
     this.state = {
       festivals: [],
+      allFestivals: [],
       filterModalVisible: false,
       selectedFilter: 'all',
+      searchMode: isSemanticSearch ? 'semantic' : 'keyword',
     };
   }
 
   componentDidMount(): void {
-    this.filterFestivals();
+    this.initializeFestivals();
   }
 
+  initializeFestivals = () => {
+    const festivalsIn: IFestival[] = this.props.navigation.state.params?.festivals ?? [];
+    // Store all festivals for mode switching
+    this.setState({ allFestivals: festivalsIn }, () => {
+      this.filterFestivals();
+    });
+  };
+
   filterFestivals = () => {
-    console.log(this.props.navigation.state.params);
-    const festivalsIn: IFestival[] =
-      this.props.navigation.state.params?.festivals ?? [];
-    const valueSearch: string =
-      this.props.navigation.state.params?.valueSearch ?? '';
+    const {allFestivals, searchMode, selectedFilter} = this.state;
+    const valueSearch: string = this.props.navigation.state.params?.valueSearch ?? '';
+
+    if (__DEV__) console.log('📋 Filtering with mode:', searchMode, 'filter:', selectedFilter);
+
+    // If semantic search mode, use pre-filtered results directly (already sorted by AI relevance)
+    if (searchMode === 'semantic') {
+      if (__DEV__) console.log('🧠 Semantic search results - using pre-filtered data:', allFestivals.length, 'items');
+      this.setState({ festivals: allFestivals });
+      return;
+    }
+
+    // For keyword search, apply additional filtering
     let festivalOut: IFestival[] = [];
 
-    festivalsIn.forEach(festival => {
+    allFestivals.forEach(festival => {
       const normalizedSearch = convertCitationVietnameseUnsigned(valueSearch)?.toLowerCase();
 
       // Apply filter based on selected filter type
       let matches = false;
 
-      if (this.state.selectedFilter === 'all') {
+      if (selectedFilter === 'all') {
         // Search by name, description, and location
         const nameMatch = convertCitationVietnameseUnsigned(festival.name ?? '')
           ?.toLowerCase()
@@ -74,15 +97,15 @@ export default class ViewAllFestivals extends React.PureComponent<
           ?.includes(normalizedSearch);
 
         matches = nameMatch || descriptionMatch || locationMatch;
-      } else if (this.state.selectedFilter === 'name') {
+      } else if (selectedFilter === 'name') {
         matches = convertCitationVietnameseUnsigned(festival.name ?? '')
           ?.toLowerCase()
           ?.includes(normalizedSearch);
-      } else if (this.state.selectedFilter === 'location') {
+      } else if (selectedFilter === 'location') {
         matches = convertCitationVietnameseUnsigned(festival.location ?? '')
           ?.toLowerCase()
           ?.includes(normalizedSearch);
-      } else if (this.state.selectedFilter === 'description') {
+      } else if (selectedFilter === 'description') {
         matches = convertCitationVietnameseUnsigned(festival.description ?? '')
           ?.toLowerCase()
           ?.includes(normalizedSearch);
@@ -93,9 +116,19 @@ export default class ViewAllFestivals extends React.PureComponent<
       }
     });
 
-    this.setState({
-      festivals: festivalOut,
-    });
+    if (__DEV__) console.log('🔤 Keyword search results:', festivalOut.length, 'items');
+    this.setState({ festivals: festivalOut });
+  };
+
+  toggleSearchMode = () => {
+    this.setState(
+      prevState => ({
+        searchMode: prevState.searchMode === 'semantic' ? 'keyword' : 'semantic',
+      }),
+      () => {
+        this.filterFestivals();
+      }
+    );
   };
 
   renderItem = ({item, index}: {item: IFestival; index: number}) => {
@@ -147,6 +180,9 @@ export default class ViewAllFestivals extends React.PureComponent<
   };
 
   render(): React.ReactNode {
+    const {searchMode, festivals} = this.state;
+    const isSemanticMode = searchMode === 'semantic';
+
     return (
       <Page>
         <HeaderBase
@@ -163,18 +199,43 @@ export default class ViewAllFestivals extends React.PureComponent<
           }}
         />
         <View style={{padding: sizes._16sdp, flex: 1}}>
-          {/* Filter Button */}
-          <TouchableOpacity
-            style={styles.filterButton}
-            onPress={() => this.setState({ filterModalVisible: true })}>
-            <TextBase style={styles.filterButtonText}>
-              🔍 Tìm kiếm theo: {this.getFilterLabel(this.state.selectedFilter)}
-            </TextBase>
-            <TextBase style={styles.filterButtonIcon}>▼</TextBase>
-          </TouchableOpacity>
+          {/* Search Mode Toggle */}
+          <View style={styles.searchModeContainer}>
+            <TouchableOpacity
+              style={[styles.searchModeButton, isSemanticMode && styles.searchModeButtonActive]}
+              onPress={() => isSemanticMode || this.toggleSearchMode()}>
+              <TextBase style={[styles.searchModeButtonText, isSemanticMode && styles.searchModeButtonTextActive]}>
+                🧠 AI Search
+              </TextBase>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.searchModeButton, !isSemanticMode && styles.searchModeButtonActive]}
+              onPress={() => !isSemanticMode || this.toggleSearchMode()}>
+              <TextBase style={[styles.searchModeButtonText, !isSemanticMode && styles.searchModeButtonTextActive]}>
+                🔤 Keyword
+              </TextBase>
+            </TouchableOpacity>
+          </View>
+
+          {/* Filter Button - only show for keyword search */}
+          {!isSemanticMode && (
+            <TouchableOpacity
+              style={styles.filterButton}
+              onPress={() => this.setState({ filterModalVisible: true })}>
+              <TextBase style={styles.filterButtonText}>
+                🔍 Tìm kiếm theo: {this.getFilterLabel(this.state.selectedFilter)}
+              </TextBase>
+              <TextBase style={styles.filterButtonIcon}>▼</TextBase>
+            </TouchableOpacity>
+          )}
+
+          {/* Results count */}
+          <TextBase style={styles.resultsCount}>
+            {festivals.length} kết quả {isSemanticMode ? '(sắp xếp theo độ liên quan)' : ''}
+          </TextBase>
 
           <FlatList
-            data={this.state.festivals}
+            data={festivals}
             renderItem={this.renderItem}
             keyExtractor={item => item.Id?.toString() ?? Math.random().toString()}
           />
@@ -295,6 +356,38 @@ const styles = StyleSheet.create({
     fontSize: sizes._18sdp,
     color: colors.primary_600,
     fontFamily: 'GoogleSans_Bold',
+  },
+  searchModeContainer: {
+    flexDirection: 'row',
+    marginBottom: sizes._12sdp,
+    backgroundColor: colors.primary_100,
+    borderRadius: sizes._8sdp,
+    padding: sizes._4sdp,
+  },
+  searchModeButton: {
+    flex: 1,
+    paddingVertical: sizes._10sdp,
+    paddingHorizontal: sizes._12sdp,
+    borderRadius: sizes._6sdp,
+    alignItems: 'center',
+  },
+  searchModeButtonActive: {
+    backgroundColor: colors.primary,
+  },
+  searchModeButtonText: {
+    fontSize: sizes._14sdp,
+    fontFamily: 'GoogleSans_Medium',
+    color: colors.primary_600,
+  },
+  searchModeButtonTextActive: {
+    color: colors.white,
+    fontFamily: 'GoogleSans_Bold',
+  },
+  resultsCount: {
+    fontSize: sizes._12sdp,
+    color: colors.primary_500,
+    marginBottom: sizes._8sdp,
+    fontFamily: 'GoogleSans_Regular',
   },
 });
 

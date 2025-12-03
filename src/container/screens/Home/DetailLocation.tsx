@@ -451,35 +451,6 @@ export default class DetailLocationScreen extends React.PureComponent<
                 marginTop: sizes._16sdp,
               }}>
                 <Button
-                  mode="outlined"
-                  icon="map-search"
-                  onPress={() => {
-                    const similarLocations = this.getSimilarLocations(location);
-                    if (similarLocations.length > 0) {
-                      NavigationService.navigate(ScreenName.VIEW_ALL_SCREEN, {
-                        title: 'Địa điểm tương tự',
-                        locations: similarLocations,
-                        valueSearch: '', // Không cần search
-                      });
-                    } else {
-                      if (__DEV__) console.log('⚠️ No similar locations found');
-                      // TODO: Show toast/alert to user
-                    }
-                  }}
-                  style={{
-                    flex: 1,
-                    borderColor: colors.primary,
-                    borderWidth: 2,
-                  }}
-                  labelStyle={{
-                    fontSize: 14,
-                    color: colors.primary,
-                  }}
-                >
-                  Địa điểm tương tự
-                </Button>
-
-                <Button
                   mode="contained"
                   icon="directions"
                   onPress={() => {
@@ -503,7 +474,7 @@ export default class DetailLocationScreen extends React.PureComponent<
                 <SimilarItemsComponent
                   entityType="location"
                   entityId={location.Id || location.id!}
-                  title="Địa điểm tương tự (AI gợi ý)"
+                  title="Địa điểm tương tự"
                   limit={5}
                 />
               )}

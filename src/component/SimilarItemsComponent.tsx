@@ -160,9 +160,6 @@ const SimilarItemsComponent: React.FC<SimilarItemsComponentProps> = ({
     <View style={styles.container}>
       <View style={styles.titleRow}>
         <TextBase style={[AppStyle.txt_18_bold, styles.title]}>{title}</TextBase>
-        <View style={styles.aiBadge}>
-          <TextBase style={styles.aiBadgeText}>🧠 AI</TextBase>
-        </View>
       </View>
       <FlatList
         data={items}

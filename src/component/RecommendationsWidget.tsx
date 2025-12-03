@@ -173,7 +173,13 @@ const RecommendationsWidget: React.FC<RecommendationsWidgetProps> = ({
       <View style={styles.headerRow}>
         <TextBase style={[AppStyle.txt_20_bold]}>{title}</TextBase>
         <TouchableOpacity onPress={fetchRecommendations} testID="refresh-button">
-          <TextBase style={styles.refreshText}>🔄 Làm mới</TextBase>
+          <TextBase 
+          style={[
+            AppStyle.txt_18_regular, 
+            {marginBottom: sizes._16sdp}
+            ]}>
+            Làm mới
+          </TextBase>
         </TouchableOpacity>
       </View>
       <FlatList

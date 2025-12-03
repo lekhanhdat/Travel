@@ -62,6 +62,13 @@
 │  • /detect       │          │  • Accounts + Objects     │
 │  • /payments/*   │          │  • Locations + Festivals  │
 │  • /webhook/*    │          │  • Transactions           │
+│  • /api/v1/*     │          │  • Embeddings + UserMemory│
+│    (Semantic AI) │          │                           │
+│                  │          │                           │
+│  AI Services:    │          │                           │
+│  • FAISS Index   │          │                           │
+│  • Embeddings    │          │                           │
+│  • RAG Pipeline  │          │                           │
 └────────┬─────────┘          └───────────────────────────┘
          │
          │ External APIs
@@ -81,6 +88,7 @@
 3. **Payment Flow**: Create Payment → PayOS API → QR Code → Webhook → Update Balance
 4. **Maps Flow**: Get Location → Mapbox API → Display Route → Turn-by-turn Navigation
 5. **Chatbot Flow**: User Message → FastAPI → OpenAI Chat → AI Response
+6. **Semantic Search Flow**: Query → FastAPI → OpenAI Embeddings → FAISS Search → Ranked Results
 
 ---
 
@@ -151,6 +159,22 @@
 - **Floating Bubble** - Chatbot nổi trên mọi màn hình
 - **Quick Suggestions** - Gợi ý câu hỏi nhanh
 
+### 🔍 Tìm kiếm ngữ nghĩa (Semantic Search)
+- **AI-Powered Search** - Tìm kiếm thông minh với OpenAI embeddings và FAISS
+- **Multi-Entity Search** - Tìm kiếm đồng thời địa điểm, lễ hội, và bài viết
+- **Similarity Score Filtering** - Lọc kết quả theo độ tương đồng ngữ nghĩa
+  - PRIMARY RULE: Hiển thị tất cả kết quả có score > 0.5
+  - FALLBACK RULE: Hiển thị top 10 kết quả nếu ít hơn 10 kết quả đạt ngưỡng
+- **Vietnamese/English Support** - Hỗ trợ tìm kiếm bằng tiếng Việt và tiếng Anh
+- **Intelligent Ranking** - Sắp xếp kết quả theo độ liên quan
+- **Keyword Fallback** - Tự động chuyển sang tìm kiếm từ khóa khi cần
+
+### 📊 Gợi ý & Đề xuất (Recommendations)
+- **RecommendationsWidget** - Gợi ý địa điểm cá nhân hóa trên trang chủ
+- **SimilarItemsComponent** - Hiển thị địa điểm/lễ hội tương tự dựa trên AI
+- **User Memory** - Lưu trữ sở thích người dùng để cá nhân hóa
+- **Similarity Percentage** - Hiển thị phần trăm độ tương đồng
+
 ### 👤 Hồ sơ (Profile)
 - Thông tin cá nhân với avatar tùy chỉnh
 - Cài đặt ứng dụng (ngôn ngữ, thông báo)
@@ -217,6 +241,8 @@
 
 #### AI & Machine Learning
 - **OpenAI** `1.51.0+` - GPT models cho chatbot và image recognition
+- **FAISS** `1.7.4+` - Vector similarity search cho semantic search
+- **sentence-transformers** `2.2.2+` - Text embeddings cho semantic search
 - **SerpAPI** `0.1.5+` - Search API cho location data
 
 #### Payment & Services
@@ -312,6 +338,9 @@ Dự án Travel App được chia thành **2 repositories riêng biệt**:
 │   │   ├── HeaderBase.tsx
 │   │   ├── BigItemLocation.tsx
 │   │   ├── FloatingChatBubble.tsx
+│   │   ├── SemanticSearchBarComponent.tsx  # AI-powered semantic search
+│   │   ├── RecommendationsWidget.tsx       # Personalized recommendations
+│   │   ├── SimilarItemsComponent.tsx       # Similar items display
 │   │   └── ...
 │   ├── 📁 container/           # Screens & navigation
 │   │   ├── AppContainer.tsx
@@ -334,13 +363,17 @@ Dự án Travel App được chia thành **2 repositories riêng biệt**:
 │   │   ├── axios.ts            # Axios config
 │   │   ├── auth.api.ts         # Authentication API
 │   │   ├── locations.api.ts    # Locations API
+│   │   ├── festivals.api.ts    # Festivals API
+│   │   ├── semantic.api.ts     # Semantic search API (AI-powered)
 │   │   ├── payment.api.ts      # Payment API
 │   │   ├── chatbot.api.ts      # Chatbot API
 │   │   └── mapbox.api.ts       # Mapbox API
 │   ├── 📁 types/               # TypeScript type definitions
+│   │   └── env.mock.ts         # Environment mocks for testing
 │   └── 📁 utils/               # Utility functions
 │       ├── configs.ts          # App configuration
 │       ├── env.ts              # Environment variables
+│       ├── apiUsageTracker.ts  # API usage monitoring & thresholds
 │       └── LocalStorageCommon.tsx
 ├── 📁 android/                 # Android native code
 │   ├── app/
@@ -349,8 +382,17 @@ Dự án Travel App được chia thành **2 repositories riêng biệt**:
 │   ├── Travel/
 │   ├── Podfile
 │   └── Travel.xcworkspace
-├── 📁 __tests__/               # Unit tests
+├── 📁 __tests__/               # Unit tests (Jest)
+│   ├── App.test.tsx
+│   ├── 📁 components/
+│   │   ├── RecommendationsWidget.test.tsx
+│   │   └── SimilarItemsComponent.test.tsx
+│   └── 📁 services/
+│       └── semantic.api.test.ts
+├── 📁 docs/                    # Technical documentation
+│   └── SEMANTIC_SEARCH_SPECIFICATION.md
 ├── App.tsx                     # Root component
+├── jest.setup.js               # Jest test configuration
 ├── package.json                # Dependencies
 ├── tsconfig.json               # TypeScript config
 └── README.md                   # Documentation (file này)
@@ -1049,6 +1091,128 @@ GET /payment/webhook-info
     "5. Save settings"
   ]
 }
+```
+
+---
+
+### Semantic Search API Endpoints (FastAPI Backend)
+
+**Base URL**: `https://digital-ocean-fast-api-h9zys.ondigitalocean.app`
+
+#### 1. Semantic Search
+
+```http
+POST /api/v1/search/semantic
+Content-Type: application/json
+```
+
+**Request Body:**
+```json
+{
+  "query": "bãi biển đẹp ở Đà Nẵng",
+  "entity_types": ["location", "festival"],
+  "limit": 15,
+  "min_score": 0.5
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "query": "bãi biển đẹp ở Đà Nẵng",
+  "results": [
+    {
+      "id": 5,
+      "entity_type": "location",
+      "title": "Bãi biển Mỹ Khê",
+      "description": "Bãi biển đẹp nhất Đà Nẵng...",
+      "score": 0.78,
+      "metadata": { "image_url": "...", "location": "Đà Nẵng" }
+    }
+  ],
+  "total_count": 8,
+  "search_time_ms": 145.5,
+  "search_type": "semantic"
+}
+```
+
+**Score Interpretation:**
+| Score | Meaning |
+|-------|---------|
+| 0.8 - 1.0 | Excellent match |
+| 0.6 - 0.8 | Good match |
+| 0.5 - 0.6 | Fair match |
+| < 0.5 | Excluded by default |
+
+---
+
+#### 2. Similar Items
+
+```http
+GET /api/v1/similar/{entity_type}/{entity_id}?limit=5
+```
+
+**Example:** `GET /api/v1/similar/location/5?limit=5`
+
+**Response:**
+```json
+{
+  "success": true,
+  "similar_items": [
+    {
+      "id": 12,
+      "entity_type": "location",
+      "title": "Cầu Tình Yêu",
+      "similarity_score": 0.72
+    }
+  ]
+}
+```
+
+---
+
+#### 4. Personalized Recommendations
+
+```http
+GET /api/v1/recommendations/{user_id}?limit=10
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "recommendations": [
+    {
+      "id": 8,
+      "entity_type": "location",
+      "title": "Bà Nà Hills",
+      "score": 0.85,
+      "reason": "Based on your interest in mountain destinations"
+    }
+  ]
+}
+```
+
+---
+
+#### 5. User Memory
+
+**Store Memory:**
+```http
+POST /api/v1/memory/store
+Content-Type: application/json
+
+{
+  "user_id": 123,
+  "memory_type": "preference",
+  "content": "User prefers beach destinations"
+}
+```
+
+**Get User Memories:**
+```http
+GET /api/v1/memory/user/{user_id}
 ```
 
 ---
@@ -1944,6 +2108,6 @@ Có ý tưởng cho tính năng mới? Tạo issue với label `enhancement`:
 
 ---
 
-*Last updated: 24 November 2025*
+*Last updated: 2 December 2025*
 
 </div>

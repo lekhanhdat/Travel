@@ -343,14 +343,14 @@ class HomeScreen extends React.PureComponent<
             {this.state.account?.Id && (
               <RecommendationsWidget
                 userId={this.state.account.Id}
-                title="🧠 Đề xuất bởi AI"
+                title="Địa điểm phù hợp"
                 limit={10}
               />
             )}
 
             {/* 2. Popular Locations */}
             <View style={[styles.rowCenter, {marginTop: this.state.account?.Id ? sizes._24sdp : 0}]}>
-              <TextBase style={[AppStyle.txt_20_bold]}>Phổ biến</TextBase>
+              <TextBase style={[AppStyle.txt_20_bold]}>Địa điểm phổ biến</TextBase>
               <TouchableOpacity
                 onPress={() =>
                   this.handleSearch(true, this.state.locationsPopular)
@@ -381,7 +381,7 @@ class HomeScreen extends React.PureComponent<
             <View style={[styles.rowCenter, {marginTop: sizes._24sdp}]}>
               <TextBase
                 style={[AppStyle.txt_20_bold, {marginBottom: sizes._16sdp}]}>
-                Gần tôi
+                Địa điểm gần bạn
               </TextBase>
               <TouchableOpacity
                 onPress={() =>

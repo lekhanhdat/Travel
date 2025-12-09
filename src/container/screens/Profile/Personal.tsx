@@ -52,6 +52,10 @@ interface IProfileScreenState {
   editFullName: string;
   editEmail: string;
   editAvatarUri?: string;
+  editPhone: string;
+  editGender: 'Male' | 'Female' | 'Other' | '';
+  editBirthday: string;
+  editAddress: string;
 
   // Password fields for Change Password Modal
   currentPassword: string;
@@ -69,6 +73,9 @@ interface IProfileScreenState {
   // Loading states
   savingProfile: boolean;
   changingPassword: boolean;
+
+  // Gender picker
+  showGenderPicker: boolean;
 }
 
 export default class ProfileScreen extends React.PureComponent<
@@ -84,6 +91,10 @@ export default class ProfileScreen extends React.PureComponent<
       editFullName: '',
       editEmail: '',
       editAvatarUri: undefined,
+      editPhone: '',
+      editGender: '',
+      editBirthday: '',
+      editAddress: '',
       currentPassword: '',
       newPassword: '',
       confirmPassword: '',
@@ -94,6 +105,7 @@ export default class ProfileScreen extends React.PureComponent<
       showAvatarPreview: false,
       savingProfile: false,
       changingPassword: false,
+      showGenderPicker: false,
     };
   }
 
@@ -118,6 +130,10 @@ export default class ProfileScreen extends React.PureComponent<
       editFullName: response?.fullName || '',
       editEmail: response?.email || '',
       editAvatarUri: response?.avatar || undefined,
+      editPhone: response?.phone || '',
+      editGender: response?.gender || '',
+      editBirthday: response?.birthday || '',
+      editAddress: response?.address || '',
     });
   };
 
@@ -129,6 +145,10 @@ export default class ProfileScreen extends React.PureComponent<
       editFullName: account?.fullName || '',
       editEmail: account?.email || '',
       editAvatarUri: account?.avatar || undefined,
+      editPhone: account?.phone || '',
+      editGender: account?.gender || '',
+      editBirthday: account?.birthday || '',
+      editAddress: account?.address || '',
     });
   };
 
@@ -139,6 +159,10 @@ export default class ProfileScreen extends React.PureComponent<
       editFullName: '',
       editEmail: '',
       editAvatarUri: undefined,
+      editPhone: '',
+      editGender: '',
+      editBirthday: '',
+      editAddress: '',
     });
   };
 
@@ -289,7 +313,7 @@ export default class ProfileScreen extends React.PureComponent<
   };
 
   handleSaveProfile = async () => {
-    const {account, editFullName, editEmail, editAvatarUri} = this.state;
+    const {account, editFullName, editEmail, editAvatarUri, editPhone, editGender, editBirthday, editAddress} = this.state;
 
     if (!account?.Id) {
       Toast.show({
@@ -336,6 +360,10 @@ export default class ProfileScreen extends React.PureComponent<
         fullName: editFullName.trim(),
         email: editEmail.trim(),
         avatar: editAvatarUri,
+        phone: editPhone.trim(),
+        gender: editGender || undefined,
+        birthday: editBirthday.trim(),
+        address: editAddress.trim(),
       });
 
       // Update local storage
@@ -344,6 +372,10 @@ export default class ProfileScreen extends React.PureComponent<
         fullName: editFullName.trim(),
         email: editEmail.trim(),
         avatar: editAvatarUri,
+        phone: editPhone.trim(),
+        gender: editGender || undefined,
+        birthday: editBirthday.trim(),
+        address: editAddress.trim(),
       };
 
       await LocalStorageCommon.setItem(localStorageKey.AVT, updatedAccount);
@@ -451,6 +483,48 @@ export default class ProfileScreen extends React.PureComponent<
     }
   };
 
+  // Helper function to translate gender
+  getGenderLabel = (gender?: string): string => {
+    switch (gender) {
+      case 'Male':
+        return 'Nam';
+      case 'Female':
+        return 'Nữ';
+      case 'Other':
+        return 'Khác';
+      default:
+        return 'Chưa cập nhật';
+    }
+  };
+
+  // Helper function to format birthday to DD/MM/YYYY
+  formatBirthday = (birthday?: string): string => {
+    if (!birthday) return 'Chưa cập nhật';
+
+    // If already in DD/MM/YYYY format, return as-is
+    if (/^\d{2}\/\d{2}\/\d{4}$/.test(birthday)) {
+      return birthday;
+    }
+
+    // If in YYYY-MM-DD format, convert to DD/MM/YYYY
+    if (/^\d{4}-\d{2}-\d{2}$/.test(birthday)) {
+      const [year, month, day] = birthday.split('-');
+      return `${day}/${month}/${year}`;
+    }
+
+    // For other formats, try to parse and format
+    const date = new Date(birthday);
+    if (!isNaN(date.getTime())) {
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const year = date.getFullYear();
+      return `${day}/${month}/${year}`;
+    }
+
+    // If all else fails, return the original value
+    return birthday;
+  };
+
   render(): React.ReactNode {
     const {
       account,
@@ -459,6 +533,10 @@ export default class ProfileScreen extends React.PureComponent<
       editFullName,
       editEmail,
       editAvatarUri,
+      editPhone,
+      editGender,
+      editBirthday,
+      editAddress,
       currentPassword,
       newPassword,
       confirmPassword,
@@ -470,6 +548,7 @@ export default class ProfileScreen extends React.PureComponent<
       previewAvatarUri,
       savingProfile,
       changingPassword,
+      showGenderPicker,
     } = this.state;
 
     return (
@@ -546,6 +625,66 @@ export default class ProfileScreen extends React.PureComponent<
             <TextBase
               style={[AppStyle.txt_16_medium, {color: colors.primary_950}]}>
               {account?.email || 'Chưa cập nhật'}
+            </TextBase>
+          </View>
+
+          {/* Số điện thoại */}
+          <View style={styles.infoRow}>
+            <TextBase
+              style={[
+                AppStyle.txt_14_medium,
+                {color: colors.primary_400, marginBottom: sizes._4sdp},
+              ]}>
+              Số điện thoại
+            </TextBase>
+            <TextBase
+              style={[AppStyle.txt_16_medium, {color: colors.primary_950}]}>
+              {account?.phone || 'Chưa cập nhật'}
+            </TextBase>
+          </View>
+
+          {/* Giới tính */}
+          <View style={styles.infoRow}>
+            <TextBase
+              style={[
+                AppStyle.txt_14_medium,
+                {color: colors.primary_400, marginBottom: sizes._4sdp},
+              ]}>
+              Giới tính
+            </TextBase>
+            <TextBase
+              style={[AppStyle.txt_16_medium, {color: colors.primary_950}]}>
+              {this.getGenderLabel(account?.gender)}
+            </TextBase>
+          </View>
+
+          {/* Ngày sinh */}
+          <View style={styles.infoRow}>
+            <TextBase
+              style={[
+                AppStyle.txt_14_medium,
+                {color: colors.primary_400, marginBottom: sizes._4sdp},
+              ]}>
+              Ngày sinh
+            </TextBase>
+            <TextBase
+              style={[AppStyle.txt_16_medium, {color: colors.primary_950}]}>
+              {this.formatBirthday(account?.birthday)}
+            </TextBase>
+          </View>
+
+          {/* Địa chỉ */}
+          <View style={styles.infoRow}>
+            <TextBase
+              style={[
+                AppStyle.txt_14_medium,
+                {color: colors.primary_400, marginBottom: sizes._4sdp},
+              ]}>
+              Địa chỉ
+            </TextBase>
+            <TextBase
+              style={[AppStyle.txt_16_medium, {color: colors.primary_950}]}>
+              {account?.address || 'Chưa cập nhật'}
             </TextBase>
           </View>
 
@@ -674,6 +813,104 @@ export default class ProfileScreen extends React.PureComponent<
                     keyboardType="email-address"
                     autoCapitalize="none"
                     style={styles.textInput}
+                    outlineColor={colors.primary_200}
+                    activeOutlineColor={colors.primary}
+                  />
+                </View>
+
+                {/* Phone */}
+                <View style={{marginBottom: sizes._16sdp}}>
+                  <TextBase
+                    style={[
+                      AppStyle.txt_14_medium,
+                      {color: colors.primary_400, marginBottom: sizes._8sdp},
+                    ]}>
+                    Số điện thoại
+                  </TextBase>
+                  <TextInput
+                    mode="outlined"
+                    value={editPhone}
+                    onChangeText={text => this.setState({editPhone: text})}
+                    placeholder="Nhập số điện thoại"
+                    keyboardType="phone-pad"
+                    style={styles.textInput}
+                    outlineColor={colors.primary_200}
+                    activeOutlineColor={colors.primary}
+                  />
+                </View>
+
+                {/* Gender */}
+                <View style={{marginBottom: sizes._16sdp}}>
+                  <TextBase
+                    style={[
+                      AppStyle.txt_14_medium,
+                      {color: colors.primary_400, marginBottom: sizes._8sdp},
+                    ]}>
+                    Giới tính
+                  </TextBase>
+                  <View style={styles.genderContainer}>
+                    {(['Male', 'Female', 'Other'] as const).map((gender) => (
+                      <TouchableOpacity
+                        key={gender}
+                        style={[
+                          styles.genderOption,
+                          editGender === gender && styles.genderOptionSelected,
+                        ]}
+                        onPress={() => this.setState({editGender: gender})}>
+                        <TextBase
+                          style={[
+                            AppStyle.txt_14_medium,
+                            {
+                              color:
+                                editGender === gender
+                                  ? colors.white
+                                  : colors.primary_950,
+                            },
+                          ]}>
+                          {gender === 'Male' ? 'Nam' : gender === 'Female' ? 'Nữ' : 'Khác'}
+                        </TextBase>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </View>
+
+                {/* Birthday */}
+                <View style={{marginBottom: sizes._16sdp}}>
+                  <TextBase
+                    style={[
+                      AppStyle.txt_14_medium,
+                      {color: colors.primary_400, marginBottom: sizes._8sdp},
+                    ]}>
+                    Ngày sinh (DD/MM/YYYY)
+                  </TextBase>
+                  <TextInput
+                    mode="outlined"
+                    value={editBirthday}
+                    onChangeText={text => this.setState({editBirthday: text})}
+                    placeholder="VD: 01/01/1990"
+                    style={styles.textInput}
+                    outlineColor={colors.primary_200}
+                    activeOutlineColor={colors.primary}
+                  />
+                </View>
+
+                {/* Address */}
+                <View style={{marginBottom: sizes._16sdp}}>
+                  <TextBase
+                    style={[
+                      AppStyle.txt_14_medium,
+                      {color: colors.primary_400, marginBottom: sizes._8sdp},
+                    ]}>
+                    Địa chỉ
+                  </TextBase>
+                  <TextInput
+                    mode="outlined"
+                    value={editAddress}
+                    onChangeText={text => this.setState({editAddress: text})}
+                    placeholder="Nhập địa chỉ"
+                    multiline
+                    numberOfLines={2}
+                    style={[styles.textInput, {minHeight: sizes._60sdp}]}
                     outlineColor={colors.primary_200}
                     activeOutlineColor={colors.primary}
                   />
@@ -992,5 +1229,23 @@ const styles = StyleSheet.create({
   },
   confirmButton: {
     backgroundColor: colors.primary,
+  },
+  genderContainer: {
+    flexDirection: 'row',
+    gap: sizes._12sdp,
+  },
+  genderOption: {
+    flex: 1,
+    paddingVertical: sizes._12sdp,
+    borderRadius: sizes._8sdp,
+    borderWidth: 1,
+    borderColor: colors.primary_200,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.white,
+  },
+  genderOptionSelected: {
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
   },
 });

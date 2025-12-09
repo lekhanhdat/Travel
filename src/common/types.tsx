@@ -6,6 +6,10 @@ export interface IAccount {
   email?: string; // Email for password recovery
   avatar?: string; // Avatar URL (optional, default to ProfileSvg)
   balance?: number; // Số dư ví
+  phone?: string; // Số điện thoại
+  gender?: 'Male' | 'Female' | 'Other'; // Giới tính
+  birthday?: string; // Ngày sinh (DD/MM/YYYY)
+  address?: string; // Địa chỉ
   CreatedAt?: string; // Timestamp
 }
 

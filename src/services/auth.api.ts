@@ -134,6 +134,10 @@ const authApi = {
     password: string,
     fullName: string,
     email: string,
+    phone?: string,
+    gender?: 'Male' | 'Female' | 'Other',
+    birthday?: string,
+    address?: string,
   ): Promise<IAccount> => {
     try {
       console.log('📝 Creating new account:', {userName, email});
@@ -158,13 +162,19 @@ const authApi = {
       const hashedPassword = hashPassword(password);
 
       // Create new account
-      const newAccount = {
+      const newAccount: any = {
         userName,
         password: hashedPassword, // Store hashed password
         fullName,
         email,
         avatar: '', // Default empty, will use ProfileSvg in UI
       };
+
+      // Add optional fields if provided
+      if (phone) newAccount.phone = phone;
+      if (gender) newAccount.gender = gender;
+      if (birthday) newAccount.birthday = birthday;
+      if (address) newAccount.address = address;
 
       const res = await request.post(URL_CREATE_ACCOUNT, newAccount);
 
@@ -229,7 +239,7 @@ const authApi = {
   },
 
   /**
-   * Update user profile (fullName, email, avatar)
+   * Update user profile (fullName, email, avatar, phone, gender, birthday, address)
    */
   updateProfile: async (
     accountId: number,
@@ -237,6 +247,10 @@ const authApi = {
       fullName?: string;
       email?: string;
       avatar?: string;
+      phone?: string;
+      gender?: 'Male' | 'Female' | 'Other';
+      birthday?: string;
+      address?: string;
     },
   ): Promise<IAccount> => {
     try {

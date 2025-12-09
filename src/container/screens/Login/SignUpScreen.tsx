@@ -26,6 +26,10 @@ interface ISignUpScreenState {
   confirmPassword: string;
   fullName: string;
   email: string;
+  phone: string;
+  gender: 'Male' | 'Female' | 'Other' | '';
+  birthday: string;
+  address: string;
   isSecureTextEntry: boolean;
   isSecureTextEntryConfirm: boolean;
   loading: boolean;
@@ -43,6 +47,10 @@ export default class SignUpScreen extends React.PureComponent<
       confirmPassword: '',
       fullName: '',
       email: '',
+      phone: '',
+      gender: '',
+      birthday: '',
+      address: '',
       isSecureTextEntry: true,
       isSecureTextEntryConfirm: true,
       loading: false,
@@ -50,7 +58,7 @@ export default class SignUpScreen extends React.PureComponent<
   }
 
   handleSignUp = async () => {
-    const {userName, password, confirmPassword, fullName, email} = this.state;
+    const {userName, password, confirmPassword, fullName, email, phone, gender, birthday, address} = this.state;
 
     // Validation
     if (!userName || !password || !confirmPassword || !fullName || !email) {
@@ -81,7 +89,7 @@ export default class SignUpScreen extends React.PureComponent<
     this.setState({loading: true});
 
     try {
-      await authApi.signUp(userName, password, fullName, email);
+      await authApi.signUp(userName, password, fullName, email, phone, gender || undefined, birthday, address);
 
       Toast.show({
         type: 'success',
@@ -122,6 +130,10 @@ export default class SignUpScreen extends React.PureComponent<
       confirmPassword,
       fullName,
       email,
+      phone,
+      gender,
+      birthday,
+      address,
       isSecureTextEntry,
       isSecureTextEntryConfirm,
       loading,
@@ -171,17 +183,68 @@ export default class SignUpScreen extends React.PureComponent<
               onChangeText={fullName => this.setState({fullName})}
             />
 
-            {/* Username */}
+            {/* Birthday */}
             <TextInput
               mode="outlined"
-              label="Tên đăng nhập"
-              placeholder="Nhập tên đăng nhập"
+              label="Ngày sinh"
+              placeholder="VD: 01/01/1990"
               style={styles.input}
               outlineStyle={styles.inputOutline}
               textColor={colors.primary_950}
               placeholderTextColor={colors.primary_400}
-              value={userName}
-              onChangeText={userName => this.setState({userName})}
+              value={birthday}
+              onChangeText={birthday => this.setState({birthday})}
+            />
+
+            {/* Gender */}
+            <View style={styles.genderSection}>
+              <Text style={styles.genderLabel}>Giới tính</Text>
+              <View style={styles.genderContainer}>
+                {(['Male', 'Female', 'Other'] as const).map((g) => (
+                  <TouchableOpacity
+                    key={g}
+                    style={[
+                      styles.genderOption,
+                      gender === g && styles.genderOptionSelected,
+                    ]}
+                    onPress={() => this.setState({gender: g})}>
+                    <Text
+                      style={[
+                        styles.genderText,
+                        gender === g && styles.genderTextSelected,
+                      ]}>
+                      {g === 'Male' ? 'Nam' : g === 'Female' ? 'Nữ' : 'Khác'}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+
+            {/* Address */}
+            <TextInput
+              mode="outlined"
+              label="Địa chỉ"
+              placeholder="Nhập địa chỉ"
+              style={styles.input}
+              outlineStyle={styles.inputOutline}
+              textColor={colors.primary_950}
+              placeholderTextColor={colors.primary_400}
+              value={address}
+              onChangeText={address => this.setState({address})}
+            />
+
+            {/* Phone */}
+            <TextInput
+              mode="outlined"
+              label="Số điện thoại"
+              placeholder="Nhập số điện thoại"
+              style={styles.input}
+              outlineStyle={styles.inputOutline}
+              textColor={colors.primary_950}
+              placeholderTextColor={colors.primary_400}
+              keyboardType="phone-pad"
+              value={phone}
+              onChangeText={phone => this.setState({phone})}
             />
 
             {/* Email */}
@@ -197,6 +260,19 @@ export default class SignUpScreen extends React.PureComponent<
               autoCapitalize="none"
               value={email}
               onChangeText={email => this.setState({email})}
+            />
+
+            {/* Username */}
+            <TextInput
+              mode="outlined"
+              label="Tên đăng nhập"
+              placeholder="Nhập tên đăng nhập"
+              style={styles.input}
+              outlineStyle={styles.inputOutline}
+              textColor={colors.primary_950}
+              placeholderTextColor={colors.primary_400}
+              value={userName}
+              onChangeText={userName => this.setState({userName})}
             />
 
             {/* Password */}
@@ -349,6 +425,40 @@ const styles = StyleSheet.create({
     color: colors.primary,
     fontSize: sizes._16sdp,
     fontWeight: 'bold',
+  },
+  genderSection: {
+    marginBottom: sizes._16sdp,
+  },
+  genderLabel: {
+    fontSize: sizes._14sdp,
+    color: colors.primary_400,
+    marginBottom: sizes._8sdp,
+    marginLeft: sizes._4sdp,
+  },
+  genderContainer: {
+    flexDirection: 'row',
+    gap: sizes._12sdp,
+  },
+  genderOption: {
+    flex: 1,
+    paddingVertical: sizes._12sdp,
+    borderRadius: sizes._12sdp,
+    borderWidth: 1,
+    borderColor: colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.white,
+  },
+  genderOptionSelected: {
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
+  },
+  genderText: {
+    fontSize: sizes._14sdp,
+    color: colors.primary_950,
+  },
+  genderTextSelected: {
+    color: colors.white,
   },
 });
 

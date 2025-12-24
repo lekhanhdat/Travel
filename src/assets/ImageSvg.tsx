@@ -2,7 +2,7 @@
   * @author AW
   * @flow
   */
-  
+
   import Add from './svg/Add.svg';
 import Call from './svg/Call.svg';
 import CameraSvg from './svg/CameraSvg.svg';

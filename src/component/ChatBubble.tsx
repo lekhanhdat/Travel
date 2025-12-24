@@ -82,8 +82,8 @@ export default class ChatBubble extends React.PureComponent<
         const minY = sizes._50sdp; // Below status bar
         const maxY = SCREEN_HEIGHT - sizes._150sdp; // Above bottom nav
 
-        if (targetY < minY) targetY = minY;
-        if (targetY > maxY) targetY = maxY;
+        if (targetY < minY) {targetY = minY;}
+        if (targetY > maxY) {targetY = maxY;}
 
         // Animate to final position
         Animated.spring(this.state.pan, {

@@ -62,7 +62,7 @@ export const Avatar: React.FC<AvatarProps> = ({
  * @returns Display name string
  */
 export const getDisplayName = (account: {fullName?: string; userName?: string} | null | undefined): string => {
-  if (!account) return '-';
+  if (!account) {return '-';}
   return account.fullName || account.userName || '-';
 };
 
@@ -72,6 +72,6 @@ export const getDisplayName = (account: {fullName?: string; userName?: string} |
  * @returns Author name string
  */
 export const getReviewAuthorName = (review: {fullName?: string; name_user_review?: string} | null | undefined): string => {
-  if (!review) return '-';
+  if (!review) {return '-';}
   return review.fullName || review.name_user_review || '-';
 };

@@ -115,12 +115,12 @@ export default class About extends React.PureComponent<IAboutProps, IAboutState>
           <View style={styles.section}>
             <TextBase style={styles.sectionTitle}>Giới thiệu</TextBase>
             <TextBase style={styles.description}>
-              Travel App là ứng dụng du lịch hàng đầu Việt Nam, giúp bạn khám phá những địa điểm tuyệt vời nhất trên khắp đất nước. 
-              Với cơ sở dữ liệu phong phú về các điểm du lịch, nhà hàng, khách sạn và hoạt động giải trí, 
+              Travel App là ứng dụng du lịch hàng đầu Việt Nam, giúp bạn khám phá những địa điểm tuyệt vời nhất trên khắp đất nước.
+              Với cơ sở dữ liệu phong phú về các điểm du lịch, nhà hàng, khách sạn và hoạt động giải trí,
               chúng tôi mang đến cho bạn trải nghiệm du lịch hoàn hảo.
             </TextBase>
             <TextBase style={styles.description}>
-              Ứng dụng cung cấp thông tin chi tiết, đánh giá từ cộng đồng, bản đồ tương tác và nhiều tính năng hữu ích khác 
+              Ứng dụng cung cấp thông tin chi tiết, đánh giá từ cộng đồng, bản đồ tương tác và nhiều tính năng hữu ích khác
               để giúp bạn lên kế hoạch và tận hưởng chuyến đi một cách tốt nhất.
             </TextBase>
           </View>

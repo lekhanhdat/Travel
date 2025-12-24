@@ -91,11 +91,11 @@ export default class DetailItem extends React.PureComponent<
               }}
             />
 
-            <View style={{flex: 1, padding: sizes._16sdp,}}>
-              <TextBase style={[AppStyle.txt_20_bold, {textAlign: 'center',}]}>{item.name}</TextBase>
+            <View style={{flex: 1, padding: sizes._16sdp}}>
+              <TextBase style={[AppStyle.txt_20_bold, {textAlign: 'center'}]}>{item.name}</TextBase>
 
               <TextBase
-                style={[AppStyle.txt_16_medium, {marginTop: sizes._12sdp, textAlign: 'justify',}]}>
+                style={[AppStyle.txt_16_medium, {marginTop: sizes._12sdp, textAlign: 'justify'}]}>
                 {item.description}
               </TextBase>
 

@@ -58,7 +58,7 @@ class APIUsageTracker {
   private initialized: boolean = false;
 
   async initialize(): Promise<void> {
-    if (this.initialized) return;
+    if (this.initialized) {return;}
 
     try {
       const storedUsage = await AsyncStorage.getItem(DAILY_USAGE_KEY);
@@ -144,7 +144,7 @@ class APIUsageTracker {
 
   checkThresholds(): string[] {
     const warnings: string[] = [];
-    if (!this.dailyUsage) return warnings;
+    if (!this.dailyUsage) {return warnings;}
 
     if (this.dailyUsage.semanticSearchCalls >= ALERT_THRESHOLDS.semanticSearch) {
       warnings.push(`Semantic search calls (${this.dailyUsage.semanticSearchCalls}) exceeded threshold`);
@@ -164,8 +164,8 @@ class APIUsageTracker {
     for (const record of this.records) {
       callsByEndpoint[record.endpoint] = (callsByEndpoint[record.endpoint] || 0) + 1;
       totalResponseTime += record.responseTime;
-      if (record.success) successfulCalls++;
-      if (record.cached) cachedCalls++;
+      if (record.success) {successfulCalls++;}
+      if (record.cached) {cachedCalls++;}
     }
 
     return {

@@ -69,7 +69,7 @@ export default class DetailFestivalScreen extends React.PureComponent<
 
   // Tính rating trung bình
   calculateAverageRating = (reviews: IFestivalReview[]) => {
-    if (!reviews || reviews.length === 0) return 0;
+    if (!reviews || reviews.length === 0) {return 0;}
     const sum = reviews.reduce((acc, review) => acc + review.start, 0);
     return sum / reviews.length;
   };
@@ -106,10 +106,10 @@ export default class DetailFestivalScreen extends React.PureComponent<
 
   render(): React.ReactNode {
     const festival: IFestival = this.props.navigation.state.params?.festival;
-    
+
     // Get first image or use placeholder
-    const festivalImage = festival.images && festival.images.length > 0 
-      ? festival.images[0] 
+    const festivalImage = festival.images && festival.images.length > 0
+      ? festival.images[0]
       : 'https://via.placeholder.com/400x200?text=Festival';
 
     const avgRating = this.calculateAverageRating(festival.reviews);

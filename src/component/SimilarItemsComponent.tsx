@@ -108,7 +108,7 @@ const SimilarItemsComponent: React.FC<SimilarItemsComponentProps> = ({
   };
 
   const handleItemPress = (item: EnrichedSimilarItem) => {
-    if (!item.fullData) return;
+    if (!item.fullData) {return;}
 
     if (item.entity_type === 'location') {
       NavigationService.navigate(ScreenName.DETAIL_LOCATION_SCREEN, {

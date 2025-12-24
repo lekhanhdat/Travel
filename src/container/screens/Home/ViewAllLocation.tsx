@@ -61,11 +61,11 @@ export default class ViewAllLocation extends React.PureComponent<
     const {allLocations, searchMode, selectedFilter} = this.state;
     const valueSearch: string = this.props.navigation.state.params?.valueSearch ?? '';
 
-    if (__DEV__) console.log('📋 Filtering with mode:', searchMode, 'filter:', selectedFilter);
+    if (__DEV__) {console.log('📋 Filtering with mode:', searchMode, 'filter:', selectedFilter);}
 
     // If semantic search mode, use pre-filtered results directly (already sorted by AI relevance)
     if (searchMode === 'semantic') {
-      if (__DEV__) console.log('🧠 Semantic search results - using pre-filtered data:', allLocations.length, 'items');
+      if (__DEV__) {console.log('🧠 Semantic search results - using pre-filtered data:', allLocations.length, 'items');}
       this.setState({ locations: allLocations });
       return;
     }
@@ -113,7 +113,7 @@ export default class ViewAllLocation extends React.PureComponent<
       }
     });
 
-    if (__DEV__) console.log('🔤 Keyword search results:', locationOut.length, 'items');
+    if (__DEV__) {console.log('🔤 Keyword search results:', locationOut.length, 'items');}
     this.setState({ locations: locationOut });
   };
 

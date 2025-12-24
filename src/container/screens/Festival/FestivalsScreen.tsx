@@ -3,34 +3,23 @@ import {
   FlatList,
   TouchableOpacity,
   View,
-  Image,
   ScrollView,
   StyleSheet,
 } from 'react-native';
 import Page from '../../../component/Page';
 import HeaderBase from '../../../component/HeaderBase';
 import strings from '../../../res/strings';
-import {IAccount, IItem, ILocation, IReview} from '../../../common/types';
+import {IItem} from '../../../common/types';
 import {IFestival} from '../../../services/festivals.api';
 import sizes from '../../../common/sizes';
 import BottomSheet from '../../../component/BottomSheet';
 import colors from '../../../common/colors';
 import TextBase from '../../../common/TextBase';
 import {AppStyle} from '../../../common/AppStyle';
-import {Searchbar, TextInput} from 'react-native-paper';
-import _, {size} from 'lodash';
-import {
-  LOCATION_NEARLY,
-  LOCATION_POPULAR,
-} from '../../../common/locationConstants';
-import LargeItemLocation from '../../../component/LargeItemLocation';
-import BigItemLocation from '../../../component/BigItemLocation';
 import NavigationService from '../NavigationService';
 import {ScreenName} from '../../AppContainer';
 import HistoricalArtifact from '../../../component/HistoricalArtifact';
-import locationApi from '../../../services/locations.api';
 import festivalsApi from '../../../services/festivals.api';
-import SearchBarComponent from '../../../component/SearchBarComponent';
 import SemanticSearchBarComponent from '../../../component/SemanticSearchBarComponent';
 import LargeItemFestival from '../../../component/LargeItemFestival';
 
@@ -87,7 +76,9 @@ export default class FestivalsScreen extends React.PureComponent<
 
   async fetchItems() {
     const data = await locationApi.getItems();
-    if (__DEV__) console.log('📦 Items loaded:', data.length);
+    if (__DEV__) {
+      console.log('📦 Items loaded:', data.length);
+    }
     this.setState({
       items: data,
       ITEMS_POPULAR: data.slice(10, 40),
@@ -97,7 +88,9 @@ export default class FestivalsScreen extends React.PureComponent<
 
   async fetchFestivals() {
     const data = await festivalsApi.getFestivals();
-    if (__DEV__) console.log('🎉 Festivals loaded:', data.length);
+    if (__DEV__) {
+      console.log('🎉 Festivals loaded:', data.length);
+    }
     this.setState({
       festivals: data,
       FESTIVALS_POPULAR: data.slice(0, 10),
@@ -125,12 +118,20 @@ export default class FestivalsScreen extends React.PureComponent<
   };
 
   // Called while typing - just update local state, don't navigate
-  handleFestivalSearch = (filteredData: IFestival[], searchValue: string, isSemanticSearch?: boolean) => {
+  handleFestivalSearch = (
+    filteredData: IFestival[],
+    searchValue: string,
+    isSemanticSearch?: boolean,
+  ) => {
     this.setState({valueSearch: searchValue});
   };
 
   // Called when user explicitly submits search (Enter key or search button)
-  handleFestivalSearchSubmit = (filteredData: IFestival[], searchValue: string, isSemanticSearch?: boolean) => {
+  handleFestivalSearchSubmit = (
+    filteredData: IFestival[],
+    searchValue: string,
+    isSemanticSearch?: boolean,
+  ) => {
     console.log('📥 [FestivalsScreen] handleFestivalSearchSubmit received:');
     console.log('  📋 filteredData.length:', filteredData?.length || 0);
     console.log('  📋 searchValue:', searchValue);
@@ -223,4 +224,3 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
 });
-

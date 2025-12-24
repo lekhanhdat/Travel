@@ -22,7 +22,7 @@ interface SearchBarComponentState {
 /**
  * Reusable SearchBar component that filters data based on multiple fields
  * with Vietnamese diacritics-insensitive search
- * 
+ *
  * @template T - The type of data being searched
  * @param data - Array of data to search through
  * @param searchFields - Array of field names to search in
@@ -63,7 +63,7 @@ export default class SearchBarComponent<T> extends React.PureComponent<
       // Check if any of the specified fields match the search
       return searchFields.some(field => {
         const fieldValue = item[field];
-        
+
         // Handle null/undefined values
         if (fieldValue === null || fieldValue === undefined) {
           return false;

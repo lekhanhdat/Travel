@@ -1,6 +1,4 @@
 import React, {useRef} from 'react';
-import {createAppContainer, createSwitchNavigator} from 'react-navigation';
-import {createCompatNavigatorFactory} from '@react-navigation/compat';
 import {createStackNavigator} from '@react-navigation/stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {useRoute} from '@react-navigation/native';
@@ -14,13 +12,6 @@ import fonts from '../common/fonts';
 import colors from '../common/colors';
 import {
   HomeSvg,
-  CategorySvg,
-  FriendsSvg,
-  LibrarySvg,
-  ChartsSvg,
-  TranslateSvg,
-  VipSvg,
-  SearchSvg,
   FireworksSvg,
   NewFeed,
   MapSvg,
@@ -79,7 +70,6 @@ export enum ScreenName {
   FORGOT_PASSWORD = 'ForgotPasswordScreen',
   DONATION = 'Donation',
   CHATBOT = 'ChatBotScreen',
-
 }
 function MyTabBar({
   state,
@@ -174,7 +164,7 @@ function getSourceWithIndex(key: number, isFocused: boolean) {
       return {
         icon: <NewFeed width={24} height={24} />,
         name: strings.new_feed,
-      };      
+      };
     case 3:
       if (isFocused) {
         return {
@@ -285,7 +275,9 @@ function HomeStack() {
               <View>
                 <Image
                   source={
-                    focused ? images.tab_add_friends_focus : images.tab_add_friends
+                    focused
+                      ? images.tab_add_friends_focus
+                      : images.tab_add_friends
                   }
                 />
               </View>
@@ -350,49 +342,47 @@ function HomeStack() {
     </View>
   );
 }
-//@ts-ignore
-const AppNavigator = createCompatNavigatorFactory(createStackNavigator)(
-  {
-    HomeStack: {screen: HomeStack},
-    LoginScreen: {screen: LoginScreen},
-    ViewAllLocation: {screen: ViewAllLocation},
-    DetailLocationScreen: {screen: DetailItemScreen},
-    PreviewImage: {screen: PreviewImage},
-    MapsScreen: {screen: MapsScreen},
-    LocationImage: {screen: LocationImage},
-    LocationVideo: {screen: LocationVideo},
-    Personal: {screen: Personal},
-    Settings: {screen: Settings},
-    FAQ: {screen: FAQ},
-    Policy: {screen: Policy},
-    About: {screen: About},
-    Advise: {screen: Advise},
-    DetailItem: {screen: DetailItem},
-    ViewAllItem: {screen: AllItemScreen},
-    SearchScreen: {screen: FestivalsScreen},
-    DetailFestivalScreen: {screen: DetailFestivalScreen},
-    ViewAllFestivals: {screen: ViewAllFestivals},
-    SignUpScreen: {screen: SignUpScreen},
-    ForgotPasswordScreen: {screen: ForgotPasswordScreen},
-    Donation: {screen: Donation},
-    ChatBotScreen: {screen: ChatBotScreen},
-  },
-  {
-    headerMode: 'none',
-    initialRouteName: __DEV__
-      ? ScreenName.HOME_STACK_SCREEN
-      : ScreenName.HOME_STACK_SCREEN,
-  },
-);
-const switchNavigator = createSwitchNavigator(
-  {
-    AppNavigator: AppNavigator,
-  },
-  {
-    initialRouteName: 'AppNavigator',
-  },
-);
-const AppContainer = createAppContainer(switchNavigator);
+
+const Stack = createStackNavigator();
+
+function AppContainer() {
+  return (
+    <Stack.Navigator
+      initialRouteName={ScreenName.HOME_STACK_SCREEN}
+      screenOptions={{headerShown: false}}>
+      <Stack.Screen name="HomeStack" component={HomeStack} />
+      <Stack.Screen name="LoginScreen" component={LoginScreen} />
+      <Stack.Screen name="ViewAllLocation" component={ViewAllLocation} />
+      <Stack.Screen name="DetailLocationScreen" component={DetailItemScreen} />
+      <Stack.Screen name="PreviewImage" component={PreviewImage} />
+      <Stack.Screen name="MapsScreen" component={MapsScreen} />
+      <Stack.Screen name="LocationImage" component={LocationImage} />
+      <Stack.Screen name="LocationVideo" component={LocationVideo} />
+      <Stack.Screen name="Personal" component={Personal} />
+      <Stack.Screen name="Settings" component={Settings} />
+      <Stack.Screen name="FAQ" component={FAQ} />
+      <Stack.Screen name="Policy" component={Policy} />
+      <Stack.Screen name="About" component={About} />
+      <Stack.Screen name="Advise" component={Advise} />
+      <Stack.Screen name="DetailItem" component={DetailItem} />
+      <Stack.Screen name="ViewAllItem" component={AllItemScreen} />
+      <Stack.Screen name="SearchScreen" component={FestivalsScreen} />
+      <Stack.Screen
+        name="DetailFestivalScreen"
+        component={DetailFestivalScreen}
+      />
+      <Stack.Screen name="ViewAllFestivals" component={ViewAllFestivals} />
+      <Stack.Screen name="SignUpScreen" component={SignUpScreen} />
+      <Stack.Screen
+        name="ForgotPasswordScreen"
+        component={ForgotPasswordScreen}
+      />
+      <Stack.Screen name="Donation" component={Donation} />
+      <Stack.Screen name="ChatBotScreen" component={ChatBotScreen} />
+    </Stack.Navigator>
+  );
+}
+
 const styles = StyleSheet.create({
   container: {
     height: '100%',

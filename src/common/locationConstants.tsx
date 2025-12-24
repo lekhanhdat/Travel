@@ -1,6 +1,6 @@
-import { icon_camera } from "../assets/ImageSvg";
-import images from "../res/images";
-import { ILocation } from "./types";
+import { icon_camera } from '../assets/ImageSvg';
+import images from '../res/images';
+import { ILocation } from './types';
 
 export const LOCATION_POPULAR: ILocation[] = [
   {
@@ -122,7 +122,7 @@ export const LOCATION_POPULAR: ILocation[] = [
       },
       {
         id: 27,
-        content: `It's really familiar to foreigners like us.Anyway, appreciate!`,
+        content: 'It\'s really familiar to foreigners like us.Anyway, appreciate!',
         name_user_review: ' Thomas',
         time_review: '13/8/2023 18:48',
         start: 5,
@@ -173,7 +173,7 @@ export const LOCATION_POPULAR: ILocation[] = [
       },
       {
         id: 27,
-        content: `It's really familiar to foreigners like us.Anyway, appreciate!`,
+        content: 'It\'s really familiar to foreigners like us.Anyway, appreciate!',
         name_user_review: ' Thomas',
         time_review: '13/8/2023 18:48',
         start: 5,
@@ -807,7 +807,7 @@ export const LOCATION_POPULAR: ILocation[] = [
       },
       {
         id: 27,
-        content: `It's really familiar to foreigners like us.Anyway, appreciate!`,
+        content: 'It\'s really familiar to foreigners like us.Anyway, appreciate!',
         name_user_review: 'Thomas',
         time_review: '13/8/2023 18:48',
         start: 5,
@@ -1085,7 +1085,7 @@ export const LOCATION_POPULAR: ILocation[] = [
       },
       {
         id: 27,
-        content: `It's really familiar to foreigners like us.Anyway, appreciate!`,
+        content: 'It\'s really familiar to foreigners like us.Anyway, appreciate!',
         name_user_review: ' Thomas',
         time_review: '13/8/2023 18:48',
         start: 5,
@@ -1135,7 +1135,7 @@ export const LOCATION_POPULAR: ILocation[] = [
       'Chùa Linh Ứng là ngôi chùa lớn nhất tại Đà Nẵng, tọa lạc trên một ngọn đồi mang hình con rùa hướng ra biển cả, lưng tựa vào cánh rừng nguyên sinh bạt ngàn với hệ động thực vật phong phú. Đây là một công trình in đậm dấu ấn phát triển của Phật giáo Việt Nam thế kỉ XXI, và còn là nơi hội tụ của linh khí đất trời và loài người. Tượng Phật Bà Quan Thế Âm được xem là cao nhất Việt Nam tương đương tòa nhà 30 tầng hiền từ che chở cho người dân Đà Nẵng trong suốt trời gian qua. Ở đây không chỉ là nơi linh thiêng mà còn là nơi có quan cảnh đẹp là dễ dàng nhìn ngắm thành phố biển từ trên cao. Phong cảnh nơi đây được ví như chốn bồng lai tiên cảnh, được rất nhiều phật tử trong cả nước đến đây thắp hương lễ Phật, đồng thời thu hút rất nhiều du khách tham quan đặc biệt có cả du khách nước ngoài.',
     lat: 16.10048736107688,
     long: 108.27777998211428,
-    reviews: [    
+    reviews: [
     ],
   },
   {
@@ -1156,17 +1156,17 @@ export const LOCATION_POPULAR: ILocation[] = [
     avatar: 'https://danangfantasticity.com/wp-content/uploads/2023/09/cong-vien-nuoc-mikazuki-365-da-nang-01.jpg',
     address: 'Khu du lịch Xuân Thiều, Nguyễn Tất Thành, Hoà Hiệp Nam, Liên Chiểu, Đà Nẵng, Việt Nam',
     description: 'Mang nét văn hóa tinh túy đậm đà Á Đông, Nhật Bản là nơi vẻ đẹp thiên nhiên, văn hóa và ẩm thực luôn được ca tụng. Với tinh thần lan tỏa tinh hoa văn hóa Nhật Bản trên đất Việt, Da Nang Mikazuki được lấy cảm hứng là nơi đất trời hội tụ và nhịp sống bắt đầu. Đến với chúng tôi để sẵn sàng cho một hành trình khám phá đầy thú vị với những giá trị chuẩn Nhật chưa từng có tại một tổ hợp nghỉ dưỡng đạt chuẩn 5 sao ngay tại Đà Nẵng..',
-    lat: 16.092263552155572, 
+    lat: 16.092263552155572,
     long: 108.14441508767,
     reviews: [],
-  },		
+  },
   {
     id: 11,
     name: 'Khu du lịch trượt thác Hòa Phú Thành',
     avatar: 'https://danangfantasticity.com/wp-content/uploads/2015/09/p18h1ef2pndr0162qbdi1holm999.jpg',
     address: 'Hoà Phú, Hòa Vang, Đà Nẵng, Việt Nam',
     description: 'Thiên nhiên đã ban tặng cho Đà Nẵng một khung cảnh tuyệt đẹp. Một bên là núi cao như một cánh tay ôm trọn thành phố từ Đèo Hải Vân nối liền với dãy Trường Sơn hùng vĩ. Một bên là biển xanh biếc với những bãi cát trắng trải dài thơ mộng. Với điều kiện khí hậu mang đặc trưng của cả miền núi và miền biển Đà Nẵng trở thành một điểm đến lý tưởng cho du khách trong và ngoài nước. Khu du lịch Hòa Phú Thành, nằm trên địa bàn huyện Hòa Vang tiếp nối với khu du lịch Bà Nà Hills cùng với các khu du lịch sinh thái Ngầm Đôi, khu du lịch Suối Hoa, khu du lịch nước khoáng nóng Suối Đôi, khu du lịch Lái Thiêu,... mỗi khu mang một bản sắc, một phong cách, một bản sắc riêng đã và đang tạo nên một quần thể du lịch phía tây thành phố phục vụ các nhu cầu tham quan, nghỉ dưỡng vui chơi cho mọi du khách ở mọi lứa tuổi khác nhau. Với mục đích đóng góp cho thành phố Đà Nẵng một “Sản phẩm du lịch mới lạ và hấp dẫn, tạo lên sự đa dạng trong sản phẩm du lịch cho thành phố”. Năm 2011, Khu du lịch Hòa Phú Thành đã được UBND thành phố Đà Nẵng phê duyệt và cấp phép xây dựng trên diện tích tổng cộng 33 héc-ta..',
-    lat: 15.95794786175143, 
+    lat: 15.95794786175143,
     long: 107.99242725645075,
     reviews: [],
   },
@@ -1176,47 +1176,47 @@ export const LOCATION_POPULAR: ILocation[] = [
     avatar: 'https://i2.ex-cdn.com/crystalbay.com/files/content/2024/08/09/hai-dang-tien-sa-1-1400.jpg',
     address: 'bán đảo Sơn Trà, Thọ Quanh, Sơn Trà, Đà Nẵng, Việt Nam',
     description: 'Hải đăng Tiên Sa là một trong những ngọn hải đăng cổ nhất Việt Nam. Được xây dựng từ năm 1902, hải đăng này không chỉ là một công trình kiến trúc độc đáo mà còn là một chứng nhân lịch sử quan trọng của thành phố biển.',
-    lat: 16.13987299207558, 
+    lat: 16.13987299207558,
     long: 108.32236290301509,
     reviews: [],
-  },	
+  },
   {
     id: 20 ,
     name: 'Mũi Nghê',
     avatar: 'https://vnpay.vn/s1/statics.vnpay.vn/2023/12/0p4jrucvrgek1701935285026.png',
     address: 'phía đông của bán đảo Sơn Trà,Thọ Quanh, Sơn Trà, Đà Nẵng, Việt Nam',
     description: 'Mũi Nghê là một điểm đến nổi tiếng ở Đà Nẵng với vẻ đẹp hoang sơ và hùng vĩ. Khi đến đây, du khách sẽ được hòa mình vào giữa thiên nhiên tinh khôi, với biển xanh trong và cây cối mát lành.',
-    lat: 16.118840833007276, 
+    lat: 16.118840833007276,
     long: 108.33726846253853,
     reviews: [],
-  },	
+  },
   {
     id: 21,
     name: 'Rạn Nam Ô',
     avatar: 'https://statics.vinpearl.com/ran-nam-o-1_1632886042.jpg',
     address: 'Làng biển cổ Nam Ô, Hòa Hiệp Nam, Liên Chiểu, Đà Nẵng, Việt Nam.',
     description: 'Rạn Nam Ô - nơi được mệnh danh là thiên đường của đá sở hữu vẻ đẹp hoang sơ đến cuốn hút. Nơi đây đã miêu tả một cách chân chất nhất về nhịp sống bình dị của người dân làng chài ở vùng biển Đà Nẵng và mang đến trải nghiệm du lịch đáng nhớ .',
-    lat: 16.118030269867813, 
+    lat: 16.118030269867813,
     long: 108.1305141508984,
     reviews: [],
-  },			
+  },
   {
     id: 22,
     name: 'Cây đa nghìn năm',
     avatar: 'https://afamilycdn.com/150157425591193600/2022/6/5/cay-da-nghin-nam-cay-da-ngan-nam-bach-nien-co-thu-cay-da-son-tra-1-16544067811372084385106.jpeg',
     address: 'Bán đảo Sơn Trà, Thọ Quanh, Sơn Trà, Đà Nẵng, Việt Nam',
     description: 'Nằm ở độ cao hơn 700m so với mực nước biển, thân cây cổ thụ này đứng sừng sững uy nghiêm, những chiếc rễ khổng lồ đâm xuống lòng đất, tán lá xum xuê và đan xen dày đặc, được xem là " ngọn hải đăng linh thiêng" ngự giữa bán đảo Sơn Trà.',
-    lat: 16.122776735576245, 
+    lat: 16.122776735576245,
     long: 108.33192890116281,
     reviews: [],
-  },				
+  },
   {
     id: 25,
     name: 'Biển Sơn Thủy',
     avatar: 'https://img.homedy.com/store/images/2022/05/23/anh-gioi-thieu-637889387331379691.jpg',
     address: 'đường Võ Nguyên Giáp,  Ngũ Hành Sơn, Đà Nẵng, Việt Nam',
     description: 'Đây là một trong những bãi tắm rất đẹp và là tiềm năng của thành phố với bãi cát trắng mịn, nước trong xanh tuyệt vời.',
-    lat: 16.01766736061042, 
+    lat: 16.01766736061042,
     long: 108.26661065057414,
     reviews: [],
   },
@@ -1226,17 +1226,17 @@ export const LOCATION_POPULAR: ILocation[] = [
     avatar: 'https://nhuminhplazahotel.com/wp-content/uploads/2023/06/bai-bien-non-nuoc-o-dau-1.jpg',
     address: 'thuộc bờ biển Đà Nẵng, Hòa Hải, Ngũ Hành Sơn, Đà Nẵng, Việt Nam',
     description: 'Biển Non Nước từng được Forbes (tạp chí hàng đầu của Mỹ) bình chọn là 1 trong 6 bãi biển đẹp nhất hành tinh năm 2005.Mặc dù đã được chính quyền khai thác du lịch trong nhiều năm, bãi biển Non Nước vẫn giữ được vẻ đẹp hoang sơ ban đầu.',
-    lat: 16.002957293796065, 
+    lat: 16.002957293796065,
     long: 108.270391120208,
     reviews: [],
-  },				
+  },
   {
     id: 26,
     name: 'Cụm Khu du lịch sinh thái thuộc xã Hòa Bắc',
     avatar: 'https://alanidananghotel.com/uploads/images/du-lich-hoa-bac-da-nang.png',
     address: 'xã Hòa Bắc,Hòa Vang, Đà Nẵng, Việt Nam',
     description: 'Khu du lịch Hòa Bắc nằm ở thượng nguồn sông Cu Đê,khung cảnh nơi đây yên bình vừa mang nét hoang sơ lại vừa hữu tình. Bao quanh cánh đồng ruộng xanh mượt là cung đường đồi trải dài.',
-    lat: 16.1228622198158, 
+    lat: 16.1228622198158,
     long: 108.06669462504428,
     reviews: [],
   },
@@ -1246,7 +1246,7 @@ export const LOCATION_POPULAR: ILocation[] = [
     avatar: 'https://media2.gody.vn/public/mytravelmap/images/2020/10/31/vithuoctinhyeu7353/571bf4fc921a3f31571d6b82af515c60.jpg',
     address: '48 Sư Vạn Hạnh, Hoà Hải, Ngũ Hành Sơn, Đà Nẵng, Việt Nam',
     description: 'Chùa Quan Âm là một trong những ngôi chùa linh thiêng nổi tiếng ở Đà Nẵng. Với phong cảnh hữu tình, nơi đây đem lại cho du khách cảm giác thật bình an, thanh tịnh.',
-    lat: 15.998957350232143, 
+    lat: 15.998957350232143,
     long: 108.25514269560406,
     reviews: [],
   },
@@ -1256,7 +1256,7 @@ export const LOCATION_POPULAR: ILocation[] = [
     avatar: 'https://dulichvn.org.vn/nhaptin/uploads/images/2023/Thang3/173Can-canh-lang-nghe-nuoc-mam-Nam-O-Da-Nang-1.jpg',
     address: 'Hiệp Hòa, Liên Chiểu, Đà Nẵng, Việt Nam',
     description: 'Làng nghề nước mắm Nam Ô là làng nghề nước mắm truyền thống nằm dưới chân đèo Hải Vân, đã tồn tại hàng trăm năm và được công nhận là Di sản Văn hóa Phi Vật Thể Quốc gia..',
-    lat: 16.115089008056508, 
+    lat: 16.115089008056508,
     long: 108.13052990123302,
     reviews: [],
   },
@@ -1266,10 +1266,10 @@ export const LOCATION_POPULAR: ILocation[] = [
     avatar: 'https://tckt.hn.ss.bfcplatform.vn/2022/12/22A12017-3.jpg',
     address: 'tLăng Cô, Phú Lộc, Thừa Thiên Huế, Việt Nam và Hòa Hiệp Bắc,  Liên Chiểu, Đà Nẵng, Việt Nam',
     description: 'Nằm giữa Huế và Đà Nẵng, Đèo Hải Vân được mệnh danh là “thiên hạ đệ nhất hùng quan” với cảnh vật núi non nên thơ, một bên là núi, một bên là vực thẳm, cùng những đám mây lưng chừng tạo nên khung cảnh chốn bồng lai say đắm lòng người.',
-    lat: 16.20296530130779, 
+    lat: 16.20296530130779,
     long: 108.1391780161492,
     reviews: [],
-  }
+  },
 ];
 
 export const LOCATION_NEARLY: ILocation[] = [
@@ -1288,7 +1288,7 @@ export const LOCATION_NEARLY: ILocation[] = [
         name_user_review: 'Trần Đình Quý',
         time_review: '23/9/2024 8:32',
         start: 5,
-        avatar: ' https://cdn.kona-blue.com/upload/kona-blue_com/post/images/2024/09/18/457/avatar-mac-dinh-1.jpg '
+        avatar: ' https://cdn.kona-blue.com/upload/kona-blue_com/post/images/2024/09/18/457/avatar-mac-dinh-1.jpg ',
       },
       {
         id: 4,
@@ -1296,7 +1296,7 @@ export const LOCATION_NEARLY: ILocation[] = [
         name_user_review: 'Ngô Bảo Khang',
         time_review: '5/7/2024 16:02',
         start: 5,
-        avatar: ' https://cellphones.com.vn/sforum/wp-content/uploads/2023/10/avatar-trang-34.jpg '
+        avatar: ' https://cellphones.com.vn/sforum/wp-content/uploads/2023/10/avatar-trang-34.jpg ',
       },
       {
         id: 6,
@@ -1304,7 +1304,7 @@ export const LOCATION_NEARLY: ILocation[] = [
         name_user_review: 'Nguyễn Ngọc Mai Khanh',
         time_review: ' 6/9/2024 7:30',
         start: 5,
-        avatar: ' https://cdn-media.sforum.vn/storage/app/media/THANHAN/avatar-trang-100.jpg '
+        avatar: ' https://cdn-media.sforum.vn/storage/app/media/THANHAN/avatar-trang-100.jpg ',
       },
       {
         id: 8,
@@ -1312,7 +1312,7 @@ export const LOCATION_NEARLY: ILocation[] = [
         name_user_review: 'Ngô Châu Bảo Khanh',
         time_review: ' 15/8/2024 17:02',
         start: 5,
-        avatar: 'https://cdn-media.sforum.vn/storage/app/media/THANHAN/avatar-trang-96.jpg '
+        avatar: 'https://cdn-media.sforum.vn/storage/app/media/THANHAN/avatar-trang-96.jpg ',
       },
       {
         id: 10,
@@ -1320,21 +1320,21 @@ export const LOCATION_NEARLY: ILocation[] = [
         name_user_review: ' David',
         time_review: '23/9/2024 5:45',
         start: 5,
-        avatar: 'https://vnn-imgs-a1.vgcloud.vn/image1.ictnews.vn/_Files/2020/03/20/trend-avatar-12.jpg '
+        avatar: 'https://vnn-imgs-a1.vgcloud.vn/image1.ictnews.vn/_Files/2020/03/20/trend-avatar-12.jpg ',
       },
     ],
     haveVoice: true,
     images: [
       'https://toquoc.mediacdn.vn/280518851207290880/2024/2/7/t13-17072924281061610153581.jpg',
       'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ5bCrreS5hu5hNdOY96dlxGldtvgtfsMaDIQ&s',
-      'https://hoangtung.com.vn/wp-content/uploads/2019/07/46960613_1789791237814094_2075173698863628288_n.jpg'
+      'https://hoangtung.com.vn/wp-content/uploads/2019/07/46960613_1789791237814094_2075173698863628288_n.jpg',
     ],
-    relatedKeyWord: 'Bao Tang',    
+    relatedKeyWord: 'Bao Tang',
     videos: ['Dh6ilW6Ua0w'],
     voiceName: 'nhavanhoasontra',
     advise: [
       'Tuân thủ, chấp hành các quy định của pháp luật; nội quy, quy tắc nơi công cộng. Tôn trọng không gian chung của cộng đồng.',
-      'Trang phục lịch sự, phù hợp. Bảo vệ cảnh quan, môi trường, bảo vệ của công. Ứng xử văn minh, thân thiện, lịch sự.'
+      'Trang phục lịch sự, phù hợp. Bảo vệ cảnh quan, môi trường, bảo vệ của công. Ứng xử văn minh, thân thiện, lịch sự.',
     ],
   },
   {
@@ -1352,7 +1352,7 @@ export const LOCATION_NEARLY: ILocation[] = [
         name_user_review: 'Trần Đình Quý',
         time_review: '23/9/2024 8:32',
         start: 5,
-        avatar: 'https://cdn.kona-blue.com/upload/kona-blue_com/post/images/2024/09/18/457/avatar-mac-dinh-1.jpg'
+        avatar: 'https://cdn.kona-blue.com/upload/kona-blue_com/post/images/2024/09/18/457/avatar-mac-dinh-1.jpg',
       },
       {
         id: 4,
@@ -1360,7 +1360,7 @@ export const LOCATION_NEARLY: ILocation[] = [
         name_user_review: 'Ngô Bảo Khang',
         time_review: '5/7/2024 16:02',
         start: 5,
-        avatar: 'https://cellphones.com.vn/sforum/wp-content/uploads/2023/10/avatar-trang-34.jpg'
+        avatar: 'https://cellphones.com.vn/sforum/wp-content/uploads/2023/10/avatar-trang-34.jpg',
       },
       {
         id: 6,
@@ -1368,7 +1368,7 @@ export const LOCATION_NEARLY: ILocation[] = [
         name_user_review: 'Nguyễn Ngọc Mai Khanh',
         time_review: ' 6/9/2024 7:30',
         start: 5,
-        avatar: 'https://cdn-media.sforum.vn/storage/app/media/THANHAN/avatar-trang-100.jpg'
+        avatar: 'https://cdn-media.sforum.vn/storage/app/media/THANHAN/avatar-trang-100.jpg',
       },
       {
         id: 8,
@@ -1376,7 +1376,7 @@ export const LOCATION_NEARLY: ILocation[] = [
         name_user_review: 'Ngô Châu Bảo Khanh',
         time_review: ' 15/8/2024 17:02',
         start: 5,
-        avatar: 'https://cdn-media.sforum.vn/storage/app/media/THANHAN/avatar-trang-96.jpg '
+        avatar: 'https://cdn-media.sforum.vn/storage/app/media/THANHAN/avatar-trang-96.jpg ',
       },
       {
         id: 10,
@@ -1384,7 +1384,7 @@ export const LOCATION_NEARLY: ILocation[] = [
         name_user_review: ' David',
         time_review: '23/9/2024 5:45',
         start: 5,
-        avatar: 'https://vnn-imgs-a1.vgcloud.vn/image1.ictnews.vn/_Files/2020/03/20/trend-avatar-12.jpg '
+        avatar: 'https://vnn-imgs-a1.vgcloud.vn/image1.ictnews.vn/_Files/2020/03/20/trend-avatar-12.jpg ',
       },
     ],
     haveVoice: true,
@@ -1416,7 +1416,7 @@ export const LOCATION_NEARLY: ILocation[] = [
         name_user_review: 'Trần Đình Quý',
         time_review: '23/9/2024 8:32',
         start: 5,
-        avatar: 'https://cdn.kona-blue.com/upload/kona-blue_com/post/images/2024/09/18/457/avatar-mac-dinh-1.jpg'
+        avatar: 'https://cdn.kona-blue.com/upload/kona-blue_com/post/images/2024/09/18/457/avatar-mac-dinh-1.jpg',
       },
       {
         id: 4,
@@ -1424,7 +1424,7 @@ export const LOCATION_NEARLY: ILocation[] = [
         name_user_review: 'Ngô Bảo Khang',
         time_review: '5/7/2024 16:02',
         start: 5,
-        avatar: 'https://cellphones.com.vn/sforum/wp-content/uploads/2023/10/avatar-trang-34.jpg'
+        avatar: 'https://cellphones.com.vn/sforum/wp-content/uploads/2023/10/avatar-trang-34.jpg',
       },
       {
         id: 6,
@@ -1432,7 +1432,7 @@ export const LOCATION_NEARLY: ILocation[] = [
         name_user_review: 'Nguyễn Ngọc Mai Khanh',
         time_review: ' 6/9/2024 7:30',
         start: 5,
-        avatar: 'https://cdn-media.sforum.vn/storage/app/media/THANHAN/avatar-trang-100.jpg'
+        avatar: 'https://cdn-media.sforum.vn/storage/app/media/THANHAN/avatar-trang-100.jpg',
       },
       {
         id: 8,
@@ -1440,7 +1440,7 @@ export const LOCATION_NEARLY: ILocation[] = [
         name_user_review: 'Ngô Châu Bảo Khanh',
         time_review: ' 15/8/2024 17:02',
         start: 5,
-        avatar: 'https://cdn-media.sforum.vn/storage/app/media/THANHAN/avatar-trang-96.jpg '
+        avatar: 'https://cdn-media.sforum.vn/storage/app/media/THANHAN/avatar-trang-96.jpg ',
       },
       {
         id: 10,
@@ -1448,7 +1448,7 @@ export const LOCATION_NEARLY: ILocation[] = [
         name_user_review: ' David',
         time_review: '23/9/2024 5:45',
         start: 5,
-        avatar: 'https://vnn-imgs-a1.vgcloud.vn/image1.ictnews.vn/_Files/2020/03/20/trend-avatar-12.jpg '
+        avatar: 'https://vnn-imgs-a1.vgcloud.vn/image1.ictnews.vn/_Files/2020/03/20/trend-avatar-12.jpg ',
       },
     ],
     haveVoice: true,
@@ -1480,7 +1480,7 @@ export const LOCATION_NEARLY: ILocation[] = [
         name_user_review: ' Xuân Hiệp',
         time_review: ' 6/9/2024 12:44',
         start: 5,
-        avatar: ' https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-facebook-trang-7-2.jpg '
+        avatar: ' https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-facebook-trang-7-2.jpg ',
       },
       {
         id: 24,
@@ -1488,7 +1488,7 @@ export const LOCATION_NEARLY: ILocation[] = [
         name_user_review: 'Hoàng Kiên',
         time_review: '13/4/2024',
         start: 4,
-        avatar: ' https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/59d24ea49dc6ecd890c9b00f85c4aecb.jpg '
+        avatar: ' https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/59d24ea49dc6ecd890c9b00f85c4aecb.jpg ',
       },
       {
         id: 25,
@@ -1496,7 +1496,7 @@ export const LOCATION_NEARLY: ILocation[] = [
         name_user_review: '박지민',
         time_review: '31/10/2023 6:58',
         start: 5,
-        avatar: 'https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-trang-nu-6.jpg '
+        avatar: 'https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-trang-nu-6.jpg ',
       },
       {
         id: 26,
@@ -1504,22 +1504,22 @@ export const LOCATION_NEARLY: ILocation[] = [
         name_user_review: ' Gia Khang',
         time_review: ' 20/12/2023 12:04',
         start: 5,
-        avatar: 'https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-trang-nu-8.jpg '
+        avatar: 'https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-trang-nu-8.jpg ',
       },
       {
         id: 27,
-        content: `It's really familiar to foreigners like us.Anyway, appreciate!`,
+        content: 'It\'s really familiar to foreigners like us.Anyway, appreciate!',
         name_user_review: ' Thomas',
         time_review: '13/8/2023 18:48',
         start: 5,
-        avatar: 'https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-trang-nu-2.jpg '
+        avatar: 'https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-trang-nu-2.jpg ',
       },
     ],
     images: [
       'https://docs.portal.danang.gov.vn/images/images/Nam%202024/Thang%2001/22-1%20NHA%20TRUNG%20BAY%20QUAN%20SON%20TRA.jpg',
       'https://image.sggp.org.vn/w2000/Uploaded/2024/evesfnbfjpy/2024_02_03/flycam-5940-6171.jpg',
-    ],    
-    relatedKeyWord: 'Bao Tang',    
+    ],
+    relatedKeyWord: 'Bao Tang',
     videos: ['i8EnEF72fa4', '-4pBL_1Qjxw'],
     haveVoice: true,
     voiceName: 'nhatrungbaytacphamnghethuat',
@@ -1527,8 +1527,8 @@ export const LOCATION_NEARLY: ILocation[] = [
       'Nên mặc trang phục gọn gàng và lịch sự khi vào tham quan. cần giữ gìn vệ sinh khu vực tham quan, không xả rác bừa bãi.',
       'Hạn chế chạm vào các tác phẩm nghệ thuật trưng bày tránh hư hại tác phẩm hoặc gây ảnh hưởng đến trải nghiệm của người khác.',
       'Du khách nên giữ yên lặng và không gây ồn ào trong không gian trưng bày. Tự quản tư trang cá nhân',
-    ] 
-  },  
+    ],
+  },
   {
     id: 32,
     name: 'Cầu Rồng',
@@ -1544,7 +1544,7 @@ export const LOCATION_NEARLY: ILocation[] = [
         name_user_review: ' Việt Hà',
         time_review: '21/4/2024 14:43',
         start: 5,
-        avatar: 'https://vnn-imgs-a1.vgcloud.vn/image1.ictnews.vn/_Files/2020/03/21/trend-avatar-7.jpg'
+        avatar: 'https://vnn-imgs-a1.vgcloud.vn/image1.ictnews.vn/_Files/2020/03/21/trend-avatar-7.jpg',
       },
       {
         id: 10,
@@ -1552,7 +1552,7 @@ export const LOCATION_NEARLY: ILocation[] = [
         name_user_review: ' David',
         time_review: '23/9/2024 5:45',
         start: 5,
-        avatar: 'https://vnn-imgs-a1.vgcloud.vn/image1.ictnews.vn/_Files/2020/03/20/trend-avatar-12.jpg'
+        avatar: 'https://vnn-imgs-a1.vgcloud.vn/image1.ictnews.vn/_Files/2020/03/20/trend-avatar-12.jpg',
       },
       {
         id: 9,
@@ -1560,7 +1560,7 @@ export const LOCATION_NEARLY: ILocation[] = [
         name_user_review: 'John Peterson',
         time_review: '30/9/2024 11:44',
         start: 5,
-        avatar: 'https://vnn-imgs-a1.vgcloud.vn/image1.ictnews.vn/_Files/2020/03/17/trend-avatar-1.jpg'
+        avatar: 'https://vnn-imgs-a1.vgcloud.vn/image1.ictnews.vn/_Files/2020/03/17/trend-avatar-1.jpg',
       },
       {
         id: 8,
@@ -1568,7 +1568,7 @@ export const LOCATION_NEARLY: ILocation[] = [
         name_user_review: 'Ngô Châu Bảo Khanh',
         time_review: ' 15/8/2024 17:02',
         start: 5,
-        avatar: 'https://cdn-media.sforum.vn/storage/app/media/THANHAN/avatar-trang-96.jpg'
+        avatar: 'https://cdn-media.sforum.vn/storage/app/media/THANHAN/avatar-trang-96.jpg',
       },
       {
         id: 7,
@@ -1576,7 +1576,7 @@ export const LOCATION_NEARLY: ILocation[] = [
         name_user_review: 'Ngô Ngọc Hoàng Vương',
         time_review: '9/10/2024 23:08',
         start: 5,
-        avatar: 'https://cdn-media.sforum.vn/storage/app/media/THANHAN/avatar-trang-89.jpg'
+        avatar: 'https://cdn-media.sforum.vn/storage/app/media/THANHAN/avatar-trang-89.jpg',
       },
     ],
     images: [
@@ -1586,8 +1586,8 @@ export const LOCATION_NEARLY: ILocation[] = [
       'https://baogiaothong.mediacdn.vn/upload/3-2022/images/2022-07-25/4-1658733315-132-width740height515.jpg',
       'https://baogiaothong.mediacdn.vn/upload/3-2022/images/2022-07-25/5-1658733315-692-width740height493.jpg',
       'https://baogiaothong.mediacdn.vn/upload/3-2022/images/2022-07-25/6-1658733315-468-width740height555.jpeg',
-    ],    
-    relatedKeyWord: 'Cầu',    
+    ],
+    relatedKeyWord: 'Cầu',
     videos: ['jK9Oe6J3Zdg', 'M5h6eP7zEH0', 'jo6nZmCN0Po'],
     haveVoice: true,
     voiceName: 'caurong',
@@ -1614,7 +1614,7 @@ export const LOCATION_NEARLY: ILocation[] = [
         name_user_review: 'William',
         time_review: '13/5/2024 16:30',
         start: 5,
-        avatar: 'https://vnn-imgs-a1.vgcloud.vn/image1.ictnews.vn/_Files/2020/02/25/trend-avatar-6.jpg'
+        avatar: 'https://vnn-imgs-a1.vgcloud.vn/image1.ictnews.vn/_Files/2020/02/25/trend-avatar-6.jpg',
       },
       {
         id: 12,
@@ -1622,7 +1622,7 @@ export const LOCATION_NEARLY: ILocation[] = [
         name_user_review: ' Việt Hà',
         time_review: '21/4/2024 14:43',
         start: 5,
-        avatar: ' https://vnn-imgs-a1.vgcloud.vn/image1.ictnews.vn/_Files/2020/03/21/trend-avatar-7.jpg '
+        avatar: ' https://vnn-imgs-a1.vgcloud.vn/image1.ictnews.vn/_Files/2020/03/21/trend-avatar-7.jpg ',
       },
       {
         id: 13,
@@ -1630,7 +1630,7 @@ export const LOCATION_NEARLY: ILocation[] = [
         name_user_review: ' Quang Khánh',
         time_review: '19/1/2024 17:56',
         start: 2,
-        avatar: 'https://vnn-imgs-a1.vgcloud.vn/image1.ictnews.vn/_Files/2020/03/21/trend-avatar-13.jpeg.jpg '
+        avatar: 'https://vnn-imgs-a1.vgcloud.vn/image1.ictnews.vn/_Files/2020/03/21/trend-avatar-13.jpeg.jpg ',
       },
       {
         id: 14,
@@ -1638,7 +1638,7 @@ export const LOCATION_NEARLY: ILocation[] = [
         name_user_review: '전정국',
         time_review: '1/9/2024. 19:42',
         start: 5,
-        avatar: 'https://vnn-imgs-a1.vgcloud.vn/image1.ictnews.vn/_Files/2020/03/04/trend-avatar-9.jpg '
+        avatar: 'https://vnn-imgs-a1.vgcloud.vn/image1.ictnews.vn/_Files/2020/03/04/trend-avatar-9.jpg ',
       },
       {
         id: 15,
@@ -1646,7 +1646,7 @@ export const LOCATION_NEARLY: ILocation[] = [
         name_user_review: ' Trần Tín',
         time_review: '24/4/2024 13:02',
         start: 5,
-        avatar: 'https://vnn-imgs-a1.vgcloud.vn/image1.ictnews.vn/_Files/2020/03/07/trend-avatar-10.jpg '
+        avatar: 'https://vnn-imgs-a1.vgcloud.vn/image1.ictnews.vn/_Files/2020/03/07/trend-avatar-10.jpg ',
       },
     ],
     images: [
@@ -1654,8 +1654,8 @@ export const LOCATION_NEARLY: ILocation[] = [
       'https://www.timdanang.com/tin-tuc/images/dia-diem-du-lich/son-tra/tuong-ca-chep-hoa-rong/tuong-ca-chep-hoa-rong-da-nang-1.jpg',
       'https://static.vinwonders.com/2022/12/tuong-ca-chep-hoa-rong-da-nang-banner.jpg',
       'https://52hz.vn/wp-content/uploads/2022/07/52hz-tuong-ca-chep-hoa-rong.jpg',
-    ],    
-    relatedKeyWord: 'đà nẵng',    
+    ],
+    relatedKeyWord: 'đà nẵng',
     videos: ['4JmBIxiZSPI', 'q1BFRI7gqeU'],
     haveVoice: true,
     voiceName: 'cachephoarong',
@@ -1680,15 +1680,15 @@ export const LOCATION_NEARLY: ILocation[] = [
         name_user_review: '黄 贺 江',
         time_review: ' 6/7/2024 7:56',
         start: 5,
-        avatar: ' https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-facebook-trang-2-2.jpg '
+        avatar: ' https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-facebook-trang-2-2.jpg ',
       },
       {
         id: 27,
-        content: `It's really familiar to foreigners like us.Anyway, appreciate!`,
+        content: 'It\'s really familiar to foreigners like us.Anyway, appreciate!',
         name_user_review: ' Thomas',
         time_review: '13/8/2023 18:48',
         start: 5,
-        avatar: 'https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-trang-nu-2.jpg '
+        avatar: 'https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-trang-nu-2.jpg ',
       },
       {
         id: 25,
@@ -1696,7 +1696,7 @@ export const LOCATION_NEARLY: ILocation[] = [
         name_user_review: '박지민',
         time_review: '31/10/2023 6:58',
         start: 5,
-        avatar: 'https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-trang-nu-6.jpg '
+        avatar: 'https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-trang-nu-6.jpg ',
       },
       {
         id: 24,
@@ -1704,7 +1704,7 @@ export const LOCATION_NEARLY: ILocation[] = [
         name_user_review: 'Hoàng Kiên',
         time_review: '13/4/2024',
         start: 4,
-        avatar: ' https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/59d24ea49dc6ecd890c9b00f85c4aecb.jpg '
+        avatar: ' https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/59d24ea49dc6ecd890c9b00f85c4aecb.jpg ',
       },
       {
         id: 20,
@@ -1712,15 +1712,15 @@ export const LOCATION_NEARLY: ILocation[] = [
         name_user_review: ' Quốc Huy',
         time_review: '15/2/2024 13:12',
         start: 5,
-        avatar: 'https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-trang-nu-13.jpg '
+        avatar: 'https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-trang-nu-13.jpg ',
       },
     ],
     images: [
       'https://danangsensetravel.com/view/at_nha-tho-tien-hien-lang-an-hai-va-thoai-ngoc-hau_16b16a1e1431c804f6811ab6d53b66f4.jpg',
       'https://danangfantasticity.com/wp-content/uploads/2018/03/nha-tho-tien-hien-lang-an-hai-va-thoai-ngoc-hau-01.jpg',
       'https://danangfantasticity.com/wp-content/uploads/2018/03/nha-tho-tien-hien-lang-an-hai-va-thoai-ngoc-hau-10.jpg',
-    ],    
-    relatedKeyWord: 'thờ',    
+    ],
+    relatedKeyWord: 'thờ',
     videos: ['PCWnp5T7Sgw', 'KUxMehJf0zs'],
     haveVoice: true,
     voiceName: 'nhathotienhien',
@@ -1737,7 +1737,7 @@ export const LOCATION_NEARLY: ILocation[] = [
     avatar: 'https://upload.wikimedia.org/wikipedia/commons/4/47/%C4%90%C3%A0i_Ph%C3%A1t_thanh_Truy%E1%BB%81n_h%C3%ACnh_%C4%90%C3%A0_N%E1%BA%B5ng_2.jpeg',
     address: 'Đường Trần Hưng Đạo, An Hải Tây, Sơn Trà, Đà Nẵng, Việt Nam',
     description: 'Đài Phát thanh - Truyền hình Đà Nẵng được thành lập vào năm 1977, là một trong những đài phát thanh - truyền hình lớn tại khu vực miền Trung. Trụ sở chính của đài DRT nằm tại số 525 Trần Hưng Đạo, quận Sơn Trà, thành phố Đà Nẵng. Đài Phát thanh - Truyền hình Đà Nẵng (DRT) là cơ quan truyền thông lớn tại thành phố Đà Nẵng, đóng vai trò quan trọng trong việc cung cấp thông tin, giải trí và các chương trình văn hóa, giáo dục cho cộng đồng.',
-    lat: 16.05733868499543, 
+    lat: 16.05733868499543,
     long: 108.2316332801281,
     reviews: [
       {
@@ -1746,7 +1746,7 @@ export const LOCATION_NEARLY: ILocation[] = [
         name_user_review: '김남준',
         time_review: '12/9/2023 21:08',
         start: 5,
-        avatar: ' https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-facebook-trang-8-1.jpg '
+        avatar: ' https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-facebook-trang-8-1.jpg ',
       },
       {
         id: 23,
@@ -1754,7 +1754,7 @@ export const LOCATION_NEARLY: ILocation[] = [
         name_user_review: 'Xuân Hiệp',
         time_review: ' 6/9/2024 12:44',
         start: 5,
-        avatar: 'https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-facebook-trang-7-2.jpg'
+        avatar: 'https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-facebook-trang-7-2.jpg',
       },
       {
         id: 25,
@@ -1762,7 +1762,7 @@ export const LOCATION_NEARLY: ILocation[] = [
         name_user_review: '박지민',
         time_review: '31/10/2023 6:58',
         start: 5,
-        avatar: 'https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-trang-nu-6.jpg '
+        avatar: 'https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-trang-nu-6.jpg ',
       },
       {
         id: 26,
@@ -1770,23 +1770,23 @@ export const LOCATION_NEARLY: ILocation[] = [
         name_user_review: ' Gia Khang',
         time_review: ' 20/12/2023 12:04',
         start: 5,
-        avatar: 'https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-trang-nu-8.jpg '
+        avatar: 'https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-trang-nu-8.jpg ',
       },
       {
         id: 27,
-        content: `It's really familiar to foreigners like us.Anyway, appreciate!`,
+        content: 'It\'s really familiar to foreigners like us.Anyway, appreciate!',
         name_user_review: ' Thomas',
         time_review: '13/8/2023 18:48',
         start: 5,
-        avatar: 'https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-trang-nu-2.jpg '
+        avatar: 'https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-trang-nu-2.jpg ',
       },
     ],
     images: [
       'https://upload.wikimedia.org/wikipedia/commons/4/47/%C4%90%C3%A0i_Ph%C3%A1t_thanh_Truy%E1%BB%81n_h%C3%ACnh_%C4%90%C3%A0_N%E1%BA%B5ng_2.jpeg',
       'https://danangtv.vn/images/shareface.png',
       'https://upload.wikimedia.org/wikipedia/commons/4/47/%C4%90%C3%A0i_Ph%C3%A1t_thanh_Truy%E1%BB%81n_h%C3%ACnh_%C4%90%C3%A0_N%E1%BA%B5ng_2.jpeg',
-    ],    
-    relatedKeyWord: 'đà nẵng',    
+    ],
+    relatedKeyWord: 'đà nẵng',
     videos: ['2cWU5TJ-Gmk'],
     haveVoice: true,
     voiceName: 'daitruyenhinhdrt',
@@ -1816,7 +1816,7 @@ export const LOCATION_NEARLY: ILocation[] = [
         name_user_review: ' Quốc Huy',
         time_review: '15/2/2024 13:12',
         start: 5,
-        avatar: 'https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-trang-nu-13.jpg '
+        avatar: 'https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-trang-nu-13.jpg ',
       },
       {
         id: 15,
@@ -1824,7 +1824,7 @@ export const LOCATION_NEARLY: ILocation[] = [
         name_user_review: ' Trần Tín',
         time_review: '24/4/2024 13:02',
         start: 5,
-        avatar: 'https://vnn-imgs-a1.vgcloud.vn/image1.ictnews.vn/_Files/2020/03/07/trend-avatar-10.jpg '
+        avatar: 'https://vnn-imgs-a1.vgcloud.vn/image1.ictnews.vn/_Files/2020/03/07/trend-avatar-10.jpg ',
       },
       {
         id: 13,
@@ -1832,7 +1832,7 @@ export const LOCATION_NEARLY: ILocation[] = [
         name_user_review: ' Quang Khánh',
         time_review: '19/1/2024 17:56',
         start: 2,
-        avatar: 'https://vnn-imgs-a1.vgcloud.vn/image1.ictnews.vn/_Files/2020/03/21/trend-avatar-13.jpeg.jpg '
+        avatar: 'https://vnn-imgs-a1.vgcloud.vn/image1.ictnews.vn/_Files/2020/03/21/trend-avatar-13.jpeg.jpg ',
       },
       {
         id: 4,
@@ -1840,7 +1840,7 @@ export const LOCATION_NEARLY: ILocation[] = [
         name_user_review: 'Ngô Bảo Khang',
         time_review: '5/7/2024 16:02',
         start: 5,
-        avatar: ' https://cellphones.com.vn/sforum/wp-content/uploads/2023/10/avatar-trang-34.jpg '
+        avatar: ' https://cellphones.com.vn/sforum/wp-content/uploads/2023/10/avatar-trang-34.jpg ',
       },
       {
         id: 3,
@@ -1848,15 +1848,15 @@ export const LOCATION_NEARLY: ILocation[] = [
         name_user_review: 'Ngô Ngọc Hoàng Vương',
         time_review: '1/7/2024  9:28',
         start: 5,
-        avatar: 'https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-nam-nu-trang-2.jpg '
+        avatar: 'https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-nam-nu-trang-2.jpg ',
       },
     ],
     images: [
       'https://drt.danang.vn/content/images/2024/01/cau-tran-thi-ly-da-nang--4-.jpg',
       'https://static.vinwonders.com/production/cau-tran-thi-ly-da-nang-top.jpg',
       'https://static.vinwonders.com/production/cau-tran-thi-ly-da-nang-1.jpg',
-    ],    
-    relatedKeyWord: 'cầu',    
+    ],
+    relatedKeyWord: 'cầu',
     videos: ['xkrQR9Hthys', 'kvj5jLPbL-g'],
     haveVoice: true,
     voiceName: 'cautranthily',
@@ -1881,7 +1881,7 @@ export const LOCATION_NEARLY: ILocation[] = [
         name_user_review: 'William',
         time_review: '13/5/2024 16:30',
         start: 5,
-        avatar: 'https://vnn-imgs-a1.vgcloud.vn/image1.ictnews.vn/_Files/2020/02/25/trend-avatar-6.jpg'
+        avatar: 'https://vnn-imgs-a1.vgcloud.vn/image1.ictnews.vn/_Files/2020/02/25/trend-avatar-6.jpg',
       },
       {
         id: 13,
@@ -1889,7 +1889,7 @@ export const LOCATION_NEARLY: ILocation[] = [
         name_user_review: ' Quang Khánh',
         time_review: '19/1/2024 17:56',
         start: 2,
-        avatar: 'https://vnn-imgs-a1.vgcloud.vn/image1.ictnews.vn/_Files/2020/03/21/trend-avatar-13.jpeg.jpg '
+        avatar: 'https://vnn-imgs-a1.vgcloud.vn/image1.ictnews.vn/_Files/2020/03/21/trend-avatar-13.jpeg.jpg ',
       },
       {
         id: 15,
@@ -1897,7 +1897,7 @@ export const LOCATION_NEARLY: ILocation[] = [
         name_user_review: ' Trần Tín',
         time_review: '24/4/2024 13:02',
         start: 5,
-        avatar: 'https://vnn-imgs-a1.vgcloud.vn/image1.ictnews.vn/_Files/2020/03/07/trend-avatar-10.jpg '
+        avatar: 'https://vnn-imgs-a1.vgcloud.vn/image1.ictnews.vn/_Files/2020/03/07/trend-avatar-10.jpg ',
       },
       {
         id: 17,
@@ -1905,7 +1905,7 @@ export const LOCATION_NEARLY: ILocation[] = [
         name_user_review: ' Tấn Minh',
         time_review: '22/4/2024 19:53',
         start: 5,
-        avatar: 'https://cellphones.com.vn/sforum/wp-content/uploads/2023/10/avatar-trang-11.jpg '
+        avatar: 'https://cellphones.com.vn/sforum/wp-content/uploads/2023/10/avatar-trang-11.jpg ',
       },
       {
         id: 19,
@@ -1913,12 +1913,12 @@ export const LOCATION_NEARLY: ILocation[] = [
         name_user_review: ' Liz',
         time_review: '28/9/2023 17:09',
         start: 5,
-        avatar: 'https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-trang-nu-11.jpg '
+        avatar: 'https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-trang-nu-11.jpg ',
       },
     ],
-    relatedKeyWord: 'son tra', 
+    relatedKeyWord: 'son tra',
     advise: [
-      
+
     ],
   },
   {
@@ -1927,7 +1927,7 @@ export const LOCATION_NEARLY: ILocation[] = [
     avatar: 'https://duthuyendanang.com/wp-content/uploads/2021/09/cau-tinh-yeu-da-nang.jpg',
     address: 'Đ. Trần Hưng Đạo, An Hải, Sơn Trà, Đà Nẵng, Việt Nam',
     description: 'Cầu tình yêu Đà Nẵng tuy không có lịch sử lâu đời hay kiến trúc độc đáo như những cây cầu khác tại Đà thành nhưng mỗi ổ khoá được treo trên cầu này lại là một câu chuyện tình yêu lãng mạn. Nó không chỉ là biểu tượng cho tình yêu, mà còn là một điểm nhấn văn hóa du lịch của Đà Nẵng.',
-    lat: 16.063356223863742, 
+    lat: 16.063356223863742,
     long: 108.22996690486535,
     reviews: [
       {
@@ -1936,7 +1936,7 @@ export const LOCATION_NEARLY: ILocation[] = [
         name_user_review: '전정국',
         time_review: '1/9/2024. 19:42',
         start: 5,
-        avatar: 'https://vnn-imgs-a1.vgcloud.vn/image1.ictnews.vn/_Files/2020/03/04/trend-avatar-9.jpg '
+        avatar: 'https://vnn-imgs-a1.vgcloud.vn/image1.ictnews.vn/_Files/2020/03/04/trend-avatar-9.jpg ',
       },
       {
         id: 16,
@@ -1944,7 +1944,7 @@ export const LOCATION_NEARLY: ILocation[] = [
         name_user_review: ' Tomoka',
         time_review: '15/12/2023 17:38',
         start: 5,
-        avatar: ' https://cellphones.com.vn/sforum/wp-content/uploads/2023/10/avatar-trang-51.jpg '
+        avatar: ' https://cellphones.com.vn/sforum/wp-content/uploads/2023/10/avatar-trang-51.jpg ',
       },
       {
         id: 18,
@@ -1952,7 +1952,7 @@ export const LOCATION_NEARLY: ILocation[] = [
         name_user_review: ' Công Mẫn',
         time_review: '3/11/2023',
         start: 3,
-        avatar: 'https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-nam-nu-trang-12.jpg'
+        avatar: 'https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-nam-nu-trang-12.jpg',
       },
       {
         id: 17,
@@ -1960,7 +1960,7 @@ export const LOCATION_NEARLY: ILocation[] = [
         name_user_review: ' Tấn Minh',
         time_review: '22/4/2024 19:53',
         start: 5,
-        avatar: 'https://cellphones.com.vn/sforum/wp-content/uploads/2023/10/avatar-trang-11.jpg '
+        avatar: 'https://cellphones.com.vn/sforum/wp-content/uploads/2023/10/avatar-trang-11.jpg ',
       },
       {
         id: 23,
@@ -1968,15 +1968,15 @@ export const LOCATION_NEARLY: ILocation[] = [
         name_user_review: ' Xuân Hiệp',
         time_review: ' 6/9/2024 12:44',
         start: 5,
-        avatar: ' https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-facebook-trang-7-2.jpg '
+        avatar: ' https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-facebook-trang-7-2.jpg ',
       },
     ],
     images: [
       'https://duthuyendanang.com/wp-content/uploads/2021/09/cau-tinh-yeu-da-nang-1024x659.jpg',
       'https://cdn.vntrip.vn/cam-nang/wp-content/uploads/2017/09/cau-tinh-yeu-da-nang-khi-ve-dem-1.jpg',
       'https://duthuyendanang.com/wp-content/uploads/2021/09/cau-tinh-yeu-da-nang-e-1024x679.jpg',
-    ],    
-    relatedKeyWord: 'cầu',    
+    ],
+    relatedKeyWord: 'cầu',
     videos: ['UVvbjjVQYmI'],
     haveVoice: true,
     voiceName: 'cautinhyeu',

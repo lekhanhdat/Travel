@@ -107,7 +107,7 @@ const RecommendationsWidget: React.FC<RecommendationsWidgetProps> = ({
   };
 
   const handleItemPress = (item: EnrichedRecommendation) => {
-    if (!item.fullData) return;
+    if (!item.fullData) {return;}
 
     if (item.entity_type === 'location') {
       NavigationService.navigate(ScreenName.DETAIL_LOCATION_SCREEN, {
@@ -173,10 +173,10 @@ const RecommendationsWidget: React.FC<RecommendationsWidgetProps> = ({
       <View style={styles.headerRow}>
         <TextBase style={[AppStyle.txt_20_bold]}>{title}</TextBase>
         <TouchableOpacity onPress={fetchRecommendations} testID="refresh-button">
-          <TextBase 
+          <TextBase
           style={[
-            AppStyle.txt_18_regular, 
-            {marginBottom: sizes._16sdp}
+            AppStyle.txt_18_regular,
+            {marginBottom: sizes._16sdp},
             ]}>
             Làm mới
           </TextBase>

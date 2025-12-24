@@ -55,7 +55,7 @@ const Donation = () => {
       }
     })();
     return () => {
-      if (pollRef.current != null) clearInterval(pollRef.current as any);
+      if (pollRef.current != null) {clearInterval(pollRef.current as any);}
     };
   }, []);
 
@@ -77,12 +77,12 @@ const Donation = () => {
 
       // Start polling status mỗi 4s nếu có orderCode
       if (res.orderCode) {
-        if (pollRef.current != null) clearInterval(pollRef.current as any);
+        if (pollRef.current != null) {clearInterval(pollRef.current as any);}
         pollRef.current = (setInterval(async () => {
           try {
             const status = await paymentApi.getStatus(res.orderCode);
             if (status.status === 'PAID') {
-              if (pollRef.current != null) clearInterval(pollRef.current as any);
+              if (pollRef.current != null) {clearInterval(pollRef.current as any);}
               pollRef.current = null;
               alert('Thanh toán thành công! Số dư sẽ được cộng tự động.');
               // Quay về trang Profile

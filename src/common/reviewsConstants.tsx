@@ -1,4 +1,4 @@
-import { IReview } from "./types";
+import { IReview } from './types';
 
 export const reviews: IReview[] = [
   {
@@ -8,7 +8,7 @@ export const reviews: IReview[] = [
     fullName: 'Ngô Châu Bảo Khanh',
     time_review: '1/10/2024 13:45',
     start: 5,
-    avatar: 'https://banahills.sunworld.vn/wp-content/uploads/2024/04/DJI_0004-1-scaled.jpg'
+    avatar: 'https://banahills.sunworld.vn/wp-content/uploads/2024/04/DJI_0004-1-scaled.jpg',
   },
   {
     id: 2,
@@ -17,7 +17,7 @@ export const reviews: IReview[] = [
     fullName: 'Trần Đình Quý',
     time_review: '23/9/2024 8:32',
     start: 5,
-    avatar: 'https://vietsensetravel.com/view/at_tong-hop-cac-tour-du-lich-da-nang-hap-dan_58e99afe10c4c5479a1c5d1ba68b9b97.jpg'
+    avatar: 'https://vietsensetravel.com/view/at_tong-hop-cac-tour-du-lich-da-nang-hap-dan_58e99afe10c4c5479a1c5d1ba68b9b97.jpg',
   },
   {
     id: 3,
@@ -26,7 +26,7 @@ export const reviews: IReview[] = [
     fullName: 'Ngô Ngọc Hoàng Vương',
     time_review: '1/7/2024  9:28',
     start: 5,
-    avatar: 'https://res.klook.com/image/upload/q_85/c_fill,w_750/v1705907713/ikh5vbdiprroxn5fadnd.jpg'
+    avatar: 'https://res.klook.com/image/upload/q_85/c_fill,w_750/v1705907713/ikh5vbdiprroxn5fadnd.jpg',
   },
   {
     id: 4,
@@ -35,7 +35,7 @@ export const reviews: IReview[] = [
     fullName: 'Ngô Bảo Khang',
     time_review: '5/7/2024 16:02',
     start: 5,
-    avatar: 'https://duonggiahotel.vn/wp-content/uploads/2023/11/dia-diem-du-lich-da-nang-avt.jpg'
+    avatar: 'https://duonggiahotel.vn/wp-content/uploads/2023/11/dia-diem-du-lich-da-nang-avt.jpg',
   },
   {
     id: 5,
@@ -44,7 +44,7 @@ export const reviews: IReview[] = [
     fullName: 'Châu Thị Diễm',
     time_review: ' 10/2/2024 20:08',
     start: 5,
-    avatar: 'https://statics.vinpearl.com/le-hoi-da-nang-3_1632922702.jpg'
+    avatar: 'https://statics.vinpearl.com/le-hoi-da-nang-3_1632922702.jpg',
   },
   {
     id: 6,
@@ -53,7 +53,7 @@ export const reviews: IReview[] = [
     fullName: 'Nguyễn Ngọc Mai Khanh',
     time_review: ' 6/9/2024 7:30',
     start: 5,
-    avatar: 'https://thuexemaydanang.com.vn/wp-content/uploads/2021/04/maxresdefault-0946.jpg'
+    avatar: 'https://thuexemaydanang.com.vn/wp-content/uploads/2021/04/maxresdefault-0946.jpg',
   },
   {
     id: 7,
@@ -61,7 +61,7 @@ export const reviews: IReview[] = [
     name_user_review: 'Ngô Ngọc Hoàng Vương',
     time_review: '9/10/2024 23:08',
     start: 5,
-    avatar: 'https://booking.muongthanh.com/upload_images/images/M%C6%B0%E1%BB%9Dng%20Thanh%20Luxury%20%C4%90%C3%A0%20N%E1%BA%B5ng.jpg'
+    avatar: 'https://booking.muongthanh.com/upload_images/images/M%C6%B0%E1%BB%9Dng%20Thanh%20Luxury%20%C4%90%C3%A0%20N%E1%BA%B5ng.jpg',
   },
   {
     id: 8,
@@ -69,7 +69,7 @@ export const reviews: IReview[] = [
     name_user_review: 'Ngô Châu Bảo Khanh',
     time_review: ' 15/8/2024 17:02',
     start: 5,
-    avatar: 'https://static.vinwonders.com/production/le-hoi-o-da-nang-1.jpg'
+    avatar: 'https://static.vinwonders.com/production/le-hoi-o-da-nang-1.jpg',
   },
   {
     id: 9,
@@ -77,7 +77,7 @@ export const reviews: IReview[] = [
     name_user_review: 'John Peterson',
     time_review: '30/9/2024 11:44',
     start: 5,
-    avatar: 'https://vnn-imgs-a1.vgcloud.vn/image1.ictnews.vn/_Files/2020/03/17/trend-avatar-1.jpg'
+    avatar: 'https://vnn-imgs-a1.vgcloud.vn/image1.ictnews.vn/_Files/2020/03/17/trend-avatar-1.jpg',
   },
   {
     id: 10,
@@ -85,7 +85,7 @@ export const reviews: IReview[] = [
     name_user_review: 'David',
     time_review: '23/9/2024 5:45',
     start: 5,
-    avatar: 'https://vnn-imgs-a1.vgcloud.vn/image1.ictnews.vn/_Files/2020/03/20/trend-avatar-12.jpg'
+    avatar: 'https://vnn-imgs-a1.vgcloud.vn/image1.ictnews.vn/_Files/2020/03/20/trend-avatar-12.jpg',
   },
   {
     id: 11,
@@ -93,7 +93,7 @@ export const reviews: IReview[] = [
     name_user_review: 'William',
     time_review: '13/5/2024 16:30',
     start: 5,
-    avatar: 'https://vnn-imgs-a1.vgcloud.vn/image1.ictnews.vn/_Files/2020/02/25/trend-avatar-6.jpg'
+    avatar: 'https://vnn-imgs-a1.vgcloud.vn/image1.ictnews.vn/_Files/2020/02/25/trend-avatar-6.jpg',
   },
   {
     id: 12,
@@ -101,7 +101,7 @@ export const reviews: IReview[] = [
     name_user_review: 'Việt Hà',
     time_review: '21/4/2024 14:43',
     start: 5,
-    avatar: 'https://vnn-imgs-a1.vgcloud.vn/image1.ictnews.vn/_Files/2020/03/21/trend-avatar-7.jpg'
+    avatar: 'https://vnn-imgs-a1.vgcloud.vn/image1.ictnews.vn/_Files/2020/03/21/trend-avatar-7.jpg',
   },
   {
     id: 13,
@@ -109,7 +109,7 @@ export const reviews: IReview[] = [
     name_user_review: 'Quang Khánh',
     time_review: '19/1/2024 17:56',
     start: 2,
-    avatar: 'https://vnn-imgs-a1.vgcloud.vn/image1.ictnews.vn/_Files/2020/03/21/trend-avatar-13.jpeg.jpg'
+    avatar: 'https://vnn-imgs-a1.vgcloud.vn/image1.ictnews.vn/_Files/2020/03/21/trend-avatar-13.jpeg.jpg',
   },
   {
     id: 14,
@@ -117,7 +117,7 @@ export const reviews: IReview[] = [
     name_user_review: '전정국',
     time_review: '1/9/2024. 19:42',
     start: 5,
-    avatar: 'https://vnn-imgs-a1.vgcloud.vn/image1.ictnews.vn/_Files/2020/03/04/trend-avatar-9.jpg'
+    avatar: 'https://vnn-imgs-a1.vgcloud.vn/image1.ictnews.vn/_Files/2020/03/04/trend-avatar-9.jpg',
   },
   {
     id: 15,
@@ -125,7 +125,7 @@ export const reviews: IReview[] = [
     name_user_review: 'Trần Tín',
     time_review: '24/4/2024 13:02',
     start: 5,
-    avatar: 'https://vnn-imgs-a1.vgcloud.vn/image1.ictnews.vn/_Files/2020/03/07/trend-avatar-10.jpg'
+    avatar: 'https://vnn-imgs-a1.vgcloud.vn/image1.ictnews.vn/_Files/2020/03/07/trend-avatar-10.jpg',
   },
   {
     id: 16,
@@ -133,7 +133,7 @@ export const reviews: IReview[] = [
     name_user_review: 'Tomoka',
     time_review: '15/12/2023 17:38',
     start: 5,
-    avatar: 'https://cellphones.com.vn/sforum/wp-content/uploads/2023/10/avatar-trang-51.jpg'
+    avatar: 'https://cellphones.com.vn/sforum/wp-content/uploads/2023/10/avatar-trang-51.jpg',
   },
   {
     id: 17,
@@ -141,7 +141,7 @@ export const reviews: IReview[] = [
     name_user_review: 'Tấn Minh',
     time_review: '22/4/2024 19:53',
     start: 5,
-    avatar: 'https://cellphones.com.vn/sforum/wp-content/uploads/2023/10/avatar-trang-11.jpg'
+    avatar: 'https://cellphones.com.vn/sforum/wp-content/uploads/2023/10/avatar-trang-11.jpg',
   },
   {
     id: 18,
@@ -149,7 +149,7 @@ export const reviews: IReview[] = [
     name_user_review: 'Công Mẫn',
     time_review: '3/11/2023 22:05',
     start: 3,
-    avatar: 'https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-nam-nu-trang-12.jpg'
+    avatar: 'https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-nam-nu-trang-12.jpg',
   },
   {
     id: 19,
@@ -157,7 +157,7 @@ export const reviews: IReview[] = [
     name_user_review: 'Liz',
     time_review: '28/9/2023 17:09',
     start: 5,
-    avatar: 'https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-trang-nu-11.jpg'
+    avatar: 'https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-trang-nu-11.jpg',
   },
   {
     id: 20,
@@ -165,7 +165,7 @@ export const reviews: IReview[] = [
     name_user_review: 'Quốc Huy',
     time_review: '15/2/2024 13:12',
     start: 5,
-    avatar: 'https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-trang-nu-13.jpg'
+    avatar: 'https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-trang-nu-13.jpg',
   },
   {
     id: 21,
@@ -173,7 +173,7 @@ export const reviews: IReview[] = [
     name_user_review: 'Thomas',
     time_review: '14/5/2024 11: 57',
     start: 5,
-    avatar: 'https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-nam-nu-trang-6.jpg'
+    avatar: 'https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-nam-nu-trang-6.jpg',
   },
   {
     id: 22,
@@ -181,7 +181,7 @@ export const reviews: IReview[] = [
     name_user_review: '김남준',
     time_review: '12/9/2023 21:08',
     start: 5,
-    avatar: 'https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-facebook-trang-8-1.jpg'
+    avatar: 'https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-facebook-trang-8-1.jpg',
   },
   {
     id: 23,
@@ -189,7 +189,7 @@ export const reviews: IReview[] = [
     name_user_review: 'Xuân Hiệp',
     time_review: '6/9/2024 12:44',
     start: 5,
-    avatar: 'https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-facebook-trang-7-2.jpg'
+    avatar: 'https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-facebook-trang-7-2.jpg',
   },
   {
     id: 24,
@@ -197,7 +197,7 @@ export const reviews: IReview[] = [
     name_user_review: 'Hoàng Kiên',
     time_review: '13/4/2024',
     start: 4,
-    avatar: 'https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/59d24ea49dc6ecd890c9b00f85c4aecb.jpg'
+    avatar: 'https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/59d24ea49dc6ecd890c9b00f85c4aecb.jpg',
   },
   {
     id: 25,
@@ -205,7 +205,7 @@ export const reviews: IReview[] = [
     name_user_review: '박지민',
     time_review: '31/10/2023 6:58',
     start: 5,
-    avatar: 'https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-trang-nu-6.jpg'
+    avatar: 'https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-trang-nu-6.jpg',
   },
   {
     id: 26,
@@ -213,15 +213,15 @@ export const reviews: IReview[] = [
     name_user_review: ' Gia Khang',
     time_review: ' 20/12/2023 12:04',
     start: 5,
-    avatar: 'https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-trang-nu-8.jpg'
+    avatar: 'https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-trang-nu-8.jpg',
   },
   {
     id: 27,
-    content: `It's really familiar to foreigners like us.Anyway, appreciate!`,
+    content: 'It\'s really familiar to foreigners like us.Anyway, appreciate!',
     name_user_review: 'Thomas',
     time_review: '13/8/2023 18:48',
     start: 5,
-    avatar: 'https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-trang-nu-2.jpg'
+    avatar: 'https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-trang-nu-2.jpg',
   },
   {
     id: 28,
@@ -229,7 +229,7 @@ export const reviews: IReview[] = [
     name_user_review: 'Ajay',
     time_review: '24/3/2024 12:49',
     start: 5,
-    avatar: 'https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-trang-nu-1.jpg'
+    avatar: 'https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-trang-nu-1.jpg',
   },
   {
     id: 29,
@@ -237,6 +237,6 @@ export const reviews: IReview[] = [
     name_user_review: '黄 贺 江',
     time_review: '6/7/2024 7:56 ',
     start: 5,
-    avatar: 'https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-facebook-trang-2-2.jpg'
+    avatar: 'https://tintuc.dienthoaigiakho.vn/wp-content/uploads/2024/01/avatar-facebook-trang-2-2.jpg',
   },
 ]

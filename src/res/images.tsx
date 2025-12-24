@@ -2,7 +2,7 @@
  * @author AW
  * @flow
  */
- 
+
  const images = {
     banner: require('../assets/images/banner.jpg'),
     banner2: require('../assets/images/banner2.jpeg'),

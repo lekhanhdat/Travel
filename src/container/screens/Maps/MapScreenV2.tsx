@@ -916,13 +916,13 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
             // ✨ FILTER LOCATIONS: Only show locations with marker=true OR focused/selected locations
             locations.filter(loc => {
               // Always show if marker is true (or undefined for backward compatibility)
-              if (loc.marker !== false) return true;
+              if (loc.marker !== false) {return true;}
 
               // Show if this location is currently focused (for navigation)
-              if (focusLocation && loc.Id === focusLocation.Id) return true;
+              if (focusLocation && loc.Id === focusLocation.Id) {return true;}
 
               // Show if this location is currently selected
-              if (selectedLocation && loc.Id === selectedLocation.Id) return true;
+              if (selectedLocation && loc.Id === selectedLocation.Id) {return true;}
 
               // Otherwise, hide this location (marker=false and not focused/selected)
               return false;
@@ -1040,9 +1040,9 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
                       'moderate', '#FFEB3B', // Yellow - moderate congestion
                       'heavy', '#FF9800',    // Orange - heavy congestion
                       'severe', '#F44336',   // Red - severe congestion
-                      '#9E9E9E'              // Gray for unknown
+                      '#9E9E9E',              // Gray for unknown
                     ],
-                    '#2196F3'                // Blue if no congestion data
+                    '#2196F3',                // Blue if no congestion data
                   ],
                   lineOpacity: 0.85,
                   lineCap: 'round',

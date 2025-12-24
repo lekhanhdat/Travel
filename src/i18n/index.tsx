@@ -35,7 +35,7 @@ const translations = {
       retry: 'Thử lại',
       refresh: 'Làm mới',
     },
-    
+
     // Home screen
     home: {
       greeting: 'Xin chào',
@@ -230,7 +230,7 @@ const translations = {
       retry: 'Retry',
       refresh: 'Refresh',
     },
-    
+
     // Home screen
     home: {
       greeting: 'Hello',
@@ -439,22 +439,22 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({children}) =>
   const t = (key: string, params?: Record<string, string>): string => {
     const keys = key.split('.');
     let value: any = translations[language];
-    
+
     for (const k of keys) {
       value = value?.[k];
     }
-    
+
     if (typeof value !== 'string') {
       console.warn(`Translation key "${key}" not found for language "${language}"`);
       return key;
     }
-    
+
     if (params) {
       return Object.keys(params).reduce((str, param) => {
         return str.replace(new RegExp(`{${param}}`, 'g'), params[param]);
       }, value);
     }
-    
+
     return value;
   };
 

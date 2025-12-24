@@ -2,7 +2,7 @@
   * @author AW
   * @flow
   */
-  
+
   import BackSvg from './svg/BackSvg.svg';
 import Backward from './svg/Backward.svg';
 import BookMarkCheckedSvg from './svg/BookMarkCheckedSvg.svg';

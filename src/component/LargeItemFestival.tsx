@@ -73,13 +73,13 @@ export default class LargeItemFestival extends React.PureComponent<
               style={AppStyle.txt_18_bold}>
               {festival.name}
             </TextBase>
-            
+
             <TextBase
               numberOfLines={1}
               style={[AppStyle.txt_14_regular, {marginTop: sizes._4sdp}]}>
               ⏰ {festival.event_time}
             </TextBase>
-            
+
             <TextBase
               numberOfLines={1}
               style={[AppStyle.txt_14_regular, {marginTop: sizes._4sdp}]}>

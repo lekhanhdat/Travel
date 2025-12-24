@@ -118,7 +118,7 @@ export default class FAQ extends React.PureComponent<IFAQProps, IFAQState> {
 
   renderFAQItem = (item: FAQItem) => {
     const isExpanded = this.state.expandedItems.has(item.id);
-    
+
     return (
       <View key={item.id} style={styles.faqItem}>
         <TouchableOpacity
@@ -132,7 +132,7 @@ export default class FAQ extends React.PureComponent<IFAQProps, IFAQState> {
             ▼
           </TextBase>
         </TouchableOpacity>
-        
+
         {isExpanded && (
           <View style={styles.answerContainer}>
             <TextBase style={styles.answerText}>{item.answer}</TextBase>

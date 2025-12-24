@@ -171,10 +171,10 @@ const authApi = {
       };
 
       // Add optional fields if provided
-      if (phone) newAccount.phone = phone;
-      if (gender) newAccount.gender = gender;
-      if (birthday) newAccount.birthday = birthday;
-      if (address) newAccount.address = address;
+      if (phone) {newAccount.phone = phone;}
+      if (gender) {newAccount.gender = gender;}
+      if (birthday) {newAccount.birthday = birthday;}
+      if (address) {newAccount.address = address;}
 
       const res = await request.post(URL_CREATE_ACCOUNT, newAccount);
 

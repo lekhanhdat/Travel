@@ -1,14 +1,12 @@
 import React from 'react';
 import {
   Image,
-  Linking,
   NativeModules,
   StyleSheet,
   TouchableOpacity,
   View,
   ScrollView,
   ActivityIndicator,
-  Alert,
   Modal,
 } from 'react-native';
 import {TextInput, IconButton} from 'react-native-paper';
@@ -16,24 +14,19 @@ import {launchImageLibrary} from 'react-native-image-picker';
 import Toast from 'react-native-toast-message';
 import Page from '../../../component/Page';
 import HeaderBase from '../../../component/HeaderBase';
-import strings from '../../../res/strings';
 import TextBase from '../../../common/TextBase';
 import sizes from '../../../common/sizes';
 import colors from '../../../common/colors';
 import {AppStyle} from '../../../common/AppStyle';
-import {Call, FAQ, Policy, Setting} from '../../../assets/ImageSvg';
 import NavigationService from '../NavigationService';
-import {ScreenName} from '../../AppContainer';
 import {IAccount} from '../../../common/types';
 import LocalStorageCommon from '../../../utils/LocalStorageCommon';
 import {localStorageKey} from '../../../common/constants';
-import {BackSvg, UserSvg} from '../../../assets/assets/ImageSvg';
-import {Button} from 'react-native-paper';
+import {BackSvg} from '../../../assets/assets/ImageSvg';
 import {Avatar, getDisplayName} from '../../../utils/avatarUtils';
 import authApi from '../../../services/auth.api';
 import locationApi from '../../../services/locations.api';
 import {validateEmail} from '../../../utils/Utils';
-
 
 const {StatusBarManager} = NativeModules;
 
@@ -193,7 +186,7 @@ export default class ProfileScreen extends React.PureComponent<
         quality: 0.8,
         selectionLimit: 1,
       },
-      async (response) => {
+      async response => {
         if (response.didCancel) {
           console.log('User cancelled image picker');
         } else if (response.errorCode) {
@@ -219,7 +212,9 @@ export default class ProfileScreen extends React.PureComponent<
   handleConfirmAvatar = async () => {
     const {previewAvatarUri, account} = this.state;
 
-    if (!previewAvatarUri || !account?.Id) return;
+    if (!previewAvatarUri || !account?.Id) {
+      return;
+    }
 
     this.setState({uploadingAvatar: true, showAvatarPreview: false});
 
@@ -272,7 +267,9 @@ export default class ProfileScreen extends React.PureComponent<
   handleDeleteAvatar = async () => {
     const {account} = this.state;
 
-    if (!account?.Id) return;
+    if (!account?.Id) {
+      return;
+    }
 
     this.setState({uploadingAvatar: true});
 
@@ -313,7 +310,16 @@ export default class ProfileScreen extends React.PureComponent<
   };
 
   handleSaveProfile = async () => {
-    const {account, editFullName, editEmail, editAvatarUri, editPhone, editGender, editBirthday, editAddress} = this.state;
+    const {
+      account,
+      editFullName,
+      editEmail,
+      editAvatarUri,
+      editPhone,
+      editGender,
+      editBirthday,
+      editAddress,
+    } = this.state;
 
     if (!account?.Id) {
       Toast.show({
@@ -454,11 +460,7 @@ export default class ProfileScreen extends React.PureComponent<
     this.setState({changingPassword: true});
 
     try {
-      await authApi.changePassword(
-        account.Id,
-        currentPassword,
-        newPassword,
-      );
+      await authApi.changePassword(account.Id, currentPassword, newPassword);
 
       this.setState({
         currentPassword: '',
@@ -499,7 +501,9 @@ export default class ProfileScreen extends React.PureComponent<
 
   // Helper function to format birthday to DD/MM/YYYY
   formatBirthday = (birthday?: string): string => {
-    if (!birthday) return 'Chưa cập nhật';
+    if (!birthday) {
+      return 'Chưa cập nhật';
+    }
 
     // If already in DD/MM/YYYY format, return as-is
     if (/^\d{2}\/\d{2}\/\d{4}$/.test(birthday)) {
@@ -693,8 +697,7 @@ export default class ProfileScreen extends React.PureComponent<
             <TouchableOpacity
               style={styles.actionButton}
               onPress={this.handleOpenEditModal}>
-              <TextBase
-                style={[AppStyle.txt_16_bold, {color: colors.white}]}>
+              <TextBase style={[AppStyle.txt_16_bold, {color: colors.white}]}>
                 Chỉnh sửa thông tin
               </TextBase>
             </TouchableOpacity>
@@ -702,8 +705,7 @@ export default class ProfileScreen extends React.PureComponent<
             <TouchableOpacity
               style={[styles.actionButton, styles.secondaryButton]}
               onPress={this.handleOpenPasswordModal}>
-              <TextBase
-                style={[AppStyle.txt_16_bold, {color: colors.primary}]}>
+              <TextBase style={[AppStyle.txt_16_bold, {color: colors.primary}]}>
                 Đổi mật khẩu
               </TextBase>
             </TouchableOpacity>
@@ -730,7 +732,8 @@ export default class ProfileScreen extends React.PureComponent<
 
               <ScrollView>
                 {/* Avatar */}
-                <View style={{alignItems: 'center', marginBottom: sizes._20sdp}}>
+                <View
+                  style={{alignItems: 'center', marginBottom: sizes._20sdp}}>
                   <TouchableOpacity
                     onPress={this.handlePickAvatar}
                     disabled={uploadingAvatar}>
@@ -766,10 +769,7 @@ export default class ProfileScreen extends React.PureComponent<
                       disabled={uploadingAvatar}
                       style={{marginTop: sizes._8sdp}}>
                       <TextBase
-                        style={[
-                          AppStyle.txt_12_medium,
-                          {color: '#FF0000'},
-                        ]}>
+                        style={[AppStyle.txt_12_medium, {color: '#FF0000'}]}>
                         🗑️ Xóa ảnh đại diện
                       </TextBase>
                     </TouchableOpacity>
@@ -849,7 +849,7 @@ export default class ProfileScreen extends React.PureComponent<
                     Giới tính
                   </TextBase>
                   <View style={styles.genderContainer}>
-                    {(['Male', 'Female', 'Other'] as const).map((gender) => (
+                    {(['Male', 'Female', 'Other'] as const).map(gender => (
                       <TouchableOpacity
                         key={gender}
                         style={[
@@ -867,7 +867,11 @@ export default class ProfileScreen extends React.PureComponent<
                                   : colors.primary_950,
                             },
                           ]}>
-                          {gender === 'Male' ? 'Nam' : gender === 'Female' ? 'Nữ' : 'Khác'}
+                          {gender === 'Male'
+                            ? 'Nam'
+                            : gender === 'Female'
+                            ? 'Nữ'
+                            : 'Khác'}
                         </TextBase>
                       </TouchableOpacity>
                     ))}
@@ -976,7 +980,9 @@ export default class ProfileScreen extends React.PureComponent<
                   <TextInput
                     mode="outlined"
                     value={currentPassword}
-                    onChangeText={text => this.setState({currentPassword: text})}
+                    onChangeText={text =>
+                      this.setState({currentPassword: text})
+                    }
                     placeholder="Nhập mật khẩu hiện tại"
                     secureTextEntry={!showCurrentPassword}
                     right={
@@ -1036,7 +1042,9 @@ export default class ProfileScreen extends React.PureComponent<
                   <TextInput
                     mode="outlined"
                     value={confirmPassword}
-                    onChangeText={text => this.setState({confirmPassword: text})}
+                    onChangeText={text =>
+                      this.setState({confirmPassword: text})
+                    }
                     placeholder="Nhập lại mật khẩu mới"
                     secureTextEntry={!showConfirmPassword}
                     right={
@@ -1092,7 +1100,10 @@ export default class ProfileScreen extends React.PureComponent<
           transparent={true}
           animationType="fade"
           onRequestClose={() =>
-            this.setState({showAvatarPreview: false, previewAvatarUri: undefined})
+            this.setState({
+              showAvatarPreview: false,
+              previewAvatarUri: undefined,
+            })
           }>
           <View style={styles.modalOverlay}>
             <View style={styles.modalContent}>

@@ -205,7 +205,7 @@ class AIApi {
   }
 
   async getLine(params: any) {
-    let url = `/maps/api/directions/json`;
+    let url = '/maps/api/directions/json';
     return await this.requestGet(url, {}, params, undefined);
   }
 }

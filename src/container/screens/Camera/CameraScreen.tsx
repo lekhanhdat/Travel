@@ -73,10 +73,10 @@ export default class CameraScreen extends React.PureComponent<
         isActive: true,
       });
     });
-    
+
     // Test backend connection on mount
     this.testBackendConnection();
-    
+
     const cameraPermission = await Camera.requestCameraPermission();
     const microphonePermission = await Camera.requestMicrophonePermission();
 
@@ -91,7 +91,7 @@ export default class CameraScreen extends React.PureComponent<
   testBackendConnection = async () => {
     console.log('=== TESTING BACKEND CONNECTION ===');
     console.log('Testing backend connection to:', SERVER_URL);
-    
+
     try {
       const response = await fetch(`${SERVER_URL}/`, {
         method: 'GET',
@@ -99,10 +99,10 @@ export default class CameraScreen extends React.PureComponent<
           'Content-Type': 'application/json',
         },
       });
-      
+
       console.log('Response status:', response.status);
       console.log('Response ok:', response.ok);
-      
+
       if (response.ok) {
         const data = await response.json();
         console.log('Backend connection successful:', data);
@@ -562,7 +562,7 @@ export default class CameraScreen extends React.PureComponent<
                   source={{
                     uri: Platform.OS === 'android'
                       ? `file://${this.state.previewImagePath}`
-                      : this.state.previewImagePath
+                      : this.state.previewImagePath,
                   }}
                   style={{
                     width: sizes.width - sizes._32sdp,

@@ -13,7 +13,7 @@ export function withTranslation<P extends WithTranslationProps>(
 ) {
   const WithTranslationComponent = (props: Omit<P, keyof WithTranslationProps>) => {
     const {t, language, setLanguage} = useLanguage();
-    
+
     return (
       <WrappedComponent
         {...(props as P)}
@@ -25,6 +25,6 @@ export function withTranslation<P extends WithTranslationProps>(
   };
 
   WithTranslationComponent.displayName = `withTranslation(${WrappedComponent.displayName || WrappedComponent.name})`;
-  
+
   return WithTranslationComponent;
 }

@@ -2,7 +2,7 @@ import React from 'react';
 import { TouchableOpacity, View, Platform, ActivityIndicator } from 'react-native';
 import Page from '../../../component/Page';
 import HeaderBase from '../../../component/HeaderBase';
-import ImageView from "react-native-image-viewing";
+import ImageView from 'react-native-image-viewing';
 import NavigationService from '../NavigationService';
 import sizes from '../../../common/sizes';
 import colors from '../../../common/colors';

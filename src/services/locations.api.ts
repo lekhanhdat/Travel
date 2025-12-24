@@ -54,7 +54,7 @@ let itemsCache: CacheEntry<IItem[]> | null = null;
 
 // Check if cache is valid
 const isCacheValid = <T>(cache: CacheEntry<T> | null): boolean => {
-  if (!cache) return false;
+  if (!cache) {return false;}
   return Date.now() - cache.timestamp < CACHE_DURATION;
 };
 
@@ -79,7 +79,7 @@ const locationApi = {
   getLocations: async (forceRefresh: boolean = false) => {
     // Return cached data if valid and not forcing refresh
     if (!forceRefresh && isCacheValid(locationsCache)) {
-      if (__DEV__) console.log('📦 Using cached locations:', locationsCache!.data.length);
+      if (__DEV__) {console.log('📦 Using cached locations:', locationsCache!.data.length);}
       return locationsCache!.data;
     }
     // 🔍 DEBUG: Log API request details (only in development)
@@ -100,7 +100,7 @@ const locationApi = {
     while (hasMorePages) {
       const offset = (currentPage - 1) * pageSize;
 
-      if (__DEV__) console.log(`📄 Fetching page ${currentPage} (offset: ${offset}, limit: ${pageSize})...`);
+      if (__DEV__) {console.log(`📄 Fetching page ${currentPage} (offset: ${offset}, limit: ${pageSize})...`);}
 
       const res = await request.get<GetLocationsResponse>(URL_GET_LOCATIONS, {
         params: {
@@ -148,7 +148,7 @@ const locationApi = {
         try {
           parsed.reviews = JSON.parse(location.reviews);
         } catch (e) {
-          if (__DEV__) console.error('Error parsing reviews:', e);
+          if (__DEV__) {console.error('Error parsing reviews:', e);}
           parsed.reviews = [];
         }
       }
@@ -158,7 +158,7 @@ const locationApi = {
         try {
           parsed.images = JSON.parse(location.images);
         } catch (e) {
-          if (__DEV__) console.error('Error parsing images:', e);
+          if (__DEV__) {console.error('Error parsing images:', e);}
           parsed.images = [];
         }
       }
@@ -168,7 +168,7 @@ const locationApi = {
         try {
           parsed.videos = JSON.parse(location.videos);
         } catch (e) {
-          if (__DEV__) console.error('Error parsing videos:', e);
+          if (__DEV__) {console.error('Error parsing videos:', e);}
           parsed.videos = [];
         }
       }
@@ -189,7 +189,7 @@ const locationApi = {
         try {
           parsed.types = JSON.parse((location as any).types);
         } catch (e) {
-          if (__DEV__) console.error('Error parsing types:', e);
+          if (__DEV__) {console.error('Error parsing types:', e);}
           parsed.types = [];
         }
       } else if (Array.isArray((location as any).types)) {
@@ -250,7 +250,7 @@ const locationApi = {
   getItems: async (forceRefresh: boolean = false) => {
     // Return cached data if valid
     if (!forceRefresh && isCacheValid(itemsCache)) {
-      if (__DEV__) console.log('📦 Using cached items:', itemsCache!.data.length);
+      if (__DEV__) {console.log('📦 Using cached items:', itemsCache!.data.length);}
       return itemsCache!.data;
     }
 
@@ -298,7 +298,7 @@ const locationApi = {
     try {
       // Return cached reviews if valid
       if (!forceRefresh && isCacheValid(reviewsCache)) {
-        if (__DEV__) console.log('📦 Using cached reviews:', reviewsCache!.data.length);
+        if (__DEV__) {console.log('📦 Using cached reviews:', reviewsCache!.data.length);}
         return reviewsCache!.data;
       }
 
@@ -318,7 +318,7 @@ const locationApi = {
               try {
                 parsedReview.images = JSON.parse(parsedReview.images);
               } catch (e) {
-                if (__DEV__) console.error('Error parsing review images:', e);
+                if (__DEV__) {console.error('Error parsing review images:', e);}
                 parsedReview.images = [];
               }
             }
@@ -332,7 +332,7 @@ const locationApi = {
         }
       });
 
-      if (__DEV__) console.log('✅ Total reviews from cloud:', allReviews.length);
+      if (__DEV__) {console.log('✅ Total reviews from cloud:', allReviews.length);}
 
       // Store in cache
       reviewsCache = {
@@ -342,7 +342,7 @@ const locationApi = {
 
       return allReviews;
     } catch (error) {
-      if (__DEV__) console.error('❌ Error fetching reviews:', error);
+      if (__DEV__) {console.error('❌ Error fetching reviews:', error);}
       return [];
     }
   },
@@ -361,7 +361,7 @@ const locationApi = {
         throw new Error('Location ID is required');
       }
 
-      if (__DEV__) console.log('📝 Creating review for location:', locationId);
+      if (__DEV__) {console.log('📝 Creating review for location:', locationId);}
 
       // 1. Lấy location hiện tại
       const res = await request.get(`${URL_GET_LOCATIONS}/${locationId}`);
@@ -374,7 +374,7 @@ const locationApi = {
           try {
             currentReviews = JSON.parse(location.reviews);
           } catch (e) {
-            if (__DEV__) console.error('Error parsing current reviews:', e);
+            if (__DEV__) {console.error('Error parsing current reviews:', e);}
             currentReviews = [];
           }
         } else if (Array.isArray(location.reviews)) {
@@ -403,7 +403,7 @@ const locationApi = {
         {
           Id: locationId, // Primary key field (viết hoa)
           reviews: JSON.stringify(currentReviews),
-        }
+        },
       ];
 
       const updateRes = await request.patch(updateUrl, updatePayload);
@@ -411,7 +411,7 @@ const locationApi = {
       // Clear cache after creating review to ensure fresh data
       clearLocationsCache();
 
-      if (__DEV__) console.log('✅ Review added to location:', locationId);
+      if (__DEV__) {console.log('✅ Review added to location:', locationId);}
       return updateRes.data;
     } catch (error: any) {
       if (__DEV__) {
@@ -449,7 +449,7 @@ const locationApi = {
       // ⚠️ QUAN TRỌNG: Phải dùng signedUrl thay vì url để tránh 403 Forbidden
       if (res.data && Array.isArray(res.data) && res.data.length > 0) {
         const uploadedFile = res.data[0];
-        if (__DEV__) console.log('📸 Image uploaded successfully');
+        if (__DEV__) {console.log('📸 Image uploaded successfully');}
 
         return {
           // Dùng signedUrl (có quyền truy cập) thay vì url (private)
@@ -460,7 +460,7 @@ const locationApi = {
 
       throw new Error('Upload response invalid');
     } catch (error: any) {
-      if (__DEV__) console.error('❌ Error uploading image:', error);
+      if (__DEV__) {console.error('❌ Error uploading image:', error);}
       throw error;
     }
   },

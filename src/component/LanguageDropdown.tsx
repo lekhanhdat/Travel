@@ -62,7 +62,7 @@ const LanguageDropdown: React.FC<LanguageDropdownProps> = ({
 
   const renderLanguageOption = ({item}: {item: LanguageOption}) => {
     const isSelected = item.code === language;
-    
+
     return (
       <TouchableOpacity
         style={[

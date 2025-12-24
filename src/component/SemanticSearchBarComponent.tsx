@@ -58,7 +58,7 @@ export default class SemanticSearchBarComponent<T> extends React.PureComponent<
   // Keyword-based filtering (existing logic)
   filterDataKeyword = (searchValue: string): T[] => {
     const {data, searchFields} = this.props;
-    if (!searchValue || searchValue.trim().length === 0) return data;
+    if (!searchValue || searchValue.trim().length === 0) {return data;}
 
     const normalizedSearch = convertCitationVietnameseUnsigned(searchValue)
       ?.toLowerCase()
@@ -67,7 +67,7 @@ export default class SemanticSearchBarComponent<T> extends React.PureComponent<
     return data.filter(item => {
       return searchFields.some(field => {
         const fieldValue = item[field];
-        if (fieldValue === null || fieldValue === undefined) return false;
+        if (fieldValue === null || fieldValue === undefined) {return false;}
         const normalizedFieldValue = convertCitationVietnameseUnsigned(
           String(fieldValue),
         )?.toLowerCase();

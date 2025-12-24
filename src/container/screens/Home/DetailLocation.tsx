@@ -56,10 +56,10 @@ export default class DetailLocationScreen extends React.PureComponent<
       const locationId = location.Id || location.id;
       try {
         const festivals = await festivalsApi.getFestivalsByLocationId(locationId!);
-        if (__DEV__) console.log(`🎉 Found ${festivals.length} festivals for location ${locationId}`);
+        if (__DEV__) {console.log(`🎉 Found ${festivals.length} festivals for location ${locationId}`);}
         this.setState({ festivals });
       } catch (error) {
-        if (__DEV__) console.error('❌ Error loading festivals:', error);
+        if (__DEV__) {console.error('❌ Error loading festivals:', error);}
       }
     }
   }
@@ -86,7 +86,7 @@ export default class DetailLocationScreen extends React.PureComponent<
     const currentTypes = currentLocation.types || [];
 
     if (currentTypes.length === 0) {
-      if (__DEV__) console.log('⚠️ Current location has no types');
+      if (__DEV__) {console.log('⚠️ Current location has no types');}
       return [];
     }
 
@@ -195,7 +195,7 @@ export default class DetailLocationScreen extends React.PureComponent<
             />
 
             <View style={{flex: 1, padding: sizes._16sdp}}>
-              <TextBase style={[AppStyle.txt_20_bold, {textAlign: 'center',}]}>
+              <TextBase style={[AppStyle.txt_20_bold, {textAlign: 'center'}]}>
                 {location.name}
               </TextBase>
 

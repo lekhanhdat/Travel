@@ -4,7 +4,7 @@ import Page from '../../../component/Page';
 import HeaderBase from '../../../component/HeaderBase';
 import strings from '../../../res/strings';
 import {reviews} from '../../../common/reviewsConstants';
-import {IAccount, ILocation, IReview,} from '../../../common/types';
+import {IAccount, ILocation, IReview} from '../../../common/types';
 import ReviewItem from '../../../component/ReviewItem';
 import sizes from '../../../common/sizes';
 import BottomSheet from '../../../component/BottomSheet';
@@ -103,7 +103,7 @@ export default class NewFeedScreen extends React.PureComponent<
     try {
       // 1. Lấy reviews từ cloud NocoDB (uses cache)
       const cloudReviews = await locationApi.getReviews();
-      if (__DEV__) console.log('✅ Cloud reviews:', cloudReviews.length);
+      if (__DEV__) {console.log('✅ Cloud reviews:', cloudReviews.length);}
 
       // 2. Lấy reviews từ hardcode (backup)
       const locations: ILocation[] = _.unionBy(
@@ -118,11 +118,11 @@ export default class NewFeedScreen extends React.PureComponent<
           hardcodeReviews = hardcodeReviews.concat(review);
         });
       });
-      if (__DEV__) console.log('✅ Hardcode reviews:', hardcodeReviews.length);
+      if (__DEV__) {console.log('✅ Hardcode reviews:', hardcodeReviews.length);}
 
       // 3. Merge: Cloud reviews lên trên, hardcode reviews ở dưới
       const allReviews = [...cloudReviews, ...hardcodeReviews];
-      if (__DEV__) console.log('✅ Total reviews:', allReviews.length);
+      if (__DEV__) {console.log('✅ Total reviews:', allReviews.length);}
 
       // 4. Sắp xếp theo thời gian (mới nhất lên trên)
       const sortedReviews = allReviews.sort((a, b) => {
@@ -131,11 +131,11 @@ export default class NewFeedScreen extends React.PureComponent<
           try {
             // Thử parse format mới: "HH:mm DD/MM/YYYY"
             let parsed = moment(timeStr, 'HH:mm DD/MM/YYYY', true);
-            if (parsed.isValid()) return parsed;
+            if (parsed.isValid()) {return parsed;}
 
             // Thử parse format cũ: "DD/MM/YYYY HH:mm"
             parsed = moment(timeStr, 'DD/MM/YYYY HH:mm', true);
-            if (parsed.isValid()) return parsed;
+            if (parsed.isValid()) {return parsed;}
 
             // Fallback
             return moment(timeStr);
@@ -155,7 +155,7 @@ export default class NewFeedScreen extends React.PureComponent<
         reviews: sortedReviews,
       });
     } catch (error) {
-      if (__DEV__) console.error('❌ Error fetching reviews:', error);
+      if (__DEV__) {console.error('❌ Error fetching reviews:', error);}
       // Fallback to hardcode reviews
       const locations: ILocation[] = _.unionBy(
         LOCATION_POPULAR,
@@ -191,15 +191,15 @@ export default class NewFeedScreen extends React.PureComponent<
       },
       (response) => {
         if (response.didCancel) {
-          if (__DEV__) console.log('User cancelled image picker');
+          if (__DEV__) {console.log('User cancelled image picker');}
         } else if (response.errorCode) {
-          if (__DEV__) console.log('ImagePicker Error: ', response.errorMessage);
+          if (__DEV__) {console.log('ImagePicker Error: ', response.errorMessage);}
           Alert.alert('Lỗi', 'Không thể chọn ảnh. Vui lòng thử lại.');
         } else if (response.assets) {
           this.setState({
             selectedImages: response.assets,
           });
-          if (__DEV__) console.log('✅ Selected images:', response.assets.length);
+          if (__DEV__) {console.log('✅ Selected images:', response.assets.length);}
         }
       },
     );
@@ -220,17 +220,17 @@ export default class NewFeedScreen extends React.PureComponent<
       // 1. Upload images nếu có
       let imageUrls: string[] = [];
       if (this.state.selectedImages.length > 0) {
-        if (__DEV__) console.log('📤 Uploading images...');
+        if (__DEV__) {console.log('📤 Uploading images...');}
         for (const image of this.state.selectedImages) {
           try {
             const uploadResult = await locationApi.uploadImage(image);
             // uploadResult.url đã là signedUrl từ API
             imageUrls.push(uploadResult.url);
           } catch (error) {
-            if (__DEV__) console.error('Error uploading image:', error);
+            if (__DEV__) {console.error('Error uploading image:', error);}
           }
         }
-        if (__DEV__) console.log('✅ Images uploaded:', imageUrls.length);
+        if (__DEV__) {console.log('✅ Images uploaded:', imageUrls.length);}
       }
 
       // 2. Create review object
@@ -251,9 +251,9 @@ export default class NewFeedScreen extends React.PureComponent<
       // 3. Save to NocoDB
       try {
         await locationApi.createReview(newReview);
-        if (__DEV__) console.log('✅ Review saved to cloud');
+        if (__DEV__) {console.log('✅ Review saved to cloud');}
       } catch (error) {
-        if (__DEV__) console.error('❌ Error saving review to cloud:', error);
+        if (__DEV__) {console.error('❌ Error saving review to cloud:', error);}
         Alert.alert('Thông báo', 'Không thể lưu đánh giá lên server, nhưng đã lưu local.');
       }
 
@@ -276,7 +276,7 @@ export default class NewFeedScreen extends React.PureComponent<
 
       this.refSheet?.close();
     } catch (error) {
-      if (__DEV__) console.error('❌ Error submitting review:', error);
+      if (__DEV__) {console.error('❌ Error submitting review:', error);}
       this.setState({uploading: false});
       Alert.alert('Lỗi', 'Không thể gửi đánh giá. Vui lòng thử lại.');
     }
@@ -542,7 +542,7 @@ export default class NewFeedScreen extends React.PureComponent<
                 <TextBase
                   style={[
                     AppStyle.txt_18_bold_review,
-                    {marginTop: sizes._8sdp}
+                    {marginTop: sizes._8sdp},
                   ]}>
                   {getDisplayName(this.state.avt)}
                 </TextBase>

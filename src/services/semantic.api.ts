@@ -35,7 +35,7 @@ class QueryCache {
     const key = this.generateKey(prefix, params);
     const entry = this.cache.get(key);
 
-    if (!entry) return null;
+    if (!entry) {return null;}
 
     if (Date.now() > entry.expiresAt) {
       this.cache.delete(key);
@@ -51,7 +51,7 @@ class QueryCache {
     // Evict oldest entries if cache is full
     if (this.cache.size >= this.maxSize) {
       const oldestKey = this.cache.keys().next().value;
-      if (oldestKey) this.cache.delete(oldestKey);
+      if (oldestKey) {this.cache.delete(oldestKey);}
     }
 
     this.cache.set(key, {

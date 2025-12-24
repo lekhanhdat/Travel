@@ -127,7 +127,7 @@ const festivalsApi = {
     try {
       const festivals = await festivalsApi.getFestivals();
       const lowerKeyword = keyword.toLowerCase();
-      return festivals.filter(f => 
+      return festivals.filter(f =>
         f.name.toLowerCase().includes(lowerKeyword) ||
         f.description.toLowerCase().includes(lowerKeyword)
       );
@@ -177,11 +177,11 @@ const festivalsApi = {
       };
 
       // Chỉ stringify các field là array/object
-      if (updates.types) payload.types = JSON.stringify(updates.types);
-      if (updates.reviews) payload.reviews = JSON.stringify(updates.reviews);
-      if (updates.images) payload.images = JSON.stringify(updates.images);
-      if (updates.videos) payload.videos = JSON.stringify(updates.videos);
-      if (updates.advise) payload.advise = JSON.stringify(updates.advise);
+      if (updates.types) {payload.types = JSON.stringify(updates.types);}
+      if (updates.reviews) {payload.reviews = JSON.stringify(updates.reviews);}
+      if (updates.images) {payload.images = JSON.stringify(updates.images);}
+      if (updates.videos) {payload.videos = JSON.stringify(updates.videos);}
+      if (updates.advise) {payload.advise = JSON.stringify(updates.advise);}
 
       // Các field khác giữ nguyên
       Object.keys(updates).forEach(key => {
@@ -233,7 +233,7 @@ const festivalsApi = {
         // Parse event_time để lấy tháng
         // Format: "Tháng 3 hàng năm" hoặc "Từ ngày 31/5 đến 12/7 hàng năm"
         const eventTime = f.event_time.toLowerCase();
-        return eventTime.includes(`tháng ${month}`) || 
+        return eventTime.includes(`tháng ${month}`) ||
                eventTime.includes(`/${month}/`) ||
                eventTime.includes(`-${month}/`);
       });

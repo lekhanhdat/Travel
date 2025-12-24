@@ -19,7 +19,7 @@ interface CachedImageProps extends Omit<ImageProps, 'source'> {
 
 /**
  * CachedImage - A performance-optimized image component
- * 
+ *
  * Features:
  * - Uses cache: 'force-cache' for better caching
  * - Shows loading indicator while image loads
@@ -47,7 +47,7 @@ const CachedImage: React.FC<CachedImageProps> = memo(({
   const handleError = useCallback(() => {
     setLoading(false);
     setError(true);
-    if (__DEV__) console.log('CachedImage error loading:', uri);
+    if (__DEV__) {console.log('CachedImage error loading:', uri);}
   }, [uri]);
 
   // If no URI or error, show placeholder

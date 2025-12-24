@@ -192,7 +192,7 @@ export default class ProfileScreen extends React.PureComponent<
                 alignItems: 'center',
                 justifyContent: 'center',
               }}>
-                
+
               <UserSvg
                 width={sizes._20sdp}
                 height={sizes._20sdp}
@@ -370,12 +370,12 @@ export default class ProfileScreen extends React.PureComponent<
             </TouchableOpacity>
           </View>
 
-          <View style={{marginTop: sizes._26sdp, marginHorizontal: sizes._26sdp,}}>
+          <View style={{marginTop: sizes._26sdp, marginHorizontal: sizes._26sdp}}>
             <Button
               mode="contained"
-              labelStyle={{ fontSize: 16, height: sizes._30sdp, textAlignVertical: 'center', color: '#B22222', }} // Tăng kích thước chữ
+              labelStyle={{ fontSize: 16, height: sizes._30sdp, textAlignVertical: 'center', color: '#B22222' }} // Tăng kích thước chữ
               onPress={() => {
-                NavigationService.reset(ScreenName.LOGIN_SCREEN);            
+                NavigationService.reset(ScreenName.LOGIN_SCREEN);
               }}>
               Đăng xuất
             </Button>

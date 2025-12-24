@@ -57,7 +57,7 @@ class ButtonBase extends React.PureComponent<Props, States> {
               styles.label,
               //@ts-ignore
               labelStyle,
-              // eslint-disable-next-line react-native/no-inline-styles
+
               {
                 width: hasRightButton ? buttonWidth - sizes._72sdp : '100%',
               },

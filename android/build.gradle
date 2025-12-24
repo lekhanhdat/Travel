@@ -29,7 +29,7 @@ allprojects {
         google()
         mavenCentral()
         // maven { url("${project(':react-native-background-geolocation').projectDir}/libs") }
-        maven { url("${project(':react-native-background-fetch').projectDir}/libs") }
+        // maven { url("${project(':react-native-background-fetch').projectDir}/libs") } // REMOVED - unused
         maven {
             url 'https://api.mapbox.com/downloads/v2/releases/maven'
             authentication {

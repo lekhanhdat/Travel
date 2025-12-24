@@ -3,6 +3,11 @@ apply plugin: "org.jetbrains.kotlin.android"
 apply plugin: "com.facebook.react"
 // Project background_geolocation = project(':react-native-background-geolocation')
 // apply from: "${background_geolocation.projectDir}/app.gradle"
+
+// Vector Icons - Only include MaterialIcons to reduce APK size
+project.ext.vectoricons = [
+    iconFontNames: [ 'MaterialIcons.ttf' ]
+]
 apply from: file("../../node_modules/react-native-vector-icons/fonts.gradle")
 /**
  * This is the configuration block to customize your React Native Android app.
@@ -59,7 +64,7 @@ react {
 /**
  * Set this to true to Run Proguard on Release builds to minify the Java bytecode.
  */
-def enableProguardInReleaseBuilds = false
+def enableProguardInReleaseBuilds = true
 
 /**
  * The preferred build flavor of JavaScriptCore (JSC)
@@ -88,6 +93,16 @@ android {
         versionName "1.0"
         multiDexEnabled true
     }
+
+    // ABI Splits - Disabled for universal APK
+    splits {
+        abi {
+            reset()
+            enable false
+            universalApk true
+        }
+    }
+
     signingConfigs {
         debug {
             storeFile file('debug.keystore')
@@ -95,19 +110,22 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
+        release {
+            storeFile file('release.keystore')
+            storePassword 'travel123'
+            keyAlias 'travel-release'
+            keyPassword 'travel123'
+        }
     }
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
         }
         release {
-            // Caution! In production, you need to generate your own keystore file.
-            // see https://reactnative.dev/docs/signed-apk-android.
-            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.release
             minifyEnabled enableProguardInReleaseBuilds
-            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
-            // shrinkResources false
-            // proguardFiles "${background_geolocation.projectDir}/proguard-rules.pro"
+            shrinkResources enableProguardInReleaseBuilds
+            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
         }
     }
 }
@@ -115,7 +133,7 @@ android {
 dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
-    implementation 'com.google.android.gms:play-services-maps:17.0.1'
+    // REMOVED: play-services-maps - using Mapbox instead
     implementation 'com.google.android.gms:play-services-location:21.3.0'
     if (hermesEnabled.toBoolean()) {
         implementation("com.facebook.react:hermes-android")

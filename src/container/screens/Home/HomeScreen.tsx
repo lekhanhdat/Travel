@@ -9,34 +9,24 @@ import {
   PermissionsAndroid,
 } from 'react-native';
 import Page from '../../../component/Page';
-import HeaderBase from '../../../component/HeaderBase';
-import strings from '../../../res/strings';
-import {Button, Card, Searchbar, TextInput} from 'react-native-paper';
 import sizes from '../../../common/sizes';
 import colors from '../../../common/colors';
 import TextBase from '../../../common/TextBase';
 import {AppStyle} from '../../../common/AppStyle';
 import {ILocation, IAccount} from '../../../common/types';
 import BigItemLocation from '../../../component/BigItemLocation';
-import {
-  LOCATION_NEARLY,
-  LOCATION_POPULAR,
-} from '../../../common/locationConstants';
 import LargeItemLocation from '../../../component/LargeItemLocation';
 import NavigationService from '../NavigationService';
 import {ScreenName} from '../../AppContainer';
-import _, {size} from 'lodash';
-import images from '../../../res/images';
-import {Text} from 'react-native-paper';
-import {Image} from 'react-native-svg';
 import locationApi from '../../../services/locations.api';
-import fonts from '../../../common/fonts';
 import LocalStorageCommon from '../../../utils/LocalStorageCommon';
 import {localStorageKey} from '../../../common/constants';
-import {withTranslation, WithTranslationProps} from '../../../i18n/withTranslation';
+import {
+  withTranslation,
+  WithTranslationProps,
+} from '../../../i18n/withTranslation';
 import LanguageDropdown from '../../../component/LanguageDropdown';
 import Geolocation from '@react-native-community/geolocation';
-import SearchBarComponent from '../../../component/SearchBarComponent';
 import SemanticSearchBarComponent from '../../../component/SemanticSearchBarComponent';
 import RecommendationsWidget from '../../../component/RecommendationsWidget';
 
@@ -108,7 +98,8 @@ class HomeScreen extends React.PureComponent<
           PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
           {
             title: 'Location Permission',
-            message: 'This app needs access to your location to show nearby places.',
+            message:
+              'This app needs access to your location to show nearby places.',
             buttonNeutral: 'Ask Me Later',
             buttonNegative: 'Cancel',
             buttonPositive: 'OK',
@@ -133,7 +124,7 @@ class HomeScreen extends React.PureComponent<
   // Get current GPS location
   getCurrentLocation = () => {
     Geolocation.getCurrentPosition(
-      (position) => {
+      position => {
         const {latitude, longitude} = position.coords;
         this.setState({
           currentLat: latitude,
@@ -143,7 +134,7 @@ class HomeScreen extends React.PureComponent<
         // Re-fetch locations to sort by distance
         this.fetchLocations();
       },
-      (error) => {
+      error => {
         console.log('❌ Error getting location:', error);
         // Use default Đà Nẵng coordinates
         this.fetchLocations();
@@ -157,7 +148,12 @@ class HomeScreen extends React.PureComponent<
   };
 
   // Calculate distance between two coordinates using Haversine formula
-  calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+  calculateDistance = (
+    lat1: number,
+    lon1: number,
+    lat2: number,
+    lon2: number,
+  ): number => {
     const R = 6371; // Radius of the Earth in km
     const dLat = this.deg2rad(lat2 - lat1);
     const dLon = this.deg2rad(lon2 - lon1);
@@ -191,7 +187,9 @@ class HomeScreen extends React.PureComponent<
     }));
 
     // Sort by distance (nearest first)
-    const sortedByDistance = [...locationsWithDistance].sort((a, b) => a.distance - b.distance);
+    const sortedByDistance = [...locationsWithDistance].sort(
+      (a, b) => a.distance - b.distance,
+    );
 
     // Get top 10 nearest locations
     const nearestLocations = sortedByDistance.slice(0, 20);
@@ -205,7 +203,14 @@ class HomeScreen extends React.PureComponent<
       locationsPopular: popularLocations,
     });
 
-    if (__DEV__) console.log('🎯 Nearest location:', nearestLocations[0]?.name, nearestLocations[0]?.distance?.toFixed(2), 'km');
+    if (__DEV__) {
+      console.log(
+        '🎯 Nearest location:',
+        nearestLocations[0]?.name,
+        nearestLocations[0]?.distance?.toFixed(2),
+        'km',
+      );
+    }
   }
 
   // ============ PERFORMANCE OPTIMIZATION: Memoized render functions ============
@@ -222,7 +227,10 @@ class HomeScreen extends React.PureComponent<
 
   // getItemLayout for horizontal FlatList (BigItemLocation)
   // BigItemLocation width: 200 + marginRight: 12 = 212
-  getItemLayoutHorizontal = (data: ILocation[] | null | undefined, index: number) => ({
+  getItemLayoutHorizontal = (
+    data: ILocation[] | null | undefined,
+    index: number,
+  ) => ({
     length: 212,
     offset: 212 * index,
     index,
@@ -230,7 +238,10 @@ class HomeScreen extends React.PureComponent<
 
   // getItemLayout for vertical FlatList (LargeItemLocation)
   // LargeItemLocation height: approximately 120 (image 80 + padding + text)
-  getItemLayoutVertical = (data: ILocation[] | null | undefined, index: number) => ({
+  getItemLayoutVertical = (
+    data: ILocation[] | null | undefined,
+    index: number,
+  ) => ({
     length: 120,
     offset: 120 * index,
     index,
@@ -246,12 +257,20 @@ class HomeScreen extends React.PureComponent<
   };
 
   // Called while typing - just update local state, don't navigate
-  handleSearchCallback = (filteredData: ILocation[], searchValue: string, isSemanticSearch?: boolean) => {
+  handleSearchCallback = (
+    filteredData: ILocation[],
+    searchValue: string,
+    isSemanticSearch?: boolean,
+  ) => {
     this.setState({valueSearch: searchValue});
   };
 
   // Called when user explicitly submits search (Enter key or search button)
-  handleSearchSubmit = (filteredData: ILocation[], searchValue: string, isSemanticSearch?: boolean) => {
+  handleSearchSubmit = (
+    filteredData: ILocation[],
+    searchValue: string,
+    isSemanticSearch?: boolean,
+  ) => {
     console.log('📥 [HomeScreen] handleSearchSubmit received:');
     console.log('  📋 filteredData.length:', filteredData?.length || 0);
     console.log('  📋 searchValue:', searchValue);
@@ -265,17 +284,32 @@ class HomeScreen extends React.PureComponent<
       // ALWAYS use filteredData from the search component - it contains the semantic results
       const locationsToShow = filteredData;
       console.log('  ➡️ Navigating with', locationsToShow.length, 'locations');
-      this.handleSearchWithFlag(false, locationsToShow, isSemanticSearch || false);
+      this.handleSearchWithFlag(
+        false,
+        locationsToShow,
+        isSemanticSearch || false,
+      );
     });
   };
 
-  handleSearchWithFlag = (isViewAll: boolean, locations: ILocation[], isSemanticSearch: boolean) => {
-    const searchValue = this.searchBarRef.current?.getSearchValue?.() || this.state.valueSearch || '';
+  handleSearchWithFlag = (
+    isViewAll: boolean,
+    locations: ILocation[],
+    isSemanticSearch: boolean,
+  ) => {
+    const searchValue =
+      this.searchBarRef.current?.getSearchValue?.() ||
+      this.state.valueSearch ||
+      '';
     console.log('🧭 [HomeScreen] Navigating to ViewAllLocation:');
     console.log('  📋 locations.length:', locations.length);
     console.log('  📋 isSemanticSearch:', isSemanticSearch);
     NavigationService.navigate(ScreenName.VIEW_ALL_SCREEN, {
-      title: isViewAll ? 'Xem tất cả' : isSemanticSearch ? '🧠 Kết quả AI Search' : 'Tìm kiếm',
+      title: isViewAll
+        ? 'Xem tất cả'
+        : isSemanticSearch
+        ? '🧠 Kết quả AI Search'
+        : 'Tìm kiếm',
       locations: locations,
       valueSearch: searchValue,
       isSemanticSearch: isSemanticSearch,
@@ -298,10 +332,17 @@ class HomeScreen extends React.PureComponent<
                 flex: 1,
               },
             ]}>
-            {this.props.t('home.greeting')}{this.state.account?.fullName ? `, ${this.state.account.fullName}` : ''}
+            {this.props.t('home.greeting')}
+            {this.state.account?.fullName
+              ? `, ${this.state.account.fullName}`
+              : ''}
           </TextBase>
           <View style={styles.languageDropdownContainer}>
-            <LanguageDropdown compact={true} showFlag={true} showNativeName={false} />
+            <LanguageDropdown
+              compact={true}
+              showFlag={true}
+              showNativeName={false}
+            />
           </View>
         </View>
         <TextBase
@@ -349,8 +390,14 @@ class HomeScreen extends React.PureComponent<
             )}
 
             {/* 2. Popular Locations */}
-            <View style={[styles.rowCenter, {marginTop: this.state.account?.Id ? sizes._24sdp : 0}]}>
-              <TextBase style={[AppStyle.txt_20_bold]}>Địa điểm phổ biến</TextBase>
+            <View
+              style={[
+                styles.rowCenter,
+                {marginTop: this.state.account?.Id ? sizes._24sdp : 0},
+              ]}>
+              <TextBase style={[AppStyle.txt_20_bold]}>
+                Địa điểm phổ biến
+              </TextBase>
               <TouchableOpacity
                 onPress={() =>
                   this.handleSearch(true, this.state.locationsPopular)

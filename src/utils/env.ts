@@ -18,6 +18,9 @@ import {
   OPENAI_API_KEY as ENV_OPENAI_API_KEY,
   UNSPLASH_ACCESS_KEY as ENV_UNSPLASH_ACCESS_KEY,
   SERPAPI_KEY as ENV_SERPAPI_KEY,
+  AZURE_TRANSLATOR_KEY as ENV_AZURE_TRANSLATOR_KEY,
+  AZURE_TRANSLATOR_REGION as ENV_AZURE_TRANSLATOR_REGION,
+  AZURE_TRANSLATOR_ENDPOINT as ENV_AZURE_TRANSLATOR_ENDPOINT,
 } from '@env';
 
 export type AppEnv = {
@@ -31,10 +34,14 @@ export type AppEnv = {
   OPENAI_API_KEY: string;
   UNSPLASH_ACCESS_KEY: string;
   SERPAPI_KEY: string;
+  AZURE_TRANSLATOR_KEY: string;
+  AZURE_TRANSLATOR_REGION: string;
+  AZURE_TRANSLATOR_ENDPOINT: string;
 };
 
 export const env: AppEnv = {
-  SERVER_URL: ENV_SERVER_URL || 'https://digital-ocean-fast-api-h9zys.ondigitalocean.app',
+  SERVER_URL:
+    ENV_SERVER_URL || 'https://digital-ocean-fast-api-h9zys.ondigitalocean.app',
   DB_URL: ENV_DB_URL || 'https://app.nocodb.com',
   NOCODB_TOKEN: ENV_NOCODB_TOKEN || '',
   MAPBOX_ACCESS_TOKEN: ENV_MAPBOX_ACCESS_TOKEN || '',
@@ -44,5 +51,9 @@ export const env: AppEnv = {
   OPENAI_API_KEY: ENV_OPENAI_API_KEY || '',
   UNSPLASH_ACCESS_KEY: ENV_UNSPLASH_ACCESS_KEY || '',
   SERPAPI_KEY: ENV_SERPAPI_KEY || '',
+  AZURE_TRANSLATOR_KEY: ENV_AZURE_TRANSLATOR_KEY || '',
+  AZURE_TRANSLATOR_REGION: ENV_AZURE_TRANSLATOR_REGION || 'southeastasia',
+  AZURE_TRANSLATOR_ENDPOINT:
+    ENV_AZURE_TRANSLATOR_ENDPOINT ||
+    'https://api.cognitive.microsofttranslator.com',
 };
-

@@ -22,15 +22,15 @@ import locationApi from '../../../services/locations.api';
 import LocalStorageCommon from '../../../utils/LocalStorageCommon';
 import {localStorageKey} from '../../../common/constants';
 import {
-  withTranslation,
-  WithTranslationProps,
-} from '../../../i18n/withTranslation';
+  withAzureTranslation,
+  WithAzureTranslationProps,
+} from '../../../hoc/withAzureTranslation';
 import LanguageDropdown from '../../../component/LanguageDropdown';
 import Geolocation from '@react-native-community/geolocation';
 import SemanticSearchBarComponent from '../../../component/SemanticSearchBarComponent';
 import RecommendationsWidget from '../../../component/RecommendationsWidget';
 
-interface IHomeScreenProps extends WithTranslationProps {
+interface IHomeScreenProps extends WithAzureTranslationProps {
   navigation: any;
 }
 
@@ -462,7 +462,7 @@ class HomeScreen extends React.PureComponent<
   }
 }
 
-export default withTranslation(HomeScreen);
+export default withAzureTranslation(HomeScreen);
 
 const styles = StyleSheet.create({
   container: {

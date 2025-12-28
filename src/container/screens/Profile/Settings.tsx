@@ -7,7 +7,10 @@ import {
   Alert,
   NativeModules,
 } from 'react-native';
-import {withTranslation, WithTranslationProps} from '../../../i18n/withTranslation';
+import {
+  withAzureTranslation,
+  WithAzureTranslationProps,
+} from '../../../hoc/withAzureTranslation';
 import LanguageDropdown from '../../../component/LanguageDropdown';
 import Page from '../../../component/Page';
 import HeaderBase from '../../../component/HeaderBase';
@@ -22,7 +25,7 @@ import {localStorageKey} from '../../../common/constants';
 
 const {StatusBarManager} = NativeModules;
 
-interface ISettingsProps extends WithTranslationProps {}
+interface ISettingsProps extends WithAzureTranslationProps {}
 
 interface ISettingsState {
   notifications: boolean;
@@ -33,10 +36,7 @@ interface ISettingsState {
   cacheSize: string;
 }
 
-class Settings extends React.PureComponent<
-  ISettingsProps,
-  ISettingsState
-> {
+class Settings extends React.PureComponent<ISettingsProps, ISettingsState> {
   constructor(props: ISettingsProps) {
     super(props);
     this.state = {
@@ -123,14 +123,15 @@ class Settings extends React.PureComponent<
           style: 'destructive',
           onPress: () => {
             this.setState({cacheSize: '0 MB'});
-            Alert.alert(this.props.t('common.success'), this.props.t('settings.clearCacheSuccess'));
+            Alert.alert(
+              this.props.t('common.success'),
+              this.props.t('settings.clearCacheSuccess'),
+            );
           },
         },
       ],
     );
   };
-
-
 
   renderSettingItem = (
     title: string,
@@ -240,7 +241,9 @@ class Settings extends React.PureComponent<
             <TouchableOpacity
               style={styles.clearButton}
               onPress={this.handleClearCache}>
-              <TextBase style={styles.clearButtonText}>{this.props.t('settings.clearCache')}</TextBase>
+              <TextBase style={styles.clearButtonText}>
+                {this.props.t('settings.clearCache')}
+              </TextBase>
             </TouchableOpacity>,
           )}
         </View>
@@ -249,7 +252,7 @@ class Settings extends React.PureComponent<
   }
 }
 
-export default withTranslation(Settings);
+export default withAzureTranslation(Settings);
 
 const styles = StyleSheet.create({
   container: {

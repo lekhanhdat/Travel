@@ -9,5 +9,7 @@ declare module '@env' {
   export const OPENAI_API_KEY: string;
   export const UNSPLASH_ACCESS_KEY: string;
   export const SERPAPI_KEY: string;
+  export const AZURE_TRANSLATOR_KEY: string;
+  export const AZURE_TRANSLATOR_REGION: string;
+  export const AZURE_TRANSLATOR_ENDPOINT: string;
 }
-

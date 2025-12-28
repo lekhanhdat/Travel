@@ -1,9 +1,10 @@
-import React, {useRef} from 'react';
+import React, {useRef, useEffect} from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {useRoute} from '@react-navigation/native';
 import {StyleSheet, View, Image, TouchableOpacity} from 'react-native';
-import {LanguageProvider} from '../i18n';
+import {TranslationProvider} from '../context/TranslationContext';
+import {offlineFallback} from '../services/translation';
 import images from '../res/images';
 import strings from '../res/strings';
 import sizes from '../common/sizes';
@@ -428,11 +429,18 @@ const styles = StyleSheet.create({
     marginTop: sizes._4sdp,
   },
 });
-// Wrap AppContainer with LanguageProvider
-const AppWithLanguage = () => (
-  <LanguageProvider>
-    <AppContainer />
-  </LanguageProvider>
-);
+// Wrap AppContainer with TranslationProvider (replaces LanguageProvider)
+const AppWithTranslation = () => {
+  useEffect(() => {
+    // Initialize offline fallback translations
+    offlineFallback.initialize('vi');
+  }, []);
 
-export default AppWithLanguage;
+  return (
+    <TranslationProvider>
+      <AppContainer />
+    </TranslationProvider>
+  );
+};
+
+export default AppWithTranslation;

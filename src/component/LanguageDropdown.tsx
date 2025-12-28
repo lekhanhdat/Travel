@@ -8,7 +8,9 @@ import {
   FlatList,
   Dimensions,
 } from 'react-native';
-import {useLanguage, Language} from '../i18n';
+import {useTranslation} from '../hooks/useTranslation';
+import {Language} from '../context/TranslationContext';
+import {offlineFallback} from '../services/translation';
 import colors from '../common/colors';
 import sizes from '../common/sizes';
 import fonts from '../common/fonts';
@@ -50,13 +52,15 @@ const LanguageDropdown: React.FC<LanguageDropdownProps> = ({
   showFlag = true,
   showNativeName = true,
 }) => {
-  const {language, setLanguage, t} = useLanguage();
+  const {language, setLanguage, t} = useTranslation();
   const [isVisible, setIsVisible] = useState(false);
 
   const currentLanguage = languageOptions.find(lang => lang.code === language);
 
-  const handleLanguageSelect = (selectedLanguage: Language) => {
+  const handleLanguageSelect = async (selectedLanguage: Language) => {
     setLanguage(selectedLanguage);
+    // Preload offline translations for the new language
+    await offlineFallback.preloadForLanguage(selectedLanguage);
     setIsVisible(false);
   };
 
@@ -65,27 +69,21 @@ const LanguageDropdown: React.FC<LanguageDropdownProps> = ({
 
     return (
       <TouchableOpacity
-        style={[
-          styles.optionItem,
-          isSelected && styles.selectedOption,
-        ]}
+        style={[styles.optionItem, isSelected && styles.selectedOption]}
         onPress={() => handleLanguageSelect(item.code)}>
         <View style={styles.optionContent}>
-          {showFlag && (
-            <Text style={styles.flag}>{item.flag}</Text>
-          )}
+          {showFlag && <Text style={styles.flag}>{item.flag}</Text>}
           <View style={styles.textContainer}>
-            <TextBase style={[
-              styles.optionName,
-              isSelected && styles.selectedText,
-            ]}>
+            <TextBase
+              style={[styles.optionName, isSelected && styles.selectedText]}>
               {item.name}
             </TextBase>
             {showNativeName && (
-              <TextBase style={[
-                styles.optionNativeName,
-                isSelected && styles.selectedSubText,
-              ]}>
+              <TextBase
+                style={[
+                  styles.optionNativeName,
+                  isSelected && styles.selectedSubText,
+                ]}>
                 {item.nativeName}
               </TextBase>
             )}
@@ -148,15 +146,15 @@ const LanguageDropdown: React.FC<LanguageDropdownProps> = ({
         style={[styles.fullButton, style]}
         onPress={() => setIsVisible(true)}>
         <View style={styles.buttonContent}>
-          {showFlag && (
-            <Text style={styles.flag}>{currentLanguage?.flag}</Text>
-          )}
+          {showFlag && <Text style={styles.flag}>{currentLanguage?.flag}</Text>}
           <View style={styles.textContainer}>
             <TextBase style={styles.buttonTitle}>
               {t('settings.language')}
             </TextBase>
             <TextBase style={styles.buttonSubtitle}>
-              {showNativeName ? currentLanguage?.nativeName : currentLanguage?.name}
+              {showNativeName
+                ? currentLanguage?.nativeName
+                : currentLanguage?.name}
             </TextBase>
           </View>
         </View>

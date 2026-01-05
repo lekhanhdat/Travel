@@ -1,0 +1,680 @@
+{
+  "fest_1": {
+    "name": "Lễ hội Pháo hoa Quốc tế Đà Nẵng (DIFF - Danang International Fireworks Festival)",
+    "description": "Lễ hội Pháo hoa Quốc tế Đà Nẵng (DIFF) là sự kiện văn hóa - du lịch lớn nhất trong năm của thành phố Đà Nẵng, thu hút hàng triệu du khách trong và ngoài nước. Đây là cuộc thi pháo hoa quốc tế quy mô lớn với sự tham gia của các đội pháo hoa hàng đầu thế giới, mang đến những màn trình diễn pháo hoa nghệ thuật đẳng cấp quốc tế trên bầu trời sông Hàn.",
+    "event_time": "Từ ngày 31/5 đến 12/7 hàng năm (DIFF 2025: 31/5 - 12/7/2025)",
+    "location": "Cầu sông Hàn",
+    "ticket_info": "Vé xem pháo hoa từ 1.000.000 VNĐ/vé tùy vào vị trí khán đài. Có các khu vực xem miễn phí dọc bờ sông Hàn.",
+    "advise": [
+      "Đặt vé trước để có vị trí xem đẹp nhất.",
+      "Đến sớm để tránh tắc đường và tìm chỗ đỗ xe.",
+      "Mang theo áo mưa vì thời tiết có thể thay đổi.",
+      "Tuân thủ hướng dẫn của ban tổ chức về an toàn.",
+      "Không mang theo đồ vật nguy hiểm, dễ cháy nổ."
+    ],
+    "price_level": 1
+  },
+  "fest_2": {
+    "name": "Liên hoan Phim Châu Á Đà Nẵng (DANAFF - Da Nang Asian Film Festival)",
+    "description": "Liên hoan Phim Châu Á Đà Nẵng (DANAFF) là sự kiện điện ảnh quốc tế thường niên, quy tụ các tác phẩm điện ảnh xuất sắc từ các nước châu Á. Đây là nơi giao lưu văn hóa điện ảnh, tôn vinh nghệ thuật thứ bảy và tạo cơ hội cho các nhà làm phim trong khu vực.",
+    "event_time": "Tháng 6-7 hàng năm (DANAFF III 2025: 28/6 - 5/7/2025)",
+    "location": "Nhà hát tuồng Nguyễn Hiển Dĩnh",
+    "ticket_info": "Miễn phí - Phát vé xem phim miễn phí tại các rạp chiếu phim tham gia",
+    "advise": [
+      "Theo dõi lịch chiếu phim trên website chính thức.",
+      "Đến sớm để nhận vé miễn phí (số lượng có hạn).",
+      "Tôn trọng không gian rạp chiếu phim, không gây ồn ào.",
+      "Tắt điện thoại hoặc chuyển sang chế độ im lặng khi xem phim."
+    ],
+    "price_level": 0
+  },
+  "fest_3": {
+    "name": "Giải Marathon Quốc tế Đà Nẵng (Danang International Marathon)",
+    "description": "Giải Marathon Quốc tế Đà Nẵng là sự kiện thể thao lớn thu hút hàng ngàn vận động viên trong và ngoài nước tham gia. Với cung đường chạy ven biển tuyệt đẹp, đây là cơ hội để vận động viên chinh phục bản thân và khám phá vẻ đẹp của thành phố biển Đà Nẵng.",
+    "event_time": "Tháng 3 hàng năm (2025: 21-23/3/2025)",
+    "location": "Bãi biển Mỹ Khê",
+    "ticket_info": "Phí đăng ký tùy theo cự ly: 42km, 21km, 10km, 5km. Giá từ 300.000 - 1.500.000 VNĐ",
+    "advise": [
+      "Đăng ký sớm để có mức giá ưu đãi.",
+      "Chuẩn bị thể lực tốt trước khi tham gia.",
+      "Tuân thủ quy định về trang phục và thiết bị.",
+      "Uống đủ nước và nghỉ ngơi hợp lý.",
+      "Đến điểm xuất phát sớm để làm thủ tục."
+    ],
+    "price_level": 1
+  },
+  "fest_4": {
+    "name": "Giải IRONMAN 70.3 Việt Nam",
+    "description": "IRONMAN 70.3 Việt Nam tại Đà Nẵng là giải đua ba môn phối hợp (bơi - đạp xe - chạy) đẳng cấp quốc tế, thu hút các vận động viên chuyên nghiệp và nghiệp dư từ khắp nơi trên thế giới. Đây là thử thách thể lực và ý chí đỉnh cao trong môi trường thiên nhiên tuyệt đẹp của Đà Nẵng.",
+    "event_time": "Tháng 5 hàng năm (2025: 10-11/5/2025)",
+    "location": "Bãi biển Mỹ Khê",
+    "ticket_info": "Phí đăng ký từ 5.000.000 - 8.000.000 VNĐ tùy theo thời điểm đăng ký",
+    "advise": [
+      "Chuẩn bị kỹ lưỡng về thể lực và trang thiết bị.",
+      "Tham gia các buổi tập luyện trước giải.",
+      "Tuân thủ nghiêm ngặt quy định an toàn.",
+      "Đăng ký sớm để có giá tốt nhất.",
+      "Chuẩn bị dinh dưỡng và phục hồi sau thi đấu."
+    ],
+    "price_level": 2
+  },
+  "fest_5": {
+    "name": "Lễ hội Việt Nam - ASEAN (Vietnam - ASEAN Festival)",
+    "description": "Lễ hội Việt Nam - ASEAN là sự kiện văn hóa quốc tế nhằm quảng bá hình ảnh Việt Nam và các nước ASEAN, tăng cường giao lưu văn hóa, nghệ thuật giữa các quốc gia trong khu vực. Lễ hội có các hoạt động biểu diễn nghệ thuật, triển lãm văn hóa, ẩm thực đặc sắc.",
+    "event_time": "Tháng 3 hàng năm (2025: 15/3/2025)",
+    "location": "Công viên Biển Đông",
+    "ticket_info": "Miễn phí tham gia",
+    "advise": [
+      "Đến sớm để tham gia đầy đủ các hoạt động.",
+      "Thưởng thức ẩm thực đa dạng từ các nước ASEAN.",
+      "Tôn trọng văn hóa và phong tục của các quốc gia.",
+      "Mang theo máy ảnh để ghi lại những khoảnh khắc đẹp."
+    ],
+    "price_level": 0
+  },
+  "fest_6": {
+    "name": "Lễ hội Việt Nam - Nhật Bản (Vietnam - Japan Festival)",
+    "description": "Lễ hội Việt Nam - Nhật Bản là sự kiện văn hóa thường niên tôn vinh tình hữu nghị và hợp tác giữa hai quốc gia. Lễ hội mang đến không gian văn hóa Nhật Bản đậm đà với các hoạt động biểu diễn nghệ thuật truyền thống, ẩm thực, triển lãm và giao lưu văn hóa.",
+    "event_time": "Tháng 7 hàng năm (2025: 4-6/7/2025)",
+    "location": "Công viên Biển Đông",
+    "ticket_info": "Miễn phí tham gia",
+    "advise": [
+      "Tham gia các hoạt động văn hóa Nhật Bản truyền thống.",
+      "Thưởng thức ẩm thực Nhật Bản đa dạng.",
+      "Tìm hiểu về văn hóa và phong tục Nhật Bản.",
+      "Mang theo gia đình để cùng trải nghiệm."
+    ],
+    "price_level": 0
+  },
+  "fest_7": {
+    "name": "Lễ hội Việt Nam - Hàn Quốc (Vietnam - Korea Festival)",
+    "description": "Lễ hội Việt Nam - Hàn Quốc là sự kiện văn hóa giao lưu giữa hai quốc gia, mang đến không gian Hallyu (làn sóng Hàn Quốc) sôi động với các màn trình diễn K-pop, võ thuật Taekwondo, ẩm thực Hàn Quốc và nhiều hoạt động văn hóa đặc sắc.",
+    "event_time": "Tháng 8 hàng năm (2025: 22-24/8/2025)",
+    "location": "Công viên Biển Đông",
+    "ticket_info": "Miễn phí tham gia",
+    "advise": [
+      "Đến sớm để có chỗ xem biểu diễn K-pop.",
+      "Thử các món ăn Hàn Quốc đặc trưng.",
+      "Tham gia các hoạt động trải nghiệm văn hóa Hàn Quốc.",
+      "Mang theo áo mưa vì thời tiết có thể thay đổi."
+    ],
+    "price_level": 0
+  },
+  "fest_8": {
+    "name": "Lễ hội Sư Tử và Rồng Quốc tế (International Lion and Dragon Dance Festival)",
+    "description": "Lễ hội Sư Tử và Rồng Quốc tế là sự kiện văn hóa truyền thống quy mô lớn, quy tụ các đội múa sư tử và rồng xuất sắc từ nhiều quốc gia. Đây là dịp để du khách chiêm ngưỡng nghệ thuật múa sư tử rồng đỉnh cao với những màn biểu diễn ấn tượng và đầy màu sắc.",
+    "event_time": "Tết Trung thu hàng năm (Tháng 9 âm lịch)",
+    "location": "Công viên Châu Á - Sun World Asia Park",
+    "ticket_info": "Miễn phí tham gia",
+    "advise": [
+      "Đến sớm để có vị trí xem đẹp nhất.",
+      "Mang theo máy ảnh để ghi lại những màn biểu diễn ấn tượng.",
+      "Tôn trọng không gian biểu diễn, không chen lấn.",
+      "Tham gia các hoạt động văn hóa truyền thống khác."
+    ],
+    "price_level": 0
+  },
+  "fest_9": {
+    "name": "Lễ hội Tận hưởng Đà Nẵng (Enjoy Danang Festival)",
+    "description": "Lễ hội Tận hưởng Đà Nẵng là sự kiện thường niên quy mô cấp thành phố với hàng loạt hoạt động văn hóa, nghệ thuật, thể thao, ẩm thực đa dạng. Lễ hội mang đến trải nghiệm du lịch đầy màu sắc cho du khách với các chương trình biểu diễn nghệ thuật, thể thao biển, ẩm thực đường phố và nhiều hoạt động giải trí hấp dẫn.",
+    "event_time": "Tháng 6-7 hàng năm (2025: 19-23/6/2025)",
+    "location": "Công viên Biển Đông",
+    "ticket_info": "Miễn phí tham gia hầu hết các hoạt động",
+    "advise": [
+      "Tham gia đầy đủ các hoạt động trong suốt lễ hội.",
+      "Thưởng thức ẩm thực đường phố đa dạng.",
+      "Tham gia các môn thể thao biển miễn phí.",
+      "Mang theo gia đình để cùng trải nghiệm.",
+      "Theo dõi lịch trình chi tiết trên website chính thức."
+    ],
+    "price_level": 0
+  },
+  "fest_10": {
+    "name": "Lễ hội Đà Nẵng Food Tour",
+    "description": "Lễ hội Đà Nẵng Food Tour là sự kiện ẩm thực lớn nhất trong năm, quảng bá và phát triển Đà Nẵng là điểm đến ẩm thực hấp dẫn. Lễ hội trao tặng hộ chiếu ẩm thực cho du khách trải nghiệm và sưu tầm các món ăn đặc trưng của Đà Nẵng, các vùng miền và quốc tế.",
+    "event_time": "Tháng 3 hàng năm (2025: 28/3 - 1/4/2025)",
+    "location": "Công viên Biển Đông",
+    "ticket_info": "Mua hộ chiếu ẩm thực để tham gia, giá khoảng 200.000 - 500.000 VNĐ",
+    "advise": [
+      "Mua hộ chiếu ẩm thực sớm để có giá ưu đãi.",
+      "Đến đói để thưởng thức nhiều món nhất có thể.",
+      "Thử các món ăn đặc sản Đà Nẵng.",
+      "Mang theo nước uống và khăn giấy.",
+      "Tham gia các hoạt động nấu ăn trải nghiệm."
+    ],
+    "price_level": 1
+  },
+  "fest_11": {
+    "name": "Lễ hội Hoa tại Bà Nà Hills (Ba Na Flower Festival)",
+    "description": "Lễ hội Hoa Bà Nà Hills là sự kiện hoa lớn nhất miền Trung, biến Bà Nà Hills thành thiên đường hoa rực rỡ sắc màu với hàng triệu bông hoa từ khắp nơi trên thế giới. Lễ hội mang đến không gian sống ảo tuyệt đẹp và trải nghiệm nghệ thuật hoa độc đáo.",
+    "event_time": "Từ tháng 1 đến tháng 5 hàng năm (2025: 25/1 - 30/5/2025)",
+    "location": "Khu du lịch Bà Nà – Núi Chúa",
+    "ticket_info": "Vé vào cổng Bà Nà Hills bao gồm cáp treo và tham quan lễ hội hoa",
+    "advise": [
+      "Mua vé cáp treo trước để tránh xếp hàng dài.",
+      "Mang theo máy ảnh để chụp ảnh với vườn hoa.",
+      "Đến sớm để tránh đông người.",
+      "Mang theo áo ấm vì nhiệt độ trên núi thấp.",
+      "Tôn trọng các công trình hoa, không hái hoa."
+    ],
+    "price_level": 2
+  },
+  "fest_12": {
+    "name": "Lễ hội Carnival tại Bà Nà Hills",
+    "description": "Lễ hội Carnival Bà Nà Hills là sự kiện giải trí sôi động với các màn diễu hành rực rỡ sắc màu, vũ điệu samba cuồng nhiệt và không khí lễ hội náo nhiệt theo phong cách Brazil. Đây là dịp để du khách hòa mình vào không khí carnival đầy màu sắc giữa lòng Việt Nam.",
+    "event_time": "Từ tháng 4 đến tháng 9 hàng năm",
+    "location": "Khu du lịch Bà Nà – Núi Chúa",
+    "ticket_info": "Vé vào cổng Bà Nà Hills bao gồm xem lễ hội Carnival",
+    "advise": [
+      "Đến đúng giờ để không bỏ lỡ màn diễu hành.",
+      "Mang theo nước uống vì thời tiết có thể nóng.",
+      "Tham gia các hoạt động tương tác với vũ công.",
+      "Mặc trang phục thoải mái để dễ di chuyển."
+    ],
+    "price_level": 2
+  },
+  "fest_13": {
+    "name": "Lễ hội Bia Kraftbeer tại Bà Nà Hills (Sun Kraftbeer Festival)",
+    "description": "Sun Kraftbeer Festival là lễ hội bia tươi và ẩm thực lớn nhất tại Bà Nà Hills, lấy cảm hứng từ Oktoberfest - lễ hội bia nổi tiếng của Đức. Lễ hội mang đến không gian bia thủ công đặc sắc, ẩm thực phong phú và các chương trình biểu diễn nghệ thuật sôi động.",
+    "event_time": "Từ tháng 8 đến tháng 9 hàng năm (2024: 14/9 - 30/9/2024)",
+    "location": "Khu du lịch Bà Nà – Núi Chúa",
+    "ticket_info": "Vé vào cổng Bà Nà Hills, bia và đồ ăn tính riêng",
+    "advise": [
+      "Đặt bàn trước nếu đi nhóm đông.",
+      "Thưởng thức bia có trách nhiệm, không lái xe sau khi uống.",
+      "Thử các món ăn Đức đặc trưng.",
+      "Tham gia các trò chơi và hoạt động giải trí.",
+      "Mang theo áo ấm vì thời tiết trên núi mát."
+    ],
+    "price_level": 2
+  },
+  "fest_14": {
+    "name": "Lễ hội Bia Đức GBA Oktoberfest",
+    "description": "Lễ hội Bia Đức GBA Oktoberfest là sự kiện bia Đức lớn nhất Đông Nam Á tại Đà Nẵng, tái hiện không khí lễ hội Oktoberfest truyền thống của Munich, Đức. Lễ hội mang đến trải nghiệm bia Đức chính gốc, ẩm thực Đức - Áo đặc sắc và các chương trình biểu diễn sôi động.",
+    "event_time": "Tháng 10 hàng năm (2025: 3/10/2025)",
+    "location": "Công viên Biển Đông",
+    "ticket_info": "Vé vào cổng từ 500.000 - 1.500.000 VNĐ, bia và đồ ăn tính riêng",
+    "advise": [
+      "Đặt vé sớm vì số lượng có hạn.",
+      "Mặc trang phục truyền thống Đức (Dirndl/Lederhosen) để hòa nhập không khí.",
+      "Thưởng thức bia có trách nhiệm.",
+      "Thử các món ăn Đức đặc trưng như xúc xích, bánh mì pretzels.",
+      "Tham gia các trò chơi và hoạt động giải trí truyền thống."
+    ],
+    "price_level": 2
+  },
+  "fest_15": {
+    "name": "Lễ hội Âm nhạc Điện tử DEC (Danang Electronic Carnival - Take me to the Sun)",
+    "description": "Danang Electronic Carnival (DEC) - Take me to the Sun là lễ hội âm nhạc điện tử quốc tế tầm cỡ lớn, quy tụ các DJ hàng đầu thế giới. Lễ hội mang đến trải nghiệm âm nhạc điện tử đỉnh cao với hệ thống âm thanh, ánh sáng hiện đại và không khí lễ hội cuồng nhiệt.",
+    "event_time": "Tháng 8-9 (Tùy năm tổ chức)",
+    "location": "Công viên Châu Á - Sun World Asia Park",
+    "ticket_info": "Vé từ 1.500.000 - 3.000.000 VNĐ tùy hạng vé",
+    "advise": [
+      "Mua vé sớm để có giá tốt nhất.",
+      "Chuẩn bị thể lực tốt cho đêm nhạc dài.",
+      "Mang theo nước uống và năng lượng.",
+      "Tuân thủ quy định an toàn của ban tổ chức.",
+      "Không mang theo đồ vật nguy hiểm."
+    ],
+    "price_level": 2
+  },
+  "fest_16": {
+    "name": "Lễ hội Màu sắc Đà Nẵng (Da Nang Color Festival)",
+    "description": "Lễ hội Màu sắc Đà Nẵng là sự kiện thể thao - giải trí đầy màu sắc với các hoạt động chạy bộ, ném bột màu, âm nhạc và vui chơi. Lễ hội mang đến trải nghiệm vui nhộn, tràn đầy năng lượng và sắc màu cho mọi lứa tuổi.",
+    "event_time": "Tháng 3-6 hàng năm",
+    "location": "Công viên Biển Đông",
+    "ticket_info": "Vé tham gia từ 300.000 - 500.000 VNĐ",
+    "advise": [
+      "Mặc trang phục trắng để bột màu nổi bật.",
+      "Mang theo kính bảo vệ mắt.",
+      "Chuẩn bị quần áo thay sau lễ hội.",
+      "Bảo vệ điện thoại và đồ vật cá nhân khỏi bột màu.",
+      "Tham gia với tinh thần vui vẻ và an toàn."
+    ],
+    "price_level": 1
+  },
+  "fest_17": {
+    "name": "Lễ hội Cosplay, Anime và Manga - Nippon Ơi",
+    "description": "Nippon Ơi là lễ hội văn hóa Cosplay, Anime và Manga lớn nhất miền Trung, mang đến không gian Nhật Bản thu nhỏ với các hoạt động cosplay, triển lãm anime/manga, game, ẩm thực Nhật và nhiều hoạt động văn hóa Nhật Bản đặc sắc.",
+    "event_time": "Tháng 7-8 hàng năm (2025: 9-10/8/2025)",
+    "location": "Công viên nước Mikazuki Water Park",
+    "ticket_info": "Vé vào cổng từ 200.000 - 400.000 VNĐ",
+    "advise": [
+      "Mặc cosplay để hòa nhập không khí lễ hội.",
+      "Tham gia các cuộc thi cosplay và game.",
+      "Thưởng thức ẩm thực Nhật Bản đa dạng.",
+      "Mua sắm các sản phẩm anime/manga độc đáo.",
+      "Tôn trọng các cosplayer khi chụp ảnh."
+    ],
+    "price_level": 1
+  },
+  "fest_18": {
+    "name": "Lễ hội Giáng sinh và Năm mới Đà Nẵng",
+    "description": "Lễ hội Đón Giáng sinh - Chào năm mới Đà Nẵng là sự kiện lớn kéo dài 20 ngày với không gian trang trí lung linh, chương trình nghệ thuật đa dạng, pháo hoa chào năm mới và nhiều hoạt động vui chơi giải trí cho cả gia đình.",
+    "event_time": "Từ 14/12 đến 2/1 hàng năm (2024-2025: 14/12/2024 - 2/1/2025)",
+    "location": "Công viên Biển Đông",
+    "ticket_info": "Miễn phí tham gia hầu hết các hoạt động",
+    "advise": [
+      "Đến sớm để tham gia đầy đủ các hoạt động.",
+      "Chụp ảnh với không gian trang trí Giáng sinh lung linh.",
+      "Tham gia đếm ngược chào năm mới tại công viên.",
+      "Mang theo gia đình để cùng trải nghiệm.",
+      "Giữ gìn vệ sinh và trật tự công cộng."
+    ],
+    "price_level": 0
+  },
+  "fest_19": {
+    "name": "Lễ hội Thần Tài tại Núi Thần Tài (God of Fortune Festival)",
+    "description": "Lễ hội Thần Tài tại Công viên Suối Khoáng Nóng Núi Thần Tài là sự kiện tâm linh đầu năm, cầu may mắn, tài lộc và bình an cho năm mới. Lễ hội có các nghi lễ truyền thống, hoạt động văn hóa dân gian và trải nghiệm suối khoáng nóng thư giãn.",
+    "event_time": "Đầu năm mới Âm lịch (Tháng 1-2 Dương lịch)",
+    "location": "Hot Springs Park - Núi Thần Tài",
+    "ticket_info": "Vé vào cổng Núi Thần Tài bao gồm tham gia lễ hội",
+    "advise": [
+      "Ăn mặc lịch sự khi tham gia nghi lễ tâm linh.",
+      "Mang theo đồ bơi để tắm suối khoáng.",
+      "Tôn trọng không gian tâm linh, giữ im lặng.",
+      "Chuẩn bị lễ vật nếu muốn cầu may.",
+      "Đến sớm để tránh đông người."
+    ],
+    "price_level": 2
+  },
+  "fest_20": {
+    "name": "Lễ hội Cầu Ngư Thanh Khê",
+    "description": "Lễ hội Cầu Ngư Thanh Khê là lễ hội truyền thống của ngư dân Đà Nẵng, cầu mong mùa biển bình an, thuận buồm xuôi gió và được mùa. Lễ hội có các nghi lễ tâm linh, rước kiệu, đua thuyền và nhiều hoạt động văn hóa dân gian đặc sắc.",
+    "event_time": "Ngày 12-13 tháng 3 Âm lịch hàng năm",
+    "location": "Trung tâm hành chính Thành phố Đà Nẵng",
+    "ticket_info": "Miễn phí tham gia",
+    "advise": [
+      "Tôn trọng không gian tâm linh của ngư dân.",
+      "Tham gia các hoạt động văn hóa dân gian.",
+      "Thưởng thức hải sản tươi ngon tại chợ cá.",
+      "Mang theo nón và kem chống nắng.",
+      "Giữ gìn vệ sinh môi trường biển."
+    ],
+    "price_level": 0
+  },
+  "fest_21": {
+    "name": "Lễ hội Quán Thế Âm Ngũ Hành Sơn",
+    "description": "Lễ hội Quán Thế Âm Ngũ Hành Sơn là lễ hội Phật giáo lớn nhất Đà Nẵng, tổ chức tại Ngũ Hành Sơn - danh thắng nổi tiếng. Lễ hội có các nghi lễ Phật giáo trang nghiêm, rước kiệu, thả đèn hoa đăng và nhiều hoạt động văn hóa tâm linh.",
+    "event_time": "Ngày 19 tháng 2 Âm lịch hàng năm",
+    "location": "Ngũ Hành Sơn",
+    "ticket_info": "Miễn phí tham gia lễ hội, vé vào cổng Ngũ Hành Sơn tính riêng",
+    "advise": [
+      "Ăn mặc lịch sự khi tham gia lễ hội Phật giáo.",
+      "Tôn trọng không gian tâm linh, giữ im lặng.",
+      "Tham gia nghi lễ thả đèn hoa đăng.",
+      "Khám phá các động và chùa trong Ngũ Hành Sơn.",
+      "Mang theo nước uống và giày thoải mái."
+    ],
+    "price_level": 0
+  },
+  "fest_22": {
+    "name": "Lễ hội Làng An Hải",
+    "description": "Lễ hội Làng An Hải là lễ hội truyền thống của làng chài An Hải, tưởng nhớ công đức tổ tiên và cầu mong cuộc sống bình an, phát đạt. Lễ hội có các nghi lễ truyền thống, rước kiệu, hát bài chòi và nhiều trò chơi dân gian đặc sắc.",
+    "event_time": "Ngày 15-16 tháng 8 Âm lịch hàng năm",
+    "location": "Trung tâm hành chính Thành phố Đà Nẵng",
+    "ticket_info": "Miễn phí tham gia",
+    "advise": [
+      "Tôn trọng phong tục tập quán của làng.",
+      "Tham gia các trò chơi dân gian truyền thống.",
+      "Thưởng thức ẩm thực làng chài đặc trưng.",
+      "Tìm hiểu lịch sử và văn hóa làng An Hải.",
+      "Giữ gìn vệ sinh và trật tự."
+    ],
+    "price_level": 0
+  },
+  "fest_23": {
+    "name": "Lễ hội Làng Túy Loan",
+    "description": "Lễ hội Làng Túy Loan là lễ hội truyền thống của làng rau Túy Loan nổi tiếng, tưởng nhớ công đức tổ tiên khai phá làng và cầu mong mùa màng bội thu. Lễ hội có các nghi lễ truyền thống, hát bài chòi, đua thuyền và nhiều hoạt động văn hóa dân gian.",
+    "event_time": "Ngày 14-15 tháng giêng Âm lịch hàng năm",
+    "location": "Trung tâm hành chính Thành phố Đà Nẵng",
+    "ticket_info": "Miễn phí tham gia",
+    "advise": [
+      "Tôn trọng phong tục tập quán của làng.",
+      "Mua rau sạch Tuy Loan làm quà.",
+      "Tham gia các hoạt động văn hóa dân gian.",
+      "Thưởng thức ẩm thực làng quê đặc trưng.",
+      "Tìm hiểu lịch sử làng rau Tuy Loan."
+    ],
+    "price_level": 0
+  },
+  "fest_24": {
+    "name": "Lễ hội Bửu đản Thánh Mẫu Đệ Tam Thoải Cung",
+    "description": "Lễ hội Bửu đản Thánh Mẫu Đệ Tam Thoải Cung là lễ hội tín ngưỡng Thờ Mẫu Tam phủ lớn nhất Đà Nẵng, tổ chức tại Miếu Bà Thoải. Lễ hội có các nghi lễ tâm linh trang nghiêm, hầu đồng, rước kiệu và nhiều hoạt động văn hóa dân gian.",
+    "event_time": "Ngày 15 tháng 3 Âm lịch hàng năm",
+    "location": "Trung tâm hành chính Thành phố Đà Nẵng",
+    "ticket_info": "Miễn phí tham gia",
+    "advise": [
+      "Ăn mặc lịch sự khi tham gia lễ hội tâm linh.",
+      "Tôn trọng không gian tín ngưỡng, giữ im lặng.",
+      "Tìm hiểu về tín ngưỡng Thờ Mẫu Tam phủ.",
+      "Tham gia nghi lễ hầu đồng nếu có duyên.",
+      "Chuẩn bị lễ vật nếu muốn cầu an."
+    ],
+    "price_level": 0
+  },
+  "fest_25": {
+    "name": "Lễ hội Bà Thu Bồn",
+    "description": "Lễ hội Bà Thu Bồn là lễ hội tín ngưỡng truyền thống của người dân ven sông Thu Bồn, tưởng nhớ công đức Bà Thu Bồn - vị thần bảo hộ sông nước. Lễ hội có các nghi lễ tâm linh, rước kiệu, đua thuyền và thả đèn hoa đăng trên sông.",
+    "event_time": "Ngày 15 tháng 7 Âm lịch hàng năm",
+    "location": "Trung tâm hành chính Thành phố Đà Nẵng",
+    "ticket_info": "Miễn phí tham gia",
+    "advise": [
+      "Tham gia nghi lễ thả đèn hoa đăng.",
+      "Tôn trọng không gian tâm linh.",
+      "Mang theo máy ảnh để chụp cảnh đèn lung linh.",
+      "Giữ gìn vệ sinh môi trường sông nước.",
+      "An toàn khi tham gia hoạt động trên sông."
+    ],
+    "price_level": 0
+  },
+  "fest_26": {
+    "name": "Lễ hội Rước Mục Đồng",
+    "description": "Lễ hội Rước Mục Đồng là lễ hội Công giáo truyền thống độc đáo của cộng đồng Công giáo Đà Nẵng, tái hiện cảnh các mục đồng đến chuồng bò Bethlehem thăm Chúa Giêsu mới sinh. Lễ hội có rước kiệu, hát thánh ca và nhiều hoạt động văn hóa tôn giáo.",
+    "event_time": "Mùa Giáng sinh hàng năm (Tháng 12)",
+    "location": "Nhà thờ chính tòa Đà Nẵng",
+    "ticket_info": "Miễn phí tham gia",
+    "advise": [
+      "Ăn mặc lịch sự khi tham gia lễ hội tôn giáo.",
+      "Tôn trọng không gian tôn giáo, giữ im lặng.",
+      "Tham gia hát thánh ca nếu biết.",
+      "Tìm hiểu ý nghĩa của lễ hội Rước Mục Đồng.",
+      "Chụp ảnh có văn hóa, không làm ồn."
+    ],
+    "price_level": 0
+  },
+  "fest_27": {
+    "name": "Lễ hội Thả đèn Hoa Đăng",
+    "description": "Lễ hội Thả đèn Hoa Đăng là sự kiện văn hóa tâm linh đẹp đẽ, diễn ra vào dịp Tết Trung thu và các dịp lễ Phật giáo. Hàng ngàn chiếc đèn hoa đăng lung linh được thả trên sông Hàn, tạo nên cảnh tượng thơ mộng và ý nghĩa.",
+    "event_time": "Tết Trung thu (Rằm tháng 8 Âm lịch) và các dịp lễ Phật giáo",
+    "location": "Cầu sông Hàn",
+    "ticket_info": "Miễn phí tham gia, mua đèn hoa đăng khoảng 20.000 - 50.000 VNĐ",
+    "advise": [
+      "Mua đèn hoa đăng từ các điểm bán chính thức.",
+      "Thả đèn có ý thức, không gây ô nhiễm.",
+      "Cầu nguyện điều tốt đẹp khi thả đèn.",
+      "Chụp ảnh cảnh đèn lung linh trên sông.",
+      "Giữ gìn vệ sinh môi trường sông nước."
+    ],
+    "price_level": 0
+  },
+  "fest_28": {
+    "name": "Giải Đua thuyền Truyền thống Đà Nẵng - Cup VTV8",
+    "description": "Giải Đua thuyền Truyền thống Đà Nẵng - Cup VTV8 là sự kiện thể thao truyền thống lớn, quy tụ các đội đua thuyền xuất sắc từ khắp nơi. Giải đấu diễn ra trên sông Hàn với không khí sôi động, cổ vũ nhiệt tình và tinh thần đoàn kết cao.",
+    "event_time": "Tháng 9 hàng năm (Tết Trung thu)",
+    "location": "Cầu sông Hàn",
+    "ticket_info": "Miễn phí xem thi đấu",
+    "advise": [
+      "Đến sớm để có vị trí xem đẹp nhất.",
+      "Mang theo nón và kem chống nắng.",
+      "Cổ vũ văn minh, không ném rác xuống sông.",
+      "Chụp ảnh các đội đua thuyền.",
+      "Giữ an toàn khi đứng gần bờ sông."
+    ],
+    "price_level": 0
+  },
+  "fest_29": {
+    "name": "Lễ hội Khinh khí cầu (Hot Air Balloon Festival)",
+    "description": "Lễ hội Khinh khí cầu Đà Nẵng là sự kiện giải trí độc đáo với hàng chục khinh khí cầu rực rỡ sắc màu bay lượn trên bầu trời Đà Nẵng. Lễ hội mang đến trải nghiệm bay khinh khí cầu, chụp ảnh sống ảo và nhiều hoạt động giải trí hấp dẫn.",
+    "event_time": "Tháng 3-6 hàng năm (Tùy năm tổ chức)",
+    "location": "Công viên Biển Đông",
+    "ticket_info": "Vé trải nghiệm bay khinh khí cầu từ 500.000 - 2.000.000 VNĐ",
+    "advise": [
+      "Đặt vé trải nghiệm sớm vì số lượng có hạn.",
+      "Đến sớm vào buổi sáng hoặc chiều tối để bay.",
+      "Mang theo máy ảnh để chụp ảnh từ trên cao.",
+      "Tuân thủ hướng dẫn an toàn của phi công.",
+      "Kiểm tra thời tiết trước khi tham gia."
+    ],
+    "price_level": 2
+  },
+  "fest_30": {
+    "name": "Lễ hội Thả diều Nghệ thuật (Kite Festival)",
+    "description": "Lễ hội Thả diều Nghệ thuật Đà Nẵng là sự kiện văn hóa nghệ thuật độc đáo với hàng trăm con diều đủ hình dạng, màu sắc bay lượn trên bầu trời biển Đà Nẵng. Lễ hội mang đến không gian nghệ thuật diều đẹp mắt và các hoạt động vui chơi cho trẻ em.",
+    "event_time": "Tháng 3-6 hàng năm",
+    "location": "Bãi biển Mỹ Khê",
+    "ticket_info": "Miễn phí tham gia, mua diều khoảng 50.000 - 500.000 VNĐ",
+    "advise": [
+      "Chọn ngày có gió để thả diều dễ dàng.",
+      "Mua diều từ các gian hàng chính thức.",
+      "Thả diều ở khu vực an toàn, tránh xa đường dây điện.",
+      "Mang theo gia đình và trẻ em để cùng vui chơi.",
+      "Giữ gìn vệ sinh bãi biển."
+    ],
+    "price_level": 0
+  },
+  "fest_31": {
+    "name": "Lễ hội Mở màn Mùa Du lịch Biển Đà Nẵng (Opening of Da Nang Beach Tourism Season)",
+    "description": "Lễ hội Mở màn Mùa Du lịch Biển Đà Nẵng là sự kiện khai mạc mùa du lịch biển hàng năm với nhiều hoạt động văn hóa, nghệ thuật, thể thao biển và giải trí. Lễ hội đánh dấu sự khởi đầu của mùa du lịch sôi động tại thành phố biển Đà Nẵng.",
+    "event_time": "Tháng 4-5 hàng năm (2025: 30/4/2025)",
+    "location": "Bãi biển Mỹ Khê",
+    "ticket_info": "Miễn phí tham gia hầu hết các hoạt động",
+    "advise": [
+      "Tham gia các môn thể thao biển miễn phí.",
+      "Thưởng thức ẩm thực biển đa dạng.",
+      "Mang theo đồ bơi và kem chống nắng.",
+      "Tham gia các chương trình biểu diễn nghệ thuật.",
+      "Giữ gìn vệ sinh bãi biển."
+    ],
+    "price_level": 0
+  },
+  "fest_32": {
+    "name": "Lễ kỷ niệm các Sự kiện Lịch sử Quốc gia và Thành phố",
+    "description": "Lễ kỷ niệm các Sự kiện Lịch sử Quốc gia và Thành phố là các sự kiện trang trọng tưởng nhớ các mốc son lịch sử của dân tộc và thành phố Đà Nẵng. Các lễ kỷ niệm có nghi lễ dâng hương, triển lãm lịch sử và nhiều hoạt động văn hóa ý nghĩa.",
+    "event_time": "Các ngày lễ lịch sử: 30/4, 2/9, 29/3 (Ngày giải phóng Đà Nẵng), v.v.",
+    "location": "Trung tâm hành chính Thành phố Đà Nẵng",
+    "ticket_info": "Miễn phí tham gia",
+    "advise": [
+      "Ăn mặc lịch sự khi tham dự lễ kỷ niệm.",
+      "Tôn trọng không gian trang nghiêm.",
+      "Tìm hiểu lịch sử các sự kiện.",
+      "Tham gia nghi lễ dâng hương tưởng niệm.",
+      "Giáo dục thế hệ trẻ về lịch sử dân tộc."
+    ],
+    "price_level": 0
+  },
+  "fest_33": {
+    "name": "Chương trình Âm nhạc Đường phố (Street Music Performances)",
+    "description": "Chương trình Âm nhạc Đường phố là hoạt động văn hóa thường xuyên tại Đà Nẵng với các nghệ sĩ đường phố biểu diễn nhạc sống, ca hát tại các điểm công cộng. Chương trình mang đến không gian âm nhạc sôi động, gần gũi và đầy cảm xúc cho người dân và du khách.",
+    "event_time": "Cuối tuần và các ngày lễ hàng năm",
+    "location": "Công viên Biển Đông",
+    "ticket_info": "Miễn phí thưởng thức",
+    "advise": [
+      "Dừng chân thưởng thức âm nhạc đường phố.",
+      "Ủng hộ nghệ sĩ đường phố nếu thích.",
+      "Tôn trọng không gian biểu diễn.",
+      "Chụp ảnh và chia sẻ để quảng bá.",
+      "Tham gia hòa nhạc nếu được mời."
+    ],
+    "price_level": 0
+  },
+  "fest_34": {
+    "name": "Vũ hội Đường phố (Street Dance Festival)",
+    "description": "Vũ hội Đường phố Đà Nẵng là sự kiện văn hóa nghệ thuật sôi động với các nhóm nhảy đường phố biểu diễn các thể loại hip-hop, breaking, popping, locking và nhiều phong cách khác. Lễ hội mang đến không gian nghệ thuật đường phố đầy năng lượng và sáng tạo.",
+    "event_time": "Cuối tuần và các ngày lễ hàng năm",
+    "location": "Công viên Biển Đông",
+    "ticket_info": "Miễn phí xem biểu diễn",
+    "advise": [
+      "Đến đúng giờ để không bỏ lỡ màn biểu diễn.",
+      "Tôn trọng không gian biểu diễn, không chen lấn.",
+      "Cổ vũ nhiệt tình cho các dancer.",
+      "Tham gia battle nếu có kỹ năng nhảy.",
+      "Chụp ảnh và video để chia sẻ."
+    ],
+    "price_level": 0
+  },
+  "fest_35": {
+    "name": "Nghệ thuật Bài chòi Trung Bộ Việt Nam",
+    "description": "Nghệ thuật Bài chòi Trung Bộ Việt Nam là một loại hình nghệ thuật đa dạng, kết hợp âm nhạc, thơ ca, diễn xuất, hội họa và văn học. Nghệ thuật Bài chòi Trung Bộ Việt Nam trở thành Di sản văn hóa phi vật thể đại diện của nhân loại Vào hồi 17 giờ 10 phút giờ địa phương (15 giờ 10 phút giờ Việt Nam) ngày 07 tháng 12 năm 2017, tại Phiên họp Uỷ ban Liên Chính phủ Công ước 2003 về bảo vệ di sản văn hóa phi vật thể lần thứ 12 của UNESCO diễn ra tại Jeju, Hàn Quốc, di sản Nghệ thuật Bài chòi Trung Bộ Việt Nam đã chính thức được UNESCO ghi danh tại Danh sách Di sản văn hóa phi vật thể đại diện của nhân loại. Nghệ thuật Bài chòi Trung Bộ Việt Nam (ở các tỉnh Quảng Bình, Quảng Trị, Thừa Thiên Huế, Quảng Nam (cũ), Quảng Ngãi, Bình Định, Phú Yên, Khánh Hòa và Đà Nẵng) là một loại hình nghệ thuật đa dạng, kết hợp âm nhạc, thơ ca, diễn xuất, hội họa và văn học. Bài chòi có hai hình thức chính: “Chơi Bài chòi” và “Trình diễn Bài chòi”. Chơi Bài chòi liên quan đến một trò chơi thẻ bài trong chòi tre vào Tết Nguyên đán. Trong các buổi trình diễn của Bài chòi, anh chị Hiệu biểu diễn trên chiếu cói, hoặc di chuyển từ nơi này đến nơi khác hoặc trong những dịp riêng tư của các gia đình. Những người lưu giữ và thực hành nghệ thuật Bài chòi là các anh chị Hiệu, những nghệ nhân biểu diễn Bài chòi đơn lẻ và những nghệ nhân làm thẻ bài. Người trình diễn và gia đình họ đóng vai trò quan trọng trong việc bảo vệ các hình thức thực hành bằng cách giảng dạy các bài bản, kỹ năng ca hát, kỹ thuật trình diễn và phương pháp làm thẻ bài cho các thế hệ trẻ. Cùng với cộng đồng, những người này đã thành lập gần 90 đội, nhóm và câu lạc bộ để luyện tập và truyền dạy Nghệ thuật Bài chòi, thu hút sự tham gia rộng rãi của cộng đồng. Hầu hết, nghệ nhân đều được học kỹ năng, kỹ thuật hô, hát Bài chòi trong gia đình, chủ yếu thông qua phương pháp truyền miệng. Tuy nhiên, một số nghệ nhân Bài chòi ngày nay cũng truyền dạy kiến ​​thức và kỹ năng trong các hội, các câu lạc bộ và trường học. Nghệ thuật Bài chòi là một hình thức sinh hoạt văn hóa và giải trí trong cộng đồng làng xã. Các thành tố văn hóa nghệ thuật: thơ ca, âm nhạc, hội họa, ngôn ngữ, tập tục… trong Nghệ thuật Bài chòi được chuyển tải một cách giản dị, tự nhiên, tạo sức hấp dẫn với công chúng, trở thành sinh hoạt văn hóa thiết yếu và phổ biến khắp miền Trung. Vì thế mà sinh hoạt Bài chòi trở thành môi trường thực hành và sáng tạo nghệ thuật, đồng thời cũng là nơi bảo tồn vốn văn nghệ dân gian, phong cách trình diễn và các giá trị văn hóa vùng miền. Với khả năng trao truyền các tri thức văn hoá dân gian thông qua trò chơi và việc trình diễn, Bài chòi đã trở thành hình thức sinh hoạt cộng đồng mang tính giáo dục cao, đặc biệt là đối với thế hệ trẻ. Tuy nhiên, hiện nay, việc trao truyền Bài chòi gặp trở ngại do: yêu cầu về năng khiếu, năng lực và sự đam mê; cơ hội, không gian trình diễn, đối tượng khán giả bị thu hẹp; nhiều nghệ nhân tuổi cao, đời sống khó khăn, kinh phí hỗ trợ học và thực hành di sản còn hạn chế. Nỗ lực bảo vệ và phát huy giá trị di sản Nghệ thuật Bài chòi được các tỉnh/thành phố có di sản thực hiện ở nhiều cấp độ: các tỉnh Bình Định, Khánh Hòa, Quảng Nam và Phú Yên đã xây dựng hồ sơ di sản Nghệ thuật Bài chòi và được Bộ Văn hóa, Thể thao và Du lịch đưa vào Danh mục di sản văn hóa phi vật thể quốc gia từ năm 2013 – 2014. Năm 2012, Viện Văn hóa Nghệ thuật Quốc gia Việt Nam đã kiểm kê di sản Bài chòi tại 8 tỉnh miền Trung và đưa vào Ngân hàng dữ liệu của Viện. Tới năm 2014, Sở Văn hóa và Thể thao, Sở Văn hóa, Thể thao và Du lịch 9 tỉnh đã phối hợp với Viện Âm nhạc kiểm kê di sản Nghệ thuật Bài chòi và được lưu trữ kết quả tại Hệ thống thông tin quản lý di sản văn hóa phi vật thể của Cục Di sản văn hóa. Bên cạnh đó, Bộ Văn hóa, Thể thao và Du lịch giao Viện Âm nhạc phối hợp với Sở Văn hóa, Thể thao và Du lịch 9 tỉnh tổ chức tập huấn và kiểm kê di sản hàng năm; nhận diện, tư liệu hóa di sản; phục hồi các thành tố đã mai một, những tri thức dân gian liên quan đến di sản và định kỳ tổ chức Liên hoan Bài chòi. Nhờ đó, dựa trên những hiểu biết về Nghệ thuật Bài chòi và Luật di sản văn hóa, đại diện cộng đồng của 86 đội, nhóm, câu lạc bộ thực hành Bài chòi tại cả 9 tỉnh/thành phố có di sản đã cam kết đồng thuận với việc xây dựng hồ sơ đệ trình UNESCO đưa Nghệ thuật Bài chòi vào Danh sách di sản văn hóa phi vật thể đại diện của nhân loại. Theo Uỷ ban Liên Chính phủ về bảo vệ di sản văn hóa phi vật thể, hồ sơ đề cử di sản văn hóa phi vật thể Nghệ thuật Bài chòi Trung Bộ Việt Nam đáp ứng những tiêu chí sau để đăng ký vào Danh sách Di sản văn hóa phi vật thể đại diện của nhân loại: CÁC TIÊU CHÍ DANH SÁCH DI SẢN VĂN HOÁ PHI VẬT THỂ CỦA NHÂN LOẠI R.1: Nghệ thuật Bài chòi là một hoạt động văn hoá quan trọng trong cộng đồng làng xã, đáp ứng nhu cầu giải trí và thưởng thức nghệ thuật của cộng đồng. Các câu chuyện trong Bài chòi là những bài học đạo đức, thể hiện tình yêu quê hương đất nước, sự gắn kết cộng đồng và những kinh nghiệm trong cuộc sống của người dân. Hồ sơ đề cử đã chỉ ra được vai trò quan trọng của người lưu giữ di sản. Là một di sản của cộng đồng, việc truyền dạy Bài chòi diễn ra chủ yếu trong gia đình, làng xóm, hội, câu lạc bộ và trường học. Việc thực hành di sản Nghệ thuật Bài chòi thúc đẩy sự bình đẳng về giới tính cũng như sự tôn trọng lẫn nhau giữa các cộng đồng. R.2: Việc ghi danh Nghệ thuật Bài chòi khuyến khích đối thoại giữa các cộng đồng, các nhóm người và cá nhân; tạo cơ hội trao đổi và chia sẻ kinh nghiệm giữa những người thực hành, qua đó làm phong phú kiến thức và kỹ năng liên quan đến việc thực hành các hình thức nghệ thuật. Việc ghi danh cũng có thể củng cố mối liên kết giữa các cá nhân, các nhóm người và các câu lạc bộ thực hành di sản và thực hành các truyền thống văn hoá khác thông qua các hoạt động trình diễn và lễ hội liên quan. Hơn nữa, việc ghi danh sẽ nâng cao nhận thức về sự đa dạng của di sản văn hoá phi vật thể vì Nghệ thuật Bài chòi là sự kết hợp của nhiều lĩnh vực văn hoá – nghệ thuật. R.3: Hồ sơ đã mô tả chi tiết, rõ ràng những nỗ lực trong quá khứ và hiện tại để bảo vệ di sản và đảm bảo sự tồn tại của các cộng đồng, các nhóm người và các câu lạc bộ với sự hỗ trợ của Chính phủ. Những nỗ lực này bao gồm việc tổ chức các hội Bài chòi, trình diễn và giảng dạy bải bản và kỹ năng ca hát, cũng như kỹ thuật trình diễn, phương pháp làm thẻ bài và các kỹ năng chơi Bài chòi. Thông qua Bộ Văn hoá, Thể thao và Du lịch và chính quyền địa phương, Quốc gia thành viên sẽ cung cấp nguồn tài chính, pháp lý và nhân lực để hỗ trợ thực hiện các biện pháp này, với sự hợp tác của cộng đồng và các nghệ nhân. Các doanh nghiệp và ngân hàng đã đóng góp cho các hội thảo khoa học về Bài chòi và hoạt động văn hóa liên quan như việc thực hành và truyền dạy di sản, cũng như sưu tầm tài liệu, tư liệu hóa và hỗ trợ các biện pháp phục hồi di sản, vì di sản vẫn có nguy cơ mai một, chủ yếu là do những khó khăn trong việc truyền dạy. Chính sách đãi ngộ cho nghệ nhân đã được ban hành và chương trình giáo dục chính quy cũng đã được thiết kế để thu hút các thế hệ trẻ. Các phương tiện truyền thông địa phương và quốc gia cam kết nâng cao nhận thức về giá trị của di sản với phần lớn các học viên tình nguyện tham gia vào quá trình phổ biến, quảng bá di sản. R.4: Cộng đồng tích cực đóng góp ý tưởng cho việc sưu tầm và tư liệu hóa di sản, điền vào các mẫu kiểm kê và tham gia vào tất cả các công đoạn chuẩn bị hồ sơ đề cử. Các cá nhân và đại diện của các nhóm và câu lạc bộ Bài chòi đã ký Cam kết tự nguyện, đồng thuận của họ đối với đề cử, đồng thời, sự hiểu biết về việc xây dựng hồ sơ đề cử của họ cũng được thể hiện trong các đoạn ghi âm và ghi hình các cuộc phỏng vấn được thực hiện tại các địa phương có thực hành Bài chòi. Cục Di sản văn hoá và Viện Âm nhạc Việt Nam đã được ủy thác quá trình tham vấn thông qua các cuộc họp và hội thảo quốc gia và quốc tế được tổ chức trong năm 2014 và 2015. Các tác động thực tiễn thông thường không tham gia điều chỉnh hoặc hạn chế quyền tiếp cận đối với di sản. R.5: Di sản này được Bộ Văn hoá, Thể thao và Du lịch Việt Nam đưa vào Danh sách di sản văn hoá phi vật thể quốc gia trong giai đoạn 2014 – 2016. Bản kiểm kê được lưu giữ tại Phần mềm Hệ thống thông tin quản lý di sản văn hoá phi vật thể của Cục Di sản văn hoá Việt Nam. Các Sở Văn hoá, Thể thao và Du lịch/Sở Văn hóa và Thể thao của 9 tỉnh có di sản Bài chòi chịu trách nhiệm phối hợp với cộng đồng để báo cáo hàng năm về Bộ Văn hóa, Thể thao và Du lịch các thông tin kiểm kê di sản Bài chòi. Viện Âm nhạc Việt Nam quản lý cơ sở dữ liệu về Nghệ thuật Bài chòi và cập nhật hàng năm. Việc UNESCO ghi danh Nghệ thuật Bài chòi Trung Bộ Việt Nam tại Danh sách Di sản văn hóa phi vật thể đại diện của nhân loại khẳng định bản sắc văn hóa phong phú của dân tộc Việt Nam, sự gắn kết cộng đồng, đề cao tôn trọng đa dạng văn hóa, khuyến khích đối thoại giữa các cá nhân, các cộng đồng và các dân tộc khác nhau vì sự khoan dung, tình yêu và lòng bác ái đúng theo tôn chỉ và mục tiêu của Công ước 2003 về bảo vệ di sản văn hóa phi vật thể của UNESCO./. KHÁM PHÁ NGHỆ THUẬT BÀI CHÒI TẠI VƯỜN TƯỢNG AN HỘI – HỘI AN Nếu bạn yêu thích văn hóa dân gian Việt Nam, đừng bỏ qua cơ hội khám phá bài chòi – di sản độc đáo của Đà Nẵng. Tại Vườn Tượng An Hội, Phường Hội An, các buổi biểu diễn bài chòi diễn ra hàng ngày lúc 19h, mang đến không gian âm nhạc đậm đà bản sắc dân tộc. Du khách không chỉ được thưởng thức những giai điệu truyền thống mà còn có thể thử sức với trò chơi bài chòi, nơi trí tuệ và may mắn hòa quyện. Các nguồn tài liệu tham khảo: 1. Cục Di sản văn hóa – Bộ Văn hóa, Thể thao và Du lịch: https://dsvh.gov.vn TRUNG TÂM XÚC TIẾN DU LỊCH TP. ĐÀ NẴNG",
+    "event_time": "Hàng năm",
+    "location": "Phố cổ Hội An",
+    "ticket_info": "Miễn phí tham gia",
+    "advise": [
+      "Nên thuê hướng dẫn viên địa phương để hiểu rõ hơn về lịch sử và văn hóa.",
+      "Mang theo nước uống và kem chống nắng khi tham quan."
+    ],
+    "price_level": 0
+  },
+  "fest_36": {
+    "name": "Lễ hội Tết Trung thu Hội An",
+    "description": "Lễ hội Tết Trung thu Hội An là một lễ hội truyền thống đặc sắc, diễn ra hằng năm vào dịp rằm tháng Tám Âm lịch tại phố cổ Hội An (phường Hội An, thành phố Đà Nẵng). Đây còn được gọi là Tết Thiếu nhi hoặc Tết Đoàn viên – thời điểm mà các gia đình quây quần bên mâm cỗ Trung thu, cùng ngắm trăng, thưởng trà, bánh và chia sẻ những câu chuyện ấm áp. Đối với người dân phố Hội, Tết Trung thu không chỉ là dịp vui chơi cho trẻ em mà còn mang ý nghĩa văn hóa – tâm linh sâu sắc, thể hiện tinh thần sum họp gia đình và lòng biết ơn trời đất sau mùa vụ. Với bề dày lịch sử phát triển qua nhiều thế kỷ, lễ hội này đã trở thành một nét sinh hoạt văn hóa cộng đồng quan trọng, thu hút sự tham gia hào hứng của cả cư dân địa phương lẫn du khách thập phương. NGUỒN GỐC,  LỊCH SỬ VÀ CÁC NGHI THỨC HÌNH THÀNH Tết Trung thu có nguồn gốc lâu đời trong văn hóa Á Đông, là lễ hội giữa mùa thu nhằm cầu mong mùa màng bội thu, gia đình hạnh phúc và quốc thái dân an. Tại Việt Nam, Tết Trung thu đã được tổ chức từ hàng trăm năm trước, hòa quyện giữa tín ngưỡng bản địa và ảnh hưởng văn hóa từ Trung Hoa. Riêng ở Hội An – một thương cảng quốc tế sầm uất từ thế kỷ XVI–XVIII – lễ Tết Trung thu dần hình thành và phát triển rực rỡ nhờ sự giao thoa giữa các nền văn hoá, tạo nên những nét đặc sắc riêng có của vùng đất này. Từ năm 1998, cùng với việc bảo tồn phố cổ và phát triển du lịch, Hội An bắt đầu tổ chức “Đêm rằm phố cổ” vào mỗi dịp rằm nhằm tái hiện không gian truyền thống không đèn điện, chỉ lung linh ánh đèn lồng. Đặc biệt, Tết Trung thu Hội An trong những năm qua đã gắn liền với hoạt động “Đêm rằm phố cổ”, trở thành một lễ hội mùa thu độc đáo, lung linh huyền ảo thu hút đông đảo du khách tham gia. Mặc dù Tết Trung thu thiên về vui chơi, Hội An vẫn lưu giữ những nghi thức mang tính lễ nghi cổ truyền vào dịp rằm tháng Tám. Trong phạm vi gia đình, hầu như mọi nhà đều chuẩn bị mâm cỗ cúng trăng vào đêm Trung thu. Trên bàn thờ tổ tiên và trước sân nhà, người ta bày biện hoa quả, bánh nướng, bánh dẻo, trà thơm và các lễ phẩm đặc trưng (như bưởi, hồng, na…) để dâng lên thần linh, gia tiên và cúng thập loại chúng sinh. Nghi thức cúng rằm tháng Tám này thể hiện lòng tri ân trời Phật và ông bà, cầu mong gia đạo bình an, mùa màng thuận lợi, buôn bán hanh thông. Khi trăng lên đỉnh đầu, các gia đình làm lễ khấn vái, trẻ em thành kính vòng tay trước mâm cỗ rồi cùng nhau “phá cỗ”, tức là thưởng thức quà bánh trong tiếng cười đùa rộn rã. VAI TRÒ VÀ GIÁ TRỊ VĂN HÓA – DU LỊCH CỦA LỄ HỘI Đối với cộng đồng Hội An, Tết Trung thu từ lâu đã vượt khỏi ý nghĩa một ngày Tết thiếu nhi thông thường để trở thành di sản văn hóa phi vật thể quý giá của địa phương. Lễ hội này kết tinh nhiều giá trị văn hóa truyền thống độc đáo, từ nghệ thuật làm lồng đèn, làm bánh Trung thu, múa lân – Thiên Cẩu cho đến các làn điệu dân ca, trò chơi cổ truyền. Thông qua lễ hội, những phong tục tốt đẹp như cúng trăng rằm tháng Tám, tặng quà bánh cho trẻ em, sum vầy gia đình đều được gìn giữ và trao truyền qua các thế hệ. Tinh thần cộng đồng gắn kết cũng thể hiện rõ: cả thành phố cùng chung tay chuẩn bị lễ hội, các nghệ nhân lớn tuổi tận tình truyền dạy cho lớp trẻ cách làm đầu lân, lồng đèn, cách múa Thiên Cẩu… Nhờ đó, Tết Trung thu Hội An vừa lưu giữ được hồn cốt văn hóa cổ truyền, vừa thổi sức sống mới vào đời sống tinh thần của người dân trong nhịp sống hiện đại. Về mặt danh hiệu di sản, Lễ hội Tết Trung thu ở Hội An đã được Bộ Văn hóa, Thể thao và Du lịch công nhận là Di sản văn hóa phi vật thể quốc gia vào đầu năm 2023. Việc vinh danh này khẳng định tầm quan trọng của lễ hội trong kho tàng di sản phi vật thể dân tộc, đồng thời mở ra cơ hội để quảng bá sâu rộng hình ảnh văn hóa Hội An. Ngày nay, Tết Trung thu đã trở thành sản phẩm du lịch văn hóa – lễ hội hấp dẫn, góp phần thu hút lượng lớn du khách đến với phố cổ mỗi dịp rằm tháng Tám. Du khách không chỉ được hòa mình vào không gian đèn lồng cổ tích và tham gia nhiều hoạt động lễ hội sôi nổi, mà còn có cơ hội hiểu thêm về những giá trị tinh thần, tín ngưỡng đặc sắc của cư dân địa phương. Chính quyền và người dân Hội An hiện nay rất chú trọng bảo tồn và phát huy lễ hội truyền thống này, coi đó là niềm tự hào và trách nhiệm chung trong việc giữ gìn bản sắc văn hóa dân tộc. Tết Trung thu Hội An vì vậy vừa là tài sản tinh thần vô giá của người Hội An, vừa là điểm nhấn du lịch độc đáo, mang lại ấn tượng sâu đậm cho bạn bè trong và ngoài nước về một đô thị cổ kính, giàu bản sắc. Các nguồn tài liệu tham khảo: Trung tâm Quản lý Bảo tồn Di sản Văn hóa Hội An:hoianheritage.net; CAND online – Chuyên trang của báo Công an Nhân Dân TP. Đà Nẵng: cadn.com.vn; Báo vnexpress.net. TRUNG TÂM XÚC TIẾN DU LỊCH TP. ĐÀ NẴNG",
+    "event_time": "Hàng năm",
+    "location": "Phố cổ Hội An",
+    "ticket_info": "Miễn phí tham gia",
+    "advise": [
+      "Nên mặc trang phục lịch sự và thoải mái khi đến tham quan.",
+      "Mang theo nước uống và kem chống nắng khi tham quan."
+    ],
+    "price_level": 0
+  },
+  "fest_37": {
+    "name": "Lễ hội Tết Nguyên Tiêu Hội An",
+    "description": "Lễ hội Tết Nguyên Tiêu ở Hội An thường diễn ra trong 3 ngày, từ 14 đến 16 tháng Giêng âm lịch hàng năm… Tết Nguyên Tiêu còn gọi là tết Thượng nguyên. Theo quan niệm dân gian, Tết Nguyên Tiêu (Thượng nguyên) là ngày “Thiên quan Tứ phước”, tức ngày các quan trời ban bố phước lành cho khắp cả nhân gian. Vì vậy từ xa xưa, ngay sau ngày Khai hạ mồng 7 tháng Giêng, người Việt lại chuẩn bị tổ chức cúng tế cầu an, cầu may mắn, phước lành, thịnh vượng trong cả một năm, đồng thời mở hội vui chơi trước khi bước vào công việc của năm mới với ước vọng mọi việc hanh thông, như ý, phát triển. Dưới triều Nguyễn, các vua rất coi trọng tết Nguyên tiêu (Thượng nguyên) và xếp vào những lễ tiết quan trọng trong năm, được quy định tổ chức cúng tế theo định kỳ và có lễ phẩm cụ thể trong triều đình. Sách Đại Nam thực lục do Quốc sử quán biên soạn có chép: Năm Minh Mệnh thứ 16 (1835), sau khi các quan bàn định thể lệ các lễ tiết hàng năm, vua chuẩn định vào những tiết Đông chí, Thượng nguyên, Trung nguyên và Hạ nguyên đều làm cỗ bàn dâng cúng các miếu và điện Phụng Tiên, lễ nghi như lễ tiết Đoan dương. Riêng lễ tiết Thượng nguyên và Trung thu thì treo đèn suốt đêm để nêu bật ngày tết nhằm thời tiết đẹp. ĐẶC ĐIỂM VÀ GIÁ TRỊ VĂN HÓA Ở Hội An, cứ sau ngày Khai hạ (mồng 7 tháng Giêng), người dân lại nô nức chuẩn bị Lễ hội Tết Nguyên Tiêu Hội An. Đây là lễ tết có từ lâu đời của cư dân Hội An và mang những giá trị văn hóa, những nét đặc trưng riêng so với nhiều nơi ở Việt Nam và châu Á do được hình thành trên cơ sở truyền thống văn hóa bản địa và có sự giao lưu tiếp biến văn hóa với các nước Trung Hoa, Nhật Bản qua nhiều giai đoạn tại thương cảng quốc tế Hội An. Theo bảng kê các ngày lễ, lệ của xã Minh Hương ở Hội An năm 1765, có 16 lễ tục được tổ chức trong năm, trong đó Tết Nguyên tiêu được tổ chức tại các địa điểm chính như cung Cẩm Hà, cung Trừng Hán và cung Hải Bình. Hình thức tổ chức chủ yếu là lễ cúng, ngoài ra có hoa đăng, làm đám rước kiệu ngoài phố… Theo bảng kê các khoản chi của Lý Tam Bửu Vụ xã Minh Hương cho biết năm 1787 có mua giấy liễn chuẩn bị Tết Nguyên Tiêu ở đình Vạn Thọ, cầu Lai Viễn; chuẩn bị cho lễ Hoa đăng, Nguyên tiêu ở cung Trừng Hán, cung Cẩm Hà, cung Hải Bình. CÁC NGHI THỨC VÀ HOẠT ĐỘNG Vào dịp Tết Nguyên Tiêu, các đình làng, chùa chiền và hội quán đều tổ chức cúng tế long trọng, giăng đèn kết hoa rực rỡ, không khí chuẩn bị nhộn nhịp vui tươi chẳng khác gì những ngày giáp Tết Nguyên Đán. Tại hội quán Quảng Triệu, Triều Châu không chỉ tổ chức cúng cầu mong an bình thịnh vượng mà đồng thời là ngày tế tự Tiền hiền và làm ngày gặp mặt thường niên của con cháu xa gần trong bang. Lễ vật được bày biện chỉnh tề, trên án thờ gồm có: heo quay, bánh bao, hương hoa, trà quả và những món ăn mang sắc thái của từng bang. Tại Quan Công miếu (Chùa Ông), Chùa Bà, Chùa Cầu và các hội quán khác như Phước Kiến, Ngũ Bang,… cũng nghi ngút khói hương, khách thập phương ra ngoài tấp nập cầu an, xin lộc đầu năm. Tết Nguyên Tiêu cũng là ngày cúng tế lớn của đạo Phật bởi quan niệm cho rằng “lễ Phật quanh năm không bằng rằm tháng giêng”. Hằng năm, đến dịp Tết Nguyên Tiêu, ở các chùa đều tổ chức lập đàn cầu Phật tụng kinh, cúng nhương sao giải hạn, trừ tai ách, cầu mong bình yên. Ý NGHĨA VÀ VAI TRÒ CỦA TẾT NGUYÊN TIÊU TRONG ĐỜI SỐNG CỘNG ĐỒNG HỘI AN Ở các đình làng, miễu xóm như đình Xuân Lâm – phường Cẩm Phô, đình Sơn Phong – phường Sơn Phong, đình An Mỹ – phường Cẩm Châu, lăng Trà Quân, miếu Cây Giá – xã Cẩm Thanh, lăng Ông An Bàng – phường Cẩm An,… cộng đồng cư dân tổ chức cúng kỳ yên đầu năm với mục đích cúng tế Thần Nông, Thành Hoàng, Đại Càn và nhiều vị thần khác, cầu mong mưa thuận gió hòa, mùa màng bội thu, quốc thái dân an. Đồng thời, cũng là ngày cúng tế tưởng niệm các bậc Tiền hiền đã có công khai hoang lập làng, những người đã xả thân vì quê hương, đất nước. TẦM QUAN TRỌNG VÀ GIÁ TRỊ DI SẢN Tết Nguyên Tiêu tuy có nguồn gốc từ nhiều quan niệm khác nhau, nhưng có cùng một đặc điểm chung đó là nhân ngày rằm đầu tiên của một  năm, người dân bày tỏ tấm lòng tôn kính đối với chư Phật, chư thần, các vị tiền nhân… cầu mong cuộc sống ấm no, hạnh phúc đồng thời tổ chức lễ hội mừng xuân để chuẩn bị bước vào một năm làm ăn mới. Vì vậy, Tết Nguyên Tiêu có vai trò rất lớn trong đời sống văn hóa của cộng đồng cư dân Hội An từ trong lịch sử cho đến hiện nay trên nhiều phương diện, vừa thỏa mãn nhu cầu tâm linh, cố kết cộng đồng, vừa vui chơi giải trí và tạo môi trường để cá nhân và cộng đồng sáng tạo nên những giá trị về văn hóa, nghệ thuật và bảo tồn, phát huy các giá trị truyền thống văn hóa tốt đẹp của quê hương. Trải qua quá trình hình thành, nuôi dưỡng và phát triển, hiện nay Tết Nguyên Tiêu ở Hội An được duy trì tổ chức theo định kỳ hàng năm và vẫn giữ được những giá trị đặc sắc riêng có. Đây là một trong những lễ hội lớn đầu năm của cộng đồng cư dân Hội An có tác động lớn và sâu sắc đến đời sống văn hóa của cộng đồng và được cả cộng đồng trân trọng gìn giữ, bảo tồn và phát huy tích cực. Qua đó, góp phần làm giàu thêm bản sắc văn hóa của dân tộc nói chung, của Hội An, Đà Nẵng nói riêng. Nhằm tôn vinh những giá trị Tết Nguyên Tiêu ở Hội An, góp phần bảo tồn và phát huy nét đẹp, bản sắc văn hóa của dân tộc, ngày 2/2/2023, Bộ trưởng Bộ Văn hóa, Thể thao và Du lịch đã ban hành quyết định ghi danh Tết Nguyên Tiêu ở Hội An vào Danh mục Di sản văn hóa phi vật thể quốc gia, thuộc loại hình Lễ hội truyền thống và Tập quán xã hội và tín ngưỡng. Sự ghi nhận của Nhà nước đối với di sản này là niềm vui, niềm tự hào và vinh dự to lớn của Nhân dân thành phố Hội An, đồng thời qua đó cũng gửi gắm thông điệp về trách nhiệm chung của cộng động trong việc gìn giữ, trao truyền và phát huy hiệu quả di sản văn hóa phi vật thể quốc gia này. Các nguồn tài liệu tham khảo: Trung tâm Bảo tồn Di sản Văn hoá thế giới Hội An: hoianheritage.net TRUNG TÂM XÚC TIẾN DU LỊCH TP. ĐÀ NẴNG",
+    "event_time": "Hàng năm",
+    "location": "Phố cổ Hội An",
+    "ticket_info": "Miễn phí tham gia",
+    "advise": [
+      "Nên mặc trang phục lịch sự và thoải mái khi đến tham quan.",
+      "Kiểm tra thời tiết trước khi đi để có trải nghiệm tốt nhất.",
+      "Mang theo nước uống và kem chống nắng khi tham quan."
+    ],
+    "price_level": 0
+  },
+  "fest_38": {
+    "name": "Lễ hội Bà Chiêm Sơn",
+    "description": "Lễ hội Bà Chiêm Sơn là một lễ hội dân gian đặc sắc và lâu đời tại Đà Nẵng, diễn ra hằng năm từ ngày 10 đến 12 tháng Giêng (Âm lịch). Lễ hội được tổ chức tại khu di tích Dinh Bà Chiêm Sơn, thôn Chiêm Sơn, xã Duy Trinh, huyện Duy Xuyên, tỉnh Quảng Nam (nay là xã Duy Xuyên, thành phố Đà Nẵng). Đây là dịp để cư dân địa phương tưởng nhớ và tri ân Bà Chiêm Sơn – vị nữ thần Bô Bô Thái Dương phu nhân đã có công phù trợ, che chở cho dân làng Chiêm Sơn và khu vực ven sông Thu Bồn. Trải qua nhiều thế kỷ hình thành và phát triển, lễ hội Bà Chiêm Sơn đã trở thành nét đẹp văn hóa tâm linh quan trọng, thể hiện truyền thống “uống nước nhớ nguồn” và tinh thần gắn kết cộng đồng của người dân nơi đây. Đồng thời, lễ hội góp phần gìn giữ và phát huy các giá trị văn hóa truyền thống, nuôi dưỡng bản sắc văn hóa dân tộc của Đà Nẵng. NGUỒN GỐC VÀ TRUYỀN THUYẾT VỀ BÀ CHIÊM SƠN Tín ngưỡng thờ Bà Chiêm Sơn hình thành từ buổi đầu khai phá vùng đất Duy Xuyên, trong bối cảnh giao thoa văn hóa Chăm Pa và Việt. Theo huyền tích dân gian, xưa kia có tám người mục đồng ở làng Chiêm Sơn phát hiện một phiến đá lạ vào đêm trăng sáng và rủ nhau khiêng về thờ trong chùa làng. Khi khiêng qua ngọn đồi Chiêm Sơn, dây buộc bỗng đứt và phiến đá rơi xuống, nặng đến mức không thể nhấc lên được. Đúng lúc đó, một cậu bé trong làng lên đồng, tự xưng là Bô Bô Thái Dương phu nhân – vị thần hộ mệnh của dân làng, cho biết Bà chọn ngự tại ngọn đồi này vì không muốn thờ chung với các vị Phật . Nghe lời thần linh mách bảo, dân làng đã lập một ngôi miếu nhỏ trên đồi (gọi là Dinh Bà) để thờ phụng Bà Chiêm Sơn. Bà Chiêm Sơn được tôn kính như Nữ thần bổn mạng của làng, luôn phù trợ và ban phúc cho cư dân quanh vùng. Pho tượng thờ Bà là tượng nữ thần bằng đá sa thạch cao khoảng 1m, với hình dáng độc đáo: tai dài, đầu đội mũ có trang trí bảy đầu rắn thần xung quanh, chân ngồi xếp bằng và khoác áo choàng . Những đặc điểm này, cùng với việc trước miếu Bà từng có tượng voi (Ganesa) và tượng Makara bằng đá – linh vật trong văn hóa Chăm Pa, cho thấy Bà Chiêm Sơn nhiều khả năng bắt nguồn từ một nữ thần của người Chăm được người Việt tiếp nhận và tôn thờ . Sự linh thiêng của Bà còn được lưu truyền qua giai thoại vua Minh Mạng khi kinh lý qua vùng này: Tương truyền, lúc đoàn ngự giá đi ngang Dinh Bà, ngựa của nhà vua bỗng dưng hoảng sợ lồng lên, buộc vua phải truyền lệnh xoay hướng mặt chính của Dinh Bà quay về phía cánh đồng, tránh hướng ra đường cái . Giai thoại này càng tô đậm uy danh và sự linh ứng của Bà trong tâm thức dân gian. Ghi nhận công đức và sự hiển linh của Bà Chiêm Sơn, triều Nguyễn đã nhiều lần sắc phong danh hiệu cho Bà. Năm 1908 (Đời vua Duy Tân thứ 2), Bà được phong là Thái Dương phu nhân; đến năm 1924 (Khải Định thứ 9), Bà tiếp tục được tặng mỹ hiệu “Trinh Uyển Dực Bảo Trung Hưng Thái Dương phu nhân tôn thần”. Từ đó, tín ngưỡng thờ Bà càng được củng cố trong cộng đồng. Hằng năm, vào ngày 12 tháng Giêng – ngày chính lễ, dân làng Chiêm Sơn và các vùng lân cận tổ chức lễ hội Bà một cách trang nghiêm theo đúng nghi thức truyền thống, như một phần không thể thiếu của đời sống văn hóa tâm linh người dân lúa nước nơi đây. CÁC NGHI THỨC TRUYỀN THỐNG TRONG PHẦN LỄ Phần lễ của lễ hội Bà Chiêm Sơn diễn ra trang trọng, thể hiện lòng thành kính của dân làng đối với vị nữ thần. Chuỗi nghi thức thường bắt đầu từ chiều tối ngày 11 và kéo dài đến hết ngày 12 tháng Giêng (Âm lịch). Các nghi thức tiêu biểu bao gồm: Lễ Mộc dục: Trước khi bước vào lễ chính, dân làng tiến hành lễ Mộc dục (tắm tượng) để tẩy tịnh pho tượng Bà. Tượng Bà được tắm bằng nước lá cây và hoa thơm, thể hiện sự trang nghiêm và tôn kính đối với thần linh . Nghi thức này mở đầu cho phần lễ, chuẩn bị không gian linh thiêng để đón Bà về hưởng lễ. Lễ Túc yết: Diễn ra vào tối ngày 11 tháng Giêng. Đây là lễ dâng hương đăng và lễ vật để “túc trực” và kính mời Bà về dự lễ hội . Lễ vật dâng Bà trong lễ Túc yết gồm mâm cơm, hoa quả và đặc biệt không thể thiếu chiếc bánh tráng nướng – lễ vật tượng trưng mang đậm nét văn hóa địa phương . Nghi thức Túc yết tuy giản dị nhưng thấm đượm lòng thành kính, mở đầu cho chuỗi hoạt động tế lễ chính thức. Lễ Kỵ Bà (Đại tế): Được cử hành vào lúc nửa đêm, thời khắc giao chuyển từ ngày 11 sang ngày 12 tháng Giêng . Đây là lễ tế chính nhằm tưởng nhớ ngày húy kỵ của Bà Chiêm Sơn – cao điểm trang nghiêm nhất của phần lễ. Trong không gian tĩnh mịch của đêm khuya, các bô lão và chức sắc uy tín trong làng (sau khi đã trai giới thanh tịnh) mặc lễ phục truyền thống tiến hành nghi thức đại tế long trọng. Lễ vật dâng cúng Bà ở lễ kỵ gồm những phẩm vật phong phú: cơm, thịt heo, trái cây, trầu cau, hương hoa, và đặc biệt bắt buộc phải có một con cua đồng, một nhánh tỏi, một cây cải, một con chồn – những lễ vật độc đáo gắn với truyền thuyết và tín ngưỡng địa phương . Tiếng chiêng trống và nhạc lễ vang lên hào hùng trong đêm tối, hòa cùng 20 lần xướng tế theo nghi thức cổ truyền , cầu cho quốc thái dân an, mưa thuận gió hòa, mọi nhà no ấm. Lễ Rước sắc: Diễn ra vào sáng ngày 12 tháng Giêng – ngày chính hội. Từ sáng sớm, dân làng tổ chức đoàn rước sắc vô cùng uy nghi từ Bến Giá bên bờ sông Thu Bồn về Dinh Bà Chiêm Sơn . Dẫn đầu đoàn rước là đội múa lân sư rộn rã, theo sau là đội chiêng trống, đội nhạc bát âm, tiếp đó là kiệu rước nông sản địa phương và kiệu rước sắc phong (chiếu chỉ phong thần của triều Nguyễn dành cho Bà) do 16 trai tráng trong làng cung nghinh . Đoàn rước còn có các lính danh dự hộ giá và đông đảo người dân, du khách thập phương cùng tham gia trong không khí thành kính mà náo nức. Về đến Dinh Bà, lễ tuyên sắc được cử hành trang trọng để ôn lại công đức và sắc phong của Bà năm xưa . Kết thúc phần lễ, toàn bộ lễ vật được chia lộc cho dân làng và mọi người đều thụ lộc ngay tại chỗ, với quan niệm hưởng lộc đầu năm để cầu may mắn, an lành. Tất cả các nghi thức trong phần lễ đều được cộng đồng làng Chiêm Sơn gìn giữ từ bao đời nay, thấm đượm lòng thành và tín ngưỡng thờ Mẫu. Những nghi lễ cổ truyền này không chỉ tái hiện sinh động truyền thống văn hóa dân gian, mà còn góp phần giáo dục con cháu về lòng biết ơn cội nguồn và niềm tự hào di sản quê hương. HOẠT ĐỘNG HỘI VÀ VUI CHƠI DÂN GIAN ĐẶC SẮC Sau phần lễ trang nghiêm là phần hội tưng bừng, rộn rã, thu hút đông đảo người dân và du khách tham gia. Phần hội của lễ hội Bà Chiêm Sơn diễn ra với nhiều hoạt động văn hóa, thể thao và trò chơi dân gian đặc sắc, tạo không khí vui tươi phấn khởi khắp làng quê. Trong các ngày hội, du khách có thể hòa mình vào những trải nghiệm độc đáo như: hô hát Bài chòi – loại hình nghệ thuật dân gian bài chòi xứ Quảng đầy lôi cuốn; thưởng thức chợ quê với các món ẩm thực dân dã; xem biểu diễn múa lân sư rộn ràng; cổ vũ các trận thi đấu bóng chuyền sôi động; thưởng thức văn nghệ quần chúng do người dân địa phương biểu diễn… VAI TRÒ VÀ GIÁ TRỊ VĂN HÓA – DU LỊCH CỦA LỄ HỘI Đối với người dân, lễ hội Bà Chiêm Sơn không chỉ là một sinh hoạt tín ngưỡng thông thường, mà từ lâu đã trở thành món ăn tinh thần không thể thiếu, góp phần bồi đắp đời sống văn hóa cộng đồng. Đây là một trong những lễ hội thờ Mẫu tiêu biểu nhất ở xứ Quảng, nơi các thế hệ cư dân địa phương gửi gắm niềm tin tâm linh và ước vọng về cuộc sống bình an, mùa màng bội thu. Thông qua lễ hội, nhiều giá trị văn hóa truyền thống quý báu được gìn giữ và trao truyền một cách sống động: từ những nghi thức tế lễ cổ xưa cho đến các làn điệu dân ca, trò chơi dân gian đặc trưng của địa phương. Lễ hội cũng là dịp để cố kết tình làng nghĩa xóm, thắt chặt thêm tình đoàn kết trong cộng đồng dân cư , đồng thời bồi dưỡng lòng tự hào về di sản quê hương trong mỗi người con xứ Quảng. Về mặt di sản, lễ hội Bà Chiêm Sơn đã được Bộ Văn hóa, Thể thao và Du lịch chính thức đưa vào Danh mục Di sản văn hóa phi vật thể quốc gia năm 2025. Việc vinh danh này khẳng định tầm quan trọng của lễ hội trong kho tàng di sản văn hóa dân tộc, đồng thời mở ra cơ hội để địa phương đẩy mạnh bảo tồn và quảng bá giá trị lễ hội trong giai đoạn mới. Các nguồn tài liệu tham khảo: Cổng thông tin điện tử thành phố Đà Nẵng: danang.gov.vn; Báo dân tộc và phát triển: baodantoc.vn; Báo Công lý: congly.vn. TRUNG TÂM XÚC TIẾN DU LỊCH ĐÀ NẴNG",
+    "event_time": "Hàng năm",
+    "location": "Phố cổ Hội An",
+    "ticket_info": "Miễn phí tham gia",
+    "advise": [
+      "Nên thuê hướng dẫn viên địa phương để hiểu rõ hơn về lịch sử và văn hóa.",
+      "Kiểm tra thời tiết trước khi đi để có trải nghiệm tốt nhất."
+    ],
+    "price_level": 0
+  },
+  "fest_39": {
+    "name": "Lễ Rước Cộ Bà Chợ Được",
+    "description": "Lễ Rước Cộ Bà Chợ Được là lễ hội nhằm vinh danh người sáng lập Chợ Được thuộc xã Thăng An, thành phố Đà Nẵng (trước thuộc thôn Phước Ấm, xã Bình Triều, Thăng Bình, Quảng Nam). TỔNG QUAN VỀ LỄ HỘI Lễ rước Cộ Bà Chợ Được thường diễn ra trong hai ngày 10 và 11 tháng Giêng âm lịch hàng năm – thời điểm ngay sau Tết Nguyên Đán khi tiết trời thuận lợi và lòng người hướng về những ước nguyện an lành đầu năm. Địa điểm chính là khu vực chợ Được và Lăng Bà Chợ Được tại làng Phước Ấm, nơi gắn liền với truyền thuyết về Bà. Lễ hội gồm hai phần chính: phần lễ và phần hội, đan xen giữa các nghi thức trang trọng và các hoạt động vui chơi giải trí mang màu sắc văn hóa dân gian. Ngày 10 tháng Giêng thường bắt đầu với các nghi thức chuẩn bị và một số hoạt động mở màn, còn cao điểm lễ hội rơi vào ngày 11 tháng Giêng với lễ rước Cộ chính thức. NGUỒN GỐC VÀ TRUYỀN THUYẾT VỀ BÀ CHỢ ĐƯỢC Tương truyền, cha Bà tên Trí, từng làm quan lớn trong triều Lê. Mẹ Bà họ Trịnh, húy là Tình. Bà sinh ra ở chốn khuê các, uy nghiêm. Lúc thân mẫu Bà trở dạ, ngoài trời xuất hiện một cơn gió quay cuồng, cát bụi mù mịt, mây trắng bồng bềnh che phủ cả một vùng trời. Khi Bà chào đời, Bà có dáng người khỏe mạnh, trắng như tuyết, thơm như hoa, bước đi khác thường, tiếng nói sang sảng, trong trẻo, thân thể không có xương. Bà hành nghề thầy lang cứu chữa người bệnh, dạy dân làng buôn bán và cũng thường xuyên biến hóa thần thông để trị bọn tham quan. Năm 18 tuổi, Bà đã quy tiên tại quê nhà. Ngày tạ thế, hồn Bà được xuôi dòng Trường Giang chu du đến làng Phước Ấm (xã Bình Triều), linh ứng dựng nên ngôi Chợ Được đông vui, sầm uất. Nhớ ơn Bà, người dân làng Phiếm Ái đã xây nên một ngôi mộ chôn cất Bà. Dân làng hết lòng sùng kính, thường xuyên cử người thay phiên nhau coi giữ, chăm nom ngôi mộ. Rồi một ngày, ngôi mộ Bà bị một con trâu húc đổ. Ngay sau khi húc ngôi mộ, con trâu liền lăn ra chết, không rõ nguyên do. Sợ Bà quở trách, dân làng đã sắm lễ, mời thầy cúng về tạ lỗi. Sau khi cúng xong, trong khi ngồi trò chuyện, vị thầy cúng đã vô ý nói lời xúc xiểm đến Bà. Tuy nhiên, vừa nói xong, đầu ông bỗng đau như búa bổ, vài ngày sau ông đột tử cũng không rõ căn nguyên. Năm Thành Thái thứ 6, dân làng Phước Ấm và thương gia Chợ Được đã làm đơn trình lên phủ, tỉnh và Bộ Lễ xin ban sắc phong Bà Chợ Được là “Tề thục dực bảo trung hưng trung đẳng thần”. Năm Khải Định tứ tuần thì Bà được phong sắc “Trang huy dực bảo trung hưng thượng đẳng thần”. Bà còn được suy tôn làm “Tề thục dực bảo trang huy thượng đẳng thần”, “Thần nữ linh ứng Nguyễn Thị Tôn Thần”… Chuyện kể rằng, Bà Chợ Được là ông tổ nghề buôn bán, thành hoàng làng của người dân làng Phước Ấm. Bà cho dựng một quán nước nhỏ bên vệ đường, gần mép sông, người qua kẻ lại ngày một đông. Dần dà, thôn vắng trở thành chợ tấp nập, nhộn nhịp, dân tứ phương kéo về dựng quán, xây nhà như đô hội. Lễ rước cộ Bà Chợ Được cầu cho “quốc thái dân an”, bày tỏ lòng tri ân của dân làng đối với Bà Chợ Được – người đã đem lại cuộc sống thanh bình cho dân làng. Lễ rước cộ Bà tái hiện hình ảnh những nhân vật trong lịch sử dân tộc hoặc sự kiện lịch sử như: Hai Bà Trưng cưỡi voi đánh giặc, Thánh Gióng đánh đuổi giặc Ân, bước chân thần tốc của người anh hùng áo vải Tây Sơn Nguyễn Huệ… Tất cả nhằm giáo dục tình yêu quê hương đất nước cho con cháu muôn đời ghi nhớ công đức của Bà. Ngày 31/12/2008, Lăng Bà Chợ Được được UBND tỉnh Quảng Nam công nhận di tích lịch sử cấp tỉnh. Ngày 19 tháng 12 năm 2014, Bộ Văn hóa thể thao và du lịch công nhận lễ hội rước cộ Bà Chợ Được là di sản văn hóa phi vật thể cấp Quốc gia. Các nguồn tài liệu tham khảo: Cổng TTĐT Ban Tôn giáo Chính Phủ: btgcp.gov.vnBáo Đà Nẵng: baodanang.vn TRUNG TÂM XÚC TIẾN DU LỊCH ĐÀ NẴNG",
+    "event_time": "Hàng năm",
+    "location": "Phố cổ Hội An",
+    "ticket_info": "Miễn phí tham gia",
+    "advise": [
+      "Nên thuê hướng dẫn viên địa phương để hiểu rõ hơn về lịch sử và văn hóa.",
+      "Mang theo nước uống và kem chống nắng khi tham quan.",
+      "Kiểm tra thời tiết trước khi đi để có trải nghiệm tốt nhất."
+    ],
+    "price_level": 0
+  },
+  "fest_40": {
+    "name": "Lễ hội Bà Phường Chào",
+    "description": "Lễ hội Bà Phường Chào là một lễ hội dân gian đặc sắc và lâu đời của người dân Đà Nẵng. Lễ hội diễn ra hằng năm vào ngày 25 tháng 2 Âm lịch tại dinh thờ Bà Phường Chào ở thôn Khương Mỹ, xã Đại Cường, huyện Đại Lộc, tỉnh Quảng Nam (nay thuộc Xã Vu Gia, Thành phố Đà Nẵng). Đây là dịp để người dân địa phương tưởng nhớ và tri ân công đức của Bà Phường Chào – vị nữ thần được nhân dân tôn kính, cầu mong cho mưa thuận gió hòa, mùa màng bội thu và cuộc sống bình yên, phồn vinh nơi quê hương . Lễ hội cũng xuất phát từ ước vọng quốc thái dân an và là minh chứng cho tinh thần cố kết cộng đồng, sự giao thoa văn hóa giữa các vùng miền ở xứ Quảng . Với bề dày hàng trăm năm, lễ hội Bà Phường Chào đã trở thành một sự kiện văn hóa tâm linh quan trọng, mang đậm truyền thống “uống nước nhớ nguồn” của người dân Đà Nẵng. NGUỒN GỐC VÀ TRUYỀN THUYẾT VỀ BÀ PHƯỜNG CHÀO Bà Phường Chào, còn được gọi là Bà Chợ Được, tên thật là Nguyễn Thị Của, sinh ngày 25/2 năm 1800 tại làng Phường Chào, châu Phiếm Ái (nay thuộc Xã Đại Lộc) . Tương truyền, Bà là vị thiên tiên giáng trần, ngay khi ra đời đã xuất hiện điềm lành mây trắng bao phủ một vùng; lớn lên Bà hành nghề bốc thuốc chữa bệnh giúp dân và trừng trị kẻ ác, được muôn người kính phục . Bà chỉ ở trần thế 17 năm rồi hóa (qua đời), nhưng hồn phách thường hiển linh tiếp tục phù hộ dân lành, nhờ đó vùng xóm chài Phiếm Ái bên sông Vu Gia trở nên đông đúc, trù phú hơn trước . Ghi nhớ ân đức của Bà, dân làng lập dinh thờ phụng ngay tại quê nhà Phường Chào. Sắc phong Thượng đẳng thần Bà Phường Chào Thần tích kể lại rằng, sau khi hiển thánh ở quê nhà, Bà Phường Chào còn du hóa đến vùng Phước Ấm (xã Thăng An), giúp dân khai lập chợ cho việc mua bán ngày càng phát đạt; từ đó hình thành ngôi Chợ Được (tên nôm mang ý nghĩa “buôn may bán đắt”) gắn liền với danh tiếng của Bà. Nhân dân địa phương cảm kích lập miếu thờ và dâng sớ xin triều đình sắc phong Bà. Dưới triều Nguyễn, Bà Phường Chào hai lần được vua ban sắc phong thần: lần đầu vào năm Thành Thái thứ 6 (1894) tôn phong Bà là Trung đẳng thần, và đến năm Khải Định thứ 4 (1919) Bà được gia phong mỹ hiệu Thượng đẳng thần. Tri ân công lao của Bà, hằng năm ở Đà Nẵng diễn ra hai lễ hội truyền thống gắn với tên Bà. Tại thôn Phước Ấm (xã Thăng An) vào ngày 11 tháng Giêng Âm lịch có lễ rước Cộ Bà Chợ Được; còn tại quê nhà thôn Khương Mỹ (xã Vu Gia) vào ngày sinh của Bà (25 tháng 2 Âm lịch) diễn ra Lễ hội tưng bừng . Hai sự kiện này tạo nên mối liên kết tín ngưỡng linh thiêng giữa vùng Phiếm Ái (xã Vu Gia) – nơi Bà sinh thành và vùng Phước Ấm – nơi Bà hiển linh giúp dân. CÁC NGHI THỨC TRUYỀN THỐNG TRONG PHẦN LỄ Phần lễ của lễ hội Bà Phường Chào diễn ra trang trọng, thể hiện lòng thành kính của dân làng đối với bậc thần linh. Chuỗi nghi thức thường bắt đầu từ ngày 24/2 Âm lịch (vào dịp lễ hội) và kéo dài sang ngày 25/2 Âm lịch, bao gồm nhiều lễ nghi truyền thống giàu giá trị tâm linh: Lễ tế Âm linh cầu an: Mở đầu lễ hội là lễ tế âm linh nhằm tưởng nhớ các vong linh và cầu quốc thái dân an, cầu cho vong hồn người đã khuất được siêu thoát và xứ sở được bình an, thịnh vượng . Nghi thức này thể hiện tinh thần nhân văn “âm dương hài hòa”, gửi gắm ước nguyện cuộc sống ấm no cho muôn dân. Lễ rước kiệu Bà: Trong không khí trang nghiêm, dân làng tổ chức rước kiệu Bà Phường Chào quanh khu vực dinh thờ. Kiệu được trang hoàng lộng lẫy, trên đặt bài vị (hoặc tượng) của Bà, do đội bô lão và trai tráng trong làng khiêng, đi đầu là cờ lọng, trống chiêng rộn rã. Đoàn rước dài hàng trăm người tạo nên khung cảnh uy nghiêm thu hút đông đảo người dân tham gia. Nghi thức rước kiệu thể hiện lòng tôn kính và tôn vinh công đức của Bà trong đời sống dân gian. Lễ thả hoa đăng: Vào buổi tối, người dân tổ chức thả hoa đăng trên dòng sông Vu Gia cạnh dinh thờ Bà. Hàng trăm chiếc đèn hoa được thắp sáng lung linh thả trôi theo dòng nước, tượng trưng cho lời cầu nguyện và lòng biết ơn gửi đến Bà Phường Chào. Khung cảnh những ngọn hoa đăng dập dờn trên sông tạo nên không khí linh thiêng và thơ mộng cho lễ hội. Lễ tế Bà (Đại lễ): Sáng ngày 25/2 Âm lịch, tại dinh thờ diễn ra lễ tế chính dâng lên Bà Phường Chào. Lễ vật được chuẩn bị trang trọng gồm hương đăng, hoa quả, lễ phẩm và có thể có vật hiến sinh tùy nghi lệ địa phương. Đội chủ tế là các vị cao niên uy tín trong làng, đọc văn tế ca ngợi công đức Bà và cầu cho mưa thuận gió hòa, muôn dân an lạc. Điểm đặc biệt tại lễ hội này là học trò dâng lễ đều được tuyển chọn từ những thiếu nữ đức hạnh trong làng – khác với nhiều nơi thường do nam giới đảm nhiệm. Nét độc đáo này xuất phát từ truyền thuyết về Bà Phường Chào lúc sinh thời rất yêu mến trẻ nhỏ, ca múa và đua thuyền, nên hậu thế thể hiện sự tôn kính Bà bằng việc để các thiếu nữ thanh khiết phụng sự lễ tế. Trong những ngày diễn ra lễ hội, các thiếu nữ được gia đình và nhà trường (nếu còn đi học) tạo điều kiện nghỉ học, nghỉ làm để toàn tâm tham gia lễ tế Bà, thể hiện trọn vẹn lòng thành kính và duy trì tục lệ độc đáo của làng. HOẠT ĐỘNG HỘI VÀ VUI CHƠI DÂN GIAN ĐẶC SẮC Sau phần lễ nghiêm trang là phần hội tưng bừng, nơi du khách và người dân hòa mình vào không khí văn hóa lễ hội sôi động. Làng quê Khương Mỹ trong những ngày hội ngập tràn cờ hoa rực rỡ, tiếng trống chiêng vang dội và tiếng reo hò náo nức. Nhiều hoạt động văn hóa, thể thao và trò chơi dân gian hấp dẫn được tổ chức xen kẽ, mang đến trải nghiệm phong phú cho người tham dự. Tiêu biểu là các chương trình như đua thuyền truyền thống trên sông Vu Gia, thu hút rất đông tay chèo tham gia tranh tài; hô hát Bài Chòi – loại hình dân ca bài chòi đặc trưng của miền Trung, vừa thi hát vừa chơi trò chơi trên chòi tre; múa lân sư rồng tưng bừng mở màn lễ hội; cùng với đó là hoạt động thả hoa đăng lung linh trên sông vào ban đêm và nhiều trò chơi dân gian vui nhộn khác (kéo co, đánh đu, bịt mắt bắt dê, v.v.) . Du khách còn có dịp thưởng thức các tiết mục văn nghệ dân gian, xem biểu diễn hát bội, tham quan gian hàng ẩm thực truyền thống… tạo nên một bức tranh văn hóa lễ hội rực rỡ sắc màu, để lại ấn tượng sâu đậm trong lòng người dự hội. VAI TRÒ VÀ GIÁ TRỊ VĂN HÓA – DU LỊCH CỦA LỄ HỘI Đối với người dân Đà Nẵng, lễ hội Bà Phường Chào không chỉ là một sinh hoạt tín ngưỡng thông thường mà đã trở thành món ăn tinh thần không thể thiếu, giữ vai trò quan trọng trong đời sống văn hóa tâm linh cộng đồng . Lễ hội này gắn liền với tín ngưỡng thờ Mẫu của người Việt, thể hiện đạo lý uống nước nhớ nguồn và lòng thành kính tri ân các bậc tiền nhân, đồng thời gửi gắm khát vọng về một cuộc sống an lành, no đủ, quốc thái dân an. Thông qua lễ hội, nhiều giá trị văn hóa truyền thống quý báu được gìn giữ và trao truyền qua các thế hệ – từ những nghi thức tế lễ cổ truyền cho đến các làn điệu dân ca, trò chơi dân gian đặc trưng – góp phần thắt chặt tình làng nghĩa xóm và củng cố tinh thần đoàn kết của cộng đồng địa phương. Về mặt di sản, lễ hội Bà Phường Chào đã được Bộ Văn hóa, Thể thao và Du lịch chính thức công nhận là Di sản văn hóa phi vật thể quốc gia vào năm 2020. Việc vinh danh này khẳng định tầm quan trọng của lễ hội trong kho tàng văn hóa dân tộc, đồng thời tạo động lực để địa phương tiếp tục bảo tồn và phát huy giá trị của lễ hội trong giai đoạn mới. Chính quyền và nhân dân xem đây vừa là niềm tự hào vừa là trách nhiệm chung, không ngừng nỗ lực gìn giữ và tôn tạo lễ hội, coi trọng cả giá trị văn hóa vật thể (dinh thờ, lăng mộ Bà) lẫn phi vật thể (các nghi thức, truyền thuyết, nghệ thuật dân gian) liên quan . Song song đó, công tác quảng bá, giới thiệu lễ hội cũng được đẩy mạnh, nhằm biến lễ hội Bà Phường Chào trở thành một sản phẩm du lịch văn hóa – tâm linh độc đáo của Đà Nẵng, thu hút du khách thập phương về trải nghiệm và tìm hiểu bản sắc văn hóa địa phương Có thể nói, lễ hội vừa là di sản văn hóa vô giá của vùng đất, vừa mang tiềm năng lớn để phát triển du lịch bền vững, góp phần giới thiệu hình ảnh quê hương và con người Đà Nẵng giàu truyền thống đến với bạn bè muôn phương. Các nguồn tài liệu tham khảo: Cổng TTĐT Ban Tôn giáo Chính Phủ: btgcp.gov.vn Báo Đà Nẵng: baodanang.vn TRUNG TÂM XÚC TIẾN DU LỊCH ĐÀ NẴNG",
+    "event_time": "Hàng năm",
+    "location": "Phố cổ Hội An",
+    "ticket_info": "Miễn phí tham gia",
+    "advise": [
+      "Kiểm tra thời tiết trước khi đi để có trải nghiệm tốt nhất.",
+      "Nên đến vào buổi sáng sớm hoặc chiều muộn để tránh nắng nóng và đông người.",
+      "Mang theo nước uống và kem chống nắng khi tham quan."
+    ],
+    "price_level": 0
+  },
+  "fest_41": {
+    "name": "Nghề làm nhà tre, dừa ở Cẩm Thanh",
+    "description": "Ở Quảng Nam (nay là Đà Nẵng), mỗi khi nghe câu ca “Đứng lên bằng súng bẹ dừa/Quê ta đồng khởi Mỹ thua ngụy hàng” thì người dân lại nghĩ về Cẩm Thanh, vùng căn cứ cách mạng với Rừng dừa Bảy Mẫu đi vào huyền thoại qua chiến công đồng khởi bằng súng bẹ dừa vào tháng 9/1964. Rừng dừa nước nơi đây không chỉ “che bộ đội, vây quân thù” mà trải qua hàng mấy trăm năm đã cung cấp nguồn nguyên liệu để hình thành và phát triển nghề làm nhà tre dừa nổi tiếng, góp phần bồi đắp thêm những giá trị văn hóa đặc sắc của nghề truyền thống Hội An, Đà Nẵng. Cẩm Thanh, tên gọi dưới thời phong kiến là làng/xã Thanh Châu, tổng Thanh Châu, huyện Hòa Vang. Đây là một làng quê nằm về phía Đông Nam của thành phố Hội An (nay thuộc Phường Hội An Đông), cách Khu phố cổ Hội An – Di sản văn hóa thế giới chừng 3km, có diện tích khoảng 970,42ha, trong đó chiếm hơn 1/3 là mặt nước với 348,69ha. ĐIỀU KIỆN TỰ NHIÊN VÀ MÔI TRƯỜNG SINH THÁI Vùng đất này bốn bề bao bọc bởi sông nước, phía Nam và Tây Nam là hạ lưu sông Thu Bồn, phía Đông và Đông Bắc là sông Ba Chươm, và sông Đò ở phía Bắc và Tây Bắc. Sông Đình và sông Đò nối sông Thu Bồn với sông Ba Chươm theo hướng Tây Nam – Đông Bắc. Các nhánh sông, con hói chằng chịt chỗ rộng chỗ hẹp, nơi cạn nơi sâu, quanh co uốn lượn qua những bãi bồi, cồn/gò đất men theo những rặng/triền dừa nước trải dài quanh năm tươi tốt như Thuận Tình (Cồn Kiện), Cồn Ông Hơi, Cồn Tiến, Cồn Ba Xã, Gò Hí, Gò Già,… tạo nên phong cảnh hết sức hữu tình thơ mộng. Có lẽ do nằm sát cửa biển Cửa Đại, cũng là vùng hội lưu của 3 nguồn sông lớn của Quảng Nam (Chiên Đàn, Thu Bồn, Vu Gia) và sông Cổ Cò nên hệ sinh thái ở Cẩm Thanh rất đặc biệt, đó là kiểu rừng ngập mặn cửa sông với đặc trưng là cây dừa nước. Hệ sinh thái rừng dừa nước ngập mặn nơi đây vừa là môi trường lý tưởng để nhiều loài chim, thủy sản sinh sống, phát triển, góp phần tạo nên sự đa dạng về mặt sinh học để Cù Lao Chàm – Hội An được công nhận là Khu Dự trữ sinh quyển thế giới vào năm 2009, đồng thời cũng tạo nên địa thế hiểm trở, vị trí trọng yếu trong việc phòng thủ, bảo vệ bờ biển, cửa sông. Ngoài dừa nước, tre cũng là loài cây sinh trưởng tươi tốt ở làng quê Cẩm Thanh. Những lũy tre chạy dài theo bờ sông hay dọc đường làng, đầu ngỏ hay cuối vườn không những góp phần tạo nên nét duyên dáng, thanh bình, yên ả của làng quê Cẩm Thanh mà còn cung cấp nguồn nguyên liệu để tạo tác nhiều đồ gia dụng và cất dựng nhà cửa. Với những ưu đãi về điều kiện tự nhiên và vị thế địa chính trị, quân sự và kinh tế, từ rất sớm, các lớp, thế hệ cư dân đã đến cư trú, sinh sống ở vùng đất Cẩm Thanh và khai phá, phát triển vùng đất này ngày thêm trù phú. Dù bị tàn phá khốc liệt qua 2 cuộc chiến chống thực dân Pháp và đế quốc Mỹ xâm lược, song với hơn 23 di tích, dấu tích gồm các loại hình khảo cổ, lịch sử, kiến trúc nghệ thuật thuộc nhiều thời kỳ lịch sử đã được xếp hạng cấp quốc gia, cấp tỉnh như móng kiến trúc chăm và lăng Bà, miếu Tổ nghề yến, lăng Trà Quân, mộ cổ Thứ phi vua Quang Trung, mộ tổ tộc Trần, mộ tổ tộc Lê, tộc Hồ, các giếng cổ,… cùng với hệ thống di sản văn hóa phi vật thể phong phú, đa dạng như lễ nghi, lễ hội, phong tục tập quán, văn hóa ẩm thực, văn nghệ dân gian, nghề truyền thống,… khá độc đáo và hấp dẫn, trong đó Nghề khai thác yến sào Thanh Châu đã được công nhận di sản văn hóa phi vật thể quốc gia,… đã minh chứng cho bề dày, truyền thống lịch sử – văn hóa – nhân văn của Cẩm Thanh trên vùng đất thương cảng quốc tế Faifo – Hội An. Dưới góc độ nghề truyền thống, có thể thấy, bên cạnh nghề khai thác yến sào và nghề buôn ghe bầu vang tiếng một thời, Cẩm Thanh còn nổi tiếng với nghề làm nhà tre dừa khá đặc sắc. Rừng dừa nước Cẩm Thanh với diện tích 106,01ha phân bố tập trung ở thôn Thanh Tam, Thanh Nhứt, Vạn Lăng, dân gian gọi là Rừng dừa Bảy Mẫu, quanh năm xanh tốt không chỉ chắn sóng gió, tích giữ phù sa, điều hòa khí hậu,… mà nơi đây còn cung cấp lá dừa khô để cùng với nguyên liệu tre hình thành và phát triển nghề làm nhà tre dừa từ lâu đời phục vụ nhu cầu cư trú của cộng đồng cư dân, và nhu cầu xây dựng các công trình phục vụ du lịch xanh trong thời gian gần đây. Trong hai cuộc kháng chiến chống thực dân Pháp và đế quốc Mỹ xâm lược, rừng dừa nước Cẩm Thanh trở thành căn cứ địa cách mạng vững chắc, giúp bám đất, bám làng làm nên những chiến công oanh liệt mà sự kiện đồng khởi tháng 9/1964 là minh chứng điển hình, góp phần vào thắng lợi vẻ vang của dân tộc vào mùa xuân năm 1975 lịch sử. LỊCH SỬ HÌNH THÀNH VÀ PHÁT TRIỂN NGHỀ Từ những ghi chép còn lưu giữ lại và qua tư liệu hồi cố cho biết, vào thế kỷ XVI-XVIII, với ưu thế và kinh nghiệm sông nước, lại nằm kề với cảng thị quốc tế Hội An, nghề buôn ghe bầu ở làng Thanh Châu rất phát triển, hình thành tuyến đường buôn bán, trao đổi dọc ven biển miền Trung, thậm chí xuôi ngược đến tận Nam bộ. Nhận thấy vùng nước ngập mặn của làng có thể phát triển được cây dừa nước như ở Nam bộ nên các chủ ghe bầu đã mang giống về trồng rồi dần dần phát triển thành rừng dừa nước bạt ngàn như ngày nay. Bên cạnh việc mang giống về trồng ở vùng đất mới, những tri thức sử dụng lá dừa nước để làm nhà ở cũng được người buôn ghe bầu học hỏi, tiếp thu. Trên cơ sở nguồn nguyên liệu sẵn có, tre làm khung sườn chịu lực, lá dừa làm phên vách, lợp mái, bằng tinh thần lao động cần cù, sáng tạo, người Cẩm Thanh đã phát triển nghề làm nhà tranh tre dừa ngày mở rộng, không chỉ đáp ứng nhu cầu tại chỗ mà còn phục vụ cho cư dân các địa phương lân cận; vừa tạo dựng, lưu giữ những giá trị của ngôi nhà tre dừa truyền thống, đồng thời cũng sáng tạo ra những kiểu thức, sản phẩm mới phục vụ du lịch và nhu cầu thẩm mỹ đương đại. Sự phát triển mạnh mẽ của nghề làm nhà tre dừa Cẩm Thanh dần dần ảnh hưởng, lan tỏa đến các địa phương khác như Cẩm Châu, Cẩm An, Cẩm Kim,… NGUYÊN LIỆU VÀ DỤNG CỤ Do chuyên về nghề làm nhà tre dừa nên người dân Cẩm Thanh đã sáng tạo nên hệ thống công cụ rất phong phú với hơn 40 loại được sử dụng trong các công đoạn của nghề, từ khâu chuẩn bị nguyên vật liệu tre dừa, gia công khung sườn, tấm lá đến ráp dựng, hoàn thiện ngôi nhà. Trong đó có một số công cụ tham gia vào nhiều công đoạn sản xuất khác nhau. Mỗi công đoạn đòi hỏi có những kinh nghiệm, bí quyết riêng nhằm tạo nên một ngôi nhà vừa đẹp, vừa sử dụng được lâu dài. Việc chuẩn bị vật liệu tre dừa đảm bảo chất lượng là một trong những yếu tố quan trọng để làm nên ngôi nhà bền đẹp. Do yêu cầu về độ bền chắc và chống được mọt nên người thợ thường chọn tre già từ 4-5 năm tuổi để làm nhà. Tre được khai thác vào tháng Giêng là tốt nhất vì đây là thời điểm cây tre tích lũy được nhiều chất dinh dưỡng. Sau khi đốn, tre được chuyển đến ngâm trong bùn nước ở những con hói chừng một đến một năm rưỡi để tăng độ bền chắc và chống mọt, sau đó vớt lên gia công khung sườn hoặc nệp làm tấm lá, phên vách,…  Người dân đào những hố dài bên bờ hòi rồi cẩn thận xếp từng cây tre vào, đóng cọc giữ chặt, sau đó dùng lá dừa đậy lại và lấp đất lên bên trên. Theo các nghệ nhân nghề làm nhà tre dừa, ở Cẩm Thanh, dừa nước sinh trưởng trên vùng đất cát thân chắc, màu hơi hồng và có độ bền hơn so với sinh trưởng ở vùng đất bùn, do vậy được ưu tiên lựa chọn để lợp mái. Dừa nước trồng 5 năm có thể khai thác lá, mỗi năm khai thác 2 lần, vào tháng 3 và tháng 8 âm lịch. Người dân dùng dao phay để đốn những tàu lá già, chừa lại tàu non và đọt (giáo) dừa để khai thác vào mùa sau. Lá dừa khai thác vào tháng 3 có chất lượng tốt hơn vào tháng 8 do có thời gian sinh trưởng lâu hơn. Để thuận tiện trong việc đốn và vận chuyển được hiệu quả, người dân thường đốn từ ngoài vào giữa đám. Đồng thời với việc đốn lá cũng chặt bỏ bớt những bẹ dừa để rộng đường di chuyển. Trước đây, những bẹ dừa này được phơi khô làm chất đốt đun nấu. Sau khi đốn, những tàu lá dừa được kéo lên bờ hoặc chất lên ghe vận chuyển vào bờ để thực hiện công đoạn gia công. Tùy vào mục đích sử dụng làm tấm lợp hay làm phên vách mà tàu lá dừa được róc lấy cộng và lá riêng hoặc xé làm đôi (thành 2 kiến) bởi bằng những thao tác hết sức điêu luyện với kinh nghiệm được đúc kết qua thời gian làm nghề. Người dân thường chọn những tàu dừa có lá lớn để róc lấy lá và cộng riêng. Lá được xâu lại thành tấm. Cộng, lá và những kiến dừa sau khi xé được phơi khô rồi bó lại từng bó, bảo quản nơi khô ráo. Để lá dừa được khô đều và thuận lợi khi gia công, người dân thường xếp phơi các kiến cùng chiều và sát với nhau, phần cộng bên trên, lá nằm bên dưới, cứ 50 kiến thì lên ngồng làm dấu. Thời gian phơi tùy thuộc vào thời tiết, khoảng từ 10-20 ngày. Bó lá dừa để bảo quản cũng là một nghệ thuật, đòi hỏi sự tỉ mỉ, cẩn thận đảm bảo lá không bị gãy, cộng phải thẳng. Để có được những bó dừa thẳng thớm người dân xốc các tàu dừa cùng kiến theo một chiều, xỏ dây dừa ở đầu và ngọn dừa rồi rịt chặc lại. Lá dừa sau khi phơi khô có thể ngâm dưới nước nơi thông thoáng chừng 1 tuần, rồi vớt lên phơi lại nhằm tăng độ bền đẹp và chống sâu mọt. Cộng dừa sử dụng làm phên, vách, lót trong mái nhà, đóng la phông… Tấm lá chằm dung làm tấm lợp cửa, gia thu, làm dù che, làm áo tơi đi mưa,… Các kiến dừa được xóc thành tấm để lợp mái, làm phên,… QUY TRÌNH LÀM NHÀ TRE, DỪA Một ngôi nhà tre dừa truyền thống dù kiểu ba gian hay năm gian, có chái hay không có chái đều được cấu tạo gồm các thành phần: khung sườn chịu lực bằng tre (cột, kèo, rượng, đòn tay, đòn đông) và hệ thống bao che (mái, phên vách, cửa làm bằng lá dừa) dựng trên nền đất cao. Để tạo dựng một ngôi nhà hoàn chỉnh, công đoạn gia công nguyên vật liệu là hết sức quan trọng, đòi hỏi người thợ phải am hiểu nằm lòng về kết cấu của một ngôi nhà tre dừa truyền thống, yêu cầu về quy mô ngôi nhà, độ cao của nền nhà so với mặt bằng chung,… để sử dụng tre làm cột, kèo, đòn tay, đòn đông, chọn dừa làm tấm lợp, phên vách, cửa cho phù hợp. Đây không chỉ liên quan đến kỹ thuật mà còn là nguồn tri thức phong phú được người thợ, cộng đồng tích lũy hàng mấy trăm năm làm nghề. Tre ngâm đủ thời gian được vớt lên phơi khô trước khi gia công các cấu kiện, bộ phận của ngôi nhà. Những cây tre dài thẳng, to đều với nhau được lựa riêng làm đòn tay. Trong quan niệm dân gian, đòn đông được xem là xương sống của ngôi nhà nên rất thận trọng trong việc lựa chọn tre để làm. Đó là loại tre vừa tuổi, không quá già không quá non vì theo quan niệm “tre già chết sớm, tre non chết trẻ”, thân cây tre phải to thẳng, không vót tinh tre và phần mắt, không phải là tre cụt ngọn. Những đoạn tre gốc già, chắc, có đường kính vừa phải dùng làm kèo, rượng. Tre làm con sẻ để liên kết, chốt, làm cửa, nệp phên vách gia thu hay tấm lợp đều phải chọn loại tre già chắc mới bền lâu được. Riêng cột nhà không dung tre ngâm, thường chọn những đoạn già thẳng chắc. Xưa kia, người thợ dùng cưa tay, đục móng, khoan tay, dao mác,… tỉ mỉ thực hiện từng động tác với những tính toán hết sức cẩn thận đảm tính thẩm mỹ và chắc chắn của ngôi nhà, đồng thời tiết kiệm được nguyên liệu. Hiện nay, việc sử dụng các phương tiện cơ giới trong gia công phổ biến hơn, song những công cụ và kỹ thuật truyền thống vẫn giữ một vai trò quan trọng. Song song với việc gia công các cấu kiện, bộ phận của khung sườn chịu lực, việc gia công tấm lợp, vách, gia thu, cửa cũng được tiến hành. Tấm lợp (tấm tranh) có các loại như tranh hai, tranh ba, tranh tư,… Tùy thuộc và kích thước, diện tích ngôi nhà mà người thợ chọn dừa xóc tấm tranh cho phù hợp, thường là những kiến dừa có độ dài tương đương nhau. Với sự tỉ mẫn và khéo léo, người thợ sử dụng các dụng cụ thủ công để xóc dừa, liên kết các nệp, lụi bằng tre với các kiến dừa với nhau bằng sợi mây (sau này sử dụng dây cước) tạo thành tấm tranh chắc chắn, có chiều ngang chừng 1m. Trước tiên người thợ chọn một chỗ đất bằng đủ rộng, sau đó xếp các kiến dừa khô lại sát nhau với mặt cộng bên trên, dùng cây lụi xuyên qua phần lá bên dưới rồi buộc nệp. Tiếp đến là buộc nệp đầu và các nệp thứ 3, thứ 4,… Các nệp cách nhau 25-27cm sao cho phù hợp với khoảng cách của đòn tay để thuận lợi khi lợp mái. Tùy theo độ rộng và chiều dài của mái mà chuẩn bị tấm tranh nhiều hay ít. Thông thường mỗi mái có 2 – 3 ly (hàng) tranh. Phên vách bao quanh ngôi nhà được làm với nhiều kiểu như phên lá, phên lá xen cộng, phên âm dương, phên cộng một lớp và nhiều lớp lá… Tùy theo vị trí sử dụng mà ra cỡ xóc phên cho phù hợp và có thể làm theo nhiều kiểu dáng khác nhau như phên liền, phên trổ cửa đi hay cửa sổ, phên trổ ô gió,… Các bộ phận của ngôi nhà như gia thu (khu đĩ), cửa chống cũng được người thợ thực hiện đồng thời với việc gia công phên vách. Gia thu, cửa có khung sườn được làm bằng tre nứt cước/mây hoặc liên kết cố định bằng chốt tre, lợp bên ngoài bằng tấm lá dừa chằm theo từng lớp từ dưới lên trên. Một bộ phận cũng được làm từ lá dừa là bức phong dùng để che đầu đòn tay. Việc ráp dựng ngôi nhà là công đoạn rất quan trọng trong quy trình thực hành nghề làm nhà tre dừa Cẩm Thanh. Công đoạn này đòi hỏi có sự phối hợp nhịp nhàng của nhiều người thợ. Để chuẩn bị cho việc ráp dựng ngôi nhà, các cấu kiện làm khung sườn chịu lực được người thợ vận chuyển đến nền đất cao dự kiến dựng nhà. Tiếp đến, người thợ ráp kèo và rượng với nhau bằng những con sẻ tre, sau đó buộc kèo rượng với đòn đông, đòn tay bằng sợi mây hoặc dây cước tạo thành khung sườn hệ mái. Theo quan niệm dân gian, tổng số đòn đông và đòn tay được người thợ sử dụng để làm mái nhà bao giờ cũng là “số sinh”, mỗi mái có 4 hoặc 6 cây đòn tay. Hơn nữa, do coi trọng hướng đông/bên trái nên đòn đông và đòn tay mái nhà sau luôn được người thợ đặt gốc ở bên trái. Chiều dài đòn đông cũng được lấy ở cung tốt theo thước Lỗ Ban. Hàng cột tre phía sau được đặt sẵn trong các lỗ cột sâu chừng 1m. Người thợ thi công ráp dựng nhà dùng thang tre và các cột tre để đỡ khung sườn hệ mái lên tương ứng đầu cột rồi dùng con sẻ liên kết đầu cột với kèo. Thực hiện tương tự như vậy với hàng cột phía trước. Người thợ dùng hệ thống cây chống để cố định khung sườn ngôi nhà, sau đó cân chỉnh về độ cao, khoảng cách phù hợp rồi chôn lấp chân cột trước, sau thật chắc chắn, và dựng thêm các cột cái. Nếu làm kiểu nhà có chái phải tiếp tục dựng thêm khung sườn của mái chái. Khi khung sườn được cố định chắc chắn, người thợ bắt đầu lợp mái nhà. Từng tấm lá dừa được kéo lên và buộc chặt vào đòn tay, đòn đông theo trình tự ly/hàng tấm tranh phía dưới trước, phía trên sau từ trái sang phải. Sau đó dùng từng kiến lá dừa khô sấp nóc rồi buộc đè lên trên một đoạn tre dài để cố định. Tiếp đến là ráp gia thu, bức phong, dựng phênh vách và ráp cửa sổ, cửa đi. Hầu hết cửa sổ và cửa đi của nhà tre dừa được làm theo kiểu cửa chống. Cây chống cửa đồng thời được sử dụng để gài cửa khi sập xuống. GIÁ TRỊ VĂN HÓA VÀ XÃ HỘI Sự hình thành và phát triển nghề làm nhà tre dừa Cẩm Thanh không chỉ minh chứng bề dày lịch sử – văn hóa của vùng đất mà còn phản ánh những đặc trưng về sinh thái, tự nhiên nơi đây. Người Thanh Châu xưa, Cẩm Thanh ngày nay với óc sáng tạo và đôi bàn tay khéo léo đã biết khắc phục, vượt qua những khó khăn, tận dụng những ưu thế của tự nhiên để phục vụ cuộc sống mà những giá trị mang lại của nghề làm nhà tre dừa là bằng chứng sống động. Dù không có tổ nghề và hệ thống thờ cúng tín ngưỡng riêng biệt nhưng các gia đình, cơ sở làm nhà tranh tre dừa đã tham gia tích cực trong các lễ cúng cầu an, Tiền hiền của xóm làng để cầu cho mưa thuận giá hòa, thôn xóm yên vui, và đặc biệt nghề ngày càng phát triển thịnh đạt. Những đóng góp của nghề làm nhà tre dừa Cẩm Thanh trong kho tàng di sản văn hóa phi vật thể Hội An nói riêng, của dân tộc nói chung là hệ thống kinh nghiệm, tri thức liên quan đến khai thác các nguồn lợi tự nhiên, văn hóa cư trú; làm giàu thêm ngôn ngữ dân tộc thông qua hệ thống thuật ngữ riêng của nghề. Qua quá trình thực hành nghề, cộng đồng không chỉ đã đúc kết được nhiều kinh nghiệm để nâng cao hiệu quả công việc, để làm ra ngôi nhà thêm bền đẹp mà ngày càng sáng tạo ra nhiều sản phẩm mới phù hợp với nhu cầu của thị trường và thời đại, thu hút khách du lịch tham gia trải nghiệm với sự thích thu, say mê. Nhận thức được giá trị của hệ sinh thái rừng dừa nước Cẩm Thanh trong phát triển kinh tế, đặc biệt là kinh tế du lịch, cũng như nhằm bảo tồn và phát triển nghề tre dừa truyền thống của địa phương trong bối cảnh mới, thành phố Hội An đã có nhiều chính sách để bảo vệ và phát huy hệ sinh thái rừng dừa nước Cẩm Thanh, phát triển du lịch cộng đồng trên cơ sở nghề truyền thống, đặc biệt là nghề tre dừa, đào tạo và truyền nghề. Việc kiểm kê, nhận diện và đề xuất hướng bảo tồn, phát huy các giá trị di sản văn hóa nói chung, nghề tranh tre dừa nói riêng ở Cẩm Thanh đã được các cơ quan chuyên môn ở Hội An quan tâm thực hiện từ rất sớm. Nghề làm nhà tre dừa Cẩm Thanh mang đặc trưng riêng của vùng đất Hội An mà không phải nơi nào cũng có được. Đó không chỉ là sự sử dụng sáng tạo nguồn tài nguyên thiên nhiên để phục vụ cuộc đời, mà hơn thế nữa, những tinh hoa của nghề đã đóng góp lớn trong kho tàng di sản văn hóa Hội An và sự phát triển kinh tế, xã hội địa phương, đất nước. Với những chính sách phù hợp của các cấp chính quyền thành phố Hội An, sự cần cù, tỉ mẫn và đổi mới sáng tạo trong cách nghĩ, cách làm của cộng đồng, tin tưởng rằng, những sản phẩm của nghề làm nhà tre dừa Cẩm Thanh sẽ tiếp tục vang danh muôn phương. Nghề làm nhà tre, dừa ở Cẩm Thanh, Hội An đã được công nhận là Di sản văn hóa phi vật thể quốc gia. Lễ đón nhận danh hiệu này diễn ra vào tối ngày 27/9/2024, nhân dịp kỷ niệm 60 năm ngày Đồng khởi Giải phóng xã Cẩm Thanh. Các nguồn tài liệu tham khảo: 1. Trung tâm Bảo tồn Di sản Văn hoá Hội An: hoianheritage.net TRUNG TÂM XÚC TIẾN DU LỊCH ĐÀ NẴNG",
+    "event_time": "Hàng năm",
+    "location": "Phố cổ Hội An",
+    "ticket_info": "Miễn phí tham gia",
+    "advise": [
+      "Nên mặc trang phục lịch sự và thoải mái khi đến tham quan.",
+      "Nên thuê hướng dẫn viên địa phương để hiểu rõ hơn về lịch sử và văn hóa.",
+      "Nên đến vào buổi sáng sớm hoặc chiều muộn để tránh nắng nóng và đông người."
+    ],
+    "price_level": 0
+  },
+  "fest_42": {
+    "name": "Nghề trồng rau Trà Quế – Hội An",
+    "description": "Đặc điểm của nghề trồng rau Trà Quế – Hội An là giống cây trồng ở đây chủ yếu giống bản địa được duy trì cách đây hàng trăm năm… Làng rau Trà Quế xã Cẩm Hà (nay thuộc Phường Hội An Tây, Thành phố Đà Nẵng) nằm cách trung tâm Hội An khoảng 2,5 km về phía Bắc. Nơi đây như một cù lao sông nước, được bao bọc bởi sông Để Võng và đầm Trà Quế. Khi nhắc đến địa danh Trà Quế, điều liên tưởng đầu tiên đó là nghề trồng rau truyền thống nổi tiếng có từ lâu đời, gắn kết với quá trình hình thành và phát triển vùng đất. GIÁ TRỊ NỔI BẬT CỦA NGHỀ TRỒNG RAU TRÀ QUẾ Trà Quế là vùng đất được hình thành khá sớm. Tại đây các nhà khảo cổ đã tìm thấy các dấu vết của Văn hóa Sa Huỳnh cách đây 2000 năm. Từ  địa danh Trà Quế đến di tích miếu Bà Yàng, giếng đá cổ,… không chỉ gợi nhớ dấu ấn của người Chăm trong lịch sử mà cùng nhiều di tích lịch sử – văn hóa, cách mạng của người Việt tại Trà Quế đã minh chứng cho diễn trình lịch sử lâu đời, liên tục của cộng đồng cư dân nơi đây. Bằng nhiều nguồn tư liệu cho biết, cách đây cách đây hơn 300 năm, những cư dân Việt đầu tiên thuộc các tộc Phạm, Mai, Nguyễn, Lê đã đến định cư tại vùng đất Trà Quế. Về sau có thêm các tộc Trần, Hồ. Ban đầu, cư dân sinh sống chủ yếu bằng nghề đánh bắt cá tôm trên sông. Trong quá trình sinh sống, cư dân  đã tìm loại rau nấu với tôm, cua, cá,… để ăn thì rất ngon, bèn đem giống về trồng để sử dụng. Bằng những sáng tạo, tần tảo của mình, một số người dân nghĩ đến việc khai phá thêm đất để trồng rau, trồng lúa. Từ đó, những vạt ngò, rau húng, rồi đến rau é, hành, cải, hẹ,… lần lượt mọc lên trên vùng đất này. Do được gieo trồng trên một vùng thổ nhưỡng phù hợp, cùng với kỹ thuật chăm bón, các loại rau không những lên xanh tốt mà còn có hương vị thơm ngon đặc trưng. Vì vậy, Trà Quế dần dần trở thành một làng rau nổi tiếng xa gần.[1] [1] Lê Thị Tuấn, Đề tài: “Điều tra khảo sát nghề trồng rau Trà Quế”, Trung tâm QLBT DSVH Hội An, năm 2004. LỊCH SỬ HÌNH THÀNH VÀ PHÁT TRIỂN Trong lịch sử, địa danh Trà Quế còn được gọi Nhự Quế, Thanh Quế, Nhà Quế. Chuyện lưu truyền trong dân gian kể rằng, vào khoảng thế kỷ XVIII có một vị vua du ngoạn trên dòng sông Đế Võng và ghé vào làng, thưởng thức một loại rau nhận thấy vị thơm của rau giống loại trà, vị cay giống quế, thế rồi vị vua này đặt tên làng rau là Trà Quế. Trong địa bạ Thanh Hà lập vào năm Gia Long thứ 17 (1818) cũng đã ghi chép danh xưng Trà/Nhà Quế. Như vậy, muộn nhất vào đầu thế kỷ XIX, địa danh Trà Quế đã xuất hiện. Trong tài liệu Quảng Nam xã chí của Viện Viễn Đông bác cổ đề cập đến thổ sản làng Thanh Hà vào thập niên 40 của thế kỷ XX như sau: “Làng Thanh Hà có diện tích trên 700 mẫu trừ Thanh khách ngoại nhân số độ 5000 người có thảy. Thổ sản của làng này đặc biệt là rau sống, lúa, khoai sắn… Trừ rau sống là có xuất sản chứ các thực phẩm khác thì cũng không đủ tiêu dùng cho dân làng. Nghề nghiệp của làng này đặc điểm là ngói, gạch, làm đồ gốm… Làng cũng có nghề đánh cá nhưng sơ sài, nghề nông thì chiếm được một nữa của làng. Ngoài các nghề chuyên môn ấy thì cũng còn các nghề khác nhưng không đáng kể.”[2]. [2] Viện Viễn đông Bác cổ, Quảng Nam xã chí, Tập tài liệu điều tra về làng xã Quảng Nam năm 1943 – 1944 hiện đang lưu trữ tại Viện nghiên cứu Hán Nôm. Điều này cho thấy trước đây nghề trồng rau của làng gần như là nghề chính để phát triển kinh tế. Trong kháng chiến chống Pháp và chống Mỹ, Trà Quế là vùng căn cứ cách mạng quan trọng của quân và dân xã Cẩm Hà và thị xã Hội An, để qua mắt kẻ địch, người dân Trà Quế ngày sản xuất rau, đêm đào hầm nuôi giấu cán bộ. Những gánh rau Trà Quế không chỉ nuôi sống gia đình mà còn góp phần nuôi quân, nuôi cán bộ; hương rau Trà Quế không chỉ mang hương vị của biển, của gió, của cát, của rong đầm Trà Quế mà còn có cả mồ hôi, nước mắt và cả máu của những người con Trà Quế đã đổ xuống để bảo vệ, gìn giữ, xây dựng mảnh đất này. THỜI KỲ SAU NĂM 1975 ĐẾN NAY Sau năm 1975, người dân làng rau Trà Quế bắt tay vào công cuộc xây dựng, tái thiết quê hương, cải tạo lại đất đai trồng hoa màu dần ổn định cuộc sống và phát triển kinh tế từ nghề rau truyền thống. Cơ sở hạ tầng dần thay đổi, đời sống người dân ngày càng được nâng cao. Đến năm 2001, thị xã Hội An (nay là thành phố Hội An) đã quy hoạch đưa vào sản xuất rau tập trung với tổng diện tích 15 ha. Hiện nay, làng rau Trà Quế có 207 hộ chuyên trồng rau với 345 lao động[3]. [3] UBND xã Cẩm Hà, “Báo cáo tình hình thực hiện công tác quản lý du lịch tại làng rau Trà Quế xã Cẩm Hà”, năm 2018. Diện tích đất trồng rau được cải tạo lên 18 ha[4]. Năm 2018, năng xuất rau đạt 792 tấn, giá trị đạt 10,73 tỷ đồng, thu nhập bình quân của người trồng rau và dịch vụ khoảng 4,4 triệu đồng/người/tháng[5]. Theo thống kê, làng rau Trà Quế có khoảng 55 loại rau, trong đó các loại rau đã mất giống như hành hương, rau diếp, xà lách son, rau húng dài. Các loại rau còn lại đều được duy trì phát triển tốt, chất lượng ngày càng được nâng cao. [4] Ban Quản lý làng rau Trà Quế thuộc UBND xã Cẩm Hà, năm 2016. [5] UBND xã Cẩm Hà, “Báo cáo tình hình thực hiện công tác quản lý du lịch tại làng rau Trà Quế xã Cẩm Hà”, năm 2018. KỸ THUẬT CANH TÁC VÀ TRI THỨC DÂN GIAN Bên cạnh việc giữ gìn phương thức canh tác truyền thống trong quy trình trồng rau từ công đoạn chọn, bảo quản giống đến gieo trồng, chăm sóc, thu hoạch, tiêu thụ. Người dân đã biết tích lũy kinh nghiệm, điều chỉnh phương pháp, cách thức sản xuất để có sản phẩm rau đảm bảo chất lượng, an toàn người sử dụng, ít tốn thời gian sản xuất. Tri thức dân gian được tích lũy theo thời gian, trong từng công đoạn sản xuất đều thể hiện sự tỉ mỉ, cần mẫn của người nông dân chịu thương chịu khó, mang tâm huyết của mình gửi vào từng vạt rau. Kinh nghiệm không chỉ riêng ai mà là sự cộng hưởng của cả cộng đồng cư dân để có những phương thức sản xuất chung nhất mà không phải làng nghề nào cũng có sự đồng điệu như vậy. Trải qua bao đời, nhờ vào yếu tố thổ nhưỡng cũng như kỹ thuật trồng và chăm bón thích hợp, nhất là nguồn phân xanh dinh dưỡng để bón cho rau từ các loại rong của đầm Trà Quế và sông Để Võng nên rau ở đây thơm ngon khác lạ. Mỗi loại rau có hình thái và hương vị riêng. Hình dáng, kích thước của rau cũng khác biệt so với nơi khác như rau lá nhỏ, dày, cây thấp cứng cáp, đặc biệt rất thơm, vị đậm đà hơn; rau mềm, dịu, khi ăn rau như tan trong miệng, không dai. Khi trộn lẫn các loại rau với nhau sẽ có 5 vị hòa lẫn vào nhau: cay, ngọt, đắng, chua, chát và để có món ăn ngon, người dân thường lựa các loại rau thích hợp, gia giảm số lượng rau tùy thích. Trà Quế có những loại rau đặc trưng mà mỗi lần đến Trà Quế không thể không thưởng thức như rau húng, é, cải con, hẹ,… Các loại rau ở Trà Quế không chỉ là món ăn hàng ngày trong bữa cơm gia đình, là nguyên liệu không thể thiếu để tạo nên sự thơm ngon cho các món ăn đặc sản của địa phương như  tam hữu, ram cuốn, mỳ Quảng, cao Lầu, bánh xèo,… mà chúng còn là những vị thuốc dân gian có tác dụng chữa các bệnh cảm cúm, phong hàn, phát ban và nhiều bệnh thời khí khác. GIỐNG CÂY TRỒNG BẢN ĐỊA VÀ CÔNG TÁC BẢO TỒN Đặc điểm nổi bật nữa ở rau Trà Quế là giống cây trồng ở đây chủ yếu giống bản địa được duy trì cách đây hàng trăm năm. Giống cây ở đây, đối với loại giống để hạt có đặc điểm hạt nhỏ, chắc, đối với các loại giống cây trồng bằng nhánh, cành có đặc biểm thân cây cứng, nhỏ, rất thơm. Người dân ở đây luôn chú trọng, gìn giữ giống truyền thống, bởi tính nổi trội của giống truyền thống thơm ngon, phù hợp với thổ nhưỡng, ít sâu bệnh, cho năng xuất ổn định. Để bảo vệ giống cây truyền thống không phải là điều đơn giản, mà là cả một quá trình lâu dài gắn bó với nghề, cộng với quá trình trồng trọt chăm bón tốt mới có thể duy trì nguồn giống lâu dài. Qua quá trình xem xét, thẩm định hồ sơ, ngày 04/4/2022, Bộ Văn hóa, Thể thao và Du lịch ban hành Quyết định số 784/QĐ-BNHTTDL về việc công bố Danh mục Di sản văn hóa phi vật thể Quốc gia, trong đó ghi danh Nghề trồng rau Trà Quế, xã Cẩm Hà, thành phố Hội An, tỉnh Quảng Nam vào Danh mục Di sản văn hóa phi vật thể Quốc gia nằm ở hạng mục Tri thức dân gian, Nghề thủ công truyền thống. Các nguồn tài liệu tham khảo: 1. Trung tâm Bảo tồn Di sản Văn hoá Hội An: hoianheritage.net TRUNG TÂM XÚC TIẾN DU LỊCH TP. ĐÀ NẴNG",
+    "event_time": "Hàng năm",
+    "location": "Làng rau Trà Quế",
+    "ticket_info": "Miễn phí tham gia",
+    "advise": [
+      "Nên mặc trang phục lịch sự và thoải mái khi đến tham quan.",
+      "Mang theo nước uống và kem chống nắng khi tham quan."
+    ],
+    "price_level": 0
+  },
+  "fest_43": {
+    "name": "Nghề mộc Kim Bồng – Hội An",
+    "description": "Nghề mộc Kim Bồng – Hội An có những giá trị lịch sử, văn hóa, khoa học vô cùng quan trọng đối với sự hình thành và phát triển đô thị thương cảng Hội An… Làng Kim Bồng ngày xưa là châu Kim Bồng, thuộc tổng Mỹ Khê, huyện Duy Xuyên, phần lớn đất thuộc xã Cẩm Kim, thành phố Hội An, tỉnh Quảng Nam (nay thuộc Phường Hội An, Thành phố Đà Nẵng). Đây là một làng được hình thành khá sớm ở đô thị thương cảng Hội An dưới thời chúa Nguyễn. LỊCH SỬ HÌNH THÀNH VÀ PHÁT TRIỂN Theo sự truyền miệng dân gian của con cháu các tộc họ Nguyễn, Phan, Huỳnh, Trương ở xã Cẩm Kim thì vị thuỷ tổ nghề mộc làng Kim Bồng là người gốc ở Thanh Hoá đã di dân lập nghiệp tại đây vào thế kỷ XVI. Nhận thấy vùng đất Kim Bồng có ba mặt giáp sông, nằm bên bờ con sông lớn Thu Bồn, sát bên cạnh đô thị thương cảng quốc tế Hội An, rất thuận tiện cho sự phát triển nghề mộc xây dựng cũng như nghề mộc gia dụng mà các tiền hiền của làng Kim Bồng đã chọn nơi đây làm nơi định cư lâu dài để xây dựng làng nghề mộc truyền thống. Họ cũng bắt đầu nghề nghiệp của mình từ những ngôi nhà tranh, tre cổ truyền đến những ngôi nhà khung gỗ thông thường “Tam gian nhị hạ”, rồi đến các tiện nghi đồ dùng trong gia đình, phương tiện giao thông (ghe – thuyền nan, săng). Vào cuối thế kỷ 16 đến thế kỷ 17, Hội An với nhiều yếu tố thuận lợi đã nhanh chóng phát triển thịnh vượng, trở thành một đô thị thương cảng ngoại thương quan trọng ở xứ Đàng Trong, kéo theo nhiều ngành nghề có điều kiện phát triển, trong đó có nghề mộc Kim Bồng. Quá trình đô thị hóa đã dẫn đến sự phân công và phân vùng lao động tại Hội An. Các nghề thủ công truyền thống phát triển mạnh mẽ nhằm đáp ứng các yêu cầu sinh hoạt đô thị thương cảng, trong đó có nghề mộc Kim Bồng. Từ đây, nghề mộc Kim Bồng đã có cơ may phát triển phục vụ nhu cầu xây dựng các công trình kiến trúc đô thị, tôn giáo – tín ngưỡng, làm đồ mộc dân dụng và đóng thuyền, trong đó có các loại thuyền buôn đường xa, trọng tải lớn (ghe bầu). Trải qua quá trình phát triển, nghề mộc Kim Bồng phân thành bốn nhánh chính gồm mộc xây dựng, mộc gia dụng, mộc mỹ nghệ và mộc đóng ghe thuyền. Trong đó, thôn Trung Châu, Phước Thắng chuyên sản xuất đồ mộc mỹ nghệ và xây dựng; thôn Đông Hà, Ngọc Thành thiên về nghề mộc đóng ghe thuyền; thôn Trung Hà, Vĩnh Thành là nơi phát nghiệp của nghề mộc sản xuất đồ gia dụng. Theo hồi cố của các bậc cao niên trong làng, một số thợ mộc Kim Bồng còn đi đến nhiều địa phương khác để hành nghề. Đặc biệt, nhiều thợ mộc của làng được triều đình nhà Nguyễn chiêu mộ ra Huế xây dựng cung điện, lăng tẩm cho các vua được phong danh tượng mục, phong hàm Bát phẩm, Cửu phẩm… hay như ông Huỳnh Kim Hơn tham gia xây dựng lăng Bác Hồ. Trong quá trình lao động sáng tạo, các nghệ nhân mộc Kim Bồng đã làm nên những sản phẩm mộc đa dạng và phong phú gồm sản phẩm mộc mỹ nghệ (mộc mỹ nghệ dân dụng hơn 50 sản phẩm; mộc mỹ nghệ thờ tự, tín ngưỡng hơn 47 sản phẩm); sản phẩm mộc gia dụng (Tủ, Bàn, Ghế, Giường Giá, Kệ, Rương, Hòm, Thùng, Khay, Mâm …); sản phẩm mộc xây dựng (nhà ở, nhà thờ tộc, đình, chùa); sản phẩm mộc ghe thuyền (Xuồng, Thuyền, Tàu, Ghe). Nhìn chung, các sản phẩm mộc Kim Bồng chủ yếu tiêu thụ tại thị trường nội địa như Đà Nẵng, Tp. Hồ Chí Minh, Hà Nội, Bình Định… Trong đó một số sản phẩm mộc mỹ nghệ được xuất khẩu sang thị trường các nước châu Âu, khu vực Bắc Mỹ, Úc. KHÔNG GIAN VĂN HOÁ VÀ TÍN NGƯỠNG NGHỀ Cùng với quá trình định cư, làm ăn sinh sống, cư dân Kim Bồng đã tạo dựng nơi thờ cúng các bậc tiền hiền khai khẩn và các vị tổ sư của nghề. Đình tiền hiền Kim Bồng được xây dựng thể hiện tư tưởng “uống nước nhớ nguồn”, “ăn quả nhớ kẻ trồng cây” của con dân Kim Bồng. Bên cạnh đó, các lớp con cháu Kim Bồng đã xây dựng các nhà thờ Tộc, nhà ở để sinh sống và thờ tự. Không gian thờ tự, lễ nghi của nghề mộc Kim Bồng rất phong phú và đa dạng. Trong đó thờ tổ nghề là tập quán chung của nhiều gia đình. Thợ mộc Kim Bồng không xác định được tổ nghề riêng của mình, họ thờ tổ nghề mộc chung là Lỗ Ban, Lỗ Bốc, đồng thời thờ vị tổ Bách nghệ là Cửu Thiên Huyền Nữ hoặc ông Tiên Sư. Ngoài ra, các nhà làm mộc đều có trang thờ tổ nghề được đặt ở vị trí trang trọng trong nhà. Hàng năm, vào ngày 6/1 Âm lịch những người thợ mộc Kim Bồng tổ chức lễ giổ tổ nghề mộc tại đình tiền hiền Kim Bồng. Lễ tế ngày 6/1 Âm lịch cũng được xem là ngày mở hàng khai trương của các kíp thợ làm mộc. Trong những năm qua, nghề mộc Kim Bồng dần được phục hồi và phát triển đã góp phần nâng cao đời sống và giải quyết việc làm cho nhân dân địa phương, qua đó, góp phần tăng doanh thu cho ngành công nghiệp không khói của xã Cẩm Kim nói riêng, thành phố Hội An nói chung. Bên cạnh phát huy khả năng sáng tạo của đội ngũ nghệ nhân giàu kinh nghiệm, cũng đã đào tạo được nhiều lớp thợ trẻ kế thừa và duy trì được hoạt động của nghề mộc trong thời gian tới. Hiện nay, hoạt động du lịch ở Hội An đang phát triển mạnh đã tác động tích cực đến hoạt động sản xuất, tiêu thụ sản phẩm của làng nghề, qua đó góp phần thúc đẩy nghề mộc từng bước hồi sinh. GIÁ TRỊ VÀ ĐÓNG GÓP CỦA NGHỀ MỘC KIM BỒNG Có thể nói, nghề mộc Kim Bồng có những giá trị lịch sử, văn hóa, khoa học vô cùng quan trọng đối với sự hình thành và phát triển đô thị thương cảng Hội An. Giá trị lịch sử: Nghề mộc hình thành và phát triển khá sớm trong lịch sử, không chỉ ở Hội An mà cả xứ Đàng Trong, mộc Kim Bồng đã đóng vai trò chính trong xây dựng kiến trúc nhà phố, nhà thờ tộc, đình, chùa, miếu ở Hội An và nhiều làng quê khác ở Đà Nẵng. Nhiều thợ mộc Kim Bồng tham gia xây dựng kinh thành, lăng tẩm ở Huế, cũng như tham gia xây dựng lăng Bác Hồ. Đặc biệt, nghề mộc Kim Bồng hình thành và phát triển là một trong các cơ sở quan trọng xác định lịch sử hình thành làng xã ở Hội An nói riêng, Đà Nẵng nói chung. Giá trị văn hóa: Qua hơn ba trăm năm tồn tại, nghề mộc Kim Bồng đã hình thành nên đội ngũ thợ có tay nghề cao, họ nắm giữ những tri thức, kỹ thuật, kỹ năng, kinh nghiệm nghề nghiệp, bồi dưỡng và phát huy đội ngũ thợ trẻ. Đặc biệt, nhiều nghệ nhân của làng đã được phong là tượng mục thời phong kiến và phong nghệ nhân ưu tú, nghệ nhân nhân dân thời hiện đại. Hiện nay, lực lượng này là những người giữ sứ mệnh truyền dạy kỹ năng, kinh nghiệm cho các thợ trẻ, để từ đó họ trở thành những người thợ có tay nghề cao đóng góp công sức vào sự nghiệp bảo tồn và phát huy các giá trị văn hóa ở Hội An. Thợ mộc Kim Bồng với tài năng, trí tuệ, bàn tay khéo léo, tài hoa, bản tính cần cù, nhẫn nại đã để lại đến ngày nay cho chúng ta những tác phẩm nghệ thuật tuyệt mỹ không chỉ ở Hội An mà còn ở một số tỉnh/thành khác trên cả nước. Các thợ mộc Kim Bồng với kỹ năng chạm khắc truyền thống về chạm chìm, chạm nổi, chạm thủng, chạm lộng nhiều tầng nhiều lớp, đã khắc hoạ nên những hình khối nhuần nhuyễn, những đường cong thanh thoát, những hoa văn, họa tiết sinh động, hết sức hấp dẫn, vô cùng độc đáo, giàu tính truyền thống mang bản sắc riêng của làng mộc Kim Bồng mà không nơi nào có được. Trải qua quá trình hội nhập, thẩm thấu, dung nạp chọn lọc các yếu tố văn hoá bên ngoài, sự giao lưu và hỗn dung giữa Hội An với các nền văn hoá ở khu vực Đông Nam Á, châu Á và các nước phương Tây, Hội An trở thành nơi hội tụ nhiều phong cách nghệ thuật khác nhau, từ đó tạo ra phong cách Hội An nhờ nhiều thế hệ nghệ nhân nghề mộc Kim Bồng. Trong xu thế đổi mới và hội nhập hiện nay, nghề mộc Kim Bồng đang có điều kiện thuận lợi để phát triển, khẳng định vị thế của mình, góp phần bảo tồn và phát huy các giá trị lịch sử – văn hóa địa phương và quốc gia. Giá trị khoa học: Bên cạnh các giá trị lịch sử – văn hóa, nghề mộc Kim Bồng là đối tượng nghiên cứu của nhiều ngành khoa học về lĩnh vực kiến trúc, mỹ thuật, lịch sử, dân tộc học… Từ đây nhiều bài viết, công trình nghiên cứu nghề mộc Kim Bồng ra đời cung cấp những thông tin khoa học quý báu góp phần bảo tồn, lưu giữ và phát huy một ngành nghề thủ công truyền thống của Cẩm Kim nói riêng, Hội An nói chung. Với những giá trị nổi bật của mình, nghề mộc Kim Bồng đã được nhà nước công nhận là di sản văn hóa phi vật thể tiêu biểu của quốc gia tại Quyết định số 4036/QĐ-BVHTTDL ngày 21/11/2016 của Bộ Văn hóa, Thể thao và Du lịch. Các nguồn tài liệu tham khảo: 1. Trung tâm Bảo tồn Di sản Văn hoá Hội An: hoianheritage.net TRUNG TÂM XÚC TIẾN DU LỊCH TP. ĐÀ NẴNG",
+    "event_time": "Hàng năm",
+    "location": "Phố cổ Hội An",
+    "ticket_info": "Miễn phí tham gia",
+    "advise": [
+      "Kiểm tra thời tiết trước khi đi để có trải nghiệm tốt nhất.",
+      "Mang theo nước uống và kem chống nắng khi tham quan."
+    ],
+    "price_level": 0
+  },
+  "fest_44": {
+    "name": "Nghề Khai thác yến sào Thanh Châu – Hội An",
+    "description": "Đối với nghề khai thác yến sào Thanh Châu – Hội An, không gian văn hóa liên quan trước hết phải kể đến đó là làng Thanh Châu hay còn gọi làng Yến… LỊCH SỬ HÌNH THÀNH VÀ PHÁT TRIỂN Nằm về phía Đông thành phố Hội An, Thanh Châu là một làng được thành lập khá sớm ở Hội An và từng giữ vai trò rất quan trọng trong diễn trình lịch sử, văn hóa Hội An. Theo các kết quả nghiên cứu, làng Thanh Châu được thành lập vào thế kỷ XVII bởi 6 tộc tiền hiền là tộc Trần, Hồ, Lê, Nguyễn, Phạm, Huỳnh. Lúc này làng Thanh Châu bao gồm cả làng Võng Nhi – một làng mà theo văn bia mộ tổ tộc Trần Văn hiện còn ở thôn Võng Nhi, xã Cẩm Thanh cho biết nó được hình thành vào niên hiệu Cảnh Thống năm Mậu Ngọ (năm 1498). Trải qua quá trình phát triển, làng Thanh Châu được chia thành làng Thanh Đông, Thanh Tây, Thanh Nam. Sau đó, đến trước năm 1945, làng Thanh Đông tiếp tục được chia lại thành làng Thanh Đông, Thanh Nhứt, Thanh Nhì, Thanh Tam. Kế thừa truyền thống văn hóa của cư dân Việt ở Bắc bộ và thích ứng với điều kiện sinh thái, xã hội ở vùng đất mới, cư dân làng Thanh Châu sinh sống bằng nhiều nghề khác nhau như làm nông, khai thác thủy hải sản, buôn bán bằng ghe bàu,… đặc biệt là nghề khai thác tổ chim yến và sơ chế tổ chim yến (yến sào) – loại sản phẩm đứng đầu trong “bát trân ngự thiện” của vua chúa thời phong kiến. Một số truyền thuyết lưu truyền tại địa phương liên quan đến việc phát hiện và khai thác tổ chim yến tại Cù Lao Chàm của cư dân làng Thanh Châu. Một truyền thuyết cho rằng nghề khai thác tổ chim yến ở làng Thanh Châu là do vợ chồng ông Trần Tiến người làng Thanh Châu làm nghề câu, tình cờ phát hiện trong một lần bị bão đánh dạt vào đảo. Một truyền thuyết khác có tên là Nàng Yến, lý giải việc chim yến làm tổ liên quan đến hóa thân một người con gái vì muốn cứu cha khỏi chết đói đã dùng nước miếng của mình làm thành món ăn, đó là tổ yến ngày nay. Tuy vậy, theo một số tư liệu lịch sử, vào trước thế kỷ XIII, người Trung Quốc đã biết đến giá trị của tổ chim yến và một số nước Đông Nam Á, trong đó có cư dân Champa đã biết khai thác nguồn lợi này. Vì thế, về thực chất là người Việt/cư dân làng Thanh Châu đã tiếp thu kinh nghiệm khai thác yến sào từ người Champa trên bước đường mở cõi về phương Nam. Dưới thời các chúa Nguyễn đến triều Nguyễn, việc khai thác tổ yến của cư dân làng Thanh Châu dần dần được tổ chức một cách bài bản từ tự phát đến chuyên nghiệp, từ phạm vi hẹp đến cả miền Trung. Qua một số tư liệu Hán Nôm hiện lưu giữ tại gia đình con cháu của tộc Trần và tộc Hồ ở Cẩm Thanh, cũng như một số tư liệu văn bia liên quan, cho biết, trong lịch sử, hai tộc Trần và Hồ ở làng Thanh Châu giữ vai trò chủ yếu trong nghề khai thác tổ chim yến. QUY TRÌNH SẢN XUẤT/ KHAI THÁC Từ năm 1975 đến nay, việc khai thác, chế biến và tiêu thụ yến sào ở Hội An được UBND thành phố Hội An quan tâm, hỗ trợ quản lý, khai thác và tiêu thụ. Ngày 20/12/1975, UBND Thị xã Hội An (nay là thành phố Hội An) ban hành quyết định thành lập Đội Quản lý và Khai thác yến sào Hội An trên cơ sở đội khai thác yến sào của cộng đồng cư dân làng yến Thanh Châu. Cũng từ năm 1975 đến nay, UBND thành phố Hội An đã đầu tư các trang thiết bị mới và áp dụng nhiều biện pháp thích hợp để giúp khai thác và bảo vệ tổ yến an toàn và hiệu quả, từng bước tăng sản lượng và chất lượng tổ yến cũng như duy trì đầu ra cho sản phẩm để tạo nguồn thu lâu bền, liên tục cho cộng đồng và phát triển kinh tế địa phương. Đối với nghề khai thác yến sào Thanh Châu, không gian văn hóa liên quan trước hết phải kể đến đó là làng Thanh Châu hay còn gọi làng Yến – là làng đầu tiên và duy nhất ở Hội An trong lịch sử hình thành nên nghề khai thác yến sào. Cho đến nay khu vực làng yến ở Cẩm Thanh vẫn giữ được không gian làng quê với những đường làng, xóm ấp, nhà cửa mang những nét đặc trưng. Địa bàn khai thác của nghề là tại một số hòn đảo ở Cù Lao Chàm, cách đất liền khoảng hơn 15km, như hang Khô ở hòn Khô Mẹ; hang Xanh Rêu, hang Bắc Cầu, hang Kỳ Trâu, hang Cạn ở hòn Tai; hang Tò Vò, hang Cả, hang Cột Buồm, hang Trán Quỷ ở hòn Lao. KHÔNG GIAN VĂN HOÁ VÀ ĐIỀU KIỆN SẢN XUẤT Đối với nghề khai thác yến sào Thanh Châu, không gian văn hóa liên quan trước hết phải kể đến đó là làng Thanh Châu hay còn gọi làng Yến – là làng đầu tiên và duy nhất ở Hội An trong lịch sử hình thành nên nghề khai thác yến sào. Cho đến nay khu vực làng yến ở Cẩm Thanh vẫn giữ được không gian làng quê với những đường làng, xóm ấp, nhà cửa mang những nét đặc trưng. Địa bàn khai thác của nghề là tại một số hòn đảo ở Cù Lao Chàm, cách đất liền khoảng hơn 15km, như hang Khô ở hòn Khô Mẹ; hang Xanh Rêu, hang Bắc Cầu, hang Kỳ Trâu, hang Cạn ở hòn Tai; hang Tò Vò, hang Cả, hang Cột Buồm, hang Trán Quỷ ở hòn Lao. SẢN PHẨM TIÊU BIỂU Với những kinh nghiệm, tri thức, những tập tục, kiêng cữ trong quá trình thực hành cùng những công cụ, phương tiện để khai thác tổ yến và đặc biệt với sự ban tặng sản vật yến sào từ thiên nhiên, trong quá trình tồn tại và phát triển nghề khai thác yến sào Thanh Châu đã tạo ra cho Hội An một sản phẩm yến sào thật đặc trưng và có giá trị. Cũng chính từ những giá trị nổi bật về lịch sử, văn hóa, khoa học và kinh tế của nghề nên ngày 21/11/2016 Bộ Văn hóa, Thể thao và Du lịch đã có quyết định số 4036/QĐ – BVHTTDL ghi danh nghề Khai thác yến sào Thanh Châu vào Danh mục Di sản văn hóa phi vật thể quốc gia cùng với nghề mộc Kim Bồng ở Cẩm Kim. Các nguồn tài liệu tham khảo: Trung tâm Bảo tồn Di sản Văn hoá Hội An: hoianheritage.net TRUNG TÂM XÚC TIẾN DU LỊCH TP. ĐÀ NẴNG",
+    "event_time": "Hàng năm",
+    "location": "Phố cổ Hội An",
+    "ticket_info": "Miễn phí tham gia",
+    "advise": [
+      "Mang theo nước uống và kem chống nắng khi tham quan.",
+      "Nên đến vào buổi sáng sớm hoặc chiều muộn để tránh nắng nóng và đông người."
+    ],
+    "price_level": 0
+  },
+  "fest_45": {
+    "name": "Nghề gốm Thanh Hà – Hội An",
+    "description": "Làng gốm Thanh Hà nay thuộc phường Hội An Tây, TP. Đà Nẵng (trước năm 1945 thuộc xã Thanh Hà, huyện Diên Phước, phủ Điện Bàn, tỉnh Quảng Nam). GIỚI THIỆU CHUNG VỀ LÀNG GỐM THANH HÀ Làng gốm Thanh Hà nay thuộc phường Hội An Tây, TP. Đà Nẵng (trước năm 1945 thuộc xã Thanh Hà, huyện Diên Phước, phủ Điện Bàn, tỉnh Quảng Nam). Làng có không gian sản xuất gốm, sành, gạch, ngói âm dương, vôi phân bổ ở nhiều ấp thuộc phía Tây và Nam của làng như: Nam Diêu, Thanh Chiếm, An Bang, Hòa Yên, Hậu Xá. Khu vực sản xuất gốm tập trung tại khối Nam Diêu, phường Thanh Hà, thành phố Hội An. LỊCH SỬ HÌNH THÀNH VÀ PHÁT TRIỂN Quy mô và lịch sử phát triển Theo hồi ức của các vị cao niên, cách đây khoảng 70 năm trở về trước, ở ấp Nam Diêu có đến 50 hộ sản xuất gốm, 30 – 40 bàn xoay chuốt, 8 lò nung sành và hàng chục hộ buôn gốm với tổng lao động là 200 – 300 lao động. Ngoài ra, còn có một số hộ làm nghề sản xuất gốm, sành, gạch, ngói, vôi ở ấp Thanh Chiếm (nay là khối Thanh Chiếm, giáp Nam Diêu về phía Đông Bắc), ấp An Bang (nay là khối An Bang, giáp Nam Diêu về phía Bắc), ấp Hậu Xá (cách Nam Diêu khoảng 1km về phía Đông). KHÔNG GIAN VĂN HOÁ VÀ ĐIỀU KIỆN SẢN XUẤT Tình hình nghề gốm hiện nay Người dân Thanh Hà ở hiện có 32 hộ làm gốm với 134 lao động trên tổng số 320 hộ, trong đó có 5 hộ làm gốm truyền thống, 13 hộ làm con thổi, số còn lại là hộ làm gốm mỹ nghệ và có ít nhất là 3 người buôn gốm chuyên nghiệp; có 4 lò gốm truyền thống (lò úp, lò bầu), 4 lò ngửa để nung gốm mỹ nghệ, 5 lò ngửa để nung con thổi. Đội ngũ thợ gốm ở Thanh Hà hiện nay đều là hậu duệ của các tộc tiền hiền làng Thanh Hà: Nguyễn Viết, Nguyễn Văn, Nguỵ, Bùi, Phạm, Lê. Nguyên liệu làm gốm Nguyên liệu chính để làm gốm là đất sét vàng, dẻo có độ kết dính cao. Loại đất này thường nằm ở các ruộng ven sông, ở độ sâu cách mặt ruộng khoảng 50 – 100cm, cách đây 60 năm trở về trước, đất được khai thác tại ấp An Bang, Thanh Chiếm (Thanh Hà) và vùng đất giáp với Thanh Hà thuộc Điện Phương ngày nay. Hiện nay, thợ gốm mua đất ở Thanh Quýt (Điện Bàn), Thi Lai (Duy Xuyên)… người bán đất vận chuyển bằng ghe đến Thanh Hà bán. QUY TRÌNH SẢN XUẤT/ KHAI THÁC Sản phẩm gốm truyền thống được làm theo các qui trình sản xuất cổ truyền như sau: Các công đoạn chế tác: + Làm đất: đất được hòa với nước rồi dùng các mai dỡ, mai tỉa, mai chém, nề để băm, chém đất thành từng cục và nhào trộn 3 lần cho sạch, dẻo. + Chuốt gốm (tạo hình phôi): thợ đẩy đẩy bàn xoay và nặn con đất trên ghế nhồi đất, thợ chuốt ngồi cạnh bàn xoay, đặt con đất vào bàn xoay, hai tay áp vào con đất nặn thành phôi. + Sửa nguội: phôi được phơi nắng cho khô dần rồi chỉnh sửa cho cân đối, sau đó đem phơi cho cứng hẳn. + Kỹ thuật tráng men (dùng cho ngói thanh lưu ly, hoàng lưu ly): Men được làm từ đồng, chì, đá son, cao lanh… Nguyên liệu được nghiền mịn, trộn với 50% nước sạch tạo thành men sống hay nói cách khác là làm thành một lớp thủy tinh mỏng để làm bóng và bảo vệ da gốm không thấm nước. Gốm đã qua nung nhẹ lửa được lấy ra nhúng men sau đó đưa vào nung tiếp để cho men chín, bám vào da gốm. + Nung gốm: gốm, sành được nung trong lò bầu, lò nung sành gọi là lò xanh, lò đỏ dùng nung gốm. Lò xanh hình chữ nhật, thành lò bằng gạch, mái bầu bằng đất sét; cao khoảng 3m, rộng 5 – 6m, dài 4 – 5m, có 2 cửa lửa ở phía trước (đun củi), 3 cửa độ/đạo thông gió ở phía sau, 3 lỗ thông hơi ở mái. Lò đỏ nhỏ hơn lò xanh, cao khoảng 2,3m, rộng 2m, dài 3m. Củi nung truyền thống là củi rừng dền, dẻ, trường, trám, nay thợ lò dùng củi dương liễu (phi lao). Mỗi đợt nung lò sành cần 10m3 củi, nung gốm cần 5 – 7m3 củi. Nung gốm, sành theo qui trình: un (sưởi ấm lò), chụm thắt (tạo lửa nhiều để phôi thành phẩm). Khi nung, bằng kinh nghiệm của mình, thợ lò nhìn thấy khói trong suốt thoát ra sẽ đoán biết được độ nóng của lò và gốm đã thành phẩm hay chưa. Trước đây, khi nung sành, người thợ còn sử dụng om thăm (thăm dò trạng thái gốm trong lò khi đang nung) để ở cửa độ, om chịu sức nóng từ lò thoát ra mà chín thì sản phẩm trong lò đã chín và qua trạng thái của om, người thợ cũng đoán biết được sản phẩm đã được nung là tốt hay xấu. Liên quan đến trạng thái/màu sắc của am thăm có cả nhiều tên gọi riêng của nghề để mô tả và đi kèm với đó là tri thức nhận biết sản phẩm. SẢN PHẨM TIÊU BIỂU Sản phẩm gốm truyền thống được làm theo các qui trình sản xuất cổ truyền như sau: + Gốm, sành truyền thống Thanh Hà: đa dạng về loại hình (hơn 40 loại sản phẩm), gồm các đồ gia dụng (hũ, bình vôi, vại, nồi, thạp, diệm, trả, om, bùng/lùng binh… các loại) dùng để đựng nước, muối, mắm, gạo, các loại ngũ cốc, thổ sản…; dụng cụ sản xuất của nghề dệt ở Duy Xuyên, Điện Bàn, nghề làm đường ở Đại Lộc – Quảng Nam (nay là Đà Nẵng) (vại ươm tơ, âu suốt đựng chỉ dệt, cái muống/mú lọc đường); gạch, ngói đất nung, đồ gốm dùng trong hoạt động tín ngưỡng (lư hương, tượng ông táo, quách…). Đặc trưng kiểu dáng sản phẩm là hũ thì có dáng miệng loe, cổ eo, vai, đáy thuôn, trôn bằng; nồi, niêu, chảo, siêu gốm… cùng chung kiểu miệng loe, vành miệng được vê tròn, cổ eo, ngắn, bụng phình to, đáy tròn. Đồ gốm, sành không men, da lán hoặc thô, xương mịn, đa số không có hoa văn, riêng một vài loại hũ sành được trang trí viền răng cưa nổi, văn lượn sóng ở cổ, vai. + Gốm mỹ nghệ: được chế tác công phu hơn, để có da gốm mịn, thợ gốm đánh, lắng, lọc đất thành dung dịch mịn rồi đổ vào khuôn trong 12 giờ cho đất kết tủa thì phơi phôi. Đồ án trang trí của gốm mỹ nghệ thường là Hán tự có ý nghĩa cát tường, hoa văn hình học, tên đơn vị kinh doanh… Cũng có sản phẩm được tạo áo gốm bằng vỏ trứng. Phôi gốm mỹ nghệ có thể được nung trong lò bầu hoặc nung riêng ở lò ngửa.Gốm mỹ nghệ có ít nhất 33 loại sản phẩm gồm tượng đức Phật, Chúa…, đèn gốm áp tường, con tiện, chậu, lọ hoa, mô hình các di tích kiến trúc, hộp, gạt tàn thuốc, mặt nạ gốm… Những sản phẩm này được nhiều cơ sở du lịch, dịch vụ (nhà hàng, khách sạn, cafe) ở Hội An, Đà Nẵng, Huế, Đà Lạt, thành phố Hồ Chí Minh đặt hàng để trang trí nội ngoại thất. Trong những năm gần đây có một số hàng hóa đã được xuất khẩu sang Nhật, Úc, Đức, Anh, Pháp, Mỹ,… + Con thổi – sản phẩm lưu niệm: Con thổi là loại hình gốm mới, có từ cuối thập niên 90, thế kỷ XX, được chế tạo đơn giản nhưng những sản phẩm này vẫn thể hiện các đề tài văn hóa truyền thống như bộ 12 con giáp, con thổi hình trẻ chăn trâu… được nhiều du khách mua làm lưu niệm. + Làm ngói âm dương: Ngói âm dương được làm từ đất sét vàng như đất làm gốm và trải qua các công đoạn: Nhồi đất, in phôi, phơi 1 nắng, rập (xếp thành từng hàng, vỗ cho cong thành ngói), vô nề (xếp thành từng hàng riêng), phơi 1 nắng, vô lò nung. Ngói âm dương được nung trong lò bầu (lò nung sành, nung gốm) hoặc lò ngửa nung gạch, ngói có nhiều kích cỡ khác nhau. + Làm gạch thẻ: Các công đoạn giống như làm ngói âm dương, chỉ khác nhau ở dùng khuôn và không qua công đoạn rập. + Làm tượng thờ ông Táo: Làm đất sét chín, nhồi đất, in bằng tay, phơi khô 2 ngày nắng, nung. + Quách gốm cũng là một sản phẩm tín ngưỡng (dùng để cải táng người quá cố) được chế tác: Làm đất sét chín, nhồi đất, Đắp bằng tay (từng miếng), ráp, phơi khô, nung. Làng gốm Thanh Hà được công nhận là làng nghề cấp Tỉnh vào năm 2014, đến năm 2019, nghề gốm Thanh Hà được Bộ Văn hóa, Thể thao và Du lịch đưa vào Danh mục Di sản văn hóa phi vật thể Quốc gia tại Quyết định số 2695/QĐ-BVHTTDL, ngày 27/8. Các nguồn tài liệu tham khảo: Cục Di sản văn hóa – Bộ Văn hóa, Thể thao và Du lịch: https://dsvh.gov.vn TRUNG TÂM XÚC TIẾN DU LỊCH TP. ĐÀ NẴNG",
+    "event_time": "Hàng năm",
+    "location": "Làng gốm Thanh Hà",
+    "ticket_info": "Miễn phí tham gia",
+    "advise": [
+      "Nên đến vào buổi sáng sớm hoặc chiều muộn để tránh nắng nóng và đông người.",
+      "Nên mặc trang phục lịch sự và thoải mái khi đến tham quan."
+    ],
+    "price_level": 0
+  },
+  "fest_46": {
+    "name": "Hát bả trạo",
+    "description": "Hát bả trạo là loại hình nghệ thuật tổng hợp, hình thức diễn xướng nghi lễ độc đáo, gắn liền với lễ hội Cầu Ngư và tục thờ Cá Ông của ngư dân vùng biển thành phố Đà Nẵng. Trong suốt quá trình tồn tại và phát triển, thông qua quá trình lao động sản xuất, người dân ven biển thành phố Đà Nẵng đã sáng tạo cho mình những giá trị văn hóa phi vật thể chứa đầy “chất biển” luôn phù hợp với mọi điều kiện tự  nhiên, môi trường xã hội, trong đó Hát bả trạo trở thành công cụ, lễ hội Cầu Ngư trở thành nơi để người dân thể hiện những giá trị văn hóa độc đáo này. HÁT BẢ TRẠO – NGHỆ THUẬT DÂN GIAN MANG ĐẬM TÍN NGƯỠNG MIỀN BIỂN Theo tên gọi, “Bả” nghĩa là nắm chắc, còn “Trạo” là mái chèo. Vì thế, “Hát bả trạo” được hiểu là hát khi vững tay chèo, kết hợp giữa điệu hát và động tác chèo thuyền nhịp nhàng. Không chỉ là một hình thức sinh hoạt dân gian, Hát bả trạo là loại hình nghệ thuật tổng hợp kết hợp nhuần nhuyễn giữa múa dân gian, hát tuồng, hò, dân ca và nghi lễ truyền thống. Đây cũng là nghi thức mang đậm yếu tố tâm linh – tín ngưỡng biển, phản ánh thế giới quan và nhân sinh quan của cư dân vùng duyên hải miền Trung, đặc biệt là tín ngưỡng thờ cá Ông – vị thần biển linh thiêng được xem là người bảo hộ, che chở ngư dân trong những chuyến ra khơi. Nội dung của Hát bả trạo ca ngợi công đức của cá Ông, tôn vinh sự trù phú và hào phóng của biển cả, đồng thời khắc họa sinh động quá trình lao động vất vả giữa khơi xa. Trong từng nhịp trống và điệu hò, người nghe có thể cảm nhận được khát vọng chân thành về cuộc sống ấm no, hạnh phúc cùng tinh thần dũng cảm, lạc quan và đoàn kết của những người con miền biển, luôn hướng về biển bình yên và cuộc sống thịnh vượng. Một đội Hát bả trạo thường gồm: Tổng mũi đứng trước mũi thuyền, người chỉ đường, hai tay cầm cặp sênh để gõ chỉ huy đội hát bả trạo từ đầu đến cuối buổi diễn; Tổng khoang đứng ở khoang thuyền, khi thuyền neo lại thì canh gác, tay cầm cần câu và gàu tát nước; Tổng lái (tổng hậu) đứng cuối đuôi thuyền, hai tay nắm chèo lái để điều khiển con thuyền đi đúng hướng. Cùng với khoảng 10 đến 16 “con trạo” tuỳ từng địa phương, tuy nhiên con số này luôn được giữ là số chẵn, thể hiện sự cân bằng và thuận hòa trong quan niệm của ngư dân vùng biển. GIÁ TRỊ ĐẶC TRƯNG Dưới góc nhìn văn nghệ dân gian, Hát bả trạo là nguồn tư liệu quý giá về phong tục, tập quán và nghệ thuật trình diễn của cư dân vùng biển miền Trung. Mỗi lời ca, điệu múa, nhịp trống đều chứa đựng tinh thần lạc quan, yêu nghề, yêu biển cả, cùng niềm tin vào cuộc sống no đủ, bình yên. Lời hát trong các bài bản Hát bả trạo mang tính triết lý sâu sắc và giá trị nhân văn cao cả – như những “hương ước bằng lời ca” được truyền từ đời này sang đời khác. Đó là sự gửi gắm về đạo lý “uống nước nhớ nguồn”, lòng biết ơn thiên nhiên và tinh thần đoàn kết, kiên cường của người dân miền biển. Chính vì vậy, Hát bả trạo không chỉ là di sản âm nhạc, mà còn là di sản tâm hồn, cần được gìn giữ, bảo tồn và phát huy như một phần quan trọng trong đời sống văn hóa Đà Nẵng hôm nay. CÁC HOẠT ĐỘNG TRẢI NGHIỆM Ngày nay, bên cạnh Lễ hội Cầu Ngư truyền thống, Hát bả trạo còn được biểu diễn trong nhiều sự kiện văn hoá, lễ hội du lịch của thành phố Đà Nẵng. Nghệ thuật dân gian này cũng được đưa vào các chương trình biểu diễn phục vụ du khách tại một số không gian văn hoá và sân khấu biểu diễn nghệ thuật trên địa bàn thành phố. Đặc biệt, một số công ty lữ hành đã kết hợp tổ chức hoạt động trải nghiệm Hát bả trạo dành cho du khách – nơi người tham gia được học các động tác, làn điệu cơ bản và trình diễn ngay trên thuyền du lịch giữa không gian sông nước. Đây là trải nghiệm độc đáo, giúp du khách hiểu sâu hơn về đời sống tinh thần, văn hoá biển của ngư dân thành phố Đà Nẵng, đồng thời lan tỏa giá trị di sản dân gian đến gần hơn với cộng đồng quốc tế. Hát Bả trạo được Bộ Văn hoá, Thể thao và Du lịch công nhận là Di sản văn hóa phi vật thể Quốc gia theo Quyết định số 3084/QĐ-BVHTTDL ngày 09/9/2013. TRUNG TÂM XÚC TIẾN DU LỊCH TP. ĐÀ NẴNG",
+    "event_time": "Hàng năm",
+    "location": "Phố cổ Hội An",
+    "ticket_info": "Miễn phí tham gia",
+    "advise": [
+      "Nên đến vào buổi sáng sớm hoặc chiều muộn để tránh nắng nóng và đông người.",
+      "Nên mặc trang phục lịch sự và thoải mái khi đến tham quan.",
+      "Mang theo nước uống và kem chống nắng khi tham quan."
+    ],
+    "price_level": 0
+  },
+  "fest_47": {
+    "name": "Nghệ thuật Tuồng",
+    "description": "Tuồng (hay hát bội) là một loại hình sân khấu cổ truyền độc đáo và giàu bản sắc của Việt Nam, được coi là một trong những “quốc hồn, quốc túy” của văn hóa dân tộc. Trải qua quá trình vừa tích lũy vừa chọn lọc và bổ sung, với óc sáng tạo nghệ thuật của người dân cùng một hệ thống văn hóa dân gian độc đáo, tuồng đã len lõi vào đời sống người dân Đà Nẵng, xuất hiện khắp mọi nơi, từ thôn giã đến thị thành trong các sinh hoạt văn hóa, lễ hội hay các sự kiện quan trọng của người dân để rồi hoàn thiện tiến lên sân khấu biểu diễn ở các rạp có bán vé, trở thành món ăn tinh thần gần gũi, phổ biến và được nhân dân địa phương hết sức ưa chuộng. LỊCH SỬ HÌNH HÌNH VÀ PHÁT TRIỂN Nghệ thuật tuồng xứ Quảng đã xuất hiện từ rất sớm, khoảng đầu thế kỷ XVII. Theo dòng lưu dân mở đất về phương Nam, tuồng theo chân họ đến vùng đất mới và nhanh chóng hòa vào đời sống văn hóa địa phương. Đến đầu thế kỷ XIX, nhiều gánh hát tuồng hình thành ở Đà Nẵng, tiêu biểu như gánh Đức Giáo (nay thuộc xã Quế Sơn) và gánh Khánh Thọ (xã Chiên Đàn). Thời kỳ này, tuồng chủ yếu diễn ở sân đình, sân nhà, lưu động qua các làng xã để phục vụ dân chúng. Sang đầu thế kỷ XX, nghệ thuật tuồng xứ Quảng bước vào giai đoạn phát triển rực rỡ. Hàng loạt rạp hát và trường dạy tuồng ra đời: Rạp Chú Châu, trường Tuồng Vĩnh Điện, trường Tuồng Bàu Toa; các sân khấu tuồng Miếu Bông, Chợ Mới, Nam Ô… Giai đoạn huy hoàng này đánh dấu sự chuyển mình của tuồng xứ Quảng từ hình thức sân khấu dân gian, tín ngưỡng sang sân khấu giải trí đô thị. Tuồng xứ Quảng thời kỳ này có bản sắc riêng, không bị pha tạp, đồng thời vẫn giao lưu mạnh mẽ với các vùng miền khác. Nhắc đến tuồng xứ Quảng không thể không nhắc đến Nguyễn Hiển Dĩnh (1853-1926), người có đóng góp lớn trong việc xây dựng nên một phong cách tuồng đặc trưng của xứ Quảng. Ông tập hợp các nghệ nhân, mở rạp hát, sắm sửa trang phục, đạo cụ và sáng tác nhiều kịch bản tuồng. Những kịch bản do Nguyễn Hiển Dĩnh soạn thảo đã trở thành mẫu mực, được giới tuồng cả nước đánh giá cao và vẫn được dàn dựng thường xuyên đến ngày nay. ĐẶC TRƯNG CỦA TUỒNG XỨ QUẢNG Nghệ thuật tuồng xứ Quảng khai thác các tích truyện lịch sử hoặc dã sử, đề cao tính chất bi – hùng nên mang âm hưởng hùng tráng trong những tấm gương tận trung báo quốc, xả thân vì đại nghĩa, những bài học về lẽ ứng xử của con người về các đạo lý, nhân cách con người, những bài học mang tính cộng đồng, trong gia đình và với Tổ quốc. Mỗi vở diễn còn là dấu ấn của văn hóa, lịch sử, quá trình lao động sản xuất, chứa đựng những giá trị thấm đẵm tính nhân văn, những ước mơ, khao khát của người dân Đà Nẵng. Kết cấu kịch bản tuồng khá chặt chẽ, theo lối chương hồi: Thường gồm 3 hồi (mở màn – xung đột – cao trào & kết), đôi khi 4 hồi tùy độ phức tạp của câu chuyện. Nhân vật tuồng được phân loại theo vai như sinh (kép), đào (vai nữ), lão (ông già), nịnh (gian thần), trung thần, tướng lĩnh, yêu tinh (vai yêu quái)… Mỗi nhân vật có tính cách đặc trưng và thường đại diện cho một phẩm chất (trung – nịnh, thiện – ác, dũng mãnh – nhu nhược …). Hệ thống làn điệu tuồng xứ Quảng rất phong phú, nhưng có ba nhóm chính: Lối nói (hát nói không nhịp), hát nam và hát khách, bên cạnh đó, còn nhiều làn điệu khác như xuân, ai, oán, ngâm,… để diễn tả tâm trạng nhân vật trong từng hoàn cảnh. Dàn nhạc đệm thường gồm trống chiến, trống chầu, đàn nhị (đàn cò), kèn bóp (kèn tuồng), não bạt, mõ, thanh la, cùng các nhạc cụ dân tộc khác. Múa trong tuồng là phương tiện chính để khắc họa tính cách và tâm trạng nhân vật. Múa tuồng xứ Quảng mang tính ước lệ cao, được chắt lọc từ những động tác sinh hoạt, lao động hàng ngày, tiếp thu tinh hoa của những hình thái múa dân gian, múa tín ngưỡng, tôn giáo trong tế lễ, hội hè. Khác với tuồng ở các địa phương khác, đặc trưng phong cách tuồng xứ Quảng là đề cao tuồng văn, coi trọng lời ca, diễn xuất nội tâm nên thường múa ít, động tác nhẹ nhàng, uyển chuyển, phảng phất nét trữ tình, sâu lắng của con người Đà Nẵng. Trong quá trình tái hiện cuộc sống, tuồng xứ Quảng không có xu hướng tả thực mà chú trọng lột tả cái thần để phù hợp với đời sống tâm linh của người dân địa phương chính vì vậy trang phục, hóa trang đều được khoa trương, cách điệu lên theo một niêm luật cụ thể nhưng gần gũi và dể hiểu. Khi xem khán giả sẽ bị cuốn hút và tham gia vào sự tưởng tượng, sáng tạo của người diễn viên. Thông qua mỗi nét vẽ, mỗi sắc màu trên khuôn mặt, trang phục, khán giả sẽ hiểu ngay nhân vật trung hay nịnh, thiện hay ác. CÁC HOẠT ĐỘNG TRẢI NGHIỆM Đến Đà Nẵng, du khách có nhiều cơ hội thưởng thức nghệ thuật tuồng – từ sân khấu nhà hát đến không gian đường phố hay các chương trình trải nghiệm tương tác. Đặc biệt, vào dịp đầu xuân trong các lễ hội truyền thống, tiếng trống tuồng vang lên rộn rã khắp nơi, mang đến bầu không khí tươi vui và thiêng liêng. Hòa mình vào không gian ấy, cùng người dân xem một trích đoạn tuồng cổ là trải nghiệm văn hóa độc đáo, giúp du khách cảm nhận sâu hơn nét đẹp tâm hồn và đời sống tinh thần phong phú của người dân địa phương. Nhà hát Tuồng Nguyễn Hiển Dĩnh là cái nôi tuồng chuyên nghiệp của Đà Nẵng và là điểm đến không thể bỏ qua với những ai yêu thích khám phá nghệ thuật dân tộc. Tọa lạc tại 155 Phan Châu Trinh, quận Hải Châu, nơi đây mang đến cho du khách trải nghiệm độc đáo với tiếng trống hội rộn rã, những trích đoạn tuồng cổ kinh điển, phần hòa tấu nhạc cụ dân tộc và cơ hội giao lưu, chụp ảnh cùng nghệ sĩ trong trang phục truyền thống. Không gian trưng bày nghệ thuật tuồng ngay trong khuôn viên Nhà hát giới thiệu hình ảnh, trang phục, mặt nạ, mão và áo giáp tinh xảo, giúp du khách hiểu thêm về nét đẹp của nghệ thuật tuồng xứ Quảng. Tại phố cổ Hội An, các trích đoạn tuồng được đưa vào phục vụ du khách tại Nhà biểu diễn Nghệ thuật cổ truyền Hội An (số 66 đường Bạch Đằng), được biểu diễn trong không gian Đêm phố cổ Hội An (14 Âm lịch hàng tháng), trong các lễ hội Tết Trung Thu, Tết Nguyên đán hay các hoạt động, sự kiện giao lưu văn hoá – du lịch… Bên cạnh xem biểu diễn, du khách còn có thể hóa thân thành nghệ nhân qua hoạt động vẽ mặt nạ tuồng. Tại không gian nghệ thuật độc đáo mang tên “Mặt nạ thời gian” của nghệ nhân Bùi Quý Phong – người hơn 40 năm gắn bó với nghề làm mặt nạ giấy bồi truyền thống. Không chỉ là giải trí, tuồng xứ Quảng mang những giá trị nhân văn sâu sắc, góp phần hun đúc tâm hồn, tình cảm cộng đồng và bản sắc văn hóa dân tộc. Nghệ thuật Tuồng xứ Quảng đã được Bộ Văn hoá, Thể thao và Du lịch công nhận là Di sản văn hoá phi vật thể quốc gia theo quyết định số: 1877/QĐ-BVHTTDL, ngày 08/6/2015. TRUNG TÂM XÚC TIẾN DU LỊCH TP. ĐÀ NẴNG",
+    "event_time": "Hàng năm",
+    "location": "Nhà hát Tuồng Nguyễn Hiển Dĩnh",
+    "ticket_info": "Miễn phí tham gia",
+    "advise": [
+      "Nên thuê hướng dẫn viên địa phương để hiểu rõ hơn về lịch sử và văn hóa.",
+      "Nên mặc trang phục lịch sự và thoải mái khi đến tham quan."
+    ],
+    "price_level": 0
+  },
+  "fest_48": {
+    "name": "Biểu diễn nghệ thuật Chăm tại Khu đền tháp Mỹ Sơn",
+    "description": "Đến với Khu đền tháp Mỹ Sơn, du khách không chỉ chiêm ngưỡng những công trình kiến trúc cổ kính rêu phong mà còn được đắm mình trong không gian nghệ thuật đặc sắc của người Chăm – nơi âm thanh, ánh sáng và chuyển động hòa quyện thành bức tranh văn hóa sống động. NGHỆ THUẬT CHĂM – DI SẢN CỦA NỀN VĂN MINH CHĂMPA RỰC RỠ Nghệ thuật Chăm là kho tàng văn hóa đặc sắc được hình thành và phát triển cùng với nền văn minh Chămpa cổ xưa – một trong những nền văn minh rực rỡ nhất ở miền Trung Việt Nam. Từ âm nhạc, múa và các nghi thức, lễ hội Chăm, tất cả đều phản ánh thế giới quan hài hòa giữa con người và thiên nhiên, giữa đời sống trần thế và thế giới tâm linh. Âm nhạc và múa Chăm mang đậm yếu tố nghi lễ, thể hiện lòng tôn kính đối với thần linh, đồng thời ca ngợi vẻ đẹp của cuộc sống và con người. Trong tiếng trống Paranưng, kèn Saranai vang vọng, những vũ điệu Apsara, múa dâng lễ, múa đội nước được tái hiện mềm mại, quyến rũ mà thiêng liêng. Mỗi chuyển động của tay, ánh nhìn, hay nhịp bước đều chứa đựng tinh thần tự hào, niềm tin và khát vọng của người Chăm qua bao thế hệ. Ngày nay, nghệ thuật Chăm không chỉ là di sản văn hóa phi vật thể quý giá mà còn là cầu nối đưa du khách gần hơn với lịch sử và tâm hồn của vùng đất miền Trung – nơi những tháp cổ, tiếng nhạc và điệu múa cùng kể câu chuyện về một nền văn minh bất diệt. TRẢI NGHIỆM NGHỆ THUẬT CHĂM TẠI KHU ĐỀN THÁP MỸ SƠN Đây là hoạt động văn hóa phi vật thể được tái hiện sinh động tại Khu đền tháp Mỹ Sơn. Những trích đoạn lễ hội Chăm, múacung đình, múa tôn giáo được dàn dựng biểu diễn giúp những ai một lần đến Mỹ Sơn cảm nhận rõ hơn về những giá trị độc đáo của nền văn hóa phi vật thể Chămpa. Các chương trình biểu diễn nghệ thuật Chăm được tổ chức thường xuyên tại Nhà biểu diễn nghệ thuật dân gian Chăm tron khu đền tháp và ngay bên chân tháp cổ, giúp du khách vừa thưởng thức tiết mục vừa cảm nhận được bầu không khí linh thiêng của di sản. Mỗi ngày, những nghệ nhân Chăm lại kể câu chuyện về quê hương mình qua từng nhịp trống, điệu múa, để du khách không chỉ “xem” mà còn “cảm” được hơi thở của nền văn minh Chămpa rực rỡ. MỘT SỐ TIẾT MỤC TIÊU BIỂU Múa Apsara: Theo các nhà nghiên cứu văn hóa Chăm thì đây là điệu múa phục vụ cho các vị thần. Apsara đã hóa thân từ đá thành những vũ điệu uyển chuyển, mượt mà, ca ngợi vẻ đẹp, những đường cong tuyệt mỹ mà tạo hóa đã ban tặng cho phái đẹp. Các điệu múa được thực hiện chậm rãi, dịu dàng, duyên dáng. Thể hiện chủ yếu qua các động tác tay, mỗi động tác mang một ý nghĩa riêng, Khi cánh tay đặt ngang ngực ý nghĩa là hạnh phúc, khi tay trái hướng ra sau, tay phải nắm lại trước ngực với 3 ngón tay hướng lên, ngón trỏ chạm ngón cái đây là biểu tượng hình ảnh rắn Naga trong văn hóa Chăm. Múa dâng lễ: Múa dâng lễ của người Chăm là một nghi thức thiêng liêng trong các lễ hội như Katê, Rija Nưgar, Rija Praung. Điệu múa này thường do các cô gái thực hiện, đầu đội các lễ vật như trái cây, nước hoặc bình gốm, tay cầm quạt hoặc quàng khăn, với các động tác uyển chuyển để thể hiện sự tôn kính thần linh. Vào ban đêm, ngọn nến được thắp sáng trên lễ vật tạo nên khung cảnh huyền ảo, trang nghiêm. Múa quạt: Đây là một hình thức múa dân gian lâu đời. Dụng cụ chính là chiếc quạt, xòe ra hay xếp lại cả cặp hoặc một xòe một xếp. Có thể múa cá nhân trong các ngày lễ hay múa tập thể trong những ngày lễ hội. Diễn viên bước ra trình diễn cái phẩy tay, phất quạt, quất roi hay cái chuyển gót chân, khi nhanh khi chậm, khi khoan thai nhẹ nhàng, khi thì hùng hồn mạnh mẽ theo nhịp của tiếng nhạc. Người xem như bị cuốn hút theo từng động tác của người nghệ sĩ. Rồi cả khán thính giả bị kích động bởi tiếng nhạc, điệu múa mà hô vang… “ahei” (hoan hô) cổ vũ Múa đội nước: Xuất phát điểm là múa đội Thong hala (cỗ bồng trầu) trong lễ dâng nước thánh trên tháp, sau đó nó được kết hợp với thao tác đội lu nước trong sinh hoạt ngày thường, thành loại hình múa này. Biểu diễn nhạc cụ dân tộc: Bên cạnh các tiết mục múa, các tiết mục biểu diễn trống Paranưng, kèn Saranai của những nghệ sĩ người Chăm cũng để lại ấn tượng trong lòng du khách. Trong thung lũng Mỹ Sơn huyền ảo, tiếng kèn, tiếng trống ngân lên như làm sống dậy những bức phù điêu trên những khu tháp, đưa du khách trở về với thánh đô ngàn năm huyền bí. Ngoài thưởng thức nghệ thuật, du khách còn có thể tham gia các hoạt động trải nghiệm văn hóa như học thử vài động tác múa truyền thống, thử đội bình nước, mặc trang phục Chăm và chụp ảnh cùng nghệ nhân. Sau buổi biểu diễn, bạn có thể tản bộ quanh khu tháp, nghe hướng dẫn viên kể về kiến trúc, tín ngưỡng và câu chuyện lịch sử của từng ngọn tháp – một hành trình vừa thư giãn, vừa thấm đẫm giá trị văn hóa. THÔNG TIN CẦN BIÊTThời gian biểu diễn: Tất cả các ngày trong tuần, cụ thể:– Các suất diễn tại nhà biểu diễn: 9h45, 10h30, 11h15,15h30– Các suất diễn dưới chân tháp G: 9h00, 14h45.Giá vé tham quan Khu đền tháp Mỹ Sơn:– Khách quốc tế: 150.000 VNĐ/người/lượt (bao gồm phí tham quan và dịch vụ).– Khách Việt Nam: 100.000 VNĐ/người/lượt (bao gồm phí tham quan và dịch vụ). TRUNG TÂM XÚC TIẾN DU LỊCH TP. ĐÀ NẴNG",
+    "event_time": "Hàng năm",
+    "location": "Khu Đền Tháp Mỹ Sơn",
+    "ticket_info": "Miễn phí tham gia",
+    "advise": [
+      "Kiểm tra thời tiết trước khi đi để có trải nghiệm tốt nhất.",
+      "Nên đến vào buổi sáng sớm hoặc chiều muộn để tránh nắng nóng và đông người.",
+      "Nên thuê hướng dẫn viên địa phương để hiểu rõ hơn về lịch sử và văn hóa."
+    ],
+    "price_level": 0
+  }
+}

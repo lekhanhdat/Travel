@@ -12,7 +12,10 @@
     "realDevice": "adb reverse tcp:8081 tcp:8081",
     "genimg": "node genimg src/assets/images --output src/res/images.tsx --name images",
     "genimgsvg": "node genimgsvg src/assets/svg --output src/assets/ImageSvg.tsx --name ImageSvg",
-    "link": "react-native link"
+   "link": "react-native link",
+   "translate:ui": "ts-node scripts/translate-i18n.ts",
+   "translate:nocodb": "ts-node scripts/pretranslate-nocodb-to-json.ts",
+   "translate:all": "npm run translate:ui && npm run translate:nocodb"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "^1.23.1",

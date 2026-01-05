@@ -6,109 +6,9 @@ import React, {
   useCallback,
   ReactNode,
 } from 'react';
+import i18n from '../i18n';
 import LocalStorageCommon from '../utils/LocalStorageCommon';
 import {translationQueue} from '../services/translation';
-import {translationMap, getEnglishText} from '../data/baseTranslations';
-
-// Vietnamese translations for common UI strings (offline fallback)
-const vietnameseTranslations: Record<string, string> = {
-  // Common
-  Back: 'Quay lại',
-  Save: 'Lưu',
-  Cancel: 'Hủy',
-  Success: 'Thành công',
-  Error: 'Lỗi',
-  'Loading...': 'Đang tải...',
-  Search: 'Tìm kiếm',
-  'View All': 'Xem tất cả',
-  Close: 'Đóng',
-  Confirm: 'Xác nhận',
-  Delete: 'Xóa',
-  Edit: 'Chỉnh sửa',
-  Add: 'Thêm',
-  Update: 'Cập nhật',
-  Select: 'Chọn',
-  Done: 'Xong',
-  Retry: 'Thử lại',
-  Refresh: 'Làm mới',
-  // Home
-  Hello: 'Xin chào',
-  'Welcome to Travel App': 'Chào mừng đến với Travel App',
-  'Popular Places': 'Địa điểm phổ biến',
-  'Nearby Places': 'Địa điểm gần bạn',
-  'Search places...': 'Tìm kiếm địa điểm...',
-  'Explore More': 'Khám phá thêm',
-  // Navigation
-  Home: 'Trang chủ',
-  Feed: 'Bảng tin',
-  Map: 'Bản đồ',
-  Camera: 'Máy ảnh',
-  Profile: 'Hồ sơ',
-  // Profile
-  'Personal Information': 'Thông tin cá nhân',
-  'Account Information': 'Thông tin tài khoản',
-  Settings: 'Cài đặt',
-  FAQ: 'Câu hỏi thường gặp',
-  'Privacy & Policy': 'Chính sách & Quyền riêng tư',
-  'About App': 'Về ứng dụng',
-  Logout: 'Đăng xuất',
-  'Edit Profile': 'Chỉnh sửa hồ sơ',
-  Language: 'Ngôn ngữ',
-  // Settings
-  Notifications: 'Thông báo',
-  'Push Notifications': 'Thông báo đẩy',
-  'Receive notifications about new places and updates':
-    'Nhận thông báo về địa điểm mới và cập nhật',
-  Privacy: 'Quyền riêng tư',
-  'Location Services': 'Dịch vụ vị trí',
-  'Allow app to access your location':
-    'Cho phép ứng dụng truy cập vị trí của bạn',
-  Synchronization: 'Đồng bộ hóa',
-  'Auto Sync': 'Tự động đồng bộ',
-  'Sync data when internet connection is available':
-    'Đồng bộ dữ liệu khi có kết nối internet',
-  Interface: 'Giao diện',
-  'Dark Mode': 'Chế độ tối',
-  'Use dark interface': 'Sử dụng giao diện tối',
-  'This feature will be updated in the next version.':
-    'Tính năng này sẽ được cập nhật trong phiên bản tiếp theo.',
-  Storage: 'Bộ nhớ',
-  Cache: 'Bộ nhớ đệm',
-  Size: 'Kích thước',
-  Clear: 'Xóa',
-  'Clear Cache': 'Xóa bộ nhớ đệm',
-  'Are you sure you want to delete all temporary data?':
-    'Bạn có chắc chắn muốn xóa tất cả dữ liệu tạm thời?',
-  'Cache cleared successfully!': 'Đã xóa bộ nhớ đệm thành công!',
-  // FAQ
-  'Frequently Asked Questions': 'Câu hỏi thường gặp',
-  'Search questions...': 'Tìm kiếm câu hỏi...',
-  'Contact Support': 'Liên hệ hỗ trợ',
-  'No results found': 'Không tìm thấy kết quả',
-  // About
-  Version: 'Phiên bản',
-  Developer: 'Nhà phát triển',
-  Contact: 'Liên hệ',
-  'Rate App': 'Đánh giá ứng dụng',
-  'Share App': 'Chia sẻ ứng dụng',
-  Feedback: 'Phản hồi',
-  // NewFeed
-  'Add Review': 'Thêm đánh giá',
-  'Write Review': 'Viết đánh giá',
-  Rating: 'Xếp hạng',
-  Comment: 'Bình luận',
-  Submit: 'Gửi',
-  Reviews: 'Đánh giá',
-  Photos: 'Ảnh',
-  Likes: 'Lượt thích',
-  Comments: 'Bình luận',
-  'View More': 'Xem thêm',
-  'Load More': 'Tải thêm',
-  'No reviews yet': 'Chưa có đánh giá',
-  // Policy
-  'Terms of Service': 'Điều khoản dịch vụ',
-  Security: 'Bảo mật',
-};
 
 export type Language = 'vi' | 'en';
 
@@ -146,6 +46,12 @@ export const TranslationProvider: React.FC<TranslationProviderProps> = ({
       const savedLanguage = await LocalStorageCommon.getItem('app_language');
       if (savedLanguage && (savedLanguage === 'vi' || savedLanguage === 'en')) {
         setLanguageState(savedLanguage);
+       // Sync with i18n
+       await i18n.changeLanguage(savedLanguage);
+     } else {
+       // Default to Vietnamese
+       setLanguageState('vi');
+       await i18n.changeLanguage('vi');
       }
     } catch (error) {
       console.log('Error loading language:', error);
@@ -156,6 +62,8 @@ export const TranslationProvider: React.FC<TranslationProviderProps> = ({
     try {
       await LocalStorageCommon.setItem('app_language', lang);
       setLanguageState(lang);
+     // Sync with i18n
+     await i18n.changeLanguage(lang);
       setTranslations(new Map()); // Clear cached translations on language change
     } catch (error) {
       console.log('Error saving language:', error);
@@ -166,34 +74,40 @@ export const TranslationProvider: React.FC<TranslationProviderProps> = ({
     async (text: string): Promise<string> => {
       if (!text) return '';
 
-      // Check if input is a translation key (e.g., "settings.title")
-      const englishText = translationMap[text] || text;
+     // 1. Check if it's an i18n key (contains ':' or '.')
+     if (text.includes(':') || text.includes('.')) {
+       // It's an i18n key, use i18n directly
+       if (i18n.exists(text)) {
+         return i18n.t(text);
+       }
+     }
 
-      // If language is English, return English text
-      if (language === 'en') return englishText;
-
-      // Check Vietnamese translations first (offline)
-      const vietnameseText = vietnameseTranslations[englishText];
-      if (vietnameseText) {
-        return vietnameseText;
-      }
+     // 2. Try to find it in i18n common namespace
+     const commonKey = `common.${text}`;
+     if (i18n.exists(commonKey)) {
+       return i18n.t(commonKey);
+     }
 
       // Check local state cache
-      const cached = translations.get(englishText);
+     const cached = translations.get(text);
       if (cached) return cached;
 
+     // 3. If not in i18n and language is English, return as-is
+     if (language === 'en') return text;
+
+     // 4. Use Azure Translator for dynamic content not in i18n
       try {
         setIsLoading(true);
         const translated = await translationQueue.translate(
-          englishText,
+         text,
           language,
           'en',
         );
-        setTranslations(prev => new Map(prev).set(englishText, translated));
+       setTranslations(prev => new Map(prev).set(text, translated));
         return translated;
       } catch (error) {
         console.error('Translation error:', error);
-        return englishText;
+       return text;
       } finally {
         setIsLoading(false);
       }
@@ -205,29 +119,28 @@ export const TranslationProvider: React.FC<TranslationProviderProps> = ({
     (text: string): string => {
       if (!text) return '';
 
-      // Check if input is a translation key (e.g., "settings.title")
-      const englishText = translationMap[text] || text;
+     // 1. Check if it's an i18n key (contains ':' or '.')
+     if (text.includes(':') || text.includes('.')) {
+       // It's an i18n key, use i18n directly
+       if (i18n.exists(text)) {
+         return i18n.t(text);
+       }
+     }
 
-      // If language is English, return English text
-      if (language === 'en') {
-        return englishText;
-      }
-
-      // If language is Vietnamese, look up Vietnamese translation
-      // First check our local Vietnamese translations map
-      const vietnameseText = vietnameseTranslations[englishText];
-      if (vietnameseText) {
-        return vietnameseText;
-      }
+     // 2. Try to find it in i18n common namespace
+     const commonKey = `common.${text}`;
+     if (i18n.exists(commonKey)) {
+       return i18n.t(commonKey);
+     }
 
       // Check dynamic translations cache
-      const cached = translations.get(englishText);
+     const cached = translations.get(text);
       if (cached) {
         return cached;
       }
 
-      // Return Vietnamese text if available, otherwise English
-      return vietnameseText || englishText;
+     // Return original text if not found
+     return text;
     },
     [language, translations],
   );

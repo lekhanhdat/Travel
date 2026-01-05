@@ -28,7 +28,7 @@ export type Namespace = (typeof NAMESPACES)[number];
 export const DEFAULT_NAMESPACE: Namespace = 'common';
 
 // Fallback language
-export const FALLBACK_LANGUAGE: SupportedLanguage = 'en';
+export const FALLBACK_LANGUAGE: SupportedLanguage = 'vi';
 
 // Resources configuration
 const resources = {
@@ -49,7 +49,7 @@ i18n
   .use(initReactI18next) // Passes i18n down to react-i18next
   .init({
     resources,
-    lng: FALLBACK_LANGUAGE, // Default language
+   lng: 'vi', // Default language (Vietnamese)
     fallbackLng: FALLBACK_LANGUAGE,
     
     // Namespaces configuration

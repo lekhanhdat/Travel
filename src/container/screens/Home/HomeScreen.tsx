@@ -250,7 +250,7 @@ class HomeScreen extends React.PureComponent<
   handleSearch = (isViewAll: boolean, locations: ILocation[]) => {
     const searchValue = this.searchBarRef.current?.getSearchValue() || '';
     NavigationService.navigate(ScreenName.VIEW_ALL_SCREEN, {
-      title: isViewAll ? 'Xem tất cả' : 'Tìm kiếm',
+      title: isViewAll ? this.props.t('home.viewAll') : this.props.t('home.search'),
       locations: locations,
       valueSearch: searchValue,
     });
@@ -306,10 +306,10 @@ class HomeScreen extends React.PureComponent<
     console.log('  📋 isSemanticSearch:', isSemanticSearch);
     NavigationService.navigate(ScreenName.VIEW_ALL_SCREEN, {
       title: isViewAll
-        ? 'Xem tất cả'
+        ? this.props.t('home.viewAll')
         : isSemanticSearch
-        ? '🧠 Kết quả AI Search'
-        : 'Tìm kiếm',
+        ? `🧠 ${this.props.t('home.aiSearchResults')}`
+        : this.props.t('home.search'),
       locations: locations,
       valueSearch: searchValue,
       isSemanticSearch: isSemanticSearch,
@@ -354,7 +354,7 @@ class HomeScreen extends React.PureComponent<
               color: colors.black,
             },
           ]}>
-          Chúc bạn có những trải nghiệm tuyệt vời
+          {this.props.t('home.welcomeMessage')}
         </TextBase>
         <TextBase
           style={[
@@ -365,7 +365,7 @@ class HomeScreen extends React.PureComponent<
               color: colors.black,
             },
           ]}>
-          tại Đà Nẵng!
+          {this.props.t('home.inDanang')}
         </TextBase>
 
         <SemanticSearchBarComponent<ILocation>
@@ -374,7 +374,7 @@ class HomeScreen extends React.PureComponent<
           searchFields={['name', 'address', 'description']}
           onSearch={this.handleSearchCallback}
           onSubmitSearch={this.handleSearchSubmit}
-          placeholder="Tìm kiếm địa điểm, địa chỉ, mô tả..."
+          placeholder={this.props.t('home.searchPlaceholder')}
           entityType="location"
           idField="Id"
         />
@@ -384,7 +384,7 @@ class HomeScreen extends React.PureComponent<
             {this.state.account?.Id && (
               <RecommendationsWidget
                 userId={this.state.account.Id}
-                title="Địa điểm phù hợp"
+                title={this.props.t('home.recommendedLocations')}
                 limit={10}
               />
             )}
@@ -396,14 +396,14 @@ class HomeScreen extends React.PureComponent<
                 {marginTop: this.state.account?.Id ? sizes._24sdp : 0},
               ]}>
               <TextBase style={[AppStyle.txt_20_bold]}>
-                Địa điểm phổ biến
+                {this.props.t('home.popularLocations')}
               </TextBase>
               <TouchableOpacity
                 onPress={() =>
                   this.handleSearch(true, this.state.locationsPopular)
                 }>
                 <TextBase style={[AppStyle.txt_18_regular]}>
-                  Xem tất cả
+                  {this.props.t('home.viewAll')}
                 </TextBase>
               </TouchableOpacity>
             </View>
@@ -428,7 +428,7 @@ class HomeScreen extends React.PureComponent<
             <View style={[styles.rowCenter, {marginTop: sizes._24sdp}]}>
               <TextBase
                 style={[AppStyle.txt_20_bold, {marginBottom: sizes._16sdp}]}>
-                Địa điểm gần bạn
+                {this.props.t('home.nearbyLocations')}
               </TextBase>
               <TouchableOpacity
                 onPress={() =>
@@ -439,7 +439,7 @@ class HomeScreen extends React.PureComponent<
                     AppStyle.txt_18_regular,
                     {marginBottom: sizes._16sdp},
                   ]}>
-                  Xem tất cả
+                  {this.props.t('home.viewAll')}
                 </TextBase>
               </TouchableOpacity>
             </View>

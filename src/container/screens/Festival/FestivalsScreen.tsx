@@ -8,7 +8,6 @@ import {
 } from 'react-native';
 import Page from '../../../component/Page';
 import HeaderBase from '../../../component/HeaderBase';
-import strings from '../../../res/strings';
 import {IItem} from '../../../common/types';
 import {IFestival} from '../../../services/festivals.api';
 import sizes from '../../../common/sizes';
@@ -20,14 +19,17 @@ import NavigationService from '../NavigationService';
 import {ScreenName} from '../../AppContainer';
 import HistoricalArtifact from '../../../component/HistoricalArtifact';
 import festivalsApi from '../../../services/festivals.api';
+import locationApi from '../../../services/locations.api';
 import SemanticSearchBarComponent from '../../../component/SemanticSearchBarComponent';
 import LargeItemFestival from '../../../component/LargeItemFestival';
+import {
+  withAzureTranslation,
+  WithAzureTranslationProps,
+} from '../../../hoc/withAzureTranslation';
 
 // TRANG FESTIVALS - Tìm kiếm và hiển thị lễ hội
-// TRANG FESTIVALS - Tìm kiếm và hiển thị lễ hội
-// TRANG FESTIVALS - Tìm kiếm và hiển thị lễ hội
 
-interface IFestivalsScreenProps {
+interface IFestivalsScreenProps extends WithAzureTranslationProps {
   navigation: any;
 }
 
@@ -40,7 +42,7 @@ interface IFestivalsScreenState {
   FESTIVALS_POPULAR: IFestival[];
 }
 
-export default class FestivalsScreen extends React.PureComponent<
+class FestivalsScreen extends React.PureComponent<
   IFestivalsScreenProps,
   IFestivalsScreenState
 > {
@@ -111,7 +113,7 @@ export default class FestivalsScreen extends React.PureComponent<
 
   handleSearch = (isViewAll: boolean, items: IItem[]) => {
     NavigationService.navigate(ScreenName.VIEW_ALL_ITEM, {
-      title: isViewAll ? 'Xem tất cả' : 'Lễ hội',
+      title: isViewAll ? this.props.t('home.viewAll') : this.props.t('festivals.title'),
       items,
       valueSearch: this.state.valueSearch,
     });
@@ -146,7 +148,7 @@ export default class FestivalsScreen extends React.PureComponent<
       const festivalsToShow = filteredData;
       console.log('  ➡️ Navigating with', festivalsToShow.length, 'festivals');
       NavigationService.navigate(ScreenName.VIEW_ALL_FESTIVALS, {
-        title: isSemanticSearch ? '🧠 Kết quả AI Search' : 'Tìm kiếm lễ hội',
+        title: isSemanticSearch ? `🧠 ${this.props.t('home.aiSearchResults')}` : this.props.t('home.search'),
         festivals: festivalsToShow,
         valueSearch: searchValue,
         isSemanticSearch: isSemanticSearch,
@@ -155,16 +157,17 @@ export default class FestivalsScreen extends React.PureComponent<
   };
 
   render(): React.ReactNode {
+    const {t} = this.props;
     return (
       <Page style={{backgroundColor: colors.background}}>
-        <HeaderBase hideLeftIcon title={strings.festival} />
+        <HeaderBase hideLeftIcon title={t('festivals.title')} />
         <SemanticSearchBarComponent<IFestival>
           ref={this.searchBarRef}
           data={this.state.festivals}
           searchFields={['name', 'location', 'description']}
           onSearch={this.handleFestivalSearch}
           onSubmitSearch={this.handleFestivalSearchSubmit}
-          placeholder="Tìm kiếm các lễ hội tại Đà Nẵng..."
+          placeholder={t('festivals.searchPlaceholder')}
           containerStyle={{marginTop: sizes._24sdp}}
           entityType="festival"
           idField="Id"
@@ -176,12 +179,12 @@ export default class FestivalsScreen extends React.PureComponent<
             <View style={[styles.rowCenter]}>
               <TextBase
                 style={[AppStyle.txt_20_bold, {marginBottom: sizes._16sdp}]}>
-                🎉 Lễ hội
+                🎉 {t('festivals.title')}
               </TextBase>
               <TouchableOpacity
                 onPress={() => {
                   NavigationService.navigate(ScreenName.VIEW_ALL_FESTIVALS, {
-                    title: 'Tất cả lễ hội',
+                    title: t('festivals.allFestivals'),
                     festivals: this.state.festivals,
                     valueSearch: '',
                   });
@@ -191,7 +194,7 @@ export default class FestivalsScreen extends React.PureComponent<
                     AppStyle.txt_18_regular,
                     {marginBottom: sizes._16sdp},
                   ]}>
-                  Xem tất cả
+                  {t('home.viewAll')}
                 </TextBase>
               </TouchableOpacity>
             </View>
@@ -213,6 +216,8 @@ export default class FestivalsScreen extends React.PureComponent<
     );
   }
 }
+
+export default withAzureTranslation(FestivalsScreen);
 
 const styles = StyleSheet.create({
   container: {

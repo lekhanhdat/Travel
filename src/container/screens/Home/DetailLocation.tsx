@@ -2,7 +2,6 @@ import React from 'react';
 import {ScrollView, View, Image, FlatList, TouchableOpacity, StyleSheet, Modal, Dimensions} from 'react-native';
 import Page from '../../../component/Page';
 import HeaderBase from '../../../component/HeaderBase';
-import strings from '../../../res/strings';
 import {BackSvg} from '../../../assets/assets/ImageSvg';
 import sizes from '../../../common/sizes';
 import colors from '../../../common/colors';
@@ -19,8 +18,12 @@ import {ScreenName} from '../../AppContainer';
 import {Button} from 'react-native-paper';
 import festivalsApi, {IFestival} from '../../../services/festivals.api';
 import SimilarItemsComponent from '../../../component/SimilarItemsComponent';
+import {
+  withAzureTranslation,
+  WithAzureTranslationProps,
+} from '../../../hoc/withAzureTranslation';
 
-interface IDetailLocationScreenProps {
+interface IDetailLocationScreenProps extends WithAzureTranslationProps {
   navigation: any;
 }
 
@@ -31,7 +34,7 @@ interface IDetailLocationScreenState {
   festivals: IFestival[];
 }
 
-export default class DetailLocationScreen extends React.PureComponent<
+class DetailLocationScreen extends React.PureComponent<
   IDetailLocationScreenProps,
   IDetailLocationScreenState
 > {
@@ -156,10 +159,11 @@ export default class DetailLocationScreen extends React.PureComponent<
 
   render(): React.ReactNode {
     const location: ILocation = this.props.navigation.state.params?.location;
+    const {t} = this.props;
     return (
       <Page>
         <HeaderBase
-          title={'Xem chi tiết'}
+          title={t('detail.viewDetail')}
           leftIconSvg={
             <BackSvg
               width={sizes._24sdp}
@@ -180,7 +184,7 @@ export default class DetailLocationScreen extends React.PureComponent<
           onRightIconOnePress={() => {
             NavigationService.navigate(ScreenName.MAP_SCREEN, {
               locations: [location],
-              showRoute: true, // ✅ Bật chỉ đường
+              showRoute: true,
             });
           }}
         />
@@ -226,7 +230,7 @@ export default class DetailLocationScreen extends React.PureComponent<
                     );
                   })}
                   <TextBase style={[AppStyle.txt_16_regular, {marginLeft: sizes._8sdp}]}>
-                    {locationApi.calculateAverageRating(location.reviews).toFixed(1)} ({location.reviews.length} đánh giá)
+                    {locationApi.calculateAverageRating(location.reviews).toFixed(1)} ({location.reviews.length})
                   </TextBase>
                 </View>
               )}
@@ -246,7 +250,7 @@ export default class DetailLocationScreen extends React.PureComponent<
                 />
                 <TextBase
                   style={[AppStyle.txt_16_medium_detail, {marginLeft: sizes._8sdp, flex: 1, textAlign: 'justify'}]}>
-                  Địa chỉ: {location.address}
+                  {t('detail.address')}: {location.address}
                 </TextBase>
               </View>
 
@@ -260,7 +264,7 @@ export default class DetailLocationScreen extends React.PureComponent<
                   />
                   <TextBase
                     style={[AppStyle.txt_16_medium_detail, {marginLeft: sizes._8sdp, flex: 1, textAlign: 'justify'}]}>
-                    Số điện thoại: {location.phone}
+                    {t('detail.phone')}: {location.phone}
                   </TextBase>
                 </View>
               )}
@@ -275,7 +279,7 @@ export default class DetailLocationScreen extends React.PureComponent<
                   />
                   <TextBase
                     style={[AppStyle.txt_16_medium_detail, {marginLeft: sizes._8sdp, flex: 1, textAlign: 'justify'}]}>
-                    Website: {location.website}
+                    {t('detail.website')}: {location.website}
                   </TextBase>
                 </View>
               )}
@@ -290,7 +294,7 @@ export default class DetailLocationScreen extends React.PureComponent<
                   />
                   <TextBase
                     style={[AppStyle.txt_16_medium_detail, {marginLeft: sizes._8sdp, flex: 1, textAlign: 'justify'}]}>
-                    Giờ mở cửa: {location.opening_hours}
+                    {t('detail.openingHours')}: {location.opening_hours}
                   </TextBase>
                 </View>
               )}
@@ -299,7 +303,7 @@ export default class DetailLocationScreen extends React.PureComponent<
               {location.images && location.images.length > 0 && (
                 <View style={{marginTop: sizes._16sdp}}>
                   <TextBase style={[AppStyle.txt_20_bold, {marginBottom: sizes._12sdp}]}>
-                    Hình ảnh địa điểm
+                    {t('detail.locationImages')}
                   </TextBase>
                   <ScrollView
                     horizontal
@@ -338,7 +342,7 @@ export default class DetailLocationScreen extends React.PureComponent<
               {this.state.festivals && this.state.festivals.length > 0 && (
                 <View style={{marginTop: sizes._16sdp}}>
                   <TextBase style={[AppStyle.txt_20_bold, {marginBottom: sizes._12sdp}]}>
-                    Lễ hội tại địa điểm
+                    {t('detail.festivalsAtLocation')}
                   </TextBase>
                   <ScrollView
                     horizontal
@@ -399,7 +403,7 @@ export default class DetailLocationScreen extends React.PureComponent<
                           {/* Price Level */}
                           <View style={{flexDirection: 'row', alignItems: 'center', marginTop: sizes._4sdp}}>
                             <TextBase style={[AppStyle.txt_14_regular, {color: colors.primary_700}]}>
-                              💰 {festival.price_level === 0 ? 'Miễn phí' : festival.price_level === 1 ? '$' : '$$'}
+                              💰 {festival.price_level === 0 ? t('priceLevel.free') : festival.price_level === 1 ? '$' : '$$'}
                             </TextBase>
                           </View>
 
@@ -423,12 +427,12 @@ export default class DetailLocationScreen extends React.PureComponent<
                 </View>
               )}
 
-              {/* Advise Section - Lời khuyên */}
+              {/* Advise Section */}
               {location.advise && (
                 <View style={{marginTop: sizes._16sdp}}>
                   <View style={{flexDirection: 'row', alignItems: 'center'}}>
                     <TextBase style={[AppStyle.txt_20_bold]}>
-                      Lời khuyên:
+                      {t('detail.advice')}:
                     </TextBase>
                   </View>
                   {(Array.isArray(location.advise)
@@ -444,7 +448,7 @@ export default class DetailLocationScreen extends React.PureComponent<
                 </View>
               )}
 
-              {/* Buttons: Địa điểm tương tự và Chỉ đường */}
+              {/* Buttons: Directions */}
               <View style={{
                 flexDirection: 'row',
                 gap: sizes._12sdp,
@@ -456,7 +460,7 @@ export default class DetailLocationScreen extends React.PureComponent<
                   onPress={() => {
                     NavigationService.navigate(ScreenName.MAP_SCREEN, {
                       locations: [location],
-                      showRoute: true, // Flag để hiển thị đường đi
+                      showRoute: true,
                     });
                   }}
                   style={{
@@ -465,7 +469,7 @@ export default class DetailLocationScreen extends React.PureComponent<
                   }}
                   labelStyle={{fontSize: 14}}
                 >
-                  Chỉ đường
+                  {t('detail.directions')}
                 </Button>
               </View>
 
@@ -474,7 +478,7 @@ export default class DetailLocationScreen extends React.PureComponent<
                 <SimilarItemsComponent
                   entityType="location"
                   entityId={location.Id || location.id!}
-                  title="Địa điểm tương tự"
+                  title={t('detail.similarLocations')}
                   limit={5}
                 />
               )}
@@ -491,7 +495,7 @@ export default class DetailLocationScreen extends React.PureComponent<
 
               <TextBase
                 style={[AppStyle.txt_20_bold, {marginBottom: sizes._20sdp}]}>
-                {'Nhận xét của du khách:'}
+                {t('detail.touristReviews')}
               </TextBase>
 
               <FlatList
@@ -599,3 +603,5 @@ export default class DetailLocationScreen extends React.PureComponent<
     );
   }
 }
+
+export default withAzureTranslation(DetailLocationScreen);

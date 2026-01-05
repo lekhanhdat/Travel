@@ -137,6 +137,8 @@ export default class SearchBarComponent<T> extends React.PureComponent<
           style={[styles.defaultSearchbar, searchbarStyle]}
           inputStyle={[styles.defaultInput, inputStyle]}
           onIconPress={this.handleSearchPress}
+          iconColor={colors.primary_950}
+          placeholderTextColor={colors.primary_600}
         />
       </View>
     );

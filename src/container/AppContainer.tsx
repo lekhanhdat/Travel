@@ -4,9 +4,9 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {useRoute} from '@react-navigation/native';
 import {StyleSheet, View, Image, TouchableOpacity} from 'react-native';
 import {TranslationProvider} from '../context/TranslationContext';
+import {useTranslation} from '../hooks/useTranslation';
 import {offlineFallback} from '../services/translation';
 import images from '../res/images';
-import strings from '../res/strings';
 import sizes from '../common/sizes';
 import TextBase from '../common/TextBase';
 import fonts from '../common/fonts';
@@ -72,6 +72,26 @@ export enum ScreenName {
   DONATION = 'Donation',
   CHATBOT = 'ChatBotScreen',
 }
+
+// Tab names as constants (used for navigation routing - do not translate)
+export const TAB_NAMES = {
+  HOME: 'TabHome',
+  FESTIVAL: 'TabFestival',
+  FEED: 'TabFeed',
+  MAP: 'TabMap',
+  CAMERA: 'TabCamera',
+  PROFILE: 'TabProfile',
+} as const;
+
+// Translation keys for tab labels
+const TAB_TRANSLATION_KEYS = {
+  [TAB_NAMES.HOME]: 'navigation.home',
+  [TAB_NAMES.FESTIVAL]: 'navigation.festivals',
+  [TAB_NAMES.FEED]: 'navigation.feed',
+  [TAB_NAMES.MAP]: 'navigation.map',
+  [TAB_NAMES.CAMERA]: 'navigation.camera',
+  [TAB_NAMES.PROFILE]: 'navigation.profile',
+} as const;
 function MyTabBar({
   state,
   _descriptors,
@@ -83,16 +103,46 @@ function MyTabBar({
   navigation: any;
   _position: any;
 }) {
+  const {t} = useTranslation();
   let refScroll = useRef(null);
 
   if (refScroll.current) {
     //@ts-ignore
     refScroll.current.scrollToIndex({index: state.index});
   }
+
+  // Get icon for tab index
+  // Active tab: dark color (colors.black)
+  // Inactive tab: light/muted color (colors.xam)
+  const getTabIcon = (index: number, isFocused: boolean) => {
+    const iconColor = isFocused ? colors.black : colors.xam;
+    switch (index) {
+      case 0:
+        return <HomeSvg width={24} height={24} fill={iconColor} />;
+      case 1:
+        return <FireworksSvg width={24} height={24} fill={iconColor} />;
+      case 2:
+        return <NewFeed width={24} height={24} fill={iconColor} />;
+      case 3:
+        return <MapSvg width={24} height={24} fill={iconColor} />;
+      case 4:
+        return <CameraSvg width={24} height={24} fill={iconColor} />;
+      case 5:
+        return <ProfileSvg width={24} height={24} fill={iconColor} />;
+      default:
+        return <HomeSvg width={24} height={24} fill={iconColor} />;
+    }
+  };
+
+  // Get translated label for tab
+  const getTabLabel = (tabName: string) => {
+    const translationKey = TAB_TRANSLATION_KEYS[tabName as keyof typeof TAB_TRANSLATION_KEYS];
+    return translationKey ? t(translationKey) : tabName;
+  };
+
   return (
     <View style={[styles.containerTab, {}]}>
       {state.routes.map((item: any, index: number) => {
-        const label = item.name;
         const isFocused = state.index === index;
 
         const onPress = () => {
@@ -114,103 +164,23 @@ function MyTabBar({
         };
         return (
           <TouchableOpacity
+            key={item.key}
             onPress={onPress}
             onLongPress={onLongPress}
             style={[styles.containerTouch]}>
-            {getSourceWithIndex(index, isFocused).icon}
+            {getTabIcon(index, isFocused)}
             <TextBase
               style={[
                 styles.title,
                 {color: isFocused ? colors.black : colors.xam},
               ]}>
-              {getSourceWithIndex(index, isFocused).name}
+              {getTabLabel(item.name)}
             </TextBase>
           </TouchableOpacity>
         );
       })}
     </View>
   );
-}
-function getSourceWithIndex(key: number, isFocused: boolean) {
-  switch (key) {
-    case 0:
-      if (isFocused) {
-        return {
-          icon: <HomeSvg width={24} height={24} fill={colors.black} />,
-          name: strings.home_page,
-        };
-      }
-      return {
-        icon: <HomeSvg width={24} height={24} />,
-        name: strings.home_page,
-      };
-    case 1:
-      if (isFocused) {
-        return {
-          icon: <FireworksSvg width={24} height={24} fill={colors.black} />,
-          name: strings.festival,
-        };
-      }
-      return {
-        icon: <FireworksSvg width={24} height={24} />,
-        name: strings.festival,
-      };
-    case 2:
-      if (isFocused) {
-        return {
-          icon: <NewFeed width={24} height={24} fill={colors.black} />,
-          name: strings.new_feed,
-        };
-      }
-      return {
-        icon: <NewFeed width={24} height={24} />,
-        name: strings.new_feed,
-      };
-    case 3:
-      if (isFocused) {
-        return {
-          icon: <MapSvg width={24} height={24} fill={colors.black} />,
-          name: strings.map,
-        };
-      }
-      return {
-        icon: <MapSvg width={24} height={24} fill={'#DDDDDD'} />,
-        name: strings.map,
-      };
-    case 4:
-      if (isFocused) {
-        return {
-          icon: <CameraSvg width={24} height={24} fill={colors.black} />,
-          name: strings.camera,
-        };
-      }
-      return {
-        icon: <CameraSvg width={24} height={24} />,
-        name: strings.camera,
-      };
-    case 5:
-      if (isFocused) {
-        return {
-          icon: <ProfileSvg width={24} height={24} fill={colors.black} />,
-          name: strings.profile,
-        };
-      }
-      return {
-        icon: <ProfileSvg width={24} height={24} />,
-        name: strings.profile,
-      };
-    default:
-      if (isFocused) {
-        return {
-          icon: <HomeSvg width={24} height={24} fill={colors.black} />,
-          name: strings.home_page,
-        };
-      }
-      return {
-        icon: <HomeSvg width={24} height={24} />,
-        name: strings.home_page,
-      };
-  }
 }
 const Tabs = createBottomTabNavigator();
 function HomeStack() {
@@ -219,34 +189,27 @@ function HomeStack() {
   const tabIndex = route.params?.tabIndex ?? 0;
   const getRouterFromProp = () => {
     switch (Number(tabIndex)) {
-      case 0: {
-        return strings.home_page;
-      }
-      case 1: {
-        return strings.festival;
-      }
-      case 2: {
-        return strings.new_feed;
-      }
-      case 3: {
-        return strings.map;
-      }
-      case 4: {
-        return strings.camera;
-      }
-      case 5: {
-        return strings.profile;
-      }
-      default: {
-        return strings.home_page;
-      }
+      case 0:
+        return TAB_NAMES.HOME;
+      case 1:
+        return TAB_NAMES.FESTIVAL;
+      case 2:
+        return TAB_NAMES.FEED;
+      case 3:
+        return TAB_NAMES.MAP;
+      case 4:
+        return TAB_NAMES.CAMERA;
+      case 5:
+        return TAB_NAMES.PROFILE;
+      default:
+        return TAB_NAMES.HOME;
     }
   };
   return (
     <View style={styles.container}>
       <Tabs.Navigator
         key={getRouterFromProp()}
-        initialRouteName={strings.home_page}
+        initialRouteName={TAB_NAMES.HOME}
         screenOptions={{
           headerShown: false,
         }}
@@ -254,7 +217,7 @@ function HomeStack() {
           <MyTabBar _descriptors={undefined} _position={undefined} {...props} />
         )}>
         <Tabs.Screen
-          name={strings.home_page}
+          name={TAB_NAMES.HOME}
           component={HomeScreen}
           options={{
             tabBarIcon: ({focused}) => (
@@ -269,7 +232,7 @@ function HomeStack() {
           }}
         />
         <Tabs.Screen
-          name={strings.festival}
+          name={TAB_NAMES.FESTIVAL}
           component={FestivalsScreen}
           options={{
             tabBarIcon: ({focused}) => (
@@ -286,7 +249,7 @@ function HomeStack() {
           }}
         />
         <Tabs.Screen
-          name={strings.new_feed}
+          name={TAB_NAMES.FEED}
           component={NewFeedScreen}
           options={{
             tabBarIcon: ({focused}) => (
@@ -301,7 +264,7 @@ function HomeStack() {
           }}
         />
         <Tabs.Screen
-          name={strings.map}
+          name={TAB_NAMES.MAP}
           component={MapsScreen}
           options={{
             tabBarIcon: ({focused}) => (
@@ -314,7 +277,7 @@ function HomeStack() {
           }}
         />
         <Tabs.Screen
-          name={strings.camera}
+          name={TAB_NAMES.CAMERA}
           component={CameraScreen}
           options={{
             tabBarIcon: ({focused}) => (
@@ -327,7 +290,7 @@ function HomeStack() {
           }}
         />
         <Tabs.Screen
-          name={strings.profile}
+          name={TAB_NAMES.PROFILE}
           component={ProfileScreen}
           options={{
             tabBarIcon: ({focused}) => (

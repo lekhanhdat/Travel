@@ -2,7 +2,6 @@ import React from 'react';
 import {ScrollView, View, Image, FlatList, TouchableOpacity, StyleSheet, Modal, Dimensions} from 'react-native';
 import Page from '../../../component/Page';
 import HeaderBase from '../../../component/HeaderBase';
-import strings from '../../../res/strings';
 import {BackSvg, Clock, CardSvg, ThunderSvg} from '../../../assets/assets/ImageSvg';
 import sizes from '../../../common/sizes';
 import colors from '../../../common/colors';
@@ -18,8 +17,12 @@ import {MapSvg} from '../../../assets/ImageSvg';
 import {ScreenName} from '../../AppContainer';
 import {Button} from 'react-native-paper';
 import SimilarItemsComponent from '../../../component/SimilarItemsComponent';
+import {
+  withAzureTranslation,
+  WithAzureTranslationProps,
+} from '../../../hoc/withAzureTranslation';
 
-interface IDetailFestivalScreenProps {
+interface IDetailFestivalScreenProps extends WithAzureTranslationProps {
   navigation: any;
 }
 
@@ -29,7 +32,7 @@ interface IDetailFestivalScreenState {
   selectedImageIndex: number;
 }
 
-export default class DetailFestivalScreen extends React.PureComponent<
+class DetailFestivalScreen extends React.PureComponent<
   IDetailFestivalScreenProps,
   IDetailFestivalScreenState
 > {
@@ -106,6 +109,7 @@ export default class DetailFestivalScreen extends React.PureComponent<
 
   render(): React.ReactNode {
     const festival: IFestival = this.props.navigation.state.params?.festival;
+    const {t} = this.props;
 
     // Get first image or use placeholder
     const festivalImage = festival.images && festival.images.length > 0
@@ -117,7 +121,7 @@ export default class DetailFestivalScreen extends React.PureComponent<
     return (
       <Page>
         <HeaderBase
-          title={'Chi tiết lễ hội'}
+          title={t('detail.festivalDetail')}
           leftIconSvg={
             <BackSvg
               width={sizes._24sdp}
@@ -170,7 +174,7 @@ export default class DetailFestivalScreen extends React.PureComponent<
                     );
                   })}
                   <TextBase style={[AppStyle.txt_16_regular, {marginLeft: sizes._8sdp}]}>
-                    {avgRating.toFixed(1)} ({festival.reviews.length} đánh giá)
+                    {avgRating.toFixed(1)} ({festival.reviews.length})
                   </TextBase>
                 </View>
               )}
@@ -190,7 +194,7 @@ export default class DetailFestivalScreen extends React.PureComponent<
                 />
                 <TextBase
                   style={[AppStyle.txt_16_medium_detail, {marginLeft: sizes._8sdp, flex: 1, textAlign: 'justify'}]}>
-                  Thời gian: {festival.event_time}
+                  {t('detail.eventTime')}: {festival.event_time}
                 </TextBase>
               </View>
 
@@ -203,7 +207,7 @@ export default class DetailFestivalScreen extends React.PureComponent<
                 />
                 <TextBase
                   style={[AppStyle.txt_16_medium_detail, {marginLeft: sizes._8sdp, flex: 1, textAlign: 'justify'}]}>
-                  Địa điểm: {festival.location}
+                  {t('detail.location')}: {festival.location}
                 </TextBase>
               </View>
 
@@ -216,8 +220,8 @@ export default class DetailFestivalScreen extends React.PureComponent<
                 />
                 <TextBase
                   style={[AppStyle.txt_16_medium_detail, {marginLeft: sizes._8sdp, flex: 1, textAlign: 'justify'}]}>
-                  Phí: {festival.price_level === 0 ? 'Miễn phí' :
-                       festival.price_level === 1 ? 'Có phí' : 'Cao cấp'}
+                  {t('detail.fee')}: {festival.price_level === 0 ? t('priceLevel.free') :
+                       festival.price_level === 1 ? t('priceLevel.paid') : t('priceLevel.premium')}
                   {festival.ticket_info && ` (${festival.ticket_info})`}
                 </TextBase>
               </View>
@@ -232,7 +236,7 @@ export default class DetailFestivalScreen extends React.PureComponent<
                       color={colors.primary}
                     />
                     <TextBase style={[AppStyle.txt_16_medium_detail, {marginLeft: sizes._8sdp}]}>
-                      Lời khuyên:
+                      {t('detail.advice')}:
                     </TextBase>
                   </View>
                   {festival.advise.map((advice, index) => (
@@ -249,7 +253,7 @@ export default class DetailFestivalScreen extends React.PureComponent<
               {festival.images && festival.images.length > 0 && (
                 <View style={{marginTop: sizes._16sdp}}>
                   <TextBase style={[AppStyle.txt_20_bold, {marginBottom: sizes._12sdp}]}>
-                    Hình ảnh lễ hội
+                    {t('detail.festivalImages')}
                   </TextBase>
                   <ScrollView
                     horizontal
@@ -284,7 +288,7 @@ export default class DetailFestivalScreen extends React.PureComponent<
                 </View>
               )}
 
-              {/* Buttons: Lễ hội tương tự */}
+              {/* Buttons: Similar Festivals */}
               <View style={{
                 marginTop: sizes._16sdp,
               }}>
@@ -295,13 +299,12 @@ export default class DetailFestivalScreen extends React.PureComponent<
                     const similarFestivals = this.getSimilarFestivals(festival);
                     if (similarFestivals.length > 0) {
                       NavigationService.navigate(ScreenName.VIEW_ALL_FESTIVALS, {
-                        title: 'Lễ hội tương tự',
+                        title: t('detail.similarFestivals'),
                         festivals: similarFestivals,
-                        valueSearch: '', // Không cần search
+                        valueSearch: '',
                       });
                     } else {
                       console.log('⚠️ No similar festivals found');
-                      // TODO: Show toast/alert to user
                     }
                   }}
                   style={{
@@ -313,7 +316,7 @@ export default class DetailFestivalScreen extends React.PureComponent<
                     color: colors.primary,
                   }}
                 >
-                  Lễ hội tương tự
+                  {t('detail.similarFestivals')}
                 </Button>
               </View>
 
@@ -322,7 +325,7 @@ export default class DetailFestivalScreen extends React.PureComponent<
                 <SimilarItemsComponent
                   entityType="festival"
                   entityId={festival.Id}
-                  title="Lễ hội tương tự (AI gợi ý)"
+                  title={t('detail.similarFestivalsAI')}
                   limit={5}
                 />
               )}
@@ -339,7 +342,7 @@ export default class DetailFestivalScreen extends React.PureComponent<
 
               <TextBase
                 style={[AppStyle.txt_20_bold, {marginBottom: sizes._20sdp}]}>
-                {'Nhận xét của du khách:'}
+                {t('detail.touristReviews')}
               </TextBase>
 
               <FlatList
@@ -448,3 +451,4 @@ export default class DetailFestivalScreen extends React.PureComponent<
   }
 }
 
+export default withAzureTranslation(DetailFestivalScreen);

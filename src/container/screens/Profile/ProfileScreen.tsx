@@ -9,7 +9,6 @@ import {
 } from 'react-native';
 import Page from '../../../component/Page';
 import HeaderBase from '../../../component/HeaderBase';
-import strings from '../../../res/strings';
 import TextBase from '../../../common/TextBase';
 import sizes from '../../../common/sizes';
 import colors from '../../../common/colors';
@@ -23,10 +22,11 @@ import {localStorageKey} from '../../../common/constants';
 import {Avatar, getDisplayName} from '../../../utils/avatarUtils';
 import {UserSvg} from '../../../assets/assets/ImageSvg';
 import {Button} from 'react-native-paper';
+import {withAzureTranslation, WithAzureTranslationProps} from '../../../hoc/withAzureTranslation';
 
 const {StatusBarManager} = NativeModules;
 
-interface IProfileScreenProps {
+interface IProfileScreenProps extends WithAzureTranslationProps {
   navigation?: any;
 }
 
@@ -34,7 +34,7 @@ interface IProfileScreenState {
   account?: IAccount | null;
 }
 
-export default class ProfileScreen extends React.PureComponent<
+class ProfileScreen extends React.PureComponent<
   IProfileScreenProps,
   IProfileScreenState
 > {
@@ -76,9 +76,10 @@ export default class ProfileScreen extends React.PureComponent<
 
   render(): React.ReactNode {
     const {account} = this.state;
+    const {t} = this.props;
     return (
       <Page>
-        <HeaderBase hideLeftIcon title={strings.profile} />
+        <HeaderBase hideLeftIcon title={t('profile.title')} />
         <View style={styles.container}>
           {/* <TextBase style={[AppStyle.txt_20_bold]}>Thông tin cá nhân</TextBase> */}
 
@@ -123,7 +124,7 @@ export default class ProfileScreen extends React.PureComponent<
               justifyContent: 'space-between',
             }}>
             <TextBase style={AppStyle.txt_18_bold}>
-              {'Trợ lý AI'}
+              {t('profile.aiAssistant')}
             </TextBase>
             <TouchableOpacity
               style={{
@@ -153,7 +154,7 @@ export default class ProfileScreen extends React.PureComponent<
               marginTop: sizes._16sdp,
             }}>
             <TextBase style={AppStyle.txt_18_bold}>
-              {'Gọi hỗ trợ / khẩn cấp SOS'}
+              {t('profile.emergencyCall')}
             </TextBase>
             <TouchableOpacity
               style={{
@@ -181,7 +182,7 @@ export default class ProfileScreen extends React.PureComponent<
               marginTop: sizes._16sdp,
             }}>
             <TextBase style={AppStyle.txt_18_bold}>
-              {'Thông tin tài khoản'}
+              {t('profile.accountInfo')}
             </TextBase>
             <TouchableOpacity
               style={{
@@ -211,7 +212,7 @@ export default class ProfileScreen extends React.PureComponent<
               justifyContent: 'space-between',
               marginTop: sizes._16sdp,
             }}>
-            <TextBase style={AppStyle.txt_18_bold}>{'Donation'}</TextBase>
+            <TextBase style={AppStyle.txt_18_bold}>{t('profile.donation')}</TextBase>
             <TouchableOpacity
               style={{
                 width: sizes._56sdp,
@@ -259,7 +260,7 @@ export default class ProfileScreen extends React.PureComponent<
               alignItems: 'center',
               justifyContent: 'space-between',
             }}>
-            <TextBase style={AppStyle.txt_18_bold}>{'Cài đặt'}</TextBase>
+            <TextBase style={AppStyle.txt_18_bold}>{t('profile.settings')}</TextBase>
             <TouchableOpacity
               style={{
                 width: sizes._56sdp,
@@ -288,7 +289,7 @@ export default class ProfileScreen extends React.PureComponent<
               marginTop: sizes._16sdp,
             }}>
             <TextBase style={AppStyle.txt_18_bold}>
-              {'Các câu hỏi thường gặp'}
+              {t('profile.faq')}
             </TextBase>
             <TouchableOpacity
               style={{
@@ -318,7 +319,7 @@ export default class ProfileScreen extends React.PureComponent<
               marginTop: sizes._16sdp,
             }}>
             <TextBase style={AppStyle.txt_18_bold}>
-              {'Chính sách & bảo mật'}
+              {t('profile.policy')}
             </TextBase>
             <TouchableOpacity
               style={{
@@ -348,7 +349,7 @@ export default class ProfileScreen extends React.PureComponent<
               marginTop: sizes._16sdp,
             }}>
             <TextBase style={AppStyle.txt_18_bold}>
-              {'Thông tin ứng dụng'}
+              {t('profile.about')}
             </TextBase>
             <TouchableOpacity
               style={{
@@ -373,11 +374,11 @@ export default class ProfileScreen extends React.PureComponent<
           <View style={{marginTop: sizes._26sdp, marginHorizontal: sizes._26sdp}}>
             <Button
               mode="contained"
-              labelStyle={{ fontSize: 16, height: sizes._30sdp, textAlignVertical: 'center', color: '#B22222' }} // Tăng kích thước chữ
+              labelStyle={{ fontSize: 16, height: sizes._30sdp, textAlignVertical: 'center', color: '#B22222' }}
               onPress={() => {
                 NavigationService.reset(ScreenName.LOGIN_SCREEN);
               }}>
-              Đăng xuất
+              {t('profile.logout')}
             </Button>
             {/* <TouchableOpacity
               style={[styles.btn]}
@@ -409,3 +410,5 @@ const styles = StyleSheet.create({
     marginTop: sizes._16sdp,
   },
 });
+
+export default withAzureTranslation(ProfileScreen);

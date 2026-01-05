@@ -317,6 +317,8 @@ export default class SemanticSearchBarComponent<T> extends React.PureComponent<
           style={styles.searchbar}
           inputStyle={styles.input}
           loading={isSearching}
+          iconColor={colors.primary_950}
+          placeholderTextColor={colors.primary_600}
         />
       </View>
     );

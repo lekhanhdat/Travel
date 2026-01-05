@@ -2,7 +2,6 @@ import React from 'react';
 import { FlatList, View, TouchableOpacity, Modal, StyleSheet } from 'react-native';
 import Page from '../../../component/Page';
 import HeaderBase from '../../../component/HeaderBase';
-import strings from '../../../res/strings';
 import { BackSvg } from '../../../assets/assets/ImageSvg';
 import sizes from '../../../common/sizes';
 import colors from '../../../common/colors';
@@ -12,12 +11,17 @@ import NavigationService from '../NavigationService';
 import { convertCitationVietnameseUnsigned } from '../../../utils/Utils';
 import TextBase from '../../../common/TextBase';
 import { AppStyle } from '../../../common/AppStyle';
+import {
+  withAzureTranslation,
+  WithAzureTranslationProps,
+} from '../../../hoc/withAzureTranslation';
 
 type SearchFilterType = 'all' | 'name' | 'address' | 'description';
 type SearchModeType = 'semantic' | 'keyword';
 
-interface IViewAllLocationProps {
+interface IViewAllLocationProps extends WithAzureTranslationProps {
   navigation: any;
+  route: any; // React Navigation v5+ route prop
 }
 
 interface IViewAllLocationState {
@@ -28,14 +32,20 @@ interface IViewAllLocationState {
   searchMode: SearchModeType; // Toggle between AI and keyword search
 }
 
-export default class ViewAllLocation extends React.PureComponent<
+// Helper to get params from either route (v5+) or navigation.state (v4)
+const getParams = (props: IViewAllLocationProps) => {
+  return props.route?.params || props.navigation?.state?.params || {};
+};
+
+class ViewAllLocation extends React.PureComponent<
   IViewAllLocationProps,
   IViewAllLocationState
 > {
   constructor(props: IViewAllLocationProps) {
     super(props);
     // Get initial search mode from navigation params
-    const isSemanticSearch = props.navigation.state.params?.isSemanticSearch ?? true;
+    const params = getParams(props);
+    const isSemanticSearch = params.isSemanticSearch ?? true;
     this.state = {
       locations: [],
       allLocations: [],
@@ -50,7 +60,8 @@ export default class ViewAllLocation extends React.PureComponent<
   }
 
   initializeLocations = () => {
-    const locationsIn: ILocation[] = this.props.navigation.state.params?.locations ?? [];
+    const params = getParams(this.props);
+    const locationsIn: ILocation[] = params.locations ?? [];
     // Store all locations for mode switching
     this.setState({ allLocations: locationsIn }, () => {
       this.filterLocations();
@@ -59,7 +70,8 @@ export default class ViewAllLocation extends React.PureComponent<
 
   filterLocations = () => {
     const {allLocations, searchMode, selectedFilter} = this.state;
-    const valueSearch: string = this.props.navigation.state.params?.valueSearch ?? '';
+    const params = getParams(this.props);
+    const valueSearch: string = params.valueSearch ?? '';
 
     if (__DEV__) {console.log('📋 Filtering with mode:', searchMode, 'filter:', selectedFilter);}
 
@@ -139,17 +151,18 @@ export default class ViewAllLocation extends React.PureComponent<
   };
 
   getFilterLabel = (filter: SearchFilterType): string => {
+    const {t} = this.props;
     switch (filter) {
       case 'all':
-        return 'Tất cả';
+        return t('search.filterAll');
       case 'name':
-        return 'Tên';
+        return t('search.filterName');
       case 'address':
-        return 'Địa chỉ';
+        return t('search.filterAddress');
       case 'description':
-        return 'Mô tả';
+        return t('search.filterDescription');
       default:
-        return 'Tất cả';
+        return t('search.filterAll');
     }
   };
 
@@ -178,12 +191,14 @@ export default class ViewAllLocation extends React.PureComponent<
 
   render(): React.ReactNode {
     const {searchMode, locations} = this.state;
+    const {t} = this.props;
+    const params = getParams(this.props);
     const isSemanticMode = searchMode === 'semantic';
 
     return (
       <Page>
         <HeaderBase
-          title={this.props.navigation.state.params?.title ?? ''}
+          title={params.title ?? ''}
           leftIconSvg={
             <BackSvg
               width={sizes._24sdp}
@@ -220,7 +235,7 @@ export default class ViewAllLocation extends React.PureComponent<
               style={styles.filterButton}
               onPress={() => this.setState({ filterModalVisible: true })}>
               <TextBase style={styles.filterButtonText}>
-                🔍 Tìm kiếm theo: {this.getFilterLabel(this.state.selectedFilter)}
+                🔍 {t('home.search')}: {this.getFilterLabel(this.state.selectedFilter)}
               </TextBase>
               <TextBase style={styles.filterButtonIcon}>▼</TextBase>
             </TouchableOpacity>
@@ -228,7 +243,7 @@ export default class ViewAllLocation extends React.PureComponent<
 
           {/* Results count */}
           <TextBase style={styles.resultsCount}>
-            {locations.length} kết quả {isSemanticMode ? '(sắp xếp theo độ liên quan)' : ''}
+            {locations.length} {t('search.results')} {isSemanticMode ? `(${t('search.sortedByRelevance')})` : ''}
           </TextBase>
 
           <FlatList
@@ -255,14 +270,14 @@ export default class ViewAllLocation extends React.PureComponent<
             <View style={styles.modalContent}>
               <View style={styles.modalHeader}>
                 <TextBase style={styles.modalTitle}>
-                  Chọn loại tìm kiếm
+                  {t('search.filterAll')}
                 </TextBase>
               </View>
               <View style={styles.filterOptionsContainer}>
-                {this.renderFilterOption('all', 'Tất cả')}
-                {this.renderFilterOption('name', 'Tên')}
-                {this.renderFilterOption('address', 'Địa chỉ')}
-                {this.renderFilterOption('description', 'Mô tả')}
+                {this.renderFilterOption('all', t('search.filterAll'))}
+                {this.renderFilterOption('name', t('search.filterName'))}
+                {this.renderFilterOption('address', t('search.filterAddress'))}
+                {this.renderFilterOption('description', t('search.filterDescription'))}
               </View>
             </View>
           </TouchableOpacity>
@@ -271,6 +286,8 @@ export default class ViewAllLocation extends React.PureComponent<
     );
   }
 }
+
+export default withAzureTranslation(ViewAllLocation);
 
 const styles = StyleSheet.create({
   filterButton: {

@@ -25,6 +25,7 @@ import {
 
 interface IDetailLocationScreenProps extends WithAzureTranslationProps {
   navigation: any;
+  route: any;
 }
 
 interface IDetailLocationScreenState {
@@ -54,7 +55,7 @@ class DetailLocationScreen extends React.PureComponent<
     this.setState({ allLocations: locations });
 
     // Load festivals cho địa điểm này
-    const location: ILocation = this.props.navigation.state.params?.location;
+    const location: ILocation = this.props.route.params?.location;
     if (location.Id || location.id) {
       const locationId = location.Id || location.id;
       try {
@@ -158,7 +159,7 @@ class DetailLocationScreen extends React.PureComponent<
   };
 
   render(): React.ReactNode {
-    const location: ILocation = this.props.navigation.state.params?.location;
+    const location: ILocation = this.props.route.params?.location;
     const {t} = this.props;
     return (
       <Page>

@@ -3,13 +3,12 @@
  * Displays personalized recommendations on the HomeScreen
  */
 
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {
   View,
   StyleSheet,
   FlatList,
   TouchableOpacity,
-  Image,
   ActivityIndicator,
 } from 'react-native';
 import TextBase from '../common/TextBase';
@@ -18,6 +17,7 @@ import sizes from '../common/sizes';
 import colors from '../common/colors';
 import NavigationService from '../container/screens/NavigationService';
 import {ScreenName} from '../container/AppContainer';
+import BigItemLocation from './BigItemLocation';
 import {
   getRecommendations,
   Recommendation,
@@ -97,8 +97,9 @@ const RecommendationsWidget: React.FC<RecommendationsWidgetProps> = ({
         }
       } else if (rec.entity_type === 'festival') {
         fullData = festivals.find(fest => fest.Id === rec.entity_id);
-        if (fullData) {
-          avatar = fullData.avatar || (fullData.images?.[0]) || avatar;
+        // Festival hiện chưa dùng UI BigItem, giữ avatar gốc nếu có
+        if (fullData && (fullData as any)?.images?.length) {
+          avatar = (fullData as any).images?.[0] || avatar;
         }
       }
 
@@ -120,39 +121,23 @@ const RecommendationsWidget: React.FC<RecommendationsWidgetProps> = ({
     }
   };
 
-  const getEntityLabel = (type: EntityType): string => {
-    switch (type) {
-      case 'location': return 'Địa điểm';
-      case 'festival': return 'Lễ hội';
-      case 'item': return 'Hiện vật';
-      default: return '';
-    }
-  };
+  // IMPORTANT: useMemo must be called before any early returns to follow Rules of Hooks
+  const locationRecommendations = useMemo(
+    () => recommendations.filter(rec => rec.entity_type === 'location'),
+    [recommendations],
+  );
 
   const renderItem = ({item}: {item: EnrichedRecommendation}) => (
-    <TouchableOpacity
-      style={styles.itemContainer}
+    <BigItemLocation
+      location={
+        item.fullData || {
+          name: item.name,
+          description: item.reason,
+          avatar: item.avatar || 'https://via.placeholder.com/200',
+        }
+      }
       onPress={() => handleItemPress(item)}
-      activeOpacity={0.8}>
-      <Image
-        source={{uri: item.avatar || 'https://via.placeholder.com/160'}}
-        style={styles.itemImage}
-        resizeMode="cover"
-      />
-      <View style={styles.overlay}>
-        <View style={styles.typeTag}>
-          <TextBase style={styles.typeText}>{getEntityLabel(item.entity_type)}</TextBase>
-        </View>
-      </View>
-      <View style={styles.itemInfo}>
-        <TextBase style={styles.itemName} numberOfLines={2}>
-          {item.name}
-        </TextBase>
-        <TextBase style={styles.reasonText} numberOfLines={1}>
-          {item.reason}
-        </TextBase>
-      </View>
-    </TouchableOpacity>
+    />
   );
 
   if (loading) {
@@ -164,7 +149,7 @@ const RecommendationsWidget: React.FC<RecommendationsWidgetProps> = ({
     );
   }
 
-  if (error || recommendations.length === 0) {
+  if (error || locationRecommendations.length === 0) {
     return null;
   }
 
@@ -173,22 +158,22 @@ const RecommendationsWidget: React.FC<RecommendationsWidgetProps> = ({
       <View style={styles.headerRow}>
         <TextBase style={[AppStyle.txt_20_bold]}>{title}</TextBase>
         <TouchableOpacity onPress={fetchRecommendations} testID="refresh-button">
-          <TextBase
-          style={[
-            AppStyle.txt_18_regular,
-            {marginBottom: sizes._16sdp},
-            ]}>
+          <TextBase style={[AppStyle.txt_18_regular]}>
             Làm mới
           </TextBase>
         </TouchableOpacity>
       </View>
       <FlatList
-        data={recommendations}
+        data={locationRecommendations}
         renderItem={renderItem}
         keyExtractor={item => `${item.entity_type}_${item.entity_id}`}
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.listContent}
+        initialNumToRender={5}
+        maxToRenderPerBatch={5}
+        windowSize={5}
+        removeClippedSubviews
       />
     </View>
   );
@@ -196,14 +181,13 @@ const RecommendationsWidget: React.FC<RecommendationsWidgetProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: sizes._24sdp,
-    marginBottom: sizes._16sdp,
+    marginBottom: sizes._8sdp,
+    // paddingBottom: sizes._8sdp, // tạo khoảng trống để bóng không bị cắt ở đáy
   },
   headerRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: sizes._12sdp,
   },
   refreshText: {
     fontSize: sizes._14sdp,
@@ -220,53 +204,7 @@ const styles = StyleSheet.create({
   },
   listContent: {
     paddingRight: sizes._16sdp,
-  },
-  itemContainer: {
-    width: sizes._160sdp,
-    marginRight: sizes._12sdp,
-    backgroundColor: colors.white,
-    borderRadius: sizes._12sdp,
-    overflow: 'hidden',
-    shadowColor: colors.black,
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  itemImage: {
-    width: '100%',
-    height: sizes._120sdp,
-    backgroundColor: colors.primary_100,
-  },
-  overlay: {
-    position: 'absolute',
-    top: sizes._8sdp,
-    left: sizes._8sdp,
-  },
-  typeTag: {
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
-    paddingHorizontal: sizes._8sdp,
-    paddingVertical: sizes._4sdp,
-    borderRadius: sizes._4sdp,
-  },
-  typeText: {
-    fontSize: sizes._10sdp,
-    color: colors.white,
-    fontWeight: '600',
-  },
-  itemInfo: {
-    padding: sizes._10sdp,
-  },
-  itemName: {
-    fontSize: sizes._14sdp,
-    fontWeight: '600',
-    color: colors.primary_950,
-    marginBottom: sizes._4sdp,
-  },
-  reasonText: {
-    fontSize: sizes._11sdp,
-    color: colors.primary_500,
-    fontStyle: 'italic',
+    paddingVertical: sizes._14sdp, // thêm đệm để shadow item có khoảng hiển thị
   },
 });
 

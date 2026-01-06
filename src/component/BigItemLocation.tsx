@@ -11,6 +11,7 @@ import CachedImage from './CachedImage';
 
 interface IBigItemLocationProps {
   location: ILocation;
+  onPress?: () => void;
 }
 
 interface IBigItemLocationState {}
@@ -24,11 +25,15 @@ export default class BigItemLocation extends React.PureComponent<
     this.state = {};
   }
   render(): React.ReactNode {
-    const {location} = this.props;
+    const {location, onPress} = this.props;
     return (
       <TouchableOpacity
         style={styles.container}
         onPress={() => {
+          if (onPress) {
+            onPress();
+            return;
+          }
           NavigationService.navigate(ScreenName.DETAIL_LOCATION_SCREEN, {
             location: location,
           });

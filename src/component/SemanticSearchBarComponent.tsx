@@ -7,6 +7,7 @@
 import React from 'react';
 import {View, StyleSheet} from 'react-native';
 import {Searchbar} from 'react-native-paper';
+import Svg, {Circle, Line} from 'react-native-svg';
 import colors from '../common/colors';
 import sizes from '../common/sizes';
 import {convertCitationVietnameseUnsigned} from '../utils/Utils';
@@ -15,6 +16,42 @@ import {
   EntityType,
   debounce,
 } from '../services/semantic.api';
+
+/**
+ * Custom Search Icon Component using react-native-svg
+ * Simple magnifying glass icon with circle and handle line
+ */
+const SearchIcon: React.FC<{color?: string; size?: number}> = ({
+  color = colors.primary_950,
+  size = 24,
+}) => (
+  <Svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+  >
+    {/* Magnifying glass circle */}
+    <Circle
+      cx="10"
+      cy="10"
+      r="7"
+      stroke={color}
+      strokeWidth="2"
+      fill="none"
+    />
+    {/* Handle line */}
+    <Line
+      x1="15.5"
+      y1="15.5"
+      x2="21"
+      y2="21"
+      stroke={color}
+      strokeWidth="2"
+      strokeLinecap="round"
+    />
+  </Svg>
+);
 
 interface SemanticSearchBarComponentProps<T> {
   data: T[];
@@ -317,7 +354,7 @@ export default class SemanticSearchBarComponent<T> extends React.PureComponent<
           style={styles.searchbar}
           inputStyle={styles.input}
           loading={isSearching}
-          iconColor={colors.primary_950}
+          icon={() => <SearchIcon color={colors.primary_950} size={24} />}
           placeholderTextColor={colors.primary_600}
         />
       </View>

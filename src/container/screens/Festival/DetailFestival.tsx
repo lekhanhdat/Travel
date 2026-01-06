@@ -24,6 +24,7 @@ import {
 
 interface IDetailFestivalScreenProps extends WithAzureTranslationProps {
   navigation: any;
+  route: any;
 }
 
 interface IDetailFestivalScreenState {
@@ -108,7 +109,7 @@ class DetailFestivalScreen extends React.PureComponent<
   };
 
   render(): React.ReactNode {
-    const festival: IFestival = this.props.navigation.state.params?.festival;
+    const festival: IFestival = this.props.route.params?.festival;
     const {t} = this.props;
 
     // Get first image or use placeholder

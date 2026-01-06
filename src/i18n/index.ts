@@ -62,7 +62,7 @@ i18n
     },
     
     // React Native specific settings
-    compatibilityJSON: 'v4', // For React Native compatibility
+    compatibilityJSON: 'v3', // For React Native compatibility - v3 avoids Intl.PluralRules requirement
     
     // Debug mode (disable in production)
     debug: __DEV__,

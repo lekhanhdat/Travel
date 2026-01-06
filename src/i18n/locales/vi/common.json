@@ -247,7 +247,18 @@
     "enable": "Bật",
     "disable": "Tắt",
     "on": "Bật",
-    "off": "Tắt"
+    "off": "Tắt",
+    "similar": "Tương đồng",
+    "exploreDanang": "Khám phá Đà Nẵng",
+    "version": "Phiên bản {{version}}",
+    "youAreHere": "Bạn đang ở đây!",
+    "offlineMode": "Chế độ Ngoại tuyến",
+    "trafficLayerEnabled": "Đã bật lớp Giao thông",
+    "trafficClear": "Thông thoáng",
+    "trafficCongested": "Tắc nghẽn",
+    "suggestionsForYou": "Gợi ý cho bạn",
+    "noInternet": "Không có kết nối Internet",
+    "showAll": "Xem tất cả"
   },
   "permissions": {
     "locationTitle": "Quyền truy cập vị trí",

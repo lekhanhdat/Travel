@@ -5,9 +5,10 @@
  */
 
 import React from 'react';
-import {View, StyleSheet} from 'react-native';
+import {View, StyleSheet, TouchableOpacity} from 'react-native';
 import {Searchbar} from 'react-native-paper';
 import Svg, {Circle, Line} from 'react-native-svg';
+import {CloseSvg} from '../assets/ImageSvg';
 import colors from '../common/colors';
 import sizes from '../common/sizes';
 import {convertCitationVietnameseUnsigned} from '../utils/Utils';
@@ -355,6 +356,17 @@ export default class SemanticSearchBarComponent<T> extends React.PureComponent<
           inputStyle={styles.input}
           loading={isSearching}
           icon={() => <SearchIcon color={colors.primary_950} size={24} />}
+          clearIcon={() => searchValue.length > 0 ? (
+            <TouchableOpacity
+              onPress={() => {
+                this.setState({searchValue: ''});
+                this.props.onSearch(this.props.data, '', this.state.useSemanticSearch);
+              }}
+              style={styles.clearButton}
+            >
+              <CloseSvg width={20} height={20} color={colors.primary_700} />
+            </TouchableOpacity>
+          ) : null}
           placeholderTextColor={colors.primary_600}
         />
       </View>
@@ -383,6 +395,10 @@ const styles = StyleSheet.create({
   input: {
     color: colors.black,
     fontFamily: 'GoogleSans_Regular',
+  },
+  clearButton: {
+    padding: sizes._4sdp,
+    marginRight: sizes._4sdp,
   },
 });
 

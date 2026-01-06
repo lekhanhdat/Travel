@@ -13,7 +13,7 @@ import {AppStyle} from '../../../common/AppStyle';
 import ReviewItem from '../../../component/ReviewItem';
 import festivalsApi from '../../../services/festivals.api';
 import {StarActive, StarInActive} from '../../../assets/assets/ImageSvg';
-import {MapSvg} from '../../../assets/ImageSvg';
+import {MapSvg, CalendarSearchSvg} from '../../../assets/ImageSvg';
 import {ScreenName} from '../../AppContainer';
 import {Button} from 'react-native-paper';
 import SimilarItemsComponent from '../../../component/SimilarItemsComponent';
@@ -259,13 +259,18 @@ class DetailFestivalScreen extends React.PureComponent<
                       {t('detail.advice')}:
                     </TextBase>
                   </View>
-                  {festival.advise.map((advice, index) => (
-                    <TextBase
-                      key={`advice-${index}`}
-                      style={[AppStyle.txt_16_medium_detail, {marginTop: sizes._4sdp, marginLeft: sizes._28sdp, textAlign: 'justify'}]}>
-                      • {advice}
-                    </TextBase>
-                  ))}
+                  {festival.advise.map((advice, index) => {
+                    const translatedAdvice = festivalId
+                      ? translateFestivalField(t, festivalId, 'advise', advice, index)
+                      : advice;
+                    return (
+                      <TextBase
+                        key={`advice-${index}`}
+                        style={[AppStyle.txt_16_medium_detail, {marginTop: sizes._4sdp, marginLeft: sizes._28sdp, textAlign: 'justify'}]}>
+                        • {translatedAdvice}
+                      </TextBase>
+                    );
+                  })}
                 </View>
               )}
 
@@ -312,9 +317,7 @@ class DetailFestivalScreen extends React.PureComponent<
               <View style={{
                 marginTop: sizes._16sdp,
               }}>
-                <Button
-                  mode="outlined"
-                  icon="calendar-search"
+                <TouchableOpacity
                   onPress={() => {
                     const similarFestivals = this.getSimilarFestivals(festival);
                     if (similarFestivals.length > 0) {
@@ -328,16 +331,26 @@ class DetailFestivalScreen extends React.PureComponent<
                     }
                   }}
                   style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'center',
                     borderColor: colors.primary,
                     borderWidth: 2,
-                  }}
-                  labelStyle={{
-                    fontSize: 14,
-                    color: colors.primary,
+                    paddingVertical: sizes._12sdp,
+                    paddingHorizontal: sizes._16sdp,
+                    borderRadius: sizes._8sdp,
+                    gap: sizes._8sdp,
                   }}
                 >
-                  {t('detail.similarFestivals')}
-                </Button>
+                  <CalendarSearchSvg
+                    width={sizes._20sdp}
+                    height={sizes._20sdp}
+                    color={colors.primary}
+                  />
+                  <TextBase style={{fontSize: 14, color: colors.primary, fontWeight: '500'}}>
+                    {t('detail.similarFestivals')}
+                  </TextBase>
+                </TouchableOpacity>
               </View>
 
               {/* Semantic Similar Items from Backend */}

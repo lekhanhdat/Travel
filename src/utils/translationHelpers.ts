@@ -11,20 +11,28 @@ export function getFestivalTranslationKey(id: string | number): string {
 export function translateLocationField(
   t: TFunction,
   locationId: string | number,
-  field: 'name' | 'description' | 'address',
+  field: 'name' | 'description' | 'address' | 'advise',
   fallback: string,
+  index?: number,
 ): string {
-  const key = `locations:loc_${locationId}.${field}`;
+  let key = `locations:loc_${locationId}.${field}`;
+  if (field === 'advise' && index !== undefined) {
+    key = `locations:loc_${locationId}.advise.${index}`;
+  }
   return translateWithFallback(t, key, fallback);
 }
 
 export function translateFestivalField(
   t: TFunction,
   festivalId: string | number,
-  field: 'name' | 'description' | 'location' | 'event_time' | 'ticket_info',
+  field: 'name' | 'description' | 'location' | 'event_time' | 'ticket_info' | 'advise',
   fallback: string,
+  index?: number,
 ): string {
-  const key = `festivals:fest_${festivalId}.${field}`;
+  let key = `festivals:fest_${festivalId}.${field}`;
+  if (field === 'advise' && index !== undefined) {
+    key = `festivals:fest_${festivalId}.advise.${index}`;
+  }
   return translateWithFallback(t, key, fallback);
 }
 

@@ -13,7 +13,7 @@ import ReviewItem from '../../../component/ReviewItem';
 import {reviews} from '../../../common/reviewsConstants';
 import locationApi from '../../../services/locations.api';
 import {StarActive, StarInActive, ThunderSvg} from '../../../assets/assets/ImageSvg';
-import {MapSvg, Call, GlobeSvg, ClockSvg} from '../../../assets/ImageSvg';
+import {MapSvg, Call, GlobeSvg, ClockSvg, DirectionsSvg} from '../../../assets/ImageSvg';
 import {ScreenName} from '../../AppContainer';
 import {Button} from 'react-native-paper';
 import festivalsApi, {IFestival} from '../../../services/festivals.api';
@@ -452,13 +452,18 @@ class DetailLocationScreen extends React.PureComponent<
                   {(Array.isArray(location.advise)
                     ? location.advise
                     : location.advise.split('\n')
-                  ).map((advice, index) => (
-                    <TextBase
-                      key={`advice-${index}`}
-                      style={[AppStyle.txt_16_medium_detail, {marginTop: sizes._4sdp, marginLeft: sizes._8sdp, textAlign: 'justify'}]}>
-                      • {advice.trim()}
-                    </TextBase>
-                  ))}
+                  ).map((advice, index) => {
+                    const translatedAdvice = locationId
+                      ? translateLocationField(t, locationId, 'advise', advice.trim(), index)
+                      : advice.trim();
+                    return (
+                      <TextBase
+                        key={`advice-${index}`}
+                        style={[AppStyle.txt_16_medium_detail, {marginTop: sizes._4sdp, marginLeft: sizes._8sdp, textAlign: 'justify'}]}>
+                        • {translatedAdvice}
+                      </TextBase>
+                    );
+                  })}
                 </View>
               )}
 
@@ -468,9 +473,7 @@ class DetailLocationScreen extends React.PureComponent<
                 gap: sizes._12sdp,
                 marginTop: sizes._16sdp,
               }}>
-                <Button
-                  mode="contained"
-                  icon="directions"
+                <TouchableOpacity
                   onPress={() => {
                     NavigationService.navigate(ScreenName.MAP_SCREEN, {
                       locations: [location],
@@ -479,12 +482,25 @@ class DetailLocationScreen extends React.PureComponent<
                   }}
                   style={{
                     flex: 1,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'center',
                     backgroundColor: colors.primary,
+                    paddingVertical: sizes._12sdp,
+                    paddingHorizontal: sizes._16sdp,
+                    borderRadius: sizes._8sdp,
+                    gap: sizes._8sdp,
                   }}
-                  labelStyle={{fontSize: 14}}
                 >
-                  {t('detail.directions')}
-                </Button>
+                  <DirectionsSvg
+                    width={sizes._20sdp}
+                    height={sizes._20sdp}
+                    color={colors.white}
+                  />
+                  <TextBase style={{fontSize: 14, color: colors.white, fontWeight: '500'}}>
+                    {t('detail.directions')}
+                  </TextBase>
+                </TouchableOpacity>
               </View>
 
               {/* Semantic Similar Items from Backend */}

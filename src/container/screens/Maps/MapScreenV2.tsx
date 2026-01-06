@@ -1011,7 +1011,7 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
                 ...getTextShadowForMapStyle(currentMapStyle),
                 marginTop: 2,
               }}>
-                You're here!
+                {t('common:common.youAreHere')}
               </TextBase>
             </View>
           </MapboxGL.MarkerView>
@@ -1180,7 +1180,7 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
               if (!showTraffic) {
                 Toast.show({
                   type: 'info',
-                  text1: '🚦 Traffic Layer Enabled',
+                  text1: `🚦 ${t('common:common.trafficLayerEnabled')}`,
                   text2: 'Zoom to level 12+ in major cities for best results',
                   position: 'bottom',
                   visibilityTime: 3000,
@@ -1249,7 +1249,7 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
                   marginRight: 6,
                 }} />
                 <TextBase style={{ fontSize: 10, color: colors.primary_950 }}>
-                  Thông thoáng
+                  {t('common:common.trafficClear')}
                 </TextBase>
               </View>
 
@@ -1291,7 +1291,7 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
                   marginRight: 6,
                 }} />
                 <TextBase style={{ fontSize: 10, color: colors.primary_950 }}>
-                  Tắc nghẽn
+                  {t('common:common.trafficCongested')}
                 </TextBase>
               </View>
             </View>
@@ -1315,7 +1315,7 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
             shadowRadius: 3.84,
           }}>
             <TextBase style={{ fontSize: 14, color: colors.white, fontWeight: 'bold' }}>
-              🔌 Offline Mode
+              🔌 {t('common:common.offlineMode')}
             </TextBase>
             <TextBase style={{ fontSize: 12, color: colors.white, marginTop: 4 }}>
               Route is approximate

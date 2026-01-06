@@ -247,7 +247,18 @@
     "enable": "Enable",
     "disable": "Disable",
     "on": "On",
-    "off": "Off"
+    "off": "Off",
+    "similar": "Similar",
+    "exploreDanang": "Explore Da Nang",
+    "version": "Ver {{version}}",
+    "youAreHere": "You're here!",
+    "offlineMode": "Offline Mode",
+    "trafficLayerEnabled": "Traffic Layer Enabled",
+    "trafficClear": "Clear traffic",
+    "trafficCongested": "Congested",
+    "suggestionsForYou": "Suggestions for you",
+    "noInternet": "No Internet Connection",
+    "showAll": "Show All"
   },
   "permissions": {
     "locationTitle": "Location Permission",

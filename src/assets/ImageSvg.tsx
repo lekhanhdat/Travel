@@ -4,12 +4,15 @@
   */
 
   import Add from './svg/Add.svg';
+import CalendarSearchSvg from './svg/CalendarSearchSvg.svg';
 import Call from './svg/Call.svg';
 import CameraSvg from './svg/CameraSvg.svg';
 import CategorySvg from './svg/CategorySvg.svg';
 import ChartsSvg from './svg/ChartsSvg.svg';
 import ChatBotSvg from './svg/ChatBotSvg.svg';
 import ClockSvg from './svg/ClockSvg.svg';
+import CloseSvg from './svg/CloseSvg.svg';
+import DirectionsSvg from './svg/DirectionsSvg.svg';
 import FAQ from './svg/FAQ.svg';
 import FireworksSvg from './svg/FireworksSvg.svg';
 import Frame from './svg/Frame.svg';
@@ -32,12 +35,15 @@ import TranslateSvg from './svg/TranslateSvg.svg';
 import VipSvg from './svg/VipSvg.svg';
   export {
     Add,
+CalendarSearchSvg,
 Call,
 CameraSvg,
 CategorySvg,
 ChartsSvg,
 ChatBotSvg,
 ClockSvg,
+CloseSvg,
+DirectionsSvg,
 FAQ,
 FireworksSvg,
 Frame,

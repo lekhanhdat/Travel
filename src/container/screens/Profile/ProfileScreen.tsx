@@ -60,6 +60,8 @@ class ProfileScreen extends React.PureComponent<
     if (this.props.navigation) {
       this.props.navigation.addListener('focus', () => {
         console.log('ProfileScreen focused - refreshing user data');
+        // Force update to refresh translations
+        this.forceUpdate();
         this.handleGetUser();
       });
     }

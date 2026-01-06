@@ -38,6 +38,10 @@
     "search": "Tìm kiếm",
     "aiSearchResults": "Kết quả tìm kiếm AI"
   },
+  "recommendations": {
+    "title": "Đề xuất cho bạn",
+    "loading": "Đang tải đề xuất..."
+  },
   "profile": {
     "title": "Hồ sơ",
     "aiAssistant": "Trợ lý AI",
@@ -174,7 +178,8 @@
     "sortedByRelevance": "sắp xếp theo độ liên quan"
   },
   "buttons": {
-    "viewAll": "Xem tất cả"
+    "viewAll": "Xem tất cả",
+    "refresh": "Làm mới"
   },
   "map": {
     "title": "Bản đồ",

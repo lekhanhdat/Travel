@@ -11,6 +11,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from 'react-native';
+import {useTranslation} from 'react-i18next';
 import TextBase from '../common/TextBase';
 import {AppStyle} from '../common/AppStyle';
 import sizes from '../common/sizes';
@@ -21,7 +22,6 @@ import BigItemLocation from './BigItemLocation';
 import {
   getRecommendations,
   Recommendation,
-  EntityType,
 } from '../services/semantic.api';
 import locationApi from '../services/locations.api';
 import festivalsApi from '../services/festivals.api';
@@ -39,9 +39,10 @@ interface EnrichedRecommendation extends Recommendation {
 
 const RecommendationsWidget: React.FC<RecommendationsWidgetProps> = ({
   userId,
-  title = 'Đề xuất cho bạn',
+  title,
   limit = 10,
 }) => {
+  const {t} = useTranslation(['common', 'locations']);
   const [recommendations, setRecommendations] = useState<EnrichedRecommendation[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -144,7 +145,7 @@ const RecommendationsWidget: React.FC<RecommendationsWidgetProps> = ({
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="small" color={colors.primary} />
-        <TextBase style={styles.loadingText}>Đang tải đề xuất...</TextBase>
+        <TextBase style={styles.loadingText}>{t('common:recommendations.loading')}</TextBase>
       </View>
     );
   }
@@ -156,10 +157,10 @@ const RecommendationsWidget: React.FC<RecommendationsWidgetProps> = ({
   return (
     <View style={styles.container}>
       <View style={styles.headerRow}>
-        <TextBase style={[AppStyle.txt_20_bold]}>{title}</TextBase>
+        <TextBase style={[AppStyle.txt_20_bold]}>{title || t('common:recommendations.title')}</TextBase>
         <TouchableOpacity onPress={fetchRecommendations} testID="refresh-button">
           <TextBase style={[AppStyle.txt_18_regular]}>
-            Làm mới
+            {t('common:buttons.refresh')}
           </TextBase>
         </TouchableOpacity>
       </View>

@@ -30,6 +30,8 @@ import festivalsApi from '../../../services/festivals.api';
 import Toast from 'react-native-toast-message';
 import {env} from '../../../utils/env';
 import Tts from 'react-native-tts';
+import {useTranslation} from 'react-i18next';
+import {translateLocationField} from '../../../utils/translationHelpers';
 
 MapboxGL.setAccessToken(env.MAPBOX_ACCESS_TOKEN || '');
 
@@ -118,6 +120,7 @@ const getTextShadowForMapStyle = (mapStyle: MapStyle) => {
 };
 
 const MapScreenV2 = ({navigation}: {navigation: any}) => {
+  const {t} = useTranslation(['common', 'locations']);
   const [currentLat, setCurrentLat] = useState(0);
   const [currentLong, setCurrentLong] = useState(0);
   const [routeCoordinates, setRouteCoordinates] = useState<{latitude: number; longitude: number}[]>([]);
@@ -938,6 +941,12 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
               const textSize = getTextSize(currentZoom, isSelected);
               const emojiSize = markerSize * 0.8; // Emoji slightly smaller than marker
 
+              // Get translated location name
+              const locationId = location.Id || location.id;
+              const translatedName = locationId
+                ? translateLocationField(t, locationId, 'name', location.name)
+                : location.name;
+
               return (
                 <MapboxGL.MarkerView
                   key={String(index)}
@@ -967,7 +976,7 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
                       ...textShadow,
                       marginTop: isSelected ? 2 : -2,
                     }}>
-                      {location.name}
+                      {translatedName}
                     </TextBase>
                   </TouchableOpacity>
                 </MapboxGL.MarkerView>
@@ -1668,21 +1677,21 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
                       marginBottom: 10,
                     },
                   ]}>
-                  {selectedLocation.name}
+                  {translateLocationField(t, selectedLocation.Id || selectedLocation.id || 0, 'name', selectedLocation.name)}
                 </TextBase>
                 <TextBase
                   style={[
                     AppStyle.txt_16_medium,
                     {marginBottom: 10, textAlign: 'justify'},
                   ]}>
-                  {selectedLocation.description}
+                  {translateLocationField(t, selectedLocation.Id || selectedLocation.id || 0, 'description', selectedLocation.description)}
                 </TextBase>
                 <TextBase
                   style={[
                     AppStyle.txt_16_medium,
                     {marginBottom: 10, textAlign: 'justify'},
                   ]}>
-                  Address: {selectedLocation.address}
+                  {t('common:detail.address')}: {translateLocationField(t, selectedLocation.Id || selectedLocation.id || 0, 'address', selectedLocation.address)}
                 </TextBase>
                 <Image
                   source={{uri: selectedLocation.avatar}} // Image URL

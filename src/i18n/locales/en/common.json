@@ -38,6 +38,10 @@
     "search": "Search",
     "aiSearchResults": "AI Search Results"
   },
+  "recommendations": {
+    "title": "Recommended for You",
+    "loading": "Loading recommendations..."
+  },
   "profile": {
     "title": "Profile",
     "aiAssistant": "AI Assistant",
@@ -174,7 +178,8 @@
     "sortedByRelevance": "sorted by relevance"
   },
   "buttons": {
-    "viewAll": "View All"
+    "viewAll": "View All",
+    "refresh": "Refresh"
   },
   "map": {
     "title": "Map",

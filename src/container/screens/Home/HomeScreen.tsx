@@ -69,6 +69,9 @@ class HomeScreen extends React.PureComponent<
 
   componentDidMount(): void {
     this.props.navigation.addListener('focus', () => {
+      // Force update to refresh translations
+      this.forceUpdate();
+
       this.setState({
         valueSearch: '',
       });
@@ -215,11 +218,23 @@ class HomeScreen extends React.PureComponent<
 
   // ============ PERFORMANCE OPTIMIZATION: Memoized render functions ============
   renderItemHorizontal = ({item, index}: {item: ILocation; index: number}) => {
-    return <BigItemLocation location={item} />;
+    return (
+      <BigItemLocation 
+        location={item} 
+        // Force re-render when language changes
+        key={`h-${item.Id || item.id}-${this.props.language}`}
+      />
+    );
   };
 
   renderItemLarge = ({item, index}: {item: ILocation; index: number}) => {
-    return <LargeItemLocation location={item} />;
+    return (
+      <LargeItemLocation 
+        location={item} 
+        // Force re-render when language changes
+        key={`v-${item.Id || item.id}-${this.props.language}`}
+      />
+    );
   };
 
   // Stable keyExtractor functions to prevent re-creation

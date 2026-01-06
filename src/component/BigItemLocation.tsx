@@ -1,5 +1,6 @@
 import React from 'react';
 import {StyleSheet, TouchableOpacity, View} from 'react-native';
+import {useTranslation} from 'react-i18next';
 import {ILocation} from '../common/types';
 import sizes from '../common/sizes';
 import colors from '../common/colors';
@@ -8,77 +9,57 @@ import {AppStyle} from '../common/AppStyle';
 import NavigationService from '../container/screens/NavigationService';
 import {ScreenName} from '../container/AppContainer';
 import CachedImage from './CachedImage';
+import {translateLocationField} from '../utils/translationHelpers';
 
 interface IBigItemLocationProps {
   location: ILocation;
   onPress?: () => void;
 }
 
-interface IBigItemLocationState {}
+const BigItemLocation: React.FC<IBigItemLocationProps> = ({location, onPress}) => {
+  const {t} = useTranslation(['common', 'locations']);
 
-export default class BigItemLocation extends React.PureComponent<
-  IBigItemLocationProps,
-  IBigItemLocationState
-> {
-  constructor(props: IBigItemLocationProps) {
-    super(props);
-    this.state = {};
-  }
-  render(): React.ReactNode {
-    const {location, onPress} = this.props;
-    return (
-      <TouchableOpacity
-        style={styles.container}
-        onPress={() => {
-          if (onPress) {
-            onPress();
-            return;
-          }
-          NavigationService.navigate(ScreenName.DETAIL_LOCATION_SCREEN, {
-            location: location,
-          });
+  const locationId = location.Id || location.id;
+  const translatedName = locationId
+    ? translateLocationField(t, locationId, 'name', location.name)
+    : location.name;
+  const translatedDescription = locationId
+    ? translateLocationField(t, locationId, 'description', location.description)
+    : location.description;
+
+  return (
+    <TouchableOpacity
+      style={styles.container}
+      onPress={() => {
+        if (onPress) {
+          onPress();
+          return;
+        }
+        NavigationService.navigate(ScreenName.DETAIL_LOCATION_SCREEN, {
+          location: location,
+        });
+      }}>
+      <CachedImage
+        uri={location.avatar}
+        style={styles.icon}
+      />
+      <View
+        style={{
+          paddingVertical: sizes._12sdp,
+          paddingHorizontal: sizes._16sdp,
         }}>
-        <CachedImage
-          uri={location.avatar}
-          style={styles.icon}
-        />
-        <View
-          style={{
-            paddingVertical: sizes._12sdp,
-            paddingHorizontal: sizes._16sdp,
-          }}>
-          <TextBase numberOfLines={1} style={[AppStyle.txt_20_bold]}>
-            {`${location.name}`}
-          </TextBase>
-          <TextBase
-            numberOfLines={3}
-            style={[AppStyle.txt_16_regular, {marginTop: sizes._8sdp}]}>
-            {location.description}
-          </TextBase>
-        </View>
-      </TouchableOpacity>
-    );
-
-    // return (
-    //   <Card
-    //     style={{
-    //       height: '100%',
-    //       width: sizes.width * 0.6,
-    //       marginRight: sizes._16sdp,
-    //       backgroundColor: colors.primary_200,
-    //       paddingBottom: sizes._16sdp,
-    //     }}>
-    //     <Card.Cover source={{uri: location.avatar}} />
-    //     <Card.Title
-    //       title={location.name}
-    //       subtitle={location.description}
-    //       subtitleNumberOfLines={3}
-    //       // left={LeftContent}
-    //     />
-    //   </Card>
-    // );
-  }
-}
+        <TextBase numberOfLines={1} style={[AppStyle.txt_20_bold]}>
+          {translatedName}
+        </TextBase>
+        <TextBase
+          numberOfLines={3}
+          style={[AppStyle.txt_16_regular, {marginTop: sizes._8sdp}]}>
+          {translatedDescription}
+        </TextBase>
+      </View>
+    </TouchableOpacity>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -102,3 +83,5 @@ const styles = StyleSheet.create({
     width: '100%',
   },
 });
+
+export default BigItemLocation;

@@ -22,6 +22,7 @@ import {
   withAzureTranslation,
   WithAzureTranslationProps,
 } from '../../../hoc/withAzureTranslation';
+import { translateLocationField } from '../../../utils/translationHelpers';
 
 interface IDetailLocationScreenProps extends WithAzureTranslationProps {
   navigation: any;
@@ -161,6 +162,18 @@ class DetailLocationScreen extends React.PureComponent<
   render(): React.ReactNode {
     const location: ILocation = this.props.route.params?.location;
     const {t} = this.props;
+
+    const locationId = location.Id || location.id;
+    const translatedName = locationId 
+      ? translateLocationField(t, locationId, 'name', location.name)
+      : location.name;
+    const translatedDescription = locationId
+      ? translateLocationField(t, locationId, 'description', location.description)
+      : location.description;
+    const translatedAddress = locationId && location.address
+      ? translateLocationField(t, locationId, 'address', location.address)
+      : location.address;
+
     return (
       <Page>
         <HeaderBase
@@ -201,7 +214,7 @@ class DetailLocationScreen extends React.PureComponent<
 
             <View style={{flex: 1, padding: sizes._16sdp}}>
               <TextBase style={[AppStyle.txt_20_bold, {textAlign: 'center'}]}>
-                {location.name}
+                {translatedName}
               </TextBase>
 
               {/* Average Rating Display */}
@@ -239,7 +252,7 @@ class DetailLocationScreen extends React.PureComponent<
               {/* Description: Use long_description if available, fallback to description */}
               <TextBase
                 style={[AppStyle.txt_16_medium_detail, {marginTop: sizes._12sdp, textAlign: 'justify'}]}>
-                {location.long_description || location.description}
+                {translatedDescription}
               </TextBase>
 
               {/* Address with Icon */}
@@ -251,7 +264,7 @@ class DetailLocationScreen extends React.PureComponent<
                 />
                 <TextBase
                   style={[AppStyle.txt_16_medium_detail, {marginLeft: sizes._8sdp, flex: 1, textAlign: 'justify'}]}>
-                  {t('detail.address')}: {location.address}
+                  {t('detail.address')}: {translatedAddress}
                 </TextBase>
               </View>
 

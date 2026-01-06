@@ -21,6 +21,7 @@ import {
   withAzureTranslation,
   WithAzureTranslationProps,
 } from '../../../hoc/withAzureTranslation';
+import { translateFestivalField } from '../../../utils/translationHelpers';
 
 interface IDetailFestivalScreenProps extends WithAzureTranslationProps {
   navigation: any;
@@ -112,6 +113,24 @@ class DetailFestivalScreen extends React.PureComponent<
     const festival: IFestival = this.props.route.params?.festival;
     const {t} = this.props;
 
+    const festivalId = festival.Id || festival.id;
+    const translatedName = festivalId
+      ? translateFestivalField(t, festivalId, 'name', festival.name)
+      : festival.name;
+    const translatedDescription = festivalId
+      ? translateFestivalField(t, festivalId, 'description', festival.description)
+      : festival.description;
+    const translatedLocation = festivalId
+      ? translateFestivalField(t, festivalId, 'location', festival.location)
+      : festival.location;
+    const translatedEventTime = festivalId
+      ? translateFestivalField(t, festivalId, 'event_time', festival.event_time)
+      : festival.event_time;
+    const translatedTicketInfo = festivalId && festival.ticket_info
+      ? translateFestivalField(t, festivalId, 'ticket_info', festival.ticket_info)
+      : festival.ticket_info;
+
+
     // Get first image or use placeholder
     const festivalImage = festival.images && festival.images.length > 0
       ? festival.images[0]
@@ -146,7 +165,7 @@ class DetailFestivalScreen extends React.PureComponent<
 
             <View style={{flex: 1, padding: sizes._16sdp}}>
               <TextBase style={[AppStyle.txt_20_bold, {textAlign: 'center'}]}>
-                {festival.name}
+                {translatedName}
               </TextBase>
 
               {/* Average Rating Display */}
@@ -183,7 +202,7 @@ class DetailFestivalScreen extends React.PureComponent<
               {/* Description */}
               <TextBase
                 style={[AppStyle.txt_16_medium_detail, {marginTop: sizes._12sdp, textAlign: 'justify'}]}>
-                {festival.description}
+                {translatedDescription}
               </TextBase>
 
               {/* Event Time */}
@@ -195,7 +214,7 @@ class DetailFestivalScreen extends React.PureComponent<
                 />
                 <TextBase
                   style={[AppStyle.txt_16_medium_detail, {marginLeft: sizes._8sdp, flex: 1, textAlign: 'justify'}]}>
-                  {t('detail.eventTime')}: {festival.event_time}
+                  {t('detail.eventTime')}: {translatedEventTime}
                 </TextBase>
               </View>
 
@@ -208,7 +227,7 @@ class DetailFestivalScreen extends React.PureComponent<
                 />
                 <TextBase
                   style={[AppStyle.txt_16_medium_detail, {marginLeft: sizes._8sdp, flex: 1, textAlign: 'justify'}]}>
-                  {t('detail.location')}: {festival.location}
+                  {t('detail.location')}: {translatedLocation}
                 </TextBase>
               </View>
 
@@ -223,7 +242,7 @@ class DetailFestivalScreen extends React.PureComponent<
                   style={[AppStyle.txt_16_medium_detail, {marginLeft: sizes._8sdp, flex: 1, textAlign: 'justify'}]}>
                   {t('detail.fee')}: {festival.price_level === 0 ? t('priceLevel.free') :
                        festival.price_level === 1 ? t('priceLevel.paid') : t('priceLevel.premium')}
-                  {festival.ticket_info && ` (${festival.ticket_info})`}
+                  {translatedTicketInfo && ` (${translatedTicketInfo})`}
                 </TextBase>
               </View>
 

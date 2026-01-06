@@ -1,5 +1,6 @@
 import React from 'react';
 import {StyleSheet, TouchableOpacity, View} from 'react-native';
+import {useTranslation} from 'react-i18next';
 import {ILocation} from '../common/types';
 import sizes from '../common/sizes';
 import colors from '../common/colors';
@@ -8,70 +9,69 @@ import TextBase from '../common/TextBase';
 import {ScreenName} from '../container/AppContainer';
 import NavigationService from '../container/screens/NavigationService';
 import CachedImage from './CachedImage';
+import {translateLocationField} from '../utils/translationHelpers';
 
 interface ILargeItemLocationProps {
   location: ILocation;
   onPress?: () => void;
 }
 
-interface ILargeItemLocationState {}
+const LargeItemLocation: React.FC<ILargeItemLocationProps> = ({location, onPress}) => {
+  const {t} = useTranslation(['common', 'locations']);
 
-export default class LargeItemLocation extends React.PureComponent<
-  ILargeItemLocationProps,
-  ILargeItemLocationState
-> {
-  constructor(props: ILargeItemLocationProps) {
-    super(props);
-    this.state = {};
-  }
-  render(): React.ReactNode {
-    const {location} = this.props;
-    return (
-      <TouchableOpacity
-        style={styles.container}
-        onPress={() => {
-          if (this.props.onPress) {
-            this.props.onPress();
-            return;
-          }
-          NavigationService.navigate(ScreenName.DETAIL_LOCATION_SCREEN, {
-            location: location,
-          });
-        }}>
-        <View style={styles.rowCenter}>
-          <CachedImage
-            uri={location.avatar}
-            style={{
-              height: sizes.width * 0.25,
-              width: sizes.width * 0.25,
-              marginRight: sizes._16sdp,
-            }}
-          />
-          <View
-            style={{
-              flex: 1,
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'flex-start',
-              marginRight: sizes._16sdp,
-            }}>
-            <TextBase
-              numberOfLines={1} // Thay đổi thành 1 để nội dung không xuống dòng
-              ellipsizeMode="tail" // Thêm thuộc tính này để hiển thị dấu '...'
-              style={AppStyle.txt_18_bold}>
-              {`${location.name}`}
-            </TextBase>
-            <TextBase
-              numberOfLines={3}
-              style={[AppStyle.txt_14_regular, {marginTop: sizes._8sdp}]}>
-              {location.description}
-            </TextBase>
-          </View>
+  const locationId = location.Id || location.id;
+  const translatedName = locationId
+    ? translateLocationField(t, locationId, 'name', location.name)
+    : location.name;
+  const translatedDescription = locationId
+    ? translateLocationField(t, locationId, 'description', location.description)
+    : location.description;
+
+  return (
+    <TouchableOpacity
+      style={styles.container}
+      onPress={() => {
+        if (onPress) {
+          onPress();
+          return;
+        }
+        NavigationService.navigate(ScreenName.DETAIL_LOCATION_SCREEN, {
+          location: location,
+        });
+      }}>
+      <View style={styles.rowCenter}>
+        <CachedImage
+          uri={location.avatar}
+          style={{
+            height: sizes.width * 0.25,
+            width: sizes.width * 0.25,
+            marginRight: sizes._16sdp,
+          }}
+        />
+        <View
+          style={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'flex-start',
+            marginRight: sizes._16sdp,
+          }}>
+          <TextBase
+            numberOfLines={1}
+            ellipsizeMode="tail"
+            style={AppStyle.txt_18_bold}>
+            {translatedName}
+          </TextBase>
+          <TextBase
+            numberOfLines={3}
+            style={[AppStyle.txt_14_regular, {marginTop: sizes._8sdp}]}>
+            {translatedDescription}
+          </TextBase>
         </View>
-      </TouchableOpacity>
-    );
-  }
-}
+      </View>
+    </TouchableOpacity>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -87,3 +87,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 });
+
+export default LargeItemLocation;

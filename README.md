@@ -1,17 +1,16 @@
-# 🌍 Travel App - Ứng dụng Du lịch Thông minh
+# 🌍 Travel Da Nang - Ứng dụng Du lịch Thông minh
 
 <div align="center">
 
 ![React Native](https://img.shields.io/badge/React_Native-0.74.2-61DAFB?style=for-the-badge&logo=react&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-4.8.4-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
-![FastAPI](https://img.shields.io/badge/FastAPI-0.108.0-009688?style=for-the-badge&logo=fastapi&logoColor=white)
-![Python](https://img.shields.io/badge/Python-3.8+-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ![Android](https://img.shields.io/badge/Android-3DDC84?style=for-the-badge&logo=android&logoColor=white)
 ![iOS](https://img.shields.io/badge/iOS-000000?style=for-the-badge&logo=apple&logoColor=white)
+![i18n](https://img.shields.io/badge/i18n-Vietnamese%20%7C%20English-blue?style=for-the-badge)
 
-Ứng dụng du lịch toàn diện với tính năng AI nhận diện địa điểm, bản đồ tương tác, chatbot thông minh, và hệ thống thanh toán tích hợp.
+**Ứng dụng di động du lịch Đà Nẵng** với tính năng AI nhận diện địa điểm, tìm kiếm ngữ nghĩa thông minh, bản đồ tương tác Mapbox, chatbot AI, và hệ thống thanh toán PayOS.
 
-[Tính năng](#-tính-năng-chính) • [Kiến trúc](#-kiến-trúc-hệ-thống) • [Cài đặt](#-hướng-dẫn-cài-đặt) • [API](#-api-documentation) • [Deployment](#-deployment)
+[Tính năng](#-tính-năng-chính) • [Cài đặt](#-hướng-dẫn-cài-đặt) • [Cấu trúc](#-cấu-trúc-dự-án) • [Scripts](#-scripts-có-sẵn) • [Cấu hình](#️-cấu-hình)
 
 </div>
 

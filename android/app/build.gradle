@@ -4,9 +4,9 @@ apply plugin: "com.facebook.react"
 // Project background_geolocation = project(':react-native-background-geolocation')
 // apply from: "${background_geolocation.projectDir}/app.gradle"
 
-// Vector Icons - Only include MaterialIcons to reduce APK size
+// Vector Icons - Include MaterialIcons and MaterialCommunityIcons (required by react-native-paper)
 project.ext.vectoricons = [
-    iconFontNames: [ 'MaterialIcons.ttf' ]
+    iconFontNames: [ 'MaterialIcons.ttf', 'MaterialCommunityIcons.ttf' ]
 ]
 apply from: file("../../node_modules/react-native-vector-icons/fonts.gradle")
 /**

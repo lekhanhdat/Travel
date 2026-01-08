@@ -10,7 +10,6 @@ import colors from '../../../common/colors';
 import sizes from '../../../common/sizes';
 import Page from '../../../component/Page';
 import {SERVER_URL} from '../../../utils/configs';
-// @ts-ignore
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import CameraResultModal from '../../../component/CameraResultModal';
 import TextBase from '../../../common/TextBase';

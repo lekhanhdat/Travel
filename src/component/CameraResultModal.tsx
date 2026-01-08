@@ -1,5 +1,6 @@
 import React from 'react';
 import {View, ScrollView, Image} from 'react-native';
+import Markdown from 'react-native-markdown-display';
 import TextBase from '../common/TextBase';
 import sizes from '../common/sizes';
 import colors from '../common/colors';
@@ -75,10 +76,65 @@ const CameraResultModal: React.FC<CustomModalProps> = ({
                 ]}>
                 {resultName}
               </TextBase>
-              <TextBase
-                style={[AppStyle.txt_18_medium, {textAlign: 'justify'}]}>
+              <Markdown
+                style={{
+                  body: {
+                    color: colors.primary_950,
+                    fontSize: sizes._16sdp,
+                    lineHeight: sizes._24sdp,
+                  },
+                  heading1: {
+                    fontSize: sizes._20sdp,
+                    fontWeight: 'bold',
+                    color: colors.primary_950,
+                    marginBottom: sizes._8sdp,
+                    marginTop: sizes._8sdp,
+                  },
+                  heading2: {
+                    fontSize: sizes._18sdp,
+                    fontWeight: 'bold',
+                    color: colors.primary_950,
+                    marginBottom: sizes._6sdp,
+                    marginTop: sizes._6sdp,
+                  },
+                  heading3: {
+                    fontSize: sizes._16sdp,
+                    fontWeight: 'bold',
+                    color: colors.primary_950,
+                    marginBottom: sizes._4sdp,
+                    marginTop: sizes._4sdp,
+                  },
+                  strong: {
+                    fontWeight: 'bold',
+                    color: colors.primary_950,
+                  },
+                  em: {
+                    fontStyle: 'italic',
+                  },
+                  bullet_list: {
+                    marginTop: sizes._4sdp,
+                    marginBottom: sizes._4sdp,
+                  },
+                  ordered_list: {
+                    marginTop: sizes._4sdp,
+                    marginBottom: sizes._4sdp,
+                  },
+                  list_item: {
+                    marginTop: sizes._2sdp,
+                    marginBottom: sizes._2sdp,
+                  },
+                  paragraph: {
+                    marginTop: sizes._4sdp,
+                    marginBottom: sizes._4sdp,
+                    textAlign: 'justify',
+                  },
+                  link: {
+                    color: colors.primary,
+                    textDecorationLine: 'underline',
+                  },
+                }}>
                 {resultDescription}
-              </TextBase>
+              </Markdown>
             </ScrollView>
           </View>
         </View>

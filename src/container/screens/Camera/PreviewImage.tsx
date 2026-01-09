@@ -6,6 +6,7 @@ import ImageView from 'react-native-image-viewing';
 import NavigationService from '../NavigationService';
 import sizes from '../../../common/sizes';
 import colors from '../../../common/colors';
+import {AI_RECOGNITION_TIMEOUT} from '../../../common/constants';
 import { SendSvg } from '../../../assets/ImageSvg';
 import RNFetchBlob from 'rn-fetch-blob';
 import { SERVER_URL } from '../../../utils/configs';
@@ -46,7 +47,9 @@ export default class PreviewImage extends React.PureComponent<IPreviewImageProps
     this.setState({ isDetecting: true });
 
     try {
-      const response = await RNFetchBlob.fetch(
+      const response = await RNFetchBlob.config({
+        timeout: AI_RECOGNITION_TIMEOUT,
+      }).fetch(
         'POST',
         url,
         {

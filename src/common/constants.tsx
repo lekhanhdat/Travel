@@ -3,6 +3,9 @@ import {AppState, AppStateStatus, Dimensions, Platform} from 'react-native';
 // import StaticSafeAreaInsets from 'react-native-static-safe-area-insets';
 
 export const API_TIME_OUT = 10000;
+// AI Camera Recognition timeout: 2 minutes (120 seconds)
+// This accounts for: image upload + OpenAI Vision API + NocoDB check + OpenAI description generation
+export const AI_RECOGNITION_TIMEOUT = 120000;
 export const localStorageKey = {
   AUTH_TOKEN: 'AUTH_TOKEN',
   ITEM_UPLOAD: 'ITEM_UPLOAD',

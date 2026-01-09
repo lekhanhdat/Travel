@@ -8,6 +8,7 @@ import RNFetchBlob from 'rn-fetch-blob';
 import {CameraSvg, Lightning, LightningOff, SendSvg} from '../../../assets/ImageSvg';
 import colors from '../../../common/colors';
 import sizes from '../../../common/sizes';
+import {AI_RECOGNITION_TIMEOUT} from '../../../common/constants';
 import Page from '../../../component/Page';
 import {SERVER_URL} from '../../../utils/configs';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -190,7 +191,9 @@ export default class CameraScreen extends React.PureComponent<
     this.setState({ isDetecting: true });
 
     try {
-      const response = await RNFetchBlob.fetch(
+      const response = await RNFetchBlob.config({
+        timeout: AI_RECOGNITION_TIMEOUT,
+      }).fetch(
         'POST',
         url,
         {

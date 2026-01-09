@@ -119,7 +119,7 @@ const getTextShadowForMapStyle = (mapStyle: MapStyle) => {
   };
 };
 
-const MapScreenV2 = ({navigation}: {navigation: any}) => {
+const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
   const {t} = useTranslation(['common', 'locations']);
   const [currentLat, setCurrentLat] = useState(0);
   const [currentLong, setCurrentLong] = useState(0);
@@ -287,8 +287,8 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
     requestLocationPermission();
 
     // Kiểm tra xem có location được truyền vào từ DetailLocation không
-    const locationProps: ILocation[] = navigation?.state?.params?.locations ?? [];
-    const showRoute = navigation?.state?.params?.showRoute ?? false;
+    const locationProps: ILocation[] = route?.params?.locations ?? [];
+    const showRoute = route?.params?.showRoute ?? false;
 
     if (locationProps.length > 0) {
       // Nếu có location được truyền vào, dùng nó
@@ -837,7 +837,7 @@ const MapScreenV2 = ({navigation}: {navigation: any}) => {
     }
   }, [visibleSecondModal, selectedLocation]);
 
-  const locationProps: ILocation[] = navigation?.state?.params?.locations ?? [];
+  const locationProps: ILocation[] = route?.params?.locations ?? [];
   console.log({locationProps});
 
   // Xác định tọa độ để focus camera

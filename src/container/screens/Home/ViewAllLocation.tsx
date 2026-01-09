@@ -32,9 +32,9 @@ interface IViewAllLocationState {
   searchMode: SearchModeType; // Toggle between AI and keyword search
 }
 
-// Helper to get params from either route (v5+) or navigation.state (v4)
+// Helper to get params from route (v5+)
 const getParams = (props: IViewAllLocationProps) => {
-  return props.route?.params || props.navigation?.state?.params || {};
+  return props.route?.params || {};
 };
 
 class ViewAllLocation extends React.PureComponent<

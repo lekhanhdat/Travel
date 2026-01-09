@@ -12,12 +12,13 @@ import {DB_URL} from '../../../utils/configs';
 
 interface Props {
   navigation: any;
+  route: any;
 }
 interface States {}
 
 export default class LocationImage extends React.PureComponent<Props, States> {
   render(): React.ReactNode {
-    const location: ILocation = this.props.navigation.state.params?.location;
+    const location: ILocation = this.props.route?.params?.location;
 
     // Debug log
     console.log('LocationImage - location:', location);

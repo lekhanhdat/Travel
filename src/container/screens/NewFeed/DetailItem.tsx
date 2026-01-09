@@ -16,6 +16,7 @@ import {DB_URL} from '../../../utils/configs';
 
 interface IDetailItemScreenProps {
   navigation: any;
+  route: any;
 }
 
 interface IDetailItemScreenState {}
@@ -46,7 +47,7 @@ export default class DetailItem extends React.PureComponent<
   };
 
   render(): React.ReactNode {
-    const item: IItem = this.props.navigation.state.params?.item;
+    const item: IItem = this.props.route?.params?.item;
     return (
       <Page>
         <HeaderBase

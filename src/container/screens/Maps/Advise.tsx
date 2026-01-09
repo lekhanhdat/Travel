@@ -11,12 +11,13 @@ import {AppStyle} from '../../../common/AppStyle';
 
 interface Props {
   navigation: any;
+  route: any;
 }
 interface States {}
 
 export default class Advise extends React.PureComponent<Props, States> {
   render(): React.ReactNode {
-    const location: ILocation = this.props.navigation.state.params?.location;
+    const location: ILocation = this.props.route?.params?.location;
     console.log(111, JSON.stringify(location, null, 2));
     return (
       <Page style={styles.pageContainer}>

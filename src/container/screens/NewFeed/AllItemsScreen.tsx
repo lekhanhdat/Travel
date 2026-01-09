@@ -15,6 +15,7 @@ import locationApi from '../../../services/locations.api';
 
 interface IViewAllItemsProps {
   navigation: any;
+  route: any;
 }
 
 interface IViewAllItemsState {
@@ -33,8 +34,8 @@ export default class AllItemScreen extends React.PureComponent<
   }
 
   componentDidMount(): void {
-    const itemsIn: IItem[] = this.props.navigation.state.params?.items ?? [];
-    const valueSearch: string = this.props.navigation.state.params?.valueSearch;
+    const itemsIn: IItem[] = this.props.route?.params?.items ?? [];
+    const valueSearch: string = this.props.route?.params?.valueSearch ?? '';
     let itemsOut: IItem[] = [];
     itemsIn.forEach(item => {
       if (
@@ -60,7 +61,7 @@ export default class AllItemScreen extends React.PureComponent<
     return (
       <Page>
         <HeaderBase
-          title={this.props.navigation.state.params?.title ?? ''}
+          title={this.props.route?.params?.title ?? ''}
           leftIconSvg={
             <BackSvg
               width={sizes._24sdp}

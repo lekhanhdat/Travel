@@ -11,12 +11,13 @@ import YoutubePlayer from 'react-native-youtube-iframe';
 
 interface Props {
   navigation: any;
+  route: any;
 }
 interface States {}
 
 export default class LocationVideo extends React.PureComponent<Props, States> {
   render(): React.ReactNode {
-    const location: ILocation = this.props.navigation.state.params?.location;
+    const location: ILocation = this.props.route?.params?.location;
     return (
       <Page>
         <HeaderBase

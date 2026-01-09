@@ -16,6 +16,7 @@ import TextBase from '../../../common/TextBase';
 
 interface IPreviewImageProps {
   navigation: any;
+  route: any;
 }
 
 interface IPreviewImageState {
@@ -116,7 +117,7 @@ export default class PreviewImage extends React.PureComponent<IPreviewImageProps
   };
 
   handleSendImage = () => {
-    const imagePath = this.props.navigation.state.params?.imagePath ?? '';
+    const imagePath = this.props.route?.params?.imagePath ?? '';
     if (imagePath) {
       this.uploadImage(imagePath);
     } else {
@@ -129,7 +130,7 @@ export default class PreviewImage extends React.PureComponent<IPreviewImageProps
   };
 
   render(): React.ReactNode {
-    const imagePath = this.props.navigation.state.params?.imagePath ?? '';
+    const imagePath = this.props.route?.params?.imagePath ?? '';
     const imageUri = Platform.OS === 'android'
       ? `file://${imagePath}`
       : imagePath;

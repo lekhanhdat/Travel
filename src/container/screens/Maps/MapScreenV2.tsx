@@ -1,3 +1,4 @@
+import {isMapLocationVisible} from '../../../utils/catalogVisibility';
 import React, {useEffect, useState} from 'react';
 import {
   ScrollView,
@@ -916,20 +917,7 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
             //   ? locationProps
             //   : _.unionBy(LOCATION_POPULAR, LOCATION_NEARLY)
             // )
-            // ✨ FILTER LOCATIONS: Only show locations with marker=true OR focused/selected locations
-            locations.filter(loc => {
-              // Always show if marker is true (or undefined for backward compatibility)
-              if (loc.marker !== false) {return true;}
-
-              // Show if this location is currently focused (for navigation)
-              if (focusLocation && loc.Id === focusLocation.Id) {return true;}
-
-              // Show if this location is currently selected
-              if (selectedLocation && loc.Id === selectedLocation.Id) {return true;}
-
-              // Otherwise, hide this location (marker=false and not focused/selected)
-              return false;
-            }).map((location, index) => {
+            locations.filter(isMapLocationVisible).map((location, index) => {
               const textColor = getTextColorForMapStyle(currentMapStyle);
               const textShadow = getTextShadowForMapStyle(currentMapStyle);
 

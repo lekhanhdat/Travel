@@ -1,3 +1,4 @@
+import {parsePublishable} from '../utils/catalogVisibility';
 import {IItem, ILocation, IReview} from '../common/types';
 import {request} from './axios';
 
@@ -208,35 +209,10 @@ const locationApi = {
         }
       }
 
-      // ✨ MARKER FIELD: Handle marker field for map visibility
-      // Default to true for backward compatibility (existing locations without marker field)
-      if (typeof (location as any).marker === 'boolean') {
-        parsed.marker = (location as any).marker;
-      } else if (typeof (location as any).marker === 'string') {
-        // Handle string values (e.g., "true", "false", "1", "0")
-        parsed.marker = (location as any).marker === 'true' || (location as any).marker === '1';
-      } else {
-        // Default to true if marker field is missing (for existing locations)
-        parsed.marker = true;
-      }
+      parsed.publishable = parsePublishable(location.publishable);
 
       return parsed;
     });
-
-    // 🔍 DEBUG: Log marker field statistics (only in development)
-    if (__DEV__) {
-      const markerTrueCount = data.filter(loc => loc.marker === true).length;
-      const markerFalseCount = data.filter(loc => loc.marker === false).length;
-      const markerUndefinedCount = data.filter(loc => loc.marker === undefined).length;
-
-      console.log('========================================');
-      console.log('🔍 DEBUG: Marker field statistics');
-      console.log(`✅ marker=true: ${markerTrueCount} locations`);
-      console.log(`❌ marker=false: ${markerFalseCount} locations`);
-      console.log(`⚠️  marker=undefined: ${markerUndefinedCount} locations`);
-      console.log(`📊 Total after parsing: ${data.length} locations`);
-      console.log('========================================');
-    }
 
     // Store in cache
     locationsCache = {

@@ -38,16 +38,6 @@ const LargeItemFestival: React.FC<ILargeItemFestivalProps> = ({festival, onPress
   // Calculate rating from reviews instead of using static rating field
   const avgRating = festivalsApi.calculateAverageRating(festival.reviews);
 
-  // Price level labels
-  const getPriceLevelLabel = () => {
-    if (festival.price_level === 0) {
-      return `🆓 ${t('common:priceLevel.free')}`;
-    } else if (festival.price_level === 1) {
-      return `💰 ${t('common:priceLevel.paid')}`;
-    }
-    return `💰💰 ${t('common:priceLevel.premium')}`;
-  };
-
   return (
     <TouchableOpacity
       style={styles.container}
@@ -101,13 +91,6 @@ const LargeItemFestival: React.FC<ILargeItemFestivalProps> = ({festival, onPress
           <View style={{flexDirection: 'row', marginTop: sizes._4sdp}}>
             <TextBase style={[AppStyle.txt_14_bold]}>
               ⭐ {avgRating.toFixed(1)}
-            </TextBase>
-            <TextBase
-              style={[
-                AppStyle.txt_14_regular,
-                {marginLeft: sizes._8sdp, color: colors.primary_600},
-              ]}>
-              {getPriceLevelLabel()}
             </TextBase>
           </View>
         </View>

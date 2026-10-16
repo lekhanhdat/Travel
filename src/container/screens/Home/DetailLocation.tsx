@@ -414,13 +414,6 @@ class DetailLocationScreen extends React.PureComponent<
                             </TextBase>
                           </View>
 
-                          {/* Price Level */}
-                          <View style={{flexDirection: 'row', alignItems: 'center', marginTop: sizes._4sdp}}>
-                            <TextBase style={[AppStyle.txt_14_regular, {color: colors.primary_700}]}>
-                              💰 {festival.price_level === 0 ? t('priceLevel.free') : festival.price_level === 1 ? '$' : '$$'}
-                            </TextBase>
-                          </View>
-
                           {/* Rating */}
                           {festival.rating > 0 && (
                             <View style={{flexDirection: 'row', alignItems: 'center', marginTop: sizes._4sdp}}>

@@ -231,8 +231,8 @@ class DetailFestivalScreen extends React.PureComponent<
                 </TextBase>
               </View>
 
-              {/* Price Level */}
-              <View style={{flexDirection: 'row', alignItems: 'center', marginTop: sizes._12sdp}}>
+              {/* Ticket information */}
+              {translatedTicketInfo ? <View style={{flexDirection: 'row', alignItems: 'center', marginTop: sizes._12sdp}}>
                 <CardSvg
                   width={sizes._20sdp}
                   height={sizes._20sdp}
@@ -240,11 +240,9 @@ class DetailFestivalScreen extends React.PureComponent<
                 />
                 <TextBase
                   style={[AppStyle.txt_16_medium_detail, {marginLeft: sizes._8sdp, flex: 1, textAlign: 'justify'}]}>
-                  {t('detail.fee')}: {festival.price_level === 0 ? t('priceLevel.free') :
-                       festival.price_level === 1 ? t('priceLevel.paid') : t('priceLevel.premium')}
-                  {translatedTicketInfo && ` (${translatedTicketInfo})`}
+                  {t('detail.fee')}: {translatedTicketInfo}
                 </TextBase>
-              </View>
+              </View> : null}
 
               {/* Advise Section */}
               {festival.advise && festival.advise.length > 0 && (

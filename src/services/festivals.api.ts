@@ -34,7 +34,6 @@ export interface IFestival {
   event_time: string; // Thời gian diễn ra
   location: string; // Tên địa điểm
   location_id?: number; // ID liên kết với bảng Locations (sẽ dùng sau)
-  price_level: number; // 0: Free, 1: Affordable, 2: Expensive
   ticket_info: string;
   rating: number;
   reviews: IFestivalReview[];
@@ -149,7 +148,6 @@ const festivalsApi = {
         event_time: festival.event_time,
         location: festival.location,
         location_id: festival.location_id,
-        price_level: festival.price_level,
         ticket_info: festival.ticket_info,
         rating: festival.rating,
         reviews: JSON.stringify(festival.reviews),
@@ -239,19 +237,6 @@ const festivalsApi = {
       });
     } catch (error) {
       console.error('❌ Error fetching festivals by month:', error);
-      throw error;
-    }
-  },
-
-  /**
-   * Lấy festivals miễn phí
-   */
-  getFreeFestivals: async (): Promise<IFestival[]> => {
-    try {
-      const festivals = await festivalsApi.getFestivals();
-      return festivals.filter(f => f.price_level === 0);
-    } catch (error) {
-      console.error('❌ Error fetching free festivals:', error);
       throw error;
     }
   },

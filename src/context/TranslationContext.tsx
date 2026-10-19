@@ -1,3 +1,4 @@
+import FEATURE_FLAGS from '../config/featureFlags';
 import React, {
   createContext,
   useContext,
@@ -78,14 +79,14 @@ export const TranslationProvider: React.FC<TranslationProviderProps> = ({
      if (text.includes(':') || text.includes('.')) {
        // It's an i18n key, use i18n directly
        if (i18n.exists(text)) {
-         return i18n.t(text);
+         return i18n.t(text, {lng: language});
        }
      }
 
      // 2. Try to find it in i18n common namespace
      const commonKey = `common.${text}`;
      if (i18n.exists(commonKey)) {
-       return i18n.t(commonKey);
+       return i18n.t(commonKey, {lng: language});
      }
 
       // Check local state cache
@@ -93,7 +94,7 @@ export const TranslationProvider: React.FC<TranslationProviderProps> = ({
       if (cached) return cached;
 
      // 3. If not in i18n and language is English, return as-is
-     if (language === 'en') return text;
+     if (!FEATURE_FLAGS.USE_AZURE_TRANSLATOR || language === 'en') return text;
 
      // 4. Use Azure Translator for dynamic content not in i18n
       try {
@@ -123,14 +124,14 @@ export const TranslationProvider: React.FC<TranslationProviderProps> = ({
      if (text.includes(':') || text.includes('.')) {
        // It's an i18n key, use i18n directly
        if (i18n.exists(text)) {
-         return i18n.t(text);
+         return i18n.t(text, {lng: language});
        }
      }
 
      // 2. Try to find it in i18n common namespace
      const commonKey = `common.${text}`;
      if (i18n.exists(commonKey)) {
-       return i18n.t(commonKey);
+       return i18n.t(commonKey, {lng: language});
      }
 
       // Check dynamic translations cache

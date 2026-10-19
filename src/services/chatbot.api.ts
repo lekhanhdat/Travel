@@ -9,8 +9,6 @@ const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
 const SERPAPI_KEY = env.SERPAPI_KEY || '';
 const SERPAPI_URL = 'https://serpapi.com/search.json';
 
-// Debug: Log API key (first 10 chars only for security)
-console.log('🔑 SERPAPI_KEY loaded:', SERPAPI_KEY ? `${SERPAPI_KEY.substring(0, 10)}...` : 'EMPTY');
 
 export interface ChatMessage {
   role: 'user' | 'assistant' | 'system';

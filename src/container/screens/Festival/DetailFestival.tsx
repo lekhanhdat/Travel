@@ -1,3 +1,4 @@
+import FEATURE_FLAGS from '../../../config/featureFlags';
 import React from 'react';
 import {ScrollView, View, Image, FlatList, TouchableOpacity, StyleSheet, Modal, Dimensions} from 'react-native';
 import Page from '../../../component/Page';
@@ -48,6 +49,7 @@ class DetailFestivalScreen extends React.PureComponent<
   }
 
   async componentDidMount() {
+    if (FEATURE_FLAGS.RECOVERY_MODE) {return;}
     // Load all festivals để filter theo types
     const festivals = await festivalsApi.getFestivals();
     this.setState({ allFestivals: festivals });
@@ -352,7 +354,7 @@ class DetailFestivalScreen extends React.PureComponent<
               </View>
 
               {/* Semantic Similar Items from Backend */}
-              {festival.Id && (
+              {FEATURE_FLAGS.ENABLE_AI && festival.Id && (
                 <SimilarItemsComponent
                   entityType="festival"
                   entityId={festival.Id}

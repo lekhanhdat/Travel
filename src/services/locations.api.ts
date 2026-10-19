@@ -1,3 +1,4 @@
+import FEATURE_FLAGS from '../config/featureFlags';
 import {parsePublishable} from '../utils/catalogVisibility';
 import {IItem, ILocation, IReview} from '../common/types';
 import {request} from './axios';
@@ -78,6 +79,9 @@ const locationApi = {
   clearLocationsCache,
 
   getLocations: async (forceRefresh: boolean = false) => {
+    if (!FEATURE_FLAGS.ENABLE_NOCODB) {
+      throw new Error('Catalog is not connected in Phase 1.');
+    }
     // Return cached data if valid and not forcing refresh
     if (!forceRefresh && isCacheValid(locationsCache)) {
       if (__DEV__) {console.log('📦 Using cached locations:', locationsCache!.data.length);}

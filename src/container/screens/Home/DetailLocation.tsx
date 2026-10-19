@@ -1,3 +1,4 @@
+import FEATURE_FLAGS from '../../../config/featureFlags';
 import React from 'react';
 import {ScrollView, View, Image, FlatList, TouchableOpacity, StyleSheet, Modal, Dimensions} from 'react-native';
 import Page from '../../../component/Page';
@@ -51,6 +52,7 @@ class DetailLocationScreen extends React.PureComponent<
   }
 
   async componentDidMount() {
+    if (FEATURE_FLAGS.RECOVERY_MODE) {return;}
     // Load all locations để filter theo types
     const locations = await locationApi.getLocations();
     this.setState({ allLocations: locations });
@@ -188,7 +190,7 @@ class DetailLocationScreen extends React.PureComponent<
           onLeftIconPress={() => {
             NavigationService.pop();
           }}
-          rightIconSvgOne={
+          rightIconSvgOne={FEATURE_FLAGS.ENABLE_MAP &&
             <MapSvg
               width={sizes._24sdp}
               height={sizes._24sdp}
@@ -461,6 +463,7 @@ class DetailLocationScreen extends React.PureComponent<
               )}
 
               {/* Buttons: Directions */}
+              {FEATURE_FLAGS.ENABLE_MAP && (
               <View style={{
                 flexDirection: 'row',
                 gap: sizes._12sdp,
@@ -495,9 +498,10 @@ class DetailLocationScreen extends React.PureComponent<
                   </TextBase>
                 </TouchableOpacity>
               </View>
+              )}
 
               {/* Semantic Similar Items from Backend */}
-              {(location.Id || location.id) && (
+              {FEATURE_FLAGS.ENABLE_AI && (location.Id || location.id) && (
                 <SimilarItemsComponent
                   entityType="location"
                   entityId={location.Id || location.id!}

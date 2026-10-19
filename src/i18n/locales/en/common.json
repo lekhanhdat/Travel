@@ -275,5 +275,10 @@
     "permissionDenied": "Permission denied.",
     "notFound": "Not found.",
     "invalidInput": "Invalid input."
+  },
+  "recovery": {
+    "loading": "Loading catalog",
+    "catalogUnavailable": "Catalog unavailable. The data connection is disabled in Phase 1 (Guest Mode).",
+    "retry": "Retry"
   }
 }

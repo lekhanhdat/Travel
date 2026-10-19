@@ -1,3 +1,4 @@
+import FEATURE_FLAGS from '../config/featureFlags';
 import {request} from './axios';
 
 // ========================================
@@ -64,6 +65,9 @@ const festivalsApi = {
    * Lấy danh sách tất cả festivals
    */
   getFestivals: async (): Promise<IFestival[]> => {
+    if (!FEATURE_FLAGS.ENABLE_NOCODB) {
+      throw new Error('Catalog is not connected in Phase 1.');
+    }
     try {
       const res = await request.get<GetFestivalsResponse>(URL_GET_FESTIVALS, {
         params: {

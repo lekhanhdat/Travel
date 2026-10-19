@@ -1,3 +1,4 @@
+import FEATURE_FLAGS from '../../../config/featureFlags';
 import React from 'react';
 import {FlatList, View, TouchableOpacity, Modal, StyleSheet} from 'react-native';
 import Page from '../../../component/Page';
@@ -45,7 +46,7 @@ class ViewAllFestivals extends React.PureComponent<
     super(props);
     // Get initial search mode from navigation params
     const params = getParams(props);
-    const isSemanticSearch = params.isSemanticSearch ?? true;
+    const isSemanticSearch = FEATURE_FLAGS.ENABLE_AI && (params.isSemanticSearch ?? true);
     this.state = {
       festivals: [],
       allFestivals: [],
@@ -134,6 +135,7 @@ class ViewAllFestivals extends React.PureComponent<
   };
 
   toggleSearchMode = () => {
+    if (!FEATURE_FLAGS.ENABLE_AI) {return;}
     this.setState(
       prevState => ({
         searchMode: prevState.searchMode === 'semantic' ? 'keyword' : 'semantic',
@@ -216,7 +218,7 @@ class ViewAllFestivals extends React.PureComponent<
         />
         <View style={{padding: sizes._16sdp, flex: 1}}>
           {/* Search Mode Toggle */}
-          <View style={styles.searchModeContainer}>
+          {FEATURE_FLAGS.ENABLE_AI && <View style={styles.searchModeContainer}>
             <TouchableOpacity
               style={[styles.searchModeButton, isSemanticMode && styles.searchModeButtonActive]}
               onPress={() => isSemanticMode || this.toggleSearchMode()}>
@@ -231,7 +233,7 @@ class ViewAllFestivals extends React.PureComponent<
                 🔤 Keyword
               </TextBase>
             </TouchableOpacity>
-          </View>
+          </View>}
 
           {/* Filter Button - only show for keyword search */}
           {!isSemanticMode && (

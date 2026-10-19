@@ -1,6 +1,6 @@
 # Kế hoạch khôi phục Travel
 
-Ngày khảo sát: **19/10/2026 — Asia/Saigon**. Trạng thái: **chỉ phân tích và lập kế hoạch**.
+Ngày khảo sát: **19/10/2026 — Asia/Saigon**. Cập nhật cùng ngày: **P1 Completed, 6/6 task; debug build và Home Guest đã chạy trên emulator Android 14**. Lịch sử khảo sát P0 dưới đây được giữ lại; chưa triển khai P2.
 
 ## 1. Phạm vi và nguyên tắc
 
@@ -8,9 +8,11 @@ Ngày khảo sát: **19/10/2026 — Asia/Saigon**. Trạng thái: **chỉ phân 
 - Backend đích: <https://travel-api-u2xcse44ca-as.a.run.app>.
 - Mốc ưu tiên: app Android mở được ở chế độ khách, xem danh sách/chi tiết địa điểm và lễ hội từ backend thật, tìm kiếm từ khóa, xử lý thiếu dữ liệu và mất mạng rõ ràng.
 - Android trước là giả định phù hợp với môi trường Windows; iOS cần macOS/Xcode và không chặn mốc Android.
-- Chỉ hai tài liệu recovery được tạo trong đợt này. Không sửa source/config, không cài package, chạy build, thay đổi dữ liệu, deploy hoặc gọi API ghi.
+- Trong P0 chỉ hai tài liệu recovery được tạo; không sửa source/config, cài package, chạy build, thay đổi dữ liệu, deploy hoặc gọi API ghi. P1 đã được người dùng cho phép riêng và có kết quả thực tế ở mục 8.
 - Không khôi phục NocoDB như nguồn chính, không tạo endpoint giả, không nâng cấp framework/refactor rộng. Backend core đang chạy nên mặc định giữ nguyên.
 - **Mỗi yêu cầu tiếp theo chỉ thực hiện một phase được chỉ định**, cập nhật tasklist, báo cáo bằng chứng và dừng. Không tự chuyển phase.
+- Khi tạm bỏ qua chức năng: giữ code gốc dưới dạng comment để có thể khôi phục; không xóa implementation. Cờ vẫn bảo vệ các đường gọi còn hoạt động.
+- Trước khi báo cáo: xóa file tạm do Agent tạo (log, observer, bundle audit, UI dump, ảnh kiểm thử); chỉ giữ source/tests, tài liệu tổng hợp và artifact kết quả được yêu cầu.
 
 ## 2. Hiện trạng đã kiểm tra
 
@@ -212,4 +214,17 @@ Các nhóm dưới đây **không phải phase được tự động thực hi�
 - Khi được yêu cầu một phase: kiểm tra lại source/Git/live cần thiết, không ghi đè thay đổi người dùng; chỉ đổi phạm vi phase đó. Nếu cần vượt phase hoặc sửa production, ghi đề xuất cụ thể và chờ chỉ định phạm vi.
 - Sau mỗi phase: cập nhật trạng thái/tổng số, liệt kê file thực đổi, kiểm tra đã chạy/chưa chạy, blockers; dừng. Không commit/deploy tự động.
 - Kiểm chứng đã làm ở P0: đọc source/config có che giá trị secret, GET/HEAD live, full pagination và lỗi tham số. Git FE baseline sạch qua `git -c safe.directory=... status --short`; chỉ áp dụng safe.directory cho từng lệnh, không đổi global config.
-- Chưa chạy npm install/Jest/ESLint/tsc/Gradle/app Android/iOS hoặc BE local: nhiệm vụ chỉ lập plan, FE chưa có node_modules; không có bằng chứng UI/runtime. Không dùng báo cáo nghiệm thu BE cũ để tuyên bố FE đã chạy.
+- Tại P0 chưa chạy npm install/Jest/ESLint/tsc/Gradle/app Android/iOS hoặc BE local: nhiệm vụ chỉ lập plan, FE chưa có node_modules; không có bằng chứng UI/runtime. Kết quả P1 được bổ sung riêng bên dưới. Không dùng báo cáo nghiệm thu BE cũ để tuyên bố FE đã chạy.
+
+## 8. Kết quả thực tế P1 — 19/10/2026
+
+- Baseline Git sạch, dùng safe.directory theo từng lệnh. Node 20.19.4, npm 10.8.2, Java 17.0.12. `node_modules` đã có khi bắt đầu P1, `npm ls --depth=0` đủ dependencies; chọn npm/package-lock.json, giữ cả hai lockfile nguyên trạng. Không sửa package/native hoặc BE.
+- Recovery flags đã được dùng thực: Home không đọc phiên legacy, xin GPS hoặc tính khoảng cách mặc định; giữ nguyên dữ liệu AsyncStorage. Chỉ Home/Festival tabs hoạt động; list/detail Location/Festival và nội dung local được giữ. Theo yêu cầu bổ sung, import/tab/route Auth/map/camera/items/payment/chatbot/profile và bubble được giữ dưới dạng comment; không khởi tạo module bị hoãn. Các guard dịch vụ/directions/recommendation/similar AI vẫn hoạt động. Code GPS/nearby và renderer Items trước đây cũng được giữ trong comment để khôi phục sau này.
+- Catalog chưa kết nối ở P1: getLocations/getFestivals từ chối rõ trước cache và request NocoDB; Axios chặn legacy read/write/upload trước network adapter. Home/Festival bắt lỗi, dừng loading, có thông báo vi/en và retry. Không trả catalog giả, không sửa URL sang Cloud Run; phần đó vẫn thuộc P2.
+- Keyword search dùng nhánh local, không bật lại semantic qua toggle. TranslationContext giữ UI common local và bypass Azure; dịch batch/detect Azure cũng có guard. Không pretranslate/offline warmup mạng. Đã bỏ log phần key chatbot và OTP.
+- Ba suite Guest Mode cuối có **9 tests pass**: Home guest/error/retry không account/GPS/request; Festival không Items; keyword bỏ dấu; legacy request bị chặn; Azure không fetch; navigation không khởi tạo tích hợp phụ; UI vi/en local không queue dịch; thêm 2 tests buộc màn kết quả Location/Festival giữ keyword dù nhận route params semantic cũ. AI toggle còn sót được phát hiện trên emulator, đã gate UI/constructor/toggle bằng flag và kiểm tra lại.
+- Lần P1 đầu: Metro Android dev bundle ghi thành công và copy 40 assets, nhưng `assembleDebug` exit 1 vì thiếu SDK. Sau User cài emulator, tìm thấy SDK ở `C:/Android/Sdk`; sửa riêng `sdk.dir` local từ đường dẫn cũ, dùng env theo tiến trình. Gradle tự cài NDK 26.1.10909125, CMake 3.22.1 và Platform 35 bằng license có sẵn. **assembleDebug exit 0**, Gradle 8.8/AGP 8.5.0, 648 tasks, 11m21s; build xác nhận sau sửa JS cũng exit 0 trong 21s. Native Mapbox compile thành công, không đổi dependency/native/autolink/lockfile. Các warning compileSdk 35/deprecated API chưa buộc nâng framework để đạt P1.
+- **Pixel_Test / emulator-5554, Android 14 API 34 x86_64:** install APK Success, `am start` Status ok/COLD; Home Guest mở không login/GPS prompt. Home/Festival báo catalog tạm tắt và retry dừng loading, keyword search/View All trả rỗng không nút AI, UI vi/en local và restart giữ ngôn ngữ. Không tạo catalog giả, chưa tích hợp Cloud Run. [Báo cáo smoke tổng hợp](docs/recovery/p1/README.md); file ảnh/audit tạm đã được dọn theo yêu cầu bổ sung.
+- Observer pass-through local tạm cài trước entry app: 70 bản ghi fetch/XHR từ 16:53–16:58 đều external=0; không có FATAL EXCEPTION/Invariant Violation/TypeError/ReferenceError trong log thu. Không ghi URL/header/body/key; không thay response hoặc chặn request. Giới hạn: không capture native sockets/WebSocket, không nghiệm thu luồng chưa mở. Đã dừng observer và trả Metro debug chuẩn/Home tiếng Việt, không xóa dữ liệu app.
+- **P1 Completed.** Typecheck toàn repo vẫn 66 diagnostics (exit 2), full Jest có các lỗi đã ghi ở tracking từ đợt trước; tests P1 hiện 9/9 pass và lint file sửa ở đợt tiếp tục 0 errors/4 warnings. Gate P1 chỉ nghiệm thu shell Guest trên Android, không tuyên bố catalog thật hoặc toàn repo đã sạch. P2–P5 giữ Pending, không commit/deploy hoặc tự chuyển phase.
+- Đợt bổ sung quy ước: phục hồi code tạm bỏ qua thành comment; chạy lại 9 tests P1 pass, ESLint 4 file chạm tới 0 errors/14 warnings. Đóng Metro/AVD do Agent khởi động để giải phóng file; dọn thư mục audit/cache riêng và raw audit, giữ APK/source/tests/tài liệu. Không thay index Git do User đã stage.

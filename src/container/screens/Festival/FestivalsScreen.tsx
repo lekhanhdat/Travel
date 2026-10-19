@@ -1,3 +1,5 @@
+import FEATURE_FLAGS from '../../../config/featureFlags';
+import CatalogStatus from '../../../component/CatalogStatus';
 import React from 'react';
 import {
   FlatList,
@@ -34,6 +36,8 @@ interface IFestivalsScreenProps extends WithAzureTranslationProps {
 }
 
 interface IFestivalsScreenState {
+  loading: boolean;
+  error: boolean;
   valueSearch: string;
   items: IItem[];
   ITEMS_POPULAR: IItem[];
@@ -54,6 +58,8 @@ class FestivalsScreen extends React.PureComponent<
     super(props);
     this.searchBarRef = React.createRef();
     this.state = {
+      loading: true,
+      error: false,
       valueSearch: '',
       items: [],
       ITEMS_POPULAR: [],
@@ -72,7 +78,7 @@ class FestivalsScreen extends React.PureComponent<
       this.searchBarRef.current?.resetSearch();
     });
 
-    this.fetchItems();
+    if (FEATURE_FLAGS.ENABLE_ITEMS) {this.fetchItems();}
     this.fetchFestivals();
   }
 
@@ -89,21 +95,23 @@ class FestivalsScreen extends React.PureComponent<
   }
 
   async fetchFestivals() {
-    const data = await festivalsApi.getFestivals();
-    if (__DEV__) {
-      console.log('🎉 Festivals loaded:', data.length);
+    this.setState({loading: true, error: false});
+    try {
+      const data = await festivalsApi.getFestivals();
+      this.setState({festivals: data, FESTIVALS_POPULAR: data.slice(0, 20)});
+    } catch {
+      this.setState({error: true});
+    } finally {
+      this.setState({loading: false});
     }
-    this.setState({
-      festivals: data,
-      FESTIVALS_POPULAR: data.slice(0, 10),
-    });
   }
 
+  /* P1: Items renderer retained while Items is temporarily disabled.
   renderItemHorizontal = ({item}: {item: IItem}) => {
     return <HistoricalArtifact key={`item-${item.Id}`} item={item} />;
   };
+  */
 
-  // Render festival item using LargeItemFestival (matching "Gần tôi" section layout)
   renderFestivalItem = ({item}: {item: IFestival}) => {
     return <LargeItemFestival festival={item} />;
   };
@@ -173,6 +181,8 @@ class FestivalsScreen extends React.PureComponent<
           idField="Id"
         />
 
+        <CatalogStatus loading={this.state.loading} error={this.state.error}
+          onRetry={() => this.fetchFestivals()} />
         <ScrollView>
           <View style={styles.container}>
             {/* FESTIVALS SECTION - Matching "Gần tôi" layout */}

@@ -275,5 +275,10 @@
     "permissionDenied": "Không có quyền truy cập.",
     "notFound": "Không tìm thấy.",
     "invalidInput": "Dữ liệu không hợp lệ."
+  },
+  "recovery": {
+    "loading": "Đang tải danh mục",
+    "catalogUnavailable": "Chưa thể tải danh mục. Kết nối dữ liệu đang tạm tắt trong Phase 1 (chế độ khách).",
+    "retry": "Thử lại"
   }
 }

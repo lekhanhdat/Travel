@@ -1,5 +1,5 @@
-import FEATURE_FLAGS from '../config/featureFlags';
-import {parsePublishable} from '../utils/catalogVisibility';
+import {createCatalogCache, fetchCatalog} from './catalog.client';
+import {adaptLocation} from './catalog.adapter';
 import {IItem, ILocation, IReview} from '../common/types';
 import {request} from './axios';
 
@@ -50,7 +50,8 @@ interface CacheEntry<T> {
 }
 
 // In-memory cache for locations
-let locationsCache: CacheEntry<ILocation[]> | null = null;
+// let locationsCache: CacheEntry<ILocation[]> | null = null; // Legacy cache
+const catalogLocations = createCatalogCache(() => fetchCatalog('/locations', adaptLocation));
 let reviewsCache: CacheEntry<IReview[]> | null = null;
 let itemsCache: CacheEntry<IItem[]> | null = null;
 
@@ -62,14 +63,14 @@ const isCacheValid = <T>(cache: CacheEntry<T> | null): boolean => {
 
 // Clear all caches (useful after creating/updating data)
 const clearCache = () => {
-  locationsCache = null;
+  catalogLocations.clear();
   reviewsCache = null;
   itemsCache = null;
 };
 
 // Clear only locations cache
 const clearLocationsCache = () => {
-  locationsCache = null;
+  catalogLocations.clear();
   reviewsCache = null; // Reviews depend on locations, so clear both
 };
 
@@ -78,154 +79,164 @@ const locationApi = {
   clearCache,
   clearLocationsCache,
 
-  getLocations: async (forceRefresh: boolean = false) => {
-    if (!FEATURE_FLAGS.ENABLE_NOCODB) {
-      throw new Error('Catalog is not connected in Phase 1.');
-    }
-    // Return cached data if valid and not forcing refresh
-    if (!forceRefresh && isCacheValid(locationsCache)) {
-      if (__DEV__) {console.log('📦 Using cached locations:', locationsCache!.data.length);}
-      return locationsCache!.data;
-    }
-    // 🔍 DEBUG: Log API request details (only in development)
-    if (__DEV__) {
-      console.log('========================================');
-      console.log('🔍 DEBUG: getLocations() - FETCHING ALL PAGES');
-      console.log(`📡 API URL: ${URL_GET_LOCATIONS}`);
-      console.log('========================================');
-    }
-
-    // ✨ PAGINATION FIX: NocoDB enforces max pageSize of 100
-    // We need to fetch all pages to get all locations
-    let allData: any[] = [];
-    let currentPage = 1;
-    let hasMorePages = true;
-    const pageSize = 100; // NocoDB's max page size
-
-    while (hasMorePages) {
-      const offset = (currentPage - 1) * pageSize;
-
-      if (__DEV__) {console.log(`📄 Fetching page ${currentPage} (offset: ${offset}, limit: ${pageSize})...`);}
-
-      const res = await request.get<GetLocationsResponse>(URL_GET_LOCATIONS, {
-        params: {
-          offset: offset.toString(),
-          limit: pageSize.toString(),
-        },
-      });
-
-      const pageData = res.data.list ?? [];
-      allData = allData.concat(pageData);
-
-      if (__DEV__) {
-        console.log(`   ✅ Page ${currentPage}: ${pageData.length} records`);
-        console.log(`   📊 Total so far: ${allData.length} records`);
-      }
-
-      // Check if there are more pages
-      const pageInfo = res.data.pageInfo;
-      hasMorePages = !pageInfo.isLastPage && pageData.length === pageSize;
-
-      if (hasMorePages) {
-        currentPage++;
-      }
-    }
-
-    let data = allData;
-
-    // 🔍 DEBUG: Log total locations fetched from NocoDB (only in development)
-    if (__DEV__) {
-      console.log('========================================');
-      console.log('🔍 DEBUG: getLocations() - ALL PAGES FETCHED');
-      console.log(`📊 Total locations fetched from NocoDB: ${data.length}`);
-      console.log(`📄 Total pages fetched: ${currentPage}`);
-      console.log('========================================');
-    }
-
-    // Parse JSON fields từ NocoDB
-    data = data.map(location => {
-      const parsed: any = {
-        ...location,
-      };
-
-      // Parse reviews (luôn là JSON string từ NocoDB)
-      if (typeof location.reviews === 'string') {
-        try {
-          parsed.reviews = JSON.parse(location.reviews);
-        } catch (e) {
-          if (__DEV__) {console.error('Error parsing reviews:', e);}
-          parsed.reviews = [];
-        }
-      }
-
-      // Parse images (có thể là JSON string từ NocoDB)
-      if (typeof location.images === 'string') {
-        try {
-          parsed.images = JSON.parse(location.images);
-        } catch (e) {
-          if (__DEV__) {console.error('Error parsing images:', e);}
-          parsed.images = [];
-        }
-      }
-
-      // Parse videos (có thể là JSON string từ NocoDB)
-      if (typeof location.videos === 'string') {
-        try {
-          parsed.videos = JSON.parse(location.videos);
-        } catch (e) {
-          if (__DEV__) {console.error('Error parsing videos:', e);}
-          parsed.videos = [];
-        }
-      }
-
-      // Parse advise (có thể là JSON string từ NocoDB)
-      if (typeof location.advise === 'string') {
-        try {
-          // Thử parse JSON trước
-          parsed.advise = JSON.parse(location.advise);
-        } catch (e) {
-          // Nếu không phải JSON, giữ nguyên string
-          parsed.advise = location.advise;
-        }
-      }
-
-      // Parse types (có thể là JSON string từ NocoDB)
-      if (typeof (location as any).types === 'string') {
-        try {
-          parsed.types = JSON.parse((location as any).types);
-        } catch (e) {
-          if (__DEV__) {console.error('Error parsing types:', e);}
-          parsed.types = [];
-        }
-      } else if (Array.isArray((location as any).types)) {
-        // Nếu đã là array, copy trực tiếp
-        parsed.types = (location as any).types;
-      }
-
-      // ✨ AUTO-GENERATE AVATAR: Lấy ảnh đầu tiên từ mảng images làm avatar
-      // Nếu không có trường avatar hoặc avatar rỗng, tự động lấy ảnh đầu tiên
-      if (!parsed.avatar || parsed.avatar === '') {
-        if (parsed.images && Array.isArray(parsed.images) && parsed.images.length > 0) {
-          parsed.avatar = parsed.images[0];
-        } else {
-          // Fallback: nếu không có images, set avatar rỗng
-          parsed.avatar = '';
-        }
-      }
-
-      parsed.publishable = parsePublishable(location.publishable);
-
-      return parsed;
-    });
-
-    // Store in cache
-    locationsCache = {
-      data: data,
-      timestamp: Date.now(),
-    };
-
-    return data;
+  getLocations: (forceRefresh = false) => {
+    if (forceRefresh) {reviewsCache = null;}
+    return catalogLocations.get(forceRefresh);
   },
+
+  getLocationById: async (id: number, forceRefresh = false) =>
+    (await locationApi.getLocations(forceRefresh)).find(location => location.id === id) ?? null,
+
+  // P2: Original NocoDB catalog read retained for recovery history.
+  //   getLocations: async (forceRefresh: boolean = false) => {
+  //     if (!FEATURE_FLAGS.ENABLE_NOCODB) {
+  //       throw new Error('Catalog is not connected in Phase 1.');
+  //     }
+  //     // Return cached data if valid and not forcing refresh
+  //     if (!forceRefresh && isCacheValid(locationsCache)) {
+  //       if (__DEV__) {console.log('📦 Using cached locations:', locationsCache!.data.length);}
+  //       return locationsCache!.data;
+  //     }
+  //     // 🔍 DEBUG: Log API request details (only in development)
+  //     if (__DEV__) {
+  //       console.log('========================================');
+  //       console.log('🔍 DEBUG: getLocations() - FETCHING ALL PAGES');
+  //       console.log(`📡 API URL: ${URL_GET_LOCATIONS}`);
+  //       console.log('========================================');
+  //     }
+  //
+  //     // ✨ PAGINATION FIX: NocoDB enforces max pageSize of 100
+  //     // We need to fetch all pages to get all locations
+  //     let allData: any[] = [];
+  //     let currentPage = 1;
+  //     let hasMorePages = true;
+  //     const pageSize = 100; // NocoDB's max page size
+  //
+  //     while (hasMorePages) {
+  //       const offset = (currentPage - 1) * pageSize;
+  //
+  //       if (__DEV__) {console.log(`📄 Fetching page ${currentPage} (offset: ${offset}, limit: ${pageSize})...`);}
+  //
+  //       const res = await request.get<GetLocationsResponse>(URL_GET_LOCATIONS, {
+  //         params: {
+  //           offset: offset.toString(),
+  //           limit: pageSize.toString(),
+  //         },
+  //       });
+  //
+  //       const pageData = res.data.list ?? [];
+  //       allData = allData.concat(pageData);
+  //
+  //       if (__DEV__) {
+  //         console.log(`   ✅ Page ${currentPage}: ${pageData.length} records`);
+  //         console.log(`   📊 Total so far: ${allData.length} records`);
+  //       }
+  //
+  //       // Check if there are more pages
+  //       const pageInfo = res.data.pageInfo;
+  //       hasMorePages = !pageInfo.isLastPage && pageData.length === pageSize;
+  //
+  //       if (hasMorePages) {
+  //         currentPage++;
+  //       }
+  //     }
+  //
+  //     let data = allData;
+  //
+  //     // 🔍 DEBUG: Log total locations fetched from NocoDB (only in development)
+  //     if (__DEV__) {
+  //       console.log('========================================');
+  //       console.log('🔍 DEBUG: getLocations() - ALL PAGES FETCHED');
+  //       console.log(`📊 Total locations fetched from NocoDB: ${data.length}`);
+  //       console.log(`📄 Total pages fetched: ${currentPage}`);
+  //       console.log('========================================');
+  //     }
+  //
+  //     // Parse JSON fields từ NocoDB
+  //     data = data.map(location => {
+  //       const parsed: any = {
+  //         ...location,
+  //       };
+  //
+  //       // Parse reviews (luôn là JSON string từ NocoDB)
+  //       if (typeof location.reviews === 'string') {
+  //         try {
+  //           parsed.reviews = JSON.parse(location.reviews);
+  //         } catch (e) {
+  //           if (__DEV__) {console.error('Error parsing reviews:', e);}
+  //           parsed.reviews = [];
+  //         }
+  //       }
+  //
+  //       // Parse images (có thể là JSON string từ NocoDB)
+  //       if (typeof location.images === 'string') {
+  //         try {
+  //           parsed.images = JSON.parse(location.images);
+  //         } catch (e) {
+  //           if (__DEV__) {console.error('Error parsing images:', e);}
+  //           parsed.images = [];
+  //         }
+  //       }
+  //
+  //       // Parse videos (có thể là JSON string từ NocoDB)
+  //       if (typeof location.videos === 'string') {
+  //         try {
+  //           parsed.videos = JSON.parse(location.videos);
+  //         } catch (e) {
+  //           if (__DEV__) {console.error('Error parsing videos:', e);}
+  //           parsed.videos = [];
+  //         }
+  //       }
+  //
+  //       // Parse advise (có thể là JSON string từ NocoDB)
+  //       if (typeof location.advise === 'string') {
+  //         try {
+  //           // Thử parse JSON trước
+  //           parsed.advise = JSON.parse(location.advise);
+  //         } catch (e) {
+  //           // Nếu không phải JSON, giữ nguyên string
+  //           parsed.advise = location.advise;
+  //         }
+  //       }
+  //
+  //       // Parse types (có thể là JSON string từ NocoDB)
+  //       if (typeof (location as any).types === 'string') {
+  //         try {
+  //           parsed.types = JSON.parse((location as any).types);
+  //         } catch (e) {
+  //           if (__DEV__) {console.error('Error parsing types:', e);}
+  //           parsed.types = [];
+  //         }
+  //       } else if (Array.isArray((location as any).types)) {
+  //         // Nếu đã là array, copy trực tiếp
+  //         parsed.types = (location as any).types;
+  //       }
+  //
+  //       // ✨ AUTO-GENERATE AVATAR: Lấy ảnh đầu tiên từ mảng images làm avatar
+  //       // Nếu không có trường avatar hoặc avatar rỗng, tự động lấy ảnh đầu tiên
+  //       if (!parsed.avatar || parsed.avatar === '') {
+  //         if (parsed.images && Array.isArray(parsed.images) && parsed.images.length > 0) {
+  //           parsed.avatar = parsed.images[0];
+  //         } else {
+  //           // Fallback: nếu không có images, set avatar rỗng
+  //           parsed.avatar = '';
+  //         }
+  //       }
+  //
+  //       parsed.publishable = parsePublishable(location.publishable);
+  //
+  //       return parsed;
+  //     });
+  //
+  //     // Store in cache
+  //     locationsCache = {
+  //       data: data,
+  //       timestamp: Date.now(),
+  //     };
+  //
+  //     return data;
+  //   },
+  //
 
   getItems: async (forceRefresh: boolean = false) => {
     // Return cached data if valid
@@ -283,7 +294,7 @@ const locationApi = {
       }
 
       // Lấy tất cả locations với reviews (uses location cache)
-      const locations = await locationApi.getLocations();
+      const locations = await locationApi.getLocations(forceRefresh);
 
       // Extract tất cả reviews từ locations
       let allReviews: IReview[] = [];
@@ -323,7 +334,7 @@ const locationApi = {
       return allReviews;
     } catch (error) {
       if (__DEV__) {console.error('❌ Error fetching reviews:', error);}
-      return [];
+      throw error;
     }
   },
 

@@ -1,4 +1,5 @@
 declare module '@env' {
+  export const CATALOG_API_URL: string;
   export const SERVER_URL: string;
   export const DB_URL: string;
   export const NOCODB_TOKEN: string;

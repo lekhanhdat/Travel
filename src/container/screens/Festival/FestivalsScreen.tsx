@@ -94,10 +94,10 @@ class FestivalsScreen extends React.PureComponent<
     });
   }
 
-  async fetchFestivals() {
+  async fetchFestivals(forceRefresh = false) {
     this.setState({loading: true, error: false});
     try {
-      const data = await festivalsApi.getFestivals();
+      const data = await festivalsApi.getFestivals(forceRefresh);
       this.setState({festivals: data, FESTIVALS_POPULAR: data.slice(0, 20)});
     } catch {
       this.setState({error: true});
@@ -182,7 +182,7 @@ class FestivalsScreen extends React.PureComponent<
         />
 
         <CatalogStatus loading={this.state.loading} error={this.state.error}
-          onRetry={() => this.fetchFestivals()} />
+          onRetry={() => this.fetchFestivals(true)} />
         <ScrollView>
           <View style={styles.container}>
             {/* FESTIVALS SECTION - Matching "Gần tôi" layout */}

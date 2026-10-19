@@ -278,7 +278,7 @@
   },
   "recovery": {
     "loading": "Loading catalog",
-    "catalogUnavailable": "Catalog unavailable. The data connection is disabled in Phase 1 (Guest Mode).",
+    "catalogUnavailable": "Unable to load the catalog. Please check your connection and retry.",
     "retry": "Retry"
   }
 }

@@ -278,7 +278,7 @@
   },
   "recovery": {
     "loading": "Đang tải danh mục",
-    "catalogUnavailable": "Chưa thể tải danh mục. Kết nối dữ liệu đang tạm tắt trong Phase 1 (chế độ khách).",
+    "catalogUnavailable": "Chưa thể tải danh mục. Vui lòng kiểm tra kết nối và thử lại.",
     "retry": "Thử lại"
   }
 }

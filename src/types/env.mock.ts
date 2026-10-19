@@ -12,3 +12,5 @@ export const OPENAI_API_KEY = 'sk-test-key';
 export const UNSPLASH_ACCESS_KEY = 'test-unsplash-key';
 export const SERPAPI_KEY = 'test-serpapi-key';
 
+
+export const CATALOG_API_URL = 'https://travel-api-u2xcse44ca-as.a.run.app';

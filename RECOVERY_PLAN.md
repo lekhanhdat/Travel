@@ -1,6 +1,6 @@
 # Kế hoạch khôi phục Travel
 
-Ngày khảo sát: **19/10/2026 — Asia/Saigon**. Cập nhật cùng ngày: **P1 Completed, 6/6 task; debug build và Home Guest đã chạy trên emulator Android 14**. Lịch sử khảo sát P0 dưới đây được giữ lại; chưa triển khai P2.
+Ngày khảo sát: **19/10/2026 — Asia/Saigon**. Cập nhật cùng ngày: **P2 Completed, 6/6 task; service FE đã đọc đủ catalog Cloud Run, 38 tests pass**. Lịch sử khảo sát P0 và kết quả P1 được giữ lại; P3 chưa triển khai. Kết quả P2 ở mục 9.
 
 ## 1. Phạm vi và nguyên tắc
 
@@ -228,3 +228,45 @@ Các nhóm dưới đây **không phải phase được tự động thực hi�
 - Observer pass-through local tạm cài trước entry app: 70 bản ghi fetch/XHR từ 16:53–16:58 đều external=0; không có FATAL EXCEPTION/Invariant Violation/TypeError/ReferenceError trong log thu. Không ghi URL/header/body/key; không thay response hoặc chặn request. Giới hạn: không capture native sockets/WebSocket, không nghiệm thu luồng chưa mở. Đã dừng observer và trả Metro debug chuẩn/Home tiếng Việt, không xóa dữ liệu app.
 - **P1 Completed.** Typecheck toàn repo vẫn 66 diagnostics (exit 2), full Jest có các lỗi đã ghi ở tracking từ đợt trước; tests P1 hiện 9/9 pass và lint file sửa ở đợt tiếp tục 0 errors/4 warnings. Gate P1 chỉ nghiệm thu shell Guest trên Android, không tuyên bố catalog thật hoặc toàn repo đã sạch. P2–P5 giữ Pending, không commit/deploy hoặc tự chuyển phase.
 - Đợt bổ sung quy ước: phục hồi code tạm bỏ qua thành comment; chạy lại 9 tests P1 pass, ESLint 4 file chạm tới 0 errors/14 warnings. Đóng Metro/AVD do Agent khởi động để giải phóng file; dọn thư mục audit/cache riêng và raw audit, giữ APK/source/tests/tài liệu. Không thay index Git do User đã stage.
+
+## 9. Kết quả thực tế P2 — 19/10/2026
+
+**Completed, 6/6 task.** Baseline Git sạch, HEAD `1c03405` (Phase 1); dùng `git -c safe.directory=...` theo từng lệnh do ownership sandbox, không sửa Git config toàn máy. Đọc lại plan/tasklist, source FE, `core_api/models.py` chỉ đọc và OpenAPI live trước khi tích hợp. Không sửa BE, DB hoặc Cloud Run production.
+
+### Thay đổi kỹ thuật
+
+- `src/services/catalog.client.ts`: client Axios độc lập với `services/axios.ts`; dùng `CATALOG_API_URL` từ `@env` nếu có, mặc định `https://travel-api-u2xcse44ca-as.a.run.app`. Chỉ helper danh sách `/locations`, `/festivals` sử dụng client này. Không cần sửa `.env` chứa key, `SERVER_URL`, `DB_URL` hay client legacy. Bổ sung khai báo/mock env cho biến mới. Không có xc-token/Authorization/Cookie trong request kiểm thử; `withCredentials=false`.
+- Timeout 30 giây mỗi request để phù hợp cold start. Tối đa 3 lần thử tổng cộng cho timeout/network/429/5xx, nghỉ 500ms rồi 1000ms; HTTP 4xx khác không retry. `CatalogError.kind` phân biệt `timeout/network/http/contract`, giữ HTTP status, không chứa URL có key/body. Lỗi được throw lên UI, không đổi thành danh sách rỗng. Chuỗi lỗi UI vi/en đã bỏ thông báo “tạm tắt Phase 1”, giữ nút Thử lại.
+- `catalog.adapter.ts` mô tả đầy đủ base/location/festival DTO theo models/OpenAPI. Adapter kiểm tra kiểu dữ liệu trước khi đưa vào cache, giữ toàn bộ trường trả về, `id`, `record_id`, alias `Id=id`, JSON arrays (kể cả review JSON lồng nhau), số và null gốc. Không JSON.parse arrays backend, không tự tạo GPS/rating hoặc suy ra dữ liệu thiếu. Không ánh xạ Hotels sang Items.
+- `locations.api.ts`, `festivals.api.ts`: chuyển hai luồng đọc sang client mới, giữ implementation đọc NocoDB cũ trong comment. Các constants/write/upload/items legacy vẫn ở client cũ và tiếp tục bị chặn bởi flags/interceptor P1. Phân trang kiểm tra offset khớp, limit nguyên 1–100, items không vượt limit, has_more là boolean; trang có has_more phải đủ limit; tăng offset bằng response.limit. Chấp nhận trang kết thúc rỗng; reject ID trùng/trang sai contract/không tiến triển; chặn trên 1000 trang, không âm thầm trả kết quả thiếu.
+- Cache danh sách 10 phút, chia sẻ request đang tải, chỉ lưu khi hoàn tất toàn bộ trang. `forceRefresh`/clear invalidates cache và chặn request cũ ghi đè kết quả mới; lỗi refresh không bị cache cũ che. Refresh location đồng thời invalidate reviews dẫn xuất; `getReviews` truyền forceRefresh và không nuốt lỗi thành `[]`. Festivals có `clearCache` và forceRefresh mới, không đổi các lời gọi không truyền tham số.
+- `getLocationById/getFestivalById` tra theo `id` trong list/cache; không gọi detail endpoint. Hai màn detail giữ record từ route và tải catalog/related qua service, có trạng thái lỗi + retry. Related chỉ so FK số nguyên thực, từ chối FK null/undefined; không dùng tên để suy luận. Retry Festival và detail ép refresh khi người dùng yêu cầu.
+- `common/types.tsx` phản ánh GPS/rating nullable và record_id. Để type mới không gây lỗi ở consumer, chỉ bổ sung guard nhỏ: rating liên quan phải là số; festival SimilarItems dùng images vì backend không có avatar; Map kiểm tra GPS trước route/focus và visibility helper có type predicate sau kiểm tra GPS hiện hữu. Map/AI vẫn tắt hoàn toàn bằng flags P1; không triển khai trải nghiệm Map hoặc các hạng mục UI rộng của P3. Code cũ bị tạm bỏ qua tiếp tục được giữ trong comment.
+- Test `__tests__/services/catalog.api.test.js` mới và cập nhật Guest Mode test cho kết nối P2: Home/Festival vẫn là guest, lỗi API kiểm thử được tiêm qua spy rõ ràng; giữ kiểm tra legacy chặn trước adapter, không tài khoản/GPS/AI/Azure. Fixtures trong unit test chỉ để kiểm tra contract, không đưa vào runtime hoặc fallback thay dữ liệu thật.
+
+### Kiểm chứng live chỉ đọc
+
+Live test gọi chính service FE qua Jest/Node HTTP adapter (Axios build Node được chọn rõ vì preset React Native chọn Axios build browser). Đối chiếu toàn bộ record với các GET phân trang độc lập, không chỉ so count. Không cần token; không gọi write, auth, AI, payment, upload, hotels hoặc NocoDB.
+
+| Catalog | Phân trang service | Tổng/ID | Bản ghi đầu | Bản ghi cuối |
+|---|---|---|---|---|
+| Locations | offset 0: 100, offset 100: 24, has_more=false | **124**, id/record_id duy nhất | id=1, `location_49887776b7c7b105`, An Phú Farm | id=124, `location_9aca2ee33f365095` |
+| Festivals | offset 0: 43, has_more=false | **43**, id/record_id duy nhất | id=1, `festival_7562b8e5601daf3f`, Biểu diễn nghệ thuật Chăm tại Khu đền tháp Mỹ Sơn | id=43, `festival_1c2cf56396a05611` |
+
+Số lượng không đổi so baseline P0. **124/124 location lat=null, 124/124 location rating=null; 43/43 festival rating=null và location_id=null.** Related festivals rỗng là đúng dữ liệu hiện tại. Arrays và các trường null được so bằng deep equality với response gốc; alias Id là trường duy nhất adapter bổ sung. OpenAPI live vẫn chỉ có `/locations`, `/festivals`, `/hotels`, `/`, `/health`, `/health/ready`; không có route detail.
+
+### Lệnh và kết quả validation
+
+```powershell
+$env:CATALOG_LIVE='1'
+node node_modules/jest/bin/jest.js __tests__/services/catalog.api.test.js __tests__/guestMode.test.js __tests__/guestNavigation.test.js __tests__/guestTranslation.test.js --runInBand --silent
+```
+
+- **4 suites, 38/38 tests pass**, không skipped khi bật CATALOG_LIVE. Mặc định không đặt biến này thì riêng live test được skip để unit tests không phụ thuộc mạng. Bao phủ >100 rows cho cả hai endpoint, trang cuối rỗng/dừng has_more, null/arrays/headers, sai contract, ID trùng, 1000 trang, lỗi/retry/phục hồi, cache/TTL/race/refresh/derived reviews, lookup/FK và detail retry. Live test không hardcode count baseline làm điều kiện pass để ghi nhận được dataset mới.
+- ESLint client/adapter/services/types/env/visibility helper và hai file test thay đổi: **exit 0, không lỗi/cảnh báo**. Lint toàn bộ source chạm tới còn **5 lỗi hooks, 13 warnings**; 1 lỗi ở SimilarItems, 4 lỗi ở Map đã có tại HEAD. Đã dùng ESLint API lintText source HEAD và lintFiles bản hiện tại đối chiếu rule/message: không phát sinh lint message mới ở hai file này. Không sửa dependency hooks của các tích hợp bị tắt trong P2.
+- `tsc --noEmit --pretty false` toàn repo còn lỗi: đối chiếu diagnostics bằng TypeScript compiler API trên source HEAD và source hiện tại: **66 → 63 diagnostics, không diagnostic mới** (so file/code/message, bỏ qua line dịch chuyển). Không lỗi mới ở catalog hoặc consumer sau khi bổ sung guard nullable. Các lỗi có sẵn về styles, typings components, i18next, semantic/legacy vẫn ngoài scope; không tuyên bố typecheck toàn repo pass.
+- `git diff --check` pass. Không thay lockfile/dependency/native/featureFlags/client legacy; không reset, stage, commit hoặc deploy. Không tạo file log/audit/bundle/test tạm trong workspace; giữ source tests và hai tài liệu tracking.
+
+### Giới hạn và điểm dừng
+
+FE **ở tầng service đã lấy đủ catalog thật**, đáp ứng gate P2. Lần này chưa build/cài APK hoặc chạy lại trên emulator; kết quả Android P1 là lịch sử, không dùng thay bằng chứng Android sau P2. Nội dung dịch theo ID cũ, null/fallback UI toàn diện và smoke thực tế còn ở P3/P4; chưa xác nhận UI đã hiển thị đúng mọi record. Không có blocker P2 cần User xử lý. **Dừng tại P2, P3–P5 giữ Pending.**

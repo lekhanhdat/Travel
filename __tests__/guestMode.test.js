@@ -18,6 +18,7 @@ jest.mock('../src/component/HistoricalArtifact', () => 'Item');
 jest.mock('../src/component/BottomSheet', () => 'BottomSheet');
 jest.mock('../src/component/LanguageDropdown', () => 'Language');
 jest.mock('../src/component/RecommendationsWidget', () => 'Recommendations');
+jest.mock('../src/component/SimilarItemsComponent', () => 'SimilarItems');
 jest.mock('react-native-paper', () => ({Button: 'Button', Searchbar: 'Searchbar'}));
 jest.mock('react-native-svg', () => ({__esModule: true, default: 'Svg', Circle: 'Circle', Line: 'Line'}));
 jest.mock('@react-native-community/geolocation', () => ({getCurrentPosition: jest.fn()}));
@@ -38,7 +39,39 @@ const props = () => ({navigation: {addListener: jest.fn(() => jest.fn())}, t: ke
 describe('Phase 1 Guest Mode', () => {
   afterEach(() => jest.restoreAllMocks());
 
+  it('loads detail catalogs and exact FK in recovery, and surfaces failure with a forced retry', async () => {
+    const DetailLocation = require('../src/container/screens/Home/DetailLocation').default;
+    const DetailFestival = require('../src/container/screens/Festival/DetailFestival').default;
+    const getLocations = jest.spyOn(locationApi, 'getLocations').mockResolvedValue([{id: 7, Id: 7}]);
+    const getFestivals = jest.spyOn(festivalsApi, 'getFestivals').mockResolvedValue([{id: 2, Id: 2}]);
+    const related = jest.spyOn(festivalsApi, 'getFestivalsByLocationId').mockResolvedValue([]);
+    const clear = jest.spyOn(festivalsApi, 'clearCache');
+    const detail = new DetailLocation({...props(), route: {params: {location: {id: 7, Id: 999}}}});
+    detail.setState = state => {detail.state = {...detail.state, ...state};};
+    await detail.loadCatalog();
+    expect(related).toHaveBeenCalledWith(7);
+    expect(detail.state).toMatchObject({catalogError: false, festivals: [], allLocations: [{id: 7, Id: 7}]});
+    getLocations.mockRejectedValueOnce(new Error('offline'));
+    await detail.loadCatalog();
+    expect(detail.state.catalogError).toBe(true);
+    await detail.loadCatalog(true);
+    expect(getLocations).toHaveBeenLastCalledWith(true);
+    expect(clear).toHaveBeenCalledTimes(1);
+    expect(detail.state.catalogError).toBe(false);
+    const festival = new DetailFestival(props());
+    festival.setState = state => {festival.state = {...festival.state, ...state};};
+    await festival.loadCatalog();
+    expect(festival.state.allFestivals).toEqual([{id: 2, Id: 2}]);
+    getFestivals.mockRejectedValueOnce(new Error('offline'));
+    await festival.loadCatalog();
+    expect(festival.state.catalogError).toBe(true);
+    await festival.loadCatalog(true);
+    expect(getFestivals).toHaveBeenLastCalledWith(true);
+    expect(festival.state.catalogError).toBe(false);
+  });
+
   it('mounts Home as guest without GPS, account reads or outgoing requests; retry settles', async () => {
+    jest.spyOn(locationApi, 'getLocations').mockRejectedValue(new Error('Catalog network error'));
     const permission = jest.spyOn(PermissionsAndroid, 'request');
     const account = jest.spyOn(storage, 'getItem');
     const adapter = jest.fn(() => {throw new Error('Unexpected network');});
@@ -60,6 +93,7 @@ describe('Phase 1 Guest Mode', () => {
 
   it('mounts Festival with an explicit error and retry, without fetching Items', async () => {
     const items = jest.spyOn(locationApi, 'getItems');
+    jest.spyOn(festivalsApi, 'getFestivals').mockRejectedValue(new Error('Catalog network error'));
     let tree;
     await act(async () => {tree = renderer.create(React.createElement(Festival, props()));});
     expect(tree.getInstance().state).toMatchObject({loading: false, error: true, festivals: []});
@@ -85,13 +119,12 @@ describe('Phase 1 Guest Mode', () => {
     tree.unmount();
   });
 
-  it('rejects legacy reads/writes before Axios adapter, and rejects catalog before cached data', async () => {
+  it('rejects legacy reads/writes before Axios adapter while catalog uses a separate client', async () => {
     const adapter = jest.fn();
     await expect(request.get('/api/v2/accounts', {adapter})).rejects.toThrow('disabled');
     await expect(request.post('/api/v2/storage/upload', {}, {adapter})).rejects.toThrow('disabled');
     expect(adapter).not.toHaveBeenCalled();
-    await expect(locationApi.getLocations()).rejects.toThrow('Phase 1');
-    await expect(festivalsApi.getFestivals()).rejects.toThrow('Phase 1');
+    expect(require('../src/services/catalog.client').catalogRequest).not.toBe(request);
   });
 
   it('never calls Azure fetch when disabled, even with local credentials present', async () => {

@@ -2,11 +2,11 @@
 export const parsePublishable = (value: unknown): boolean =>
   value === true || value === 1 || value === 'true' || value === '1';
 
-export const isMapLocationVisible = (location: {
+export const isMapLocationVisible = <T extends {
   publishable?: boolean;
   lat?: number | null;
   long?: number | null;
-}): boolean =>
+}>(location: T): location is T & {lat: number; long: number} =>
   location.publishable === true &&
   typeof location.lat === 'number' && Number.isFinite(location.lat) &&
   typeof location.long === 'number' && Number.isFinite(location.long) &&

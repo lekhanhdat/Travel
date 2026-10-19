@@ -465,6 +465,7 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
   }, [showTraffic]);
 
   const fetchRouteToLocation = async (location: ILocation) => {
+    if (typeof location.lat !== 'number' || typeof location.long !== 'number') {return;}
     try {
       console.log('=== FETCHING ROUTE WITH MAPBOX ===');
       console.log('From:', currentLat, currentLong);
@@ -843,7 +844,7 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
 
   // Xác định tọa độ để focus camera
   const focusCoordinate =
-    locationProps.length > 0
+    locationProps.length > 0 && typeof locationProps[0].long === 'number' && typeof locationProps[0].lat === 'number'
       ? [locationProps[0].long, locationProps[0].lat]
       : [currentLong, currentLat];
 

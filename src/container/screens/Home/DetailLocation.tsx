@@ -1,5 +1,6 @@
 import FEATURE_FLAGS from '../../../config/featureFlags';
 import React from 'react';
+import CatalogStatus from '../../../component/CatalogStatus';
 import {ScrollView, View, Image, FlatList, TouchableOpacity, StyleSheet, Modal, Dimensions} from 'react-native';
 import Page from '../../../component/Page';
 import HeaderBase from '../../../component/HeaderBase';
@@ -31,6 +32,7 @@ interface IDetailLocationScreenProps extends WithAzureTranslationProps {
 }
 
 interface IDetailLocationScreenState {
+  catalogError: boolean;
   allLocations: ILocation[];
   showImageModal: boolean;
   selectedImageIndex: number;
@@ -44,6 +46,7 @@ class DetailLocationScreen extends React.PureComponent<
   constructor(props: IDetailLocationScreenProps) {
     super(props);
     this.state = {
+      catalogError: false,
       allLocations: [],
       showImageModal: false,
       selectedImageIndex: 0,
@@ -51,25 +54,24 @@ class DetailLocationScreen extends React.PureComponent<
     };
   }
 
-  async componentDidMount() {
-    if (FEATURE_FLAGS.RECOVERY_MODE) {return;}
-    // Load all locations để filter theo types
-    const locations = await locationApi.getLocations();
-    this.setState({ allLocations: locations });
-
-    // Load festivals cho địa điểm này
-    const location: ILocation = this.props.route.params?.location;
-    if (location.Id || location.id) {
-      const locationId = location.Id || location.id;
-      try {
-        const festivals = await festivalsApi.getFestivalsByLocationId(locationId!);
-        if (__DEV__) {console.log(`🎉 Found ${festivals.length} festivals for location ${locationId}`);}
-        this.setState({ festivals });
-      } catch (error) {
-        if (__DEV__) {console.error('❌ Error loading festivals:', error);}
-      }
-    }
+  componentDidMount() {
+    // P1: if (FEATURE_FLAGS.RECOVERY_MODE) {return;}
+    this.loadCatalog();
   }
+
+  loadCatalog = async (forceRefresh = false) => {
+    this.setState({catalogError: false});
+    try {
+      const locations = await locationApi.getLocations(forceRefresh);
+      const location: ILocation = this.props.route.params?.location;
+      const locationId = location.id ?? location.Id;
+      if (forceRefresh) {festivalsApi.clearCache();}
+      const festivals = locationId == null ? [] : await festivalsApi.getFestivalsByLocationId(locationId);
+      this.setState({allLocations: locations, festivals});
+    } catch {
+      this.setState({catalogError: true});
+    }
+  };
 
   renderItem = ({item, index}: {item: IReview; index: number}) => {
     return <ReviewItem review={item} />;
@@ -204,6 +206,8 @@ class DetailLocationScreen extends React.PureComponent<
             });
           }}
         />
+        <CatalogStatus loading={false} error={this.state.catalogError}
+          onRetry={() => this.loadCatalog(true)} />
         <View style={{flex: 1, backgroundColor: colors.primary_200}}>
           <ScrollView>
             <Image
@@ -417,7 +421,7 @@ class DetailLocationScreen extends React.PureComponent<
                           </View>
 
                           {/* Rating */}
-                          {festival.rating > 0 && (
+                          {typeof festival.rating === 'number' && festival.rating > 0 && (
                             <View style={{flexDirection: 'row', alignItems: 'center', marginTop: sizes._4sdp}}>
                               <StarActive
                                 width={sizes._16sdp}

@@ -99,7 +99,9 @@ const SimilarItemsComponent: React.FC<SimilarItemsComponentProps> = ({
       } else if (item.entity_type === 'festival') {
         fullData = festivals.find(fest => fest.Id === item.entity_id);
         if (fullData) {
-          avatar = fullData.avatar || (fullData.images?.[0]) || avatar;
+          // Cloud Run festivals expose images, without an avatar field.
+          // Legacy: avatar = fullData.avatar || (fullData.images?.[0]) || avatar;
+          avatar = fullData.images?.[0] || avatar;
         }
       }
 

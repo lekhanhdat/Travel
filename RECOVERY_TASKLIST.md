@@ -1,6 +1,6 @@
 # Travel Recovery — Tasklist
 
-Cập nhật: **19/10/2026 — Asia/Saigon**. P0 giữ nguyên lịch sử; **P1 Completed, 6/6 task**, đã build debug và mở Home Guest trên emulator. Chưa triển khai P2.
+Cập nhật: **19/10/2026 — Asia/Saigon**. Giữ lịch sử P0–P1; **P2 Completed, 6/6 task**, service FE đọc đủ 124 Locations/43 Festivals từ Cloud Run, 38 tests pass. Dừng P2; P3 chưa triển khai.
 
 Phạm vi/contract/file/tiêu chí chi tiết: [RECOVERY_PLAN.md](RECOVERY_PLAN.md).
 
@@ -19,12 +19,12 @@ Phạm vi/contract/file/tiêu chí chi tiết: [RECOVERY_PLAN.md](RECOVERY_PLAN.
 |---|---|---|---|---|
 | P0 | Khảo sát và lập tài liệu | Không | Completed | 5/5 |
 | P1 | Build/open Android guest, gate tích hợp phụ | P0 + yêu cầu P1 | Completed | 6/6 |
-| P2 | Catalog Cloud Run và adapter/phân trang | P1 + yêu cầu P2 | Pending | 0/6 |
+| P2 | Catalog Cloud Run và adapter/phân trang | P1 + yêu cầu P2 | Completed | 6/6 |
 | P3 | UI đúng dữ liệu, null/ID/bản dịch/review | P2 + yêu cầu P3 | Pending | 0/6 |
 | P4 | Nghiệm thu Android core | P3 + yêu cầu P4 | Pending | 0/6 |
 | P5 | Mapbox/GPS tùy chọn | P4 + yêu cầu P5 + điều kiện map | Pending | 0/5 |
 
-Mốc core: **6/24 task triển khai P1–P4**, 1/4 phase triển khai hoàn thành. P0 là khảo sát, P5 không tính vào mốc core. P1 đạt gate build + launch Guest; P2–P5 giữ Pending.
+Mốc core: **12/24 task triển khai P1–P4**, 2/4 phase triển khai hoàn thành. P0 là khảo sát, P5 không tính vào mốc core. P1 đạt gate build + launch Guest; P2 đạt gate service + live contract; P3–P5 giữ Pending.
 
 ## PHASE 0 — Khảo sát
 
@@ -57,14 +57,16 @@ File dự kiến: env/config, client/adapter catalog riêng, locations.api/festi
 
 | Check | ID | Task | Owner | Trạng thái | Bằng chứng / điều kiện hoàn thành |
 |---|---|---|---|---|---|
-| [ ] | P2.1 | Cấu hình Cloud Run URL và catalog client không xc-token | Agent | Pending | Request chỉ đúng host/path; không lộ credential |
-| [ ] | P2.2 | DTO/adapter id + alias Id nếu cần, record_id, nullable/arrays | Agent | Pending | Không dùng hotel làm item; không biến null thành 0 |
-| [ ] | P2.3 | Chuyển location/festival sang items/offset/has_more, đọc đủ trang | Agent | Pending | Không pageInfo/list NocoDB; hơn 100 location không bị cắt |
-| [ ] | P2.4 | Lookup/detail/related festival qua record/list/FK thật; giữ cache/refresh đúng | Agent | Pending | Không gọi /locations/{id}; không suy đoán location_id |
-| [ ] | P2.5 | Xử lý timeout/lỗi/retry và test contract/phân trang/null/header | Agent | Pending | Tests pass cho multi-page/end/null/array; không retry vô hạn |
-| [ ] | P2.6 | So live count/ID tại thời điểm chạy; cập nhật tracking rồi dừng | Agent | Pending | Baseline 124 locations/43 festivals; count mới nếu live thay đổi |
+| [x] | P2.1 | Cấu hình Cloud Run URL và catalog client không xc-token | Agent | Completed | catalog.client.ts dùng CATALOG_API_URL tùy chọn + fallback host Cloud Run; timeout 30s, withCredentials=false. Test adapter xác nhận host/path và không xc-token/Authorization/Cookie; client legacy/flags không đổi |
+| [x] | P2.2 | DTO/adapter id + alias Id nếu cần, record_id, nullable/arrays | Agent | Completed | catalog.adapter.ts đối chiếu models.py/OpenAPI live; giữ nguyên fields/arrays, alias Id=id; rating/GPS/FK/date null không ép số; contract sai bị reject; không gọi hotels/items |
+| [x] | P2.3 | Chuyển location/festival sang items/offset/has_more, đọc đủ trang | Agent | Completed | getLocations/getFestivals đọc endpoint danh sách; offset += response.limit; kiểm tra offset/limit/has_more, ID trùng, trang không tiến triển, tối đa 1000 trang. Live locations 100+24, festivals 43 |
+| [x] | P2.4 | Lookup/detail/related festival qua record/list/FK thật; giữ cache/refresh đúng | Agent | Completed | getLocationById/getFestivalById tra list/cache theo id; detail giữ record route, tải catalog/related và có retry. Related chỉ so FK số hợp lệ; 43/43 FK live null nên rỗng. Cache 10 phút, forceRefresh/clear/expiry, chống kết quả cũ ghi đè, refresh reviews phụ thuộc đã test |
+| [x] | P2.5 | Xử lý timeout/lỗi/retry và test contract/phân trang/null/header | Agent | Completed | 38/38 tests pass (4 suites, gồm live); CatalogError phân biệt timeout/network/http/contract, tối đa 2 retry cho network/timeout/429/5xx, không retry 404. Core lint pass; tsc toàn repo 63 lỗi cũ so baseline 66, không lỗi mới; 5 lỗi lint hooks cũ ở Map/SimilarItems không đổi |
+| [x] | P2.6 | So live count/ID tại thời điểm chạy; cập nhật tracking rồi dừng | Agent | Completed | 19/10/2026: service FE lấy 124 locations/43 festivals, ID và record_id duy nhất, toàn bộ record khớp GET phân trang độc lập. Location id=1 An Phú Farm; festival id=1 biểu diễn Chăm Mỹ Sơn. Xem mục 9 plan: ID nguồn, lệnh kiểm thử, giới hạn. Dừng P2 |
 
 Gate P2: service lấy đủ data thật, đúng contract, test liên quan pass. Hotels API đã sẵn nhưng UI mới ngoài scope.
+
+Bằng chứng P2 và giới hạn: [RECOVERY_PLAN.md — mục 9](RECOVERY_PLAN.md#9-kết-quả-thực-tế-p2--19102026). Live test chạy service TypeScript qua Jest/Node HTTP adapter; chưa nghiệm thu lại APK/emulator trong P2. Bản dịch catalog theo ID cũ, UI null/fallback còn thuộc P3; nghiệm thu Android core thuộc P4. Không yêu cầu User xử lý blocker cho P2; không sửa BE/DB/Cloud Run, không commit/deploy; không tạo file audit/log tạm.
 
 ## PHASE 3 — UI đúng dữ liệu
 

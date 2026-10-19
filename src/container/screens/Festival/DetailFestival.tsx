@@ -1,5 +1,6 @@
 import FEATURE_FLAGS from '../../../config/featureFlags';
 import React from 'react';
+import CatalogStatus from '../../../component/CatalogStatus';
 import {ScrollView, View, Image, FlatList, TouchableOpacity, StyleSheet, Modal, Dimensions} from 'react-native';
 import Page from '../../../component/Page';
 import HeaderBase from '../../../component/HeaderBase';
@@ -30,6 +31,7 @@ interface IDetailFestivalScreenProps extends WithAzureTranslationProps {
 }
 
 interface IDetailFestivalScreenState {
+  catalogError: boolean;
   allFestivals: IFestival[];
   showImageModal: boolean;
   selectedImageIndex: number;
@@ -42,18 +44,27 @@ class DetailFestivalScreen extends React.PureComponent<
   constructor(props: IDetailFestivalScreenProps) {
     super(props);
     this.state = {
+      catalogError: false,
       allFestivals: [],
       showImageModal: false,
       selectedImageIndex: 0,
     };
   }
 
-  async componentDidMount() {
-    if (FEATURE_FLAGS.RECOVERY_MODE) {return;}
-    // Load all festivals để filter theo types
-    const festivals = await festivalsApi.getFestivals();
-    this.setState({ allFestivals: festivals });
+  componentDidMount() {
+    // P1: if (FEATURE_FLAGS.RECOVERY_MODE) {return;}
+    this.loadCatalog();
   }
+
+  loadCatalog = async (forceRefresh = false) => {
+    this.setState({catalogError: false});
+    try {
+      const festivals = await festivalsApi.getFestivals(forceRefresh);
+      this.setState({allFestivals: festivals});
+    } catch {
+      this.setState({catalogError: true});
+    }
+  };
 
   // Convert IFestivalReview to IReview for ReviewItem component
   convertToReview = (festivalReview: IFestivalReview): IReview => {
@@ -155,6 +166,8 @@ class DetailFestivalScreen extends React.PureComponent<
             NavigationService.pop();
           }}
         />
+        <CatalogStatus loading={false} error={this.state.catalogError}
+          onRetry={() => this.loadCatalog(true)} />
         <View style={{flex: 1, backgroundColor: colors.primary_200}}>
           <ScrollView>
             <Image

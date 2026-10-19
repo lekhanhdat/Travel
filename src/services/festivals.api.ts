@@ -1,4 +1,5 @@
-import FEATURE_FLAGS from '../config/featureFlags';
+import {createCatalogCache, fetchCatalog} from './catalog.client';
+import {adaptFestival, FestivalDTO} from './catalog.adapter';
 import {request} from './axios';
 
 // ========================================
@@ -27,82 +28,94 @@ export interface IFestivalReview {
   images?: string[]; // Array of image URLs uploaded by user
 }
 
-export interface IFestival {
+export interface IFestival extends FestivalDTO {
   Id?: number;
-  name: string;
-  types: string[]; // ['festival', 'sport', 'cultural', etc.]
-  description: string;
-  event_time: string; // Thời gian diễn ra
-  location: string; // Tên địa điểm
-  location_id?: number; // ID liên kết với bảng Locations (sẽ dùng sau)
-  ticket_info: string;
-  rating: number;
-  reviews: IFestivalReview[];
-  images: string[]; // Array of image URLs
-  videos: string[]; // Array of YouTube video IDs
-  advise: string[]; // Array of advice strings
   CreatedAt?: string;
   UpdatedAt?: string;
 }
+// P2: Legacy festival type retained below.
+// export interface IFestival {
+//   Id?: number;
+//   name: string;
+//   types: string[]; // ['festival', 'sport', 'cultural', etc.]
+//   description: string;
+//   event_time: string; // Thời gian diễn ra
+//   location: string; // Tên địa điểm
+//   location_id?: number; // ID liên kết với bảng Locations (sẽ dùng sau)
+//   ticket_info: string;
+//   rating: number;
+//   reviews: IFestivalReview[];
+//   images: string[]; // Array of image URLs
+//   videos: string[]; // Array of YouTube video IDs
+//   advise: string[]; // Array of advice strings
+//   CreatedAt?: string;
+//   UpdatedAt?: string;
+// }
 
-interface GetFestivalsResponse {
-  list: IFestival[];
-  pageInfo: {
-    totalRows: number;
-    page: number;
-    pageSize: number;
-    isFirstPage: boolean;
-    isLastPage: boolean;
-  };
-}
-
+// interface GetFestivalsResponse {
+//   list: IFestival[];
+//   pageInfo: {
+//     totalRows: number;
+//     page: number;
+//     pageSize: number;
+//     isFirstPage: boolean;
+//     isLastPage: boolean;
+//   };
+// }
+//
 // ========================================
 // API FUNCTIONS
 // ========================================
+
+const catalogFestivals = createCatalogCache(() => fetchCatalog('/festivals', adaptFestival));
 
 const festivalsApi = {
   /**
    * Lấy danh sách tất cả festivals
    */
-  getFestivals: async (): Promise<IFestival[]> => {
-    if (!FEATURE_FLAGS.ENABLE_NOCODB) {
-      throw new Error('Catalog is not connected in Phase 1.');
-    }
-    try {
-      const res = await request.get<GetFestivalsResponse>(URL_GET_FESTIVALS, {
-        params: {
-          offset: '0',
-          limit: '100', // Lấy tối đa 100 festivals
-        },
-      });
+  getFestivals: catalogFestivals.get,
+  clearCache: catalogFestivals.clear,
 
-      let data = res.data.list ?? [];
-
-      // Parse JSON fields
-      data = data.map(festival => ({
-        ...festival,
-        types: typeof festival.types === 'string' ? JSON.parse(festival.types) : festival.types,
-        reviews: typeof festival.reviews === 'string' ? JSON.parse(festival.reviews) : festival.reviews,
-        images: typeof festival.images === 'string' ? JSON.parse(festival.images) : festival.images,
-        videos: typeof festival.videos === 'string' ? JSON.parse(festival.videos) : festival.videos,
-        advise: typeof festival.advise === 'string' ? JSON.parse(festival.advise) : festival.advise,
-      }));
-
-      console.log('✅ Fetched festivals:', data.length);
-      return data;
-    } catch (error) {
-      console.error('❌ Error fetching festivals:', error);
-      throw error;
-    }
-  },
+  // P2: Original NocoDB catalog read retained for recovery history.
+  //   getFestivals: async (): Promise<IFestival[]> => {
+  //     if (!FEATURE_FLAGS.ENABLE_NOCODB) {
+  //       throw new Error('Catalog is not connected in Phase 1.');
+  //     }
+  //     try {
+  //       const res = await request.get<GetFestivalsResponse>(URL_GET_FESTIVALS, {
+  //         params: {
+  //           offset: '0',
+  //           limit: '100', // Lấy tối đa 100 festivals
+  //         },
+  //       });
+  //
+  //       let data = res.data.list ?? [];
+  //
+  //       // Parse JSON fields
+  //       data = data.map(festival => ({
+  //         ...festival,
+  //         types: typeof festival.types === 'string' ? JSON.parse(festival.types) : festival.types,
+  //         reviews: typeof festival.reviews === 'string' ? JSON.parse(festival.reviews) : festival.reviews,
+  //         images: typeof festival.images === 'string' ? JSON.parse(festival.images) : festival.images,
+  //         videos: typeof festival.videos === 'string' ? JSON.parse(festival.videos) : festival.videos,
+  //         advise: typeof festival.advise === 'string' ? JSON.parse(festival.advise) : festival.advise,
+  //       }));
+  //
+  //       console.log('✅ Fetched festivals:', data.length);
+  //       return data;
+  //     } catch (error) {
+  //       console.error('❌ Error fetching festivals:', error);
+  //       throw error;
+  //     }
+  //   },
 
   /**
    * Lấy festival theo ID
    */
-  getFestivalById: async (id: number): Promise<IFestival | null> => {
+  getFestivalById: async (id: number, forceRefresh = false): Promise<IFestival | null> => {
     try {
-      const festivals = await festivalsApi.getFestivals();
-      const festival = festivals.find(f => f.Id === id);
+      const festivals = await festivalsApi.getFestivals(forceRefresh);
+      const festival = festivals.find(f => f.id === id);
       return festival || null;
     } catch (error) {
       console.error('❌ Error fetching festival by ID:', error);
@@ -188,7 +201,7 @@ const festivalsApi = {
       // Các field khác giữ nguyên
       Object.keys(updates).forEach(key => {
         if (!['types', 'reviews', 'images', 'videos', 'advise', 'Id'].includes(key)) {
-          payload[key] = updates[key];
+          payload[key] = updates[key as keyof IFestival];
         }
       });
 
@@ -249,6 +262,7 @@ const festivalsApi = {
    * Lấy festivals theo location ID
    */
   getFestivalsByLocationId: async (locationId: number): Promise<IFestival[]> => {
+    if (!Number.isSafeInteger(locationId)) {return [];}
     try {
       const festivals = await festivalsApi.getFestivals();
       return festivals.filter(f => f.location_id === locationId);

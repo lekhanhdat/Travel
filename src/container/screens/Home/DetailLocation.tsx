@@ -12,7 +12,6 @@ import {ILocation, IReview} from '../../../common/types';
 import TextBase from '../../../common/TextBase';
 import {AppStyle} from '../../../common/AppStyle';
 import ReviewItem from '../../../component/ReviewItem';
-import {reviews} from '../../../common/reviewsConstants';
 import locationApi from '../../../services/locations.api';
 import {StarActive, StarInActive, ThunderSvg} from '../../../assets/assets/ImageSvg';
 import {MapSvg, Call, GlobeSvg, ClockSvg, DirectionsSvg} from '../../../assets/ImageSvg';
@@ -25,6 +24,8 @@ import {
   WithAzureTranslationProps,
 } from '../../../hoc/withAzureTranslation';
 import { translateLocationField } from '../../../utils/translationHelpers';
+import { catalogImage } from '../../../utils/catalogDisplay';
+import CachedImage from '../../../component/CachedImage';
 
 interface IDetailLocationScreenProps extends WithAzureTranslationProps {
   navigation: any;
@@ -210,8 +211,8 @@ class DetailLocationScreen extends React.PureComponent<
           onRetry={() => this.loadCatalog(true)} />
         <View style={{flex: 1, backgroundColor: colors.primary_200}}>
           <ScrollView>
-            <Image
-              source={{uri: location.avatar}}
+            <CachedImage
+              uri={catalogImage(location)}
               style={{
                 width: sizes.width,
                 height: sizes._200sdp,
@@ -262,17 +263,19 @@ class DetailLocationScreen extends React.PureComponent<
               </TextBase>
 
               {/* Address with Icon */}
-              <View style={{flexDirection: 'row', alignItems: 'center', marginTop: sizes._12sdp}}>
-                <MapSvg
-                  width={sizes._20sdp}
-                  height={sizes._20sdp}
-                  color={'#000000'}
-                />
-                <TextBase
-                  style={[AppStyle.txt_16_medium_detail, {marginLeft: sizes._8sdp, flex: 1, textAlign: 'justify'}]}>
-                  {t('detail.address')}: {translatedAddress}
-                </TextBase>
-              </View>
+              {translatedAddress ? (
+                <View style={{flexDirection: 'row', alignItems: 'center', marginTop: sizes._12sdp}}>
+                  <MapSvg
+                    width={sizes._20sdp}
+                    height={sizes._20sdp}
+                    color={'#000000'}
+                  />
+                  <TextBase
+                    style={[AppStyle.txt_16_medium_detail, {marginLeft: sizes._8sdp, flex: 1, textAlign: 'justify'}]}>
+                    {t('detail.address')}: {translatedAddress}
+                  </TextBase>
+                </View>
+              ) : null}
 
               {/* Phone Number with Icon */}
               {location.phone && (
@@ -441,7 +444,7 @@ class DetailLocationScreen extends React.PureComponent<
               )}
 
               {/* Advise Section */}
-              {location.advise && (
+              {location.advise && location.advise.length > 0 && (
                 <View style={{marginTop: sizes._16sdp}}>
                   <View style={{flexDirection: 'row', alignItems: 'center'}}>
                     <TextBase style={[AppStyle.txt_20_bold]}>
@@ -534,6 +537,11 @@ class DetailLocationScreen extends React.PureComponent<
                 scrollEnabled={false}
                 renderItem={this.renderItem}
                 keyExtractor={(item, index) => index.toString() + item.id}
+                ListEmptyComponent={
+                  <TextBase style={[AppStyle.txt_16_regular, {textAlign: 'center'}]}>
+                    {t('detail.noReviews')}
+                  </TextBase>
+                }
               />
             </View>
           </ScrollView>

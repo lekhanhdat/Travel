@@ -1,5 +1,5 @@
 import React from 'react';
-import {Image, StyleSheet, TouchableOpacity, View} from 'react-native';
+import {StyleSheet, TouchableOpacity, View} from 'react-native';
 import {useTranslation} from 'react-i18next';
 import {IFestival} from '../services/festivals.api';
 import festivalsApi from '../services/festivals.api';
@@ -10,6 +10,8 @@ import TextBase from '../common/TextBase';
 import {ScreenName} from '../container/AppContainer';
 import NavigationService from '../container/screens/NavigationService';
 import {translateFestivalField} from '../utils/translationHelpers';
+import {catalogImage} from '../utils/catalogDisplay';
+import CachedImage from './CachedImage';
 
 interface ILargeItemFestivalProps {
   festival: IFestival;
@@ -17,7 +19,7 @@ interface ILargeItemFestivalProps {
 }
 
 const LargeItemFestival: React.FC<ILargeItemFestivalProps> = ({festival, onPress}) => {
-  const {t} = useTranslation(['common', 'festivals']);
+  const {t} = useTranslation('common');
 
   const festivalId = festival.Id;
   const translatedName = festivalId
@@ -30,10 +32,6 @@ const LargeItemFestival: React.FC<ILargeItemFestivalProps> = ({festival, onPress
     ? translateFestivalField(t, festivalId, 'event_time', festival.event_time)
     : festival.event_time;
 
-  // Get first image or use placeholder
-  const festivalImage = festival.images && festival.images.length > 0
-    ? festival.images[0]
-    : 'https://via.placeholder.com/200x200?text=Festival';
 
   // Calculate rating from reviews instead of using static rating field
   const avgRating = festivalsApi.calculateAverageRating(festival.reviews);
@@ -51,12 +49,11 @@ const LargeItemFestival: React.FC<ILargeItemFestivalProps> = ({festival, onPress
         });
       }}>
       <View style={styles.rowCenter}>
-        <Image
-          source={{uri: festivalImage}}
+        <CachedImage
+          uri={catalogImage(festival)}
           style={{
             height: sizes.width * 0.25,
             width: sizes.width * 0.25,
-            resizeMode: 'cover',
             marginRight: sizes._16sdp,
             borderRadius: sizes._8sdp,
           }}
@@ -76,23 +73,30 @@ const LargeItemFestival: React.FC<ILargeItemFestivalProps> = ({festival, onPress
             {translatedName}
           </TextBase>
 
-          <TextBase
-            numberOfLines={1}
-            style={[AppStyle.txt_14_regular, {marginTop: sizes._4sdp}]}>
-            ⏰ {translatedEventTime}
-          </TextBase>
-
-          <TextBase
-            numberOfLines={1}
-            style={[AppStyle.txt_14_regular, {marginTop: sizes._4sdp}]}>
-            📍 {translatedLocation}
-          </TextBase>
-
-          <View style={{flexDirection: 'row', marginTop: sizes._4sdp}}>
-            <TextBase style={[AppStyle.txt_14_bold]}>
-              ⭐ {avgRating.toFixed(1)}
+          {translatedEventTime ? (
+            <TextBase
+              numberOfLines={1}
+              style={[AppStyle.txt_14_regular, {marginTop: sizes._4sdp}]}>
+              ⏰ {translatedEventTime}
             </TextBase>
-          </View>
+          ) : null}
+
+          {/* Festivals without location_id have no venue line. */}
+          {translatedLocation ? (
+            <TextBase
+              numberOfLines={1}
+              style={[AppStyle.txt_14_regular, {marginTop: sizes._4sdp}]}>
+              📍 {translatedLocation}
+            </TextBase>
+          ) : null}
+
+          {festival.reviews?.length > 0 ? (
+            <View style={{flexDirection: 'row', marginTop: sizes._4sdp}}>
+              <TextBase style={[AppStyle.txt_14_bold]}>
+                ⭐ {avgRating.toFixed(1)}
+              </TextBase>
+            </View>
+          ) : null}
         </View>
       </View>
     </TouchableOpacity>

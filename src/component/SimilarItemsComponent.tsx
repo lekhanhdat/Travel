@@ -9,13 +9,13 @@ import {
   StyleSheet,
   FlatList,
   TouchableOpacity,
-  Image,
   ActivityIndicator,
 } from 'react-native';
 import TextBase from '../common/TextBase';
 import {AppStyle} from '../common/AppStyle';
 import sizes from '../common/sizes';
 import colors from '../common/colors';
+import CachedImage from './CachedImage';
 import NavigationService from '../container/screens/NavigationService';
 import {ScreenName} from '../container/AppContainer';
 import {
@@ -128,8 +128,8 @@ const SimilarItemsComponent: React.FC<SimilarItemsComponentProps> = ({
       style={styles.itemContainer}
       onPress={() => handleItemPress(item)}
       activeOpacity={0.8}>
-      <Image
-        source={{uri: item.avatar || 'https://via.placeholder.com/100'}}
+      <CachedImage
+        uri={item.avatar || ''}
         style={styles.itemImage}
         resizeMode="cover"
       />

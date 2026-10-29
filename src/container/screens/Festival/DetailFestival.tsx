@@ -24,6 +24,8 @@ import {
   WithAzureTranslationProps,
 } from '../../../hoc/withAzureTranslation';
 import { translateFestivalField } from '../../../utils/translationHelpers';
+import { catalogImage } from '../../../utils/catalogDisplay';
+import CachedImage from '../../../component/CachedImage';
 
 interface IDetailFestivalScreenProps extends WithAzureTranslationProps {
   navigation: any;
@@ -144,11 +146,6 @@ class DetailFestivalScreen extends React.PureComponent<
       : festival.ticket_info;
 
 
-    // Get first image or use placeholder
-    const festivalImage = festival.images && festival.images.length > 0
-      ? festival.images[0]
-      : 'https://via.placeholder.com/400x200?text=Festival';
-
     const avgRating = this.calculateAverageRating(festival.reviews);
 
     return (
@@ -170,8 +167,8 @@ class DetailFestivalScreen extends React.PureComponent<
           onRetry={() => this.loadCatalog(true)} />
         <View style={{flex: 1, backgroundColor: colors.primary_200}}>
           <ScrollView>
-            <Image
-              source={{uri: festivalImage}}
+            <CachedImage
+              uri={catalogImage(festival)}
               style={{
                 width: sizes.width,
                 height: sizes._200sdp,
@@ -221,30 +218,34 @@ class DetailFestivalScreen extends React.PureComponent<
               </TextBase>
 
               {/* Event Time */}
-              <View style={{flexDirection: 'row', alignItems: 'center', marginTop: sizes._12sdp}}>
-                <Clock
-                  width={sizes._20sdp}
-                  height={sizes._20sdp}
-                  color={colors.primary}
-                />
-                <TextBase
-                  style={[AppStyle.txt_16_medium_detail, {marginLeft: sizes._8sdp, flex: 1, textAlign: 'justify'}]}>
-                  {t('detail.eventTime')}: {translatedEventTime}
-                </TextBase>
-              </View>
+              {translatedEventTime ? (
+                <View style={{flexDirection: 'row', alignItems: 'center', marginTop: sizes._12sdp}}>
+                  <Clock
+                    width={sizes._20sdp}
+                    height={sizes._20sdp}
+                    color={colors.primary}
+                  />
+                  <TextBase
+                    style={[AppStyle.txt_16_medium_detail, {marginLeft: sizes._8sdp, flex: 1, textAlign: 'justify'}]}>
+                    {t('detail.eventTime')}: {translatedEventTime}
+                  </TextBase>
+                </View>
+              ) : null}
 
-              {/* Location */}
-              <View style={{flexDirection: 'row', alignItems: 'center', marginTop: sizes._12sdp}}>
-                <MapSvg
-                  width={sizes._20sdp}
-                  height={sizes._20sdp}
-                  color={colors.primary}
-                />
-                <TextBase
-                  style={[AppStyle.txt_16_medium_detail, {marginLeft: sizes._8sdp, flex: 1, textAlign: 'justify'}]}>
-                  {t('detail.location')}: {translatedLocation}
-                </TextBase>
-              </View>
+              {/* Location: hidden when the festival has no location_id */}
+              {festival.location_id !== null && translatedLocation ? (
+                <View style={{flexDirection: 'row', alignItems: 'center', marginTop: sizes._12sdp}}>
+                  <MapSvg
+                    width={sizes._20sdp}
+                    height={sizes._20sdp}
+                    color={colors.primary}
+                  />
+                  <TextBase
+                    style={[AppStyle.txt_16_medium_detail, {marginLeft: sizes._8sdp, flex: 1, textAlign: 'justify'}]}>
+                    {t('detail.location')}: {translatedLocation}
+                  </TextBase>
+                </View>
+              ) : null}
 
               {/* Ticket information */}
               {translatedTicketInfo ? <View style={{flexDirection: 'row', alignItems: 'center', marginTop: sizes._12sdp}}>
@@ -396,6 +397,11 @@ class DetailFestivalScreen extends React.PureComponent<
                 scrollEnabled={false}
                 renderItem={this.renderReviewItem}
                 keyExtractor={(item, index) => index.toString() + item.id}
+                ListEmptyComponent={
+                  <TextBase style={[AppStyle.txt_16_regular, {textAlign: 'center'}]}>
+                    {t('detail.noReviews')}
+                  </TextBase>
+                }
               />
             </View>
           </ScrollView>

@@ -121,7 +121,7 @@ const getTextShadowForMapStyle = (mapStyle: MapStyle) => {
 };
 
 const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
-  const {t} = useTranslation(['common', 'locations']);
+  const {t} = useTranslation('common');
   const [currentLat, setCurrentLat] = useState(0);
   const [currentLong, setCurrentLong] = useState(0);
   const [routeCoordinates, setRouteCoordinates] = useState<{latitude: number; longitude: number}[]>([]);
@@ -355,10 +355,7 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
 
     //         let localLocationShow: ILocation | undefined | null = null;
     //         let isPlayVoice = false;
-    //         (locationProps?.length > 0
-    //           ? locationProps
-    //           : _.unionBy(LOCATION_POPULAR, LOCATION_NEARLY)
-    //         ).forEach(location => {
+    //         locationProps.forEach(location => {
     //           if (!location.haveVoice) {
     //             return;
     //           }
@@ -913,11 +910,6 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
           />
 
           {
-            // (
-            //   locationProps.length > 0
-            //   ? locationProps
-            //   : _.unionBy(LOCATION_POPULAR, LOCATION_NEARLY)
-            // )
             locations.filter(isMapLocationVisible).map((location, index) => {
               const textColor = getTextColorForMapStyle(currentMapStyle);
               const textShadow = getTextShadowForMapStyle(currentMapStyle);

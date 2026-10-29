@@ -1,6 +1,5 @@
+import i18n from '../../src/i18n';
 import {
-  getLocationTranslationKey,
-  getFestivalTranslationKey,
   translateLocationField,
   translateFestivalField,
   translateWithFallback,
@@ -20,81 +19,22 @@ describe('translationHelpers', () => {
     // Reset global __DEV__ if needed, but usually jest sets it based on config
   });
 
-  describe('getLocationTranslationKey', () => {
-    it('should generate correct key for string id', () => {
-      expect(getLocationTranslationKey('1')).toBe('loc_1');
+  describe('catalog fields come from the API', () => {
+    it('returns the API value without calling t', () => {
+      expect(translateLocationField(mockT, 1, 'name', 'Tên từ API')).toBe('Tên từ API');
+      expect(translateLocationField(mockT, 1, 'advise', 'Lời khuyên', 0)).toBe('Lời khuyên');
+      expect(translateFestivalField(mockT, 10, 'location', '')).toBe('');
+      expect(mockT).not.toHaveBeenCalled();
     });
 
-    it('should generate correct key for number id', () => {
-      expect(getLocationTranslationKey(1)).toBe('loc_1');
-    });
-  });
-
-  describe('getFestivalTranslationKey', () => {
-    it('should generate correct key for string id', () => {
-      expect(getFestivalTranslationKey('1')).toBe('fest_1');
-    });
-
-    it('should generate correct key for number id', () => {
-      expect(getFestivalTranslationKey(1)).toBe('fest_1');
-    });
-  });
-
-  describe('translateLocationField', () => {
-    it('should call t with correct key and fallback', () => {
-      const locationId = 1;
-      const field = 'name';
-      const fallback = 'Default Name';
-      const expectedKey = 'locations:loc_1.name';
-
-      mockT.mockReturnValue('Translated Name');
-
-      const result = translateLocationField(mockT, locationId, field, fallback);
-
-      expect(mockT).toHaveBeenCalledWith(expectedKey, {defaultValue: fallback});
-      expect(result).toBe('Translated Name');
-    });
-
-    it('should return fallback when t returns key (missing translation)', () => {
-      const locationId = 2;
-      const field = 'description';
-      const fallback = 'Default Description';
-      const expectedKey = 'locations:loc_2.description';
-
-      // Simulate missing translation by returning the key (i18next behavior)
-      mockT.mockReturnValue(expectedKey);
-
-      // We need to verify translateWithFallback behavior which is used internally
-      // But here we're mocking t, so let's rely on translateWithFallback implementation detail
-      // translateWithFallback calls t(key, {defaultValue})
-      // If t returns defaultValue (or key if defaultValue not passed, but here we pass it), that's what we get.
-      // Wait, translateWithFallback implementation:
-      // const defaultValue = fallback || key;
-      // const translated = t(key, {defaultValue});
-      // return translated;
-
-      mockT.mockImplementation((_key: string, options: MockTOptions) => options.defaultValue);
-
-      const result = translateLocationField(mockT, locationId, field, fallback);
-
-      expect(mockT).toHaveBeenCalledWith(expectedKey, {defaultValue: fallback});
-      expect(result).toBe(fallback);
-    });
-  });
-
-  describe('translateFestivalField', () => {
-    it('should call t with correct key and fallback', () => {
-      const festivalId = 10;
-      const field = 'name';
-      const fallback = 'Default Festival';
-      const expectedKey = 'festivals:fest_10.name';
-
-      mockT.mockReturnValue('Translated Festival');
-
-      const result = translateFestivalField(mockT, festivalId, field, fallback);
-
-      expect(mockT).toHaveBeenCalledWith(expectedKey, {defaultValue: fallback});
-      expect(result).toBe('Translated Festival');
+    it.each(['vi', 'en'])('shows the API name for an id that collides with an old static key (%s)', async lng => {
+      // Old vi/locations.json mapped loc_1 to a different place than API id 1.
+      await i18n.changeLanguage(lng);
+      const t = i18n.t.bind(i18n);
+      expect(translateLocationField(t, 1, 'name', 'An Phú Farm')).toBe('An Phú Farm');
+      expect(translateFestivalField(t, 1, 'name', 'Lễ hội từ API')).toBe('Lễ hội từ API');
+      expect(i18n.hasResourceBundle(lng, 'locations')).toBe(false);
+      expect(i18n.hasResourceBundle(lng, 'festivals')).toBe(false);
     });
   });
 

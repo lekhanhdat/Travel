@@ -42,7 +42,7 @@ const RecommendationsWidget: React.FC<RecommendationsWidgetProps> = ({
   title,
   limit = 10,
 }) => {
-  const {t} = useTranslation(['common', 'locations']);
+  const {t} = useTranslation('common');
   const [recommendations, setRecommendations] = useState<EnrichedRecommendation[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -134,7 +134,7 @@ const RecommendationsWidget: React.FC<RecommendationsWidgetProps> = ({
         item.fullData || {
           name: item.name,
           description: item.reason,
-          avatar: item.avatar || 'https://via.placeholder.com/200',
+          avatar: item.avatar || '',
         }
       }
       onPress={() => handleItemPress(item)}

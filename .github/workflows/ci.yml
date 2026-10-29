@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+    branches: [main, improve, 'migration/**']
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --ignore-scripts
+      # Recovery + catalog suites; AzureTranslatorService/semantic.api fail since before migration and are not gated.
+      - name: Jest (recovery + catalog)
+        run: >
+          node node_modules/jest/bin/jest.js --runInBand
+          __tests__/services/catalog.api.test.js __tests__/services/catalog.contract.test.js
+          __tests__/guestMode.test.js __tests__/guestNavigation.test.js __tests__/guestTranslation.test.js
+      - name: tsc (baseline 63 errors, must not grow)
+        run: |
+          count=$(node node_modules/typescript/bin/tsc --noEmit | grep -c "error TS" || true)
+          echo "tsc errors: $count (baseline 63)"
+          test "$count" -le 63

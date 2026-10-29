@@ -1,5 +1,7 @@
 # Travel Recovery — Tasklist
 
+> **Đã được thay thế (29/10/2026)** bằng [MIGRATION_TASKLIST.md](MIGRATION_TASKLIST.md) và [MIGRATION_AUDIT.md](MIGRATION_AUDIT.md). File này chỉ còn giá trị lịch sử; số liệu 124/43 bên dưới đã lỗi thời (baseline hiện hành 123 locations / 49 festivals / 82 hotels, schema 001–006).
+
 Cập nhật: **19/10/2026 — Asia/Saigon**. Giữ lịch sử P0–P1; **P2 Completed, 6/6 task**, service FE đọc đủ 124 Locations/43 Festivals từ Cloud Run, 38 tests pass. Dừng P2; P3 chưa triển khai.
 
 Phạm vi/contract/file/tiêu chí chi tiết: [RECOVERY_PLAN.md](RECOVERY_PLAN.md).

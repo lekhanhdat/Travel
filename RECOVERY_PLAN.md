@@ -1,5 +1,7 @@
 # Kế hoạch khôi phục Travel
 
+> **Đã được thay thế (29/10/2026)** bằng [MIGRATION_TASKLIST.md](MIGRATION_TASKLIST.md) và [MIGRATION_AUDIT.md](MIGRATION_AUDIT.md). File này chỉ còn giá trị lịch sử; số liệu 124/43 bên dưới đã lỗi thời (baseline hiện hành 123 locations / 49 festivals / 82 hotels, schema 001–006).
+
 Ngày khảo sát: **19/10/2026 — Asia/Saigon**. Cập nhật cùng ngày: **P2 Completed, 6/6 task; service FE đã đọc đủ catalog Cloud Run, 38 tests pass**. Lịch sử khảo sát P0 và kết quả P1 được giữ lại; P3 chưa triển khai. Kết quả P2 ở mục 9.
 
 ## 1. Phạm vi và nguyên tắc

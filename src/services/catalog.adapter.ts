@@ -31,9 +31,14 @@ export interface FestivalDTO extends CatalogDTO {
   location_id: number | null;
 }
 
+// Fields dropped by BE schema 002–006; seeing one means the API and app disagree on the contract.
+export const REMOVED_FIELDS = ['verification_status', 'marker', 'metadata', 'amenities', 'price_level',
+  'operational_status', 'location', 'start_date', 'end_date', 'schedule_status', 'organizer'];
+
 function validate(raw: unknown, festival: boolean): void {
   if (!raw || typeof raw !== 'object') {throw new CatalogError('contract');}
   const row = raw as Record<string, unknown>;
+  if (REMOVED_FIELDS.some(key => key in row)) {throw new CatalogError('contract');}
   const strings = ['record_id', 'name', 'description', 'long_description', 'website', 'phone',
     'ticket_info', ...(festival
       ? ['event_time'] : ['address', 'opening_hours', 'avatar'])];

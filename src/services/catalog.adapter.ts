@@ -15,7 +15,6 @@ export interface CatalogDTO {
   website: string;
   phone: string;
   ticket_info: string;
-  verification_status: string;
   publishable: boolean;
 }
 
@@ -29,20 +28,15 @@ export interface LocationDTO extends CatalogDTO {
 
 export interface FestivalDTO extends CatalogDTO {
   event_time: string;
-  location: string;
   location_id: number | null;
-  start_date: string | null;
-  end_date: string | null;
-  schedule_status: string;
-  organizer: string;
 }
 
 function validate(raw: unknown, festival: boolean): void {
   if (!raw || typeof raw !== 'object') {throw new CatalogError('contract');}
   const row = raw as Record<string, unknown>;
   const strings = ['record_id', 'name', 'description', 'long_description', 'website', 'phone',
-    'ticket_info', 'verification_status', ...(festival
-      ? ['event_time', 'location', 'schedule_status', 'organizer'] : ['address', 'opening_hours', 'avatar'])];
+    'ticket_info', ...(festival
+      ? ['event_time'] : ['address', 'opening_hours', 'avatar'])];
   const numbers = festival ? ['rating', 'location_id'] : ['rating', 'lat', 'long'];
   if (!Number.isSafeInteger(row.id) || typeof row.publishable !== 'boolean' ||
       strings.some(key => typeof row[key] !== 'string') ||
@@ -50,8 +44,7 @@ function validate(raw: unknown, festival: boolean): void {
       !Array.isArray(row.reviews) ||
       ['types', 'images', 'videos', 'advise'].some(key =>
         !Array.isArray(row[key]) || (row[key] as unknown[]).some(value => typeof value !== 'string')) ||
-      (festival && (['start_date', 'end_date'].some(key => row[key] !== null && typeof row[key] !== 'string') ||
-        (row.location_id !== null && !Number.isSafeInteger(row.location_id))))) {
+      (festival && row.location_id !== null && !Number.isSafeInteger(row.location_id))) {
     throw new CatalogError('contract');
   }
 }

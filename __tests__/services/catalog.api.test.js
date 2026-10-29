@@ -8,10 +8,9 @@ const {request: legacyRequest} = require('../../src/services/axios');
 
 const common = id => ({id, record_id: `source-${id}`, name: 'Catalog', types: ['culture'],
   description: '', long_description: '', rating: null, reviews: [], images: [], videos: [],
-  advise: ['Advice'], website: '', phone: '', ticket_info: '', verification_status: '', publishable: false});
+  advise: ['Advice'], website: '', phone: '', ticket_info: '', publishable: false});
 const location = id => ({...common(id), address: '', lat: null, long: null, opening_hours: '', avatar: ''});
-const festival = id => ({...common(id), event_time: '', location: 'Same name', location_id: null,
-  start_date: null, end_date: null, schedule_status: '', organizer: ''});
+const festival = id => ({...common(id), event_time: '', location_id: null});
 const page = (items, offset = 0, has_more = false, limit = 100) => ({items, offset, has_more, limit});
 const response = (config, data) => ({config, data, status: 200, statusText: 'OK', headers: {}});
 
@@ -104,6 +103,7 @@ describe('Cloud Run catalog contract', () => {
     expect(await festivals.getFestivalById(200)).toBeNull();
     expect((await festivals.getFestivalsByLocationId(7)).map(row => row.id)).toEqual([2]);
     expect(await festivals.getFestivalsByLocationId(null)).toEqual([]);
+    expect((await festivals.getFestivals()).map(row => row.location)).toEqual(['', 'Catalog', '']);
     expect(adapter).toHaveBeenCalledTimes(2);
     await locations.getLocations(true);
     await festivals.getFestivals(true);

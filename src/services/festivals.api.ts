@@ -1,5 +1,6 @@
 import {createCatalogCache, fetchCatalog} from './catalog.client';
 import {adaptFestival, FestivalDTO} from './catalog.adapter';
+import locationApi from './locations.api';
 import {request} from './axios';
 
 // ========================================
@@ -32,6 +33,8 @@ export interface IFestival extends FestivalDTO {
   Id?: number;
   CreatedAt?: string;
   UpdatedAt?: string;
+  /** Venue name resolved from location_id; empty when the festival has no linked location. */
+  location: string;
 }
 // P2: Legacy festival type retained below.
 // export interface IFestival {
@@ -67,7 +70,22 @@ export interface IFestival extends FestivalDTO {
 // API FUNCTIONS
 // ========================================
 
-const catalogFestivals = createCatalogCache(() => fetchCatalog('/festivals', adaptFestival));
+// The API only carries location_id; resolve the venue name the screens display and search on.
+const catalogFestivals = createCatalogCache(async (): Promise<IFestival[]> => {
+  const festivals = await fetchCatalog('/festivals', adaptFestival);
+  const names = new Map<number, string>();
+  if (festivals.some(festival => festival.location_id !== null)) {
+    try {
+      for (const location of await locationApi.getLocations()) {names.set(location.id, location.name);}
+    } catch (error) {
+      console.warn('⚠️ Festival venues unavailable:', error);
+    }
+  }
+  return festivals.map(festival => ({
+    ...festival,
+    location: festival.location_id !== null ? names.get(festival.location_id) ?? '' : '',
+  }));
+});
 
 const festivalsApi = {
   /**

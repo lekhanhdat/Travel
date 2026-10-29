@@ -161,6 +161,7 @@
     "fee": "Phí",
     "festivalImages": "Hình ảnh lễ hội",
     "similarFestivals": "Lễ hội tương tự",
+    "noReviews": "Chưa có đánh giá",
     "similarFestivalsAI": "Lễ hội tương tự (AI gợi ý)"
   },
   "priceLevel": {
@@ -275,5 +276,10 @@
     "permissionDenied": "Không có quyền truy cập.",
     "notFound": "Không tìm thấy.",
     "invalidInput": "Dữ liệu không hợp lệ."
+  },
+  "recovery": {
+    "loading": "Đang tải danh mục",
+    "catalogUnavailable": "Chưa thể tải danh mục. Vui lòng kiểm tra kết nối và thử lại.",
+    "retry": "Thử lại"
   }
 }

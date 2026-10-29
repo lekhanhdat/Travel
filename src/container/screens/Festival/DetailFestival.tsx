@@ -1,4 +1,6 @@
+import FEATURE_FLAGS from '../../../config/featureFlags';
 import React from 'react';
+import CatalogStatus from '../../../component/CatalogStatus';
 import {ScrollView, View, Image, FlatList, TouchableOpacity, StyleSheet, Modal, Dimensions} from 'react-native';
 import Page from '../../../component/Page';
 import HeaderBase from '../../../component/HeaderBase';
@@ -22,6 +24,8 @@ import {
   WithAzureTranslationProps,
 } from '../../../hoc/withAzureTranslation';
 import { translateFestivalField } from '../../../utils/translationHelpers';
+import { catalogImage } from '../../../utils/catalogDisplay';
+import CachedImage from '../../../component/CachedImage';
 
 interface IDetailFestivalScreenProps extends WithAzureTranslationProps {
   navigation: any;
@@ -29,6 +33,7 @@ interface IDetailFestivalScreenProps extends WithAzureTranslationProps {
 }
 
 interface IDetailFestivalScreenState {
+  catalogError: boolean;
   allFestivals: IFestival[];
   showImageModal: boolean;
   selectedImageIndex: number;
@@ -41,17 +46,27 @@ class DetailFestivalScreen extends React.PureComponent<
   constructor(props: IDetailFestivalScreenProps) {
     super(props);
     this.state = {
+      catalogError: false,
       allFestivals: [],
       showImageModal: false,
       selectedImageIndex: 0,
     };
   }
 
-  async componentDidMount() {
-    // Load all festivals để filter theo types
-    const festivals = await festivalsApi.getFestivals();
-    this.setState({ allFestivals: festivals });
+  componentDidMount() {
+    // P1: if (FEATURE_FLAGS.RECOVERY_MODE) {return;}
+    this.loadCatalog();
   }
+
+  loadCatalog = async (forceRefresh = false) => {
+    this.setState({catalogError: false});
+    try {
+      const festivals = await festivalsApi.getFestivals(forceRefresh);
+      this.setState({allFestivals: festivals});
+    } catch {
+      this.setState({catalogError: true});
+    }
+  };
 
   // Convert IFestivalReview to IReview for ReviewItem component
   convertToReview = (festivalReview: IFestivalReview): IReview => {
@@ -131,11 +146,6 @@ class DetailFestivalScreen extends React.PureComponent<
       : festival.ticket_info;
 
 
-    // Get first image or use placeholder
-    const festivalImage = festival.images && festival.images.length > 0
-      ? festival.images[0]
-      : 'https://via.placeholder.com/400x200?text=Festival';
-
     const avgRating = this.calculateAverageRating(festival.reviews);
 
     return (
@@ -153,10 +163,12 @@ class DetailFestivalScreen extends React.PureComponent<
             NavigationService.pop();
           }}
         />
+        <CatalogStatus loading={false} error={this.state.catalogError}
+          onRetry={() => this.loadCatalog(true)} />
         <View style={{flex: 1, backgroundColor: colors.primary_200}}>
           <ScrollView>
-            <Image
-              source={{uri: festivalImage}}
+            <CachedImage
+              uri={catalogImage(festival)}
               style={{
                 width: sizes.width,
                 height: sizes._200sdp,
@@ -206,33 +218,37 @@ class DetailFestivalScreen extends React.PureComponent<
               </TextBase>
 
               {/* Event Time */}
-              <View style={{flexDirection: 'row', alignItems: 'center', marginTop: sizes._12sdp}}>
-                <Clock
-                  width={sizes._20sdp}
-                  height={sizes._20sdp}
-                  color={colors.primary}
-                />
-                <TextBase
-                  style={[AppStyle.txt_16_medium_detail, {marginLeft: sizes._8sdp, flex: 1, textAlign: 'justify'}]}>
-                  {t('detail.eventTime')}: {translatedEventTime}
-                </TextBase>
-              </View>
+              {translatedEventTime ? (
+                <View style={{flexDirection: 'row', alignItems: 'center', marginTop: sizes._12sdp}}>
+                  <Clock
+                    width={sizes._20sdp}
+                    height={sizes._20sdp}
+                    color={colors.primary}
+                  />
+                  <TextBase
+                    style={[AppStyle.txt_16_medium_detail, {marginLeft: sizes._8sdp, flex: 1, textAlign: 'justify'}]}>
+                    {t('detail.eventTime')}: {translatedEventTime}
+                  </TextBase>
+                </View>
+              ) : null}
 
-              {/* Location */}
-              <View style={{flexDirection: 'row', alignItems: 'center', marginTop: sizes._12sdp}}>
-                <MapSvg
-                  width={sizes._20sdp}
-                  height={sizes._20sdp}
-                  color={colors.primary}
-                />
-                <TextBase
-                  style={[AppStyle.txt_16_medium_detail, {marginLeft: sizes._8sdp, flex: 1, textAlign: 'justify'}]}>
-                  {t('detail.location')}: {translatedLocation}
-                </TextBase>
-              </View>
+              {/* Location: hidden when the festival has no location_id */}
+              {festival.location_id !== null && translatedLocation ? (
+                <View style={{flexDirection: 'row', alignItems: 'center', marginTop: sizes._12sdp}}>
+                  <MapSvg
+                    width={sizes._20sdp}
+                    height={sizes._20sdp}
+                    color={colors.primary}
+                  />
+                  <TextBase
+                    style={[AppStyle.txt_16_medium_detail, {marginLeft: sizes._8sdp, flex: 1, textAlign: 'justify'}]}>
+                    {t('detail.location')}: {translatedLocation}
+                  </TextBase>
+                </View>
+              ) : null}
 
-              {/* Price Level */}
-              <View style={{flexDirection: 'row', alignItems: 'center', marginTop: sizes._12sdp}}>
+              {/* Ticket information */}
+              {translatedTicketInfo ? <View style={{flexDirection: 'row', alignItems: 'center', marginTop: sizes._12sdp}}>
                 <CardSvg
                   width={sizes._20sdp}
                   height={sizes._20sdp}
@@ -240,11 +256,9 @@ class DetailFestivalScreen extends React.PureComponent<
                 />
                 <TextBase
                   style={[AppStyle.txt_16_medium_detail, {marginLeft: sizes._8sdp, flex: 1, textAlign: 'justify'}]}>
-                  {t('detail.fee')}: {festival.price_level === 0 ? t('priceLevel.free') :
-                       festival.price_level === 1 ? t('priceLevel.paid') : t('priceLevel.premium')}
-                  {translatedTicketInfo && ` (${translatedTicketInfo})`}
+                  {t('detail.fee')}: {translatedTicketInfo}
                 </TextBase>
-              </View>
+              </View> : null}
 
               {/* Advise Section */}
               {festival.advise && festival.advise.length > 0 && (
@@ -354,7 +368,7 @@ class DetailFestivalScreen extends React.PureComponent<
               </View>
 
               {/* Semantic Similar Items from Backend */}
-              {festival.Id && (
+              {FEATURE_FLAGS.ENABLE_AI && festival.Id && (
                 <SimilarItemsComponent
                   entityType="festival"
                   entityId={festival.Id}
@@ -383,6 +397,11 @@ class DetailFestivalScreen extends React.PureComponent<
                 scrollEnabled={false}
                 renderItem={this.renderReviewItem}
                 keyExtractor={(item, index) => index.toString() + item.id}
+                ListEmptyComponent={
+                  <TextBase style={[AppStyle.txt_16_regular, {textAlign: 'center'}]}>
+                    {t('detail.noReviews')}
+                  </TextBase>
+                }
               />
             </View>
           </ScrollView>

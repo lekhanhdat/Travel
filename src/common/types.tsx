@@ -21,8 +21,10 @@ export interface ILocation {
   address: string;
   description: string;
   long_description?: string; // Detailed description for DetailLocation screen (falls back to description if empty)
-  lat: number;
-  long: number;
+  record_id?: string;
+  rating?: number | null;
+  lat: number | null;
+  long: number | null;
   types?: string[]; // Array of location types (e.g., ["museum", "attraction", "historical"])
   haveVoice?: boolean; // DƯ THỪA - chỉ cần check voiceName
   reviews: IReview[];
@@ -37,7 +39,7 @@ export interface ILocation {
   phone?: string; // Phone number
   website?: string; // Website URL
   opening_hours?: string; // Opening hours
-  marker?: boolean; // Whether to display as marker on map (default: true for existing locations, false for hidden locations)
+  publishable?: boolean; // Only explicitly published records may appear on the map.
 }
 
 export interface IReview {

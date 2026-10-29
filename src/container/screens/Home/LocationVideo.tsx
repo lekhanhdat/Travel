@@ -40,11 +40,15 @@ export default class LocationVideo extends React.PureComponent<Props, States> {
             padding: sizes._16sdp,
           }}>
           <ScrollView>
-            {location.videos?.map(video => {
-              return <View>
-                <ChildVideo videoId={video}/>
-              </View>;
-            })}
+            {location.videos && location.videos.length > 0 ? (
+              location.videos.map(video => {
+                return <View key={video}>
+                  <ChildVideo videoId={video}/>
+                </View>;
+              })
+            ) : (
+              <Text style={{textAlign: 'center', color: colors.primary_950}}>Không có video nào</Text>
+            )}
           </ScrollView>
         </View>
       </Page>

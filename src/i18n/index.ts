@@ -11,17 +11,13 @@ import {initReactI18next} from 'react-i18next';
 // Import translation files
 import enCommon from './locales/en/common.json';
 import viCommon from './locales/vi/common.json';
-import enLocations from './locales/en/locations.json';
-import viLocations from './locales/vi/locations.json';
-import enFestivals from './locales/en/festivals.json';
-import viFestivals from './locales/vi/festivals.json';
 
 // Define supported languages
 export const SUPPORTED_LANGUAGES = ['en', 'vi'] as const;
 export type SupportedLanguage = (typeof SUPPORTED_LANGUAGES)[number];
 
-// Define namespaces
-export const NAMESPACES = ['common', 'locations', 'festivals'] as const;
+// Define namespaces (UI strings only; catalog content comes from the API)
+export const NAMESPACES = ['common'] as const;
 export type Namespace = (typeof NAMESPACES)[number];
 
 // Default namespace
@@ -34,13 +30,9 @@ export const FALLBACK_LANGUAGE: SupportedLanguage = 'vi';
 const resources = {
   en: {
     common: enCommon,
-    locations: enLocations,
-    festivals: enFestivals,
   },
   vi: {
     common: viCommon,
-    locations: viLocations,
-    festivals: viFestivals,
   },
 };
 

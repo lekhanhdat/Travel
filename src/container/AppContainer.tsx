@@ -1,3 +1,4 @@
+import FEATURE_FLAGS from '../config/featureFlags';
 import React, {useRef, useEffect} from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
@@ -19,32 +20,33 @@ import {
   CameraSvg,
   ProfileSvg,
 } from '../assets/ImageSvg';
-import LoginScreen from './screens/Login/LoginScreen';
+// P1: Keep deferred imports commented to avoid native/service initialization.
+// import LoginScreen from './screens/Login/LoginScreen';
 import HomeScreen from './screens/Home/HomeScreen';
-import NewFeedScreen from './screens/NewFeed/NewFeedScreen';
-import MapsScreen from './screens/Maps/MapScreenV2';
-import CameraScreen from './screens/Camera/CameraScreen';
-import ProfileScreen from './screens/Profile/ProfileScreen';
+// import NewFeedScreen from './screens/NewFeed/NewFeedScreen';
+// import MapsScreen from './screens/Maps/MapScreenV2';
+// import CameraScreen from './screens/Camera/CameraScreen';
+// import ProfileScreen from './screens/Profile/ProfileScreen';
 import ViewAllLocation from './screens/Home/ViewAllLocation';
 import DetailItemScreen from './screens/Home/DetailLocation';
-import PreviewImage from './screens/Camera/PreviewImage';
+// import PreviewImage from './screens/Camera/PreviewImage';
 import LocationImage from './screens/Home/LocationImage';
 import LocationVideo from './screens/Home/LocationVideo';
-import Personal from './screens/Profile/Personal';
+// import Personal from './screens/Profile/Personal';
 import Settings from './screens/Profile/Settings';
 import FAQ from './screens/Profile/FAQ';
 import Policy from './screens/Profile/Policy';
 import About from './screens/Profile/About';
-import Advise from './screens/Maps/Advise';
-import DetailItem from './screens/NewFeed/DetailItem';
-import AllItemScreen from './screens/NewFeed/AllItemsScreen';
+// import Advise from './screens/Maps/Advise';
+// import DetailItem from './screens/NewFeed/DetailItem';
+// import AllItemScreen from './screens/NewFeed/AllItemsScreen';
 import FestivalsScreen from './screens/Festival/FestivalsScreen';
 import DetailFestivalScreen from './screens/Festival/DetailFestival';
 import ViewAllFestivals from './screens/Festival/ViewAllFestivals';
-import SignUpScreen from './screens/Login/SignUpScreen';
-import ForgotPasswordScreen from './screens/Login/ForgotPasswordScreen';
-import Donation from './screens/Profile/Donation';
-import ChatBotScreen from './screens/Profile/ChatbotScreen';
+// import SignUpScreen from './screens/Login/SignUpScreen';
+// import ForgotPasswordScreen from './screens/Login/ForgotPasswordScreen';
+// import Donation from './screens/Profile/Donation';
+// import ChatBotScreen from './screens/Profile/ChatbotScreen';
 
 export enum ScreenName {
   SPLASH_SCREEN = 'SplashScreen',
@@ -248,6 +250,7 @@ function HomeStack() {
             ),
           }}
         />
+        {/* P1: Temporarily disabled; retain for restoration.
         <Tabs.Screen
           name={TAB_NAMES.FEED}
           component={NewFeedScreen}
@@ -263,6 +266,8 @@ function HomeStack() {
             ),
           }}
         />
+        */}
+        {/* P1: Temporarily disabled; retain for restoration.
         <Tabs.Screen
           name={TAB_NAMES.MAP}
           component={MapsScreen}
@@ -276,6 +281,8 @@ function HomeStack() {
             ),
           }}
         />
+        */}
+        {/* P1: Temporarily disabled; retain for restoration.
         <Tabs.Screen
           name={TAB_NAMES.CAMERA}
           component={CameraScreen}
@@ -289,6 +296,8 @@ function HomeStack() {
             ),
           }}
         />
+        */}
+        {/* P1: Temporarily disabled; retain for restoration.
         <Tabs.Screen
           name={TAB_NAMES.PROFILE}
           component={ProfileScreen}
@@ -302,6 +311,7 @@ function HomeStack() {
             ),
           }}
         />
+        */}
       </Tabs.Navigator>
     </View>
   );
@@ -315,34 +325,56 @@ function AppContainer() {
       initialRouteName={ScreenName.HOME_STACK_SCREEN}
       screenOptions={{headerShown: false}}>
       <Stack.Screen name="HomeStack" component={HomeStack} />
+      {/* P1: Temporarily disabled; retain for restoration.
       <Stack.Screen name="LoginScreen" component={LoginScreen} />
+      */}
       <Stack.Screen name="ViewAllLocation" component={ViewAllLocation} />
       <Stack.Screen name="DetailLocationScreen" component={DetailItemScreen} />
+      {/* P1: Temporarily disabled; retain for restoration.
       <Stack.Screen name="PreviewImage" component={PreviewImage} />
+      */}
+      {/* P1: Temporarily disabled; retain for restoration.
       <Stack.Screen name="MapsScreen" component={MapsScreen} />
+      */}
       <Stack.Screen name="LocationImage" component={LocationImage} />
       <Stack.Screen name="LocationVideo" component={LocationVideo} />
+      {/* P1: Temporarily disabled; retain for restoration.
       <Stack.Screen name="Personal" component={Personal} />
+      */}
       <Stack.Screen name="Settings" component={Settings} />
       <Stack.Screen name="FAQ" component={FAQ} />
       <Stack.Screen name="Policy" component={Policy} />
       <Stack.Screen name="About" component={About} />
+      {/* P1: Temporarily disabled; retain for restoration.
       <Stack.Screen name="Advise" component={Advise} />
+      */}
+      {/* P1: Temporarily disabled; retain for restoration.
       <Stack.Screen name="DetailItem" component={DetailItem} />
+      */}
+      {/* P1: Temporarily disabled; retain for restoration.
       <Stack.Screen name="ViewAllItem" component={AllItemScreen} />
+      */}
       <Stack.Screen name="SearchScreen" component={FestivalsScreen} />
       <Stack.Screen
         name="DetailFestivalScreen"
         component={DetailFestivalScreen}
       />
       <Stack.Screen name="ViewAllFestivals" component={ViewAllFestivals} />
+      {/* P1: Temporarily disabled; retain for restoration.
       <Stack.Screen name="SignUpScreen" component={SignUpScreen} />
+      */}
+      {/* P1: Temporarily disabled; retain for restoration.
       <Stack.Screen
         name="ForgotPasswordScreen"
         component={ForgotPasswordScreen}
       />
+      */}
+      {/* P1: Temporarily disabled; retain for restoration.
       <Stack.Screen name="Donation" component={Donation} />
+      */}
+      {/* P1: Temporarily disabled; retain for restoration.
       <Stack.Screen name="ChatBotScreen" component={ChatBotScreen} />
+      */}
     </Stack.Navigator>
   );
 }
@@ -357,7 +389,7 @@ const styles = StyleSheet.create({
     fontFamily: fonts.GoogleSans_Regular,
   },
   containerTouch: {
-    width: sizes.width / 6,
+    flex: 1,
     height: sizes._49sdp,
     alignItems: 'center',
     justifyContent: 'center',
@@ -396,7 +428,9 @@ const styles = StyleSheet.create({
 const AppWithTranslation = () => {
   useEffect(() => {
     // Initialize offline fallback translations
-    offlineFallback.initialize('vi');
+    if (FEATURE_FLAGS.ENABLE_OFFLINE_CACHE) {
+      offlineFallback.initialize('vi');
+    }
   }, []);
 
   return (

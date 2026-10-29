@@ -1,3 +1,4 @@
+import {isMapLocationVisible} from '../../../utils/catalogVisibility';
 import React, {useEffect, useState} from 'react';
 import {
   ScrollView,
@@ -120,7 +121,7 @@ const getTextShadowForMapStyle = (mapStyle: MapStyle) => {
 };
 
 const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
-  const {t} = useTranslation(['common', 'locations']);
+  const {t} = useTranslation('common');
   const [currentLat, setCurrentLat] = useState(0);
   const [currentLong, setCurrentLong] = useState(0);
   const [routeCoordinates, setRouteCoordinates] = useState<{latitude: number; longitude: number}[]>([]);
@@ -354,10 +355,7 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
 
     //         let localLocationShow: ILocation | undefined | null = null;
     //         let isPlayVoice = false;
-    //         (locationProps?.length > 0
-    //           ? locationProps
-    //           : _.unionBy(LOCATION_POPULAR, LOCATION_NEARLY)
-    //         ).forEach(location => {
+    //         locationProps.forEach(location => {
     //           if (!location.haveVoice) {
     //             return;
     //           }
@@ -464,6 +462,7 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
   }, [showTraffic]);
 
   const fetchRouteToLocation = async (location: ILocation) => {
+    if (typeof location.lat !== 'number' || typeof location.long !== 'number') {return;}
     try {
       console.log('=== FETCHING ROUTE WITH MAPBOX ===');
       console.log('From:', currentLat, currentLong);
@@ -842,7 +841,7 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
 
   // Xác định tọa độ để focus camera
   const focusCoordinate =
-    locationProps.length > 0
+    locationProps.length > 0 && typeof locationProps[0].long === 'number' && typeof locationProps[0].lat === 'number'
       ? [locationProps[0].long, locationProps[0].lat]
       : [currentLong, currentLat];
 
@@ -911,25 +910,7 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
           />
 
           {
-            // (
-            //   locationProps.length > 0
-            //   ? locationProps
-            //   : _.unionBy(LOCATION_POPULAR, LOCATION_NEARLY)
-            // )
-            // ✨ FILTER LOCATIONS: Only show locations with marker=true OR focused/selected locations
-            locations.filter(loc => {
-              // Always show if marker is true (or undefined for backward compatibility)
-              if (loc.marker !== false) {return true;}
-
-              // Show if this location is currently focused (for navigation)
-              if (focusLocation && loc.Id === focusLocation.Id) {return true;}
-
-              // Show if this location is currently selected
-              if (selectedLocation && loc.Id === selectedLocation.Id) {return true;}
-
-              // Otherwise, hide this location (marker=false and not focused/selected)
-              return false;
-            }).map((location, index) => {
+            locations.filter(isMapLocationVisible).map((location, index) => {
               const textColor = getTextColorForMapStyle(currentMapStyle);
               const textShadow = getTextShadowForMapStyle(currentMapStyle);
 

@@ -1,3 +1,4 @@
+import FEATURE_FLAGS from '../config/featureFlags';
 import axios, {AxiosInstance, AxiosResponse, HttpStatusCode} from 'axios';
 import {DB_URL} from '../utils/configs';
 import {env} from '../utils/env';
@@ -12,7 +13,12 @@ const request: AxiosInstance = axios.create({
 });
 
 request.interceptors.request.use(async config => {
-  // if (waitForLogout) return;
+  if (!FEATURE_FLAGS.ENABLE_UPLOAD && config.method?.toLowerCase() !== 'get') {
+    throw new Error('Writes and uploads are disabled in Guest Mode.');
+  }
+  if (!FEATURE_FLAGS.ENABLE_NOCODB) {
+    throw new Error('Legacy services are disabled in Guest Mode.');
+  }
 
   //   const token = LocalStorage.get(AUTH_KEY) || undefined;
 

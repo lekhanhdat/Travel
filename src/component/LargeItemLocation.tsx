@@ -10,6 +10,7 @@ import {ScreenName} from '../container/AppContainer';
 import NavigationService from '../container/screens/NavigationService';
 import CachedImage from './CachedImage';
 import {translateLocationField} from '../utils/translationHelpers';
+import {catalogImage} from '../utils/catalogDisplay';
 
 interface ILargeItemLocationProps {
   location: ILocation;
@@ -17,7 +18,7 @@ interface ILargeItemLocationProps {
 }
 
 const LargeItemLocation: React.FC<ILargeItemLocationProps> = ({location, onPress}) => {
-  const {t} = useTranslation(['common', 'locations']);
+  const {t} = useTranslation('common');
 
   const locationId = location.Id || location.id;
   const translatedName = locationId
@@ -41,7 +42,7 @@ const LargeItemLocation: React.FC<ILargeItemLocationProps> = ({location, onPress
       }}>
       <View style={styles.rowCenter}>
         <CachedImage
-          uri={location.avatar}
+          uri={catalogImage(location)}
           style={{
             height: sizes.width * 0.25,
             width: sizes.width * 0.25,

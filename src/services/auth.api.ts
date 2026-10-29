@@ -406,7 +406,6 @@ const authApi = {
         lastAttemptAt: now,
       });
 
-      console.log('🔢 OTP Code:', otp);
       console.log('⏰ Expires at:', new Date(expiresAt).toLocaleString());
 
       // Send email via SendGrid REST API

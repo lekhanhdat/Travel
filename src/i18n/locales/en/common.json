@@ -161,6 +161,7 @@
     "fee": "Fee",
     "festivalImages": "Festival Images",
     "similarFestivals": "Similar Festivals",
+    "noReviews": "No reviews yet",
     "similarFestivalsAI": "Similar Festivals (AI Suggestions)"
   },
   "priceLevel": {
@@ -275,5 +276,10 @@
     "permissionDenied": "Permission denied.",
     "notFound": "Not found.",
     "invalidInput": "Invalid input."
+  },
+  "recovery": {
+    "loading": "Loading catalog",
+    "catalogUnavailable": "Unable to load the catalog. Please check your connection and retry.",
+    "retry": "Retry"
   }
 }

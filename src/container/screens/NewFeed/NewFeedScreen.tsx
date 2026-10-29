@@ -3,7 +3,6 @@ import {FlatList, TouchableOpacity, View, Image, ScrollView, Alert, ActivityIndi
 import Page from '../../../component/Page';
 import HeaderBase from '../../../component/HeaderBase';
 import strings from '../../../res/strings';
-import {reviews} from '../../../common/reviewsConstants';
 import {IAccount, ILocation, IReview} from '../../../common/types';
 import ReviewItem from '../../../component/ReviewItem';
 import sizes from '../../../common/sizes';
@@ -18,11 +17,6 @@ import {localStorageKey} from '../../../common/constants';
 import {StarActive, StarInActive} from '../../../assets/assets/ImageSvg';
 import {TextInput, Button} from 'react-native-paper';
 import moment from 'moment';
-import _ from 'lodash';
-import {
-  LOCATION_NEARLY,
-  LOCATION_POPULAR,
-} from '../../../common/locationConstants';
 import LargeItemLocation from '../../../component/LargeItemLocation';
 import locationApi from '../../../services/locations.api';
 import {launchImageLibrary} from 'react-native-image-picker';
@@ -101,30 +95,11 @@ export default class NewFeedScreen extends React.PureComponent<
 
   handleGetReviews = async () => {
     try {
-      // 1. Lấy reviews từ cloud NocoDB (uses cache)
-      const cloudReviews = await locationApi.getReviews();
-      if (__DEV__) {console.log('✅ Cloud reviews:', cloudReviews.length);}
+      // Reviews chỉ lấy từ API (uses cache); chưa có review thì danh sách rỗng.
+      const allReviews = await locationApi.getReviews();
+      if (__DEV__) {console.log('✅ Cloud reviews:', allReviews.length);}
 
-      // 2. Lấy reviews từ hardcode (backup)
-      const locations: ILocation[] = _.unionBy(
-        LOCATION_POPULAR,
-        LOCATION_NEARLY,
-        'id',
-      );
-      let hardcodeReviews: IReview[] = [];
-      locations.forEach(location => {
-        location.reviews.forEach(review => {
-          review.location = location;
-          hardcodeReviews = hardcodeReviews.concat(review);
-        });
-      });
-      if (__DEV__) {console.log('✅ Hardcode reviews:', hardcodeReviews.length);}
-
-      // 3. Merge: Cloud reviews lên trên, hardcode reviews ở dưới
-      const allReviews = [...cloudReviews, ...hardcodeReviews];
-      if (__DEV__) {console.log('✅ Total reviews:', allReviews.length);}
-
-      // 4. Sắp xếp theo thời gian (mới nhất lên trên)
+      // Sắp xếp theo thời gian (mới nhất lên trên)
       const sortedReviews = allReviews.sort((a, b) => {
         // Parse time_review format: "HH:mm DD/MM/YYYY" hoặc "DD/MM/YYYY HH:mm"
         const parseTime = (timeStr: string) => {
@@ -156,21 +131,8 @@ export default class NewFeedScreen extends React.PureComponent<
       });
     } catch (error) {
       if (__DEV__) {console.error('❌ Error fetching reviews:', error);}
-      // Fallback to hardcode reviews
-      const locations: ILocation[] = _.unionBy(
-        LOCATION_POPULAR,
-        LOCATION_NEARLY,
-        'id',
-      );
-      let reviewsLocal: IReview[] = [];
-      locations.forEach(location => {
-        location.reviews.forEach(review => {
-          review.location = location;
-          reviewsLocal = reviewsLocal.concat(review);
-        });
-      });
       this.setState({
-        reviews: reviewsLocal,
+        reviews: [],
       });
     }
   };

@@ -17,9 +17,6 @@ declare module 'react-i18next' {
     // Resources type definition
     resources: {
       common: typeof enCommon;
-      // Add other namespaces here as they are created
-      // locations: typeof enLocations;
-      // festivals: typeof enFestivals;
     };
   }
 }
@@ -41,7 +38,7 @@ export type TranslationKey = NestedKeyOf<typeof enCommon>;
 export type SupportedLanguage = 'en' | 'vi';
 
 // Namespace type
-export type TranslationNamespace = 'common' | 'locations' | 'festivals';
+export type TranslationNamespace = 'common';
 
 // Translation function type
 export type TFunction = (key: TranslationKey, options?: Record<string, unknown>) => string;

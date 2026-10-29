@@ -1,3 +1,4 @@
+import FEATURE_FLAGS from '../config/featureFlags';
 /**
  * SemanticSearchBarComponent
  * Enhanced search bar with semantic search support using AI
@@ -82,7 +83,7 @@ export default class SemanticSearchBarComponent<T> extends React.PureComponent<
     super(props);
     this.state = {
       searchValue: '',
-      useSemanticSearch: true, // Default to semantic search (AI-powered)
+      useSemanticSearch: FEATURE_FLAGS.ENABLE_AI, // Default to semantic search (AI-powered)
       isSearching: false,
       lastFilteredData: props.data, // Initialize with all data
     };
@@ -131,6 +132,7 @@ export default class SemanticSearchBarComponent<T> extends React.PureComponent<
 
   // Semantic search using AI - returns results and stores in state
   performSemanticSearch = async (query: string): Promise<T[]> => {
+    if (!FEATURE_FLAGS.ENABLE_AI) {return this.filterDataKeyword(query);}
     const {data, entityType, idField = 'Id' as keyof T} = this.props;
 
     console.log('🔍 [SemanticSearch] Starting search...');
@@ -321,7 +323,7 @@ export default class SemanticSearchBarComponent<T> extends React.PureComponent<
 
   toggleSearchMode = () => {
     const {data, onSearch} = this.props;
-    const newMode = !this.state.useSemanticSearch;
+    const newMode = FEATURE_FLAGS.ENABLE_AI && !this.state.useSemanticSearch;
     this.setState({useSemanticSearch: newMode, searchValue: ''});
     onSearch(data, '', newMode); // Reset results
   };

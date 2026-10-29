@@ -1,4 +1,6 @@
+import FEATURE_FLAGS from '../../../config/featureFlags';
 import React from 'react';
+import CatalogStatus from '../../../component/CatalogStatus';
 import {ScrollView, View, Image, FlatList, TouchableOpacity, StyleSheet, Modal, Dimensions} from 'react-native';
 import Page from '../../../component/Page';
 import HeaderBase from '../../../component/HeaderBase';
@@ -10,7 +12,6 @@ import {ILocation, IReview} from '../../../common/types';
 import TextBase from '../../../common/TextBase';
 import {AppStyle} from '../../../common/AppStyle';
 import ReviewItem from '../../../component/ReviewItem';
-import {reviews} from '../../../common/reviewsConstants';
 import locationApi from '../../../services/locations.api';
 import {StarActive, StarInActive, ThunderSvg} from '../../../assets/assets/ImageSvg';
 import {MapSvg, Call, GlobeSvg, ClockSvg, DirectionsSvg} from '../../../assets/ImageSvg';
@@ -23,6 +24,8 @@ import {
   WithAzureTranslationProps,
 } from '../../../hoc/withAzureTranslation';
 import { translateLocationField } from '../../../utils/translationHelpers';
+import { catalogImage } from '../../../utils/catalogDisplay';
+import CachedImage from '../../../component/CachedImage';
 
 interface IDetailLocationScreenProps extends WithAzureTranslationProps {
   navigation: any;
@@ -30,6 +33,7 @@ interface IDetailLocationScreenProps extends WithAzureTranslationProps {
 }
 
 interface IDetailLocationScreenState {
+  catalogError: boolean;
   allLocations: ILocation[];
   showImageModal: boolean;
   selectedImageIndex: number;
@@ -43,6 +47,7 @@ class DetailLocationScreen extends React.PureComponent<
   constructor(props: IDetailLocationScreenProps) {
     super(props);
     this.state = {
+      catalogError: false,
       allLocations: [],
       showImageModal: false,
       selectedImageIndex: 0,
@@ -50,24 +55,24 @@ class DetailLocationScreen extends React.PureComponent<
     };
   }
 
-  async componentDidMount() {
-    // Load all locations để filter theo types
-    const locations = await locationApi.getLocations();
-    this.setState({ allLocations: locations });
-
-    // Load festivals cho địa điểm này
-    const location: ILocation = this.props.route.params?.location;
-    if (location.Id || location.id) {
-      const locationId = location.Id || location.id;
-      try {
-        const festivals = await festivalsApi.getFestivalsByLocationId(locationId!);
-        if (__DEV__) {console.log(`🎉 Found ${festivals.length} festivals for location ${locationId}`);}
-        this.setState({ festivals });
-      } catch (error) {
-        if (__DEV__) {console.error('❌ Error loading festivals:', error);}
-      }
-    }
+  componentDidMount() {
+    // P1: if (FEATURE_FLAGS.RECOVERY_MODE) {return;}
+    this.loadCatalog();
   }
+
+  loadCatalog = async (forceRefresh = false) => {
+    this.setState({catalogError: false});
+    try {
+      const locations = await locationApi.getLocations(forceRefresh);
+      const location: ILocation = this.props.route.params?.location;
+      const locationId = location.id ?? location.Id;
+      if (forceRefresh) {festivalsApi.clearCache();}
+      const festivals = locationId == null ? [] : await festivalsApi.getFestivalsByLocationId(locationId);
+      this.setState({allLocations: locations, festivals});
+    } catch {
+      this.setState({catalogError: true});
+    }
+  };
 
   renderItem = ({item, index}: {item: IReview; index: number}) => {
     return <ReviewItem review={item} />;
@@ -188,7 +193,7 @@ class DetailLocationScreen extends React.PureComponent<
           onLeftIconPress={() => {
             NavigationService.pop();
           }}
-          rightIconSvgOne={
+          rightIconSvgOne={FEATURE_FLAGS.ENABLE_MAP &&
             <MapSvg
               width={sizes._24sdp}
               height={sizes._24sdp}
@@ -202,10 +207,12 @@ class DetailLocationScreen extends React.PureComponent<
             });
           }}
         />
+        <CatalogStatus loading={false} error={this.state.catalogError}
+          onRetry={() => this.loadCatalog(true)} />
         <View style={{flex: 1, backgroundColor: colors.primary_200}}>
           <ScrollView>
-            <Image
-              source={{uri: location.avatar}}
+            <CachedImage
+              uri={catalogImage(location)}
               style={{
                 width: sizes.width,
                 height: sizes._200sdp,
@@ -256,17 +263,19 @@ class DetailLocationScreen extends React.PureComponent<
               </TextBase>
 
               {/* Address with Icon */}
-              <View style={{flexDirection: 'row', alignItems: 'center', marginTop: sizes._12sdp}}>
-                <MapSvg
-                  width={sizes._20sdp}
-                  height={sizes._20sdp}
-                  color={'#000000'}
-                />
-                <TextBase
-                  style={[AppStyle.txt_16_medium_detail, {marginLeft: sizes._8sdp, flex: 1, textAlign: 'justify'}]}>
-                  {t('detail.address')}: {translatedAddress}
-                </TextBase>
-              </View>
+              {translatedAddress ? (
+                <View style={{flexDirection: 'row', alignItems: 'center', marginTop: sizes._12sdp}}>
+                  <MapSvg
+                    width={sizes._20sdp}
+                    height={sizes._20sdp}
+                    color={'#000000'}
+                  />
+                  <TextBase
+                    style={[AppStyle.txt_16_medium_detail, {marginLeft: sizes._8sdp, flex: 1, textAlign: 'justify'}]}>
+                    {t('detail.address')}: {translatedAddress}
+                  </TextBase>
+                </View>
+              ) : null}
 
               {/* Phone Number with Icon */}
               {location.phone && (
@@ -414,15 +423,8 @@ class DetailLocationScreen extends React.PureComponent<
                             </TextBase>
                           </View>
 
-                          {/* Price Level */}
-                          <View style={{flexDirection: 'row', alignItems: 'center', marginTop: sizes._4sdp}}>
-                            <TextBase style={[AppStyle.txt_14_regular, {color: colors.primary_700}]}>
-                              💰 {festival.price_level === 0 ? t('priceLevel.free') : festival.price_level === 1 ? '$' : '$$'}
-                            </TextBase>
-                          </View>
-
                           {/* Rating */}
-                          {festival.rating > 0 && (
+                          {typeof festival.rating === 'number' && festival.rating > 0 && (
                             <View style={{flexDirection: 'row', alignItems: 'center', marginTop: sizes._4sdp}}>
                               <StarActive
                                 width={sizes._16sdp}
@@ -442,7 +444,7 @@ class DetailLocationScreen extends React.PureComponent<
               )}
 
               {/* Advise Section */}
-              {location.advise && (
+              {location.advise && location.advise.length > 0 && (
                 <View style={{marginTop: sizes._16sdp}}>
                   <View style={{flexDirection: 'row', alignItems: 'center'}}>
                     <TextBase style={[AppStyle.txt_20_bold]}>
@@ -468,6 +470,7 @@ class DetailLocationScreen extends React.PureComponent<
               )}
 
               {/* Buttons: Directions */}
+              {FEATURE_FLAGS.ENABLE_MAP && (
               <View style={{
                 flexDirection: 'row',
                 gap: sizes._12sdp,
@@ -502,9 +505,10 @@ class DetailLocationScreen extends React.PureComponent<
                   </TextBase>
                 </TouchableOpacity>
               </View>
+              )}
 
               {/* Semantic Similar Items from Backend */}
-              {(location.Id || location.id) && (
+              {FEATURE_FLAGS.ENABLE_AI && (location.Id || location.id) && (
                 <SimilarItemsComponent
                   entityType="location"
                   entityId={location.Id || location.id!}
@@ -533,6 +537,11 @@ class DetailLocationScreen extends React.PureComponent<
                 scrollEnabled={false}
                 renderItem={this.renderItem}
                 keyExtractor={(item, index) => index.toString() + item.id}
+                ListEmptyComponent={
+                  <TextBase style={[AppStyle.txt_16_regular, {textAlign: 'center'}]}>
+                    {t('detail.noReviews')}
+                  </TextBase>
+                }
               />
             </View>
           </ScrollView>

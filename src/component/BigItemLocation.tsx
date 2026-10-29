@@ -10,6 +10,7 @@ import NavigationService from '../container/screens/NavigationService';
 import {ScreenName} from '../container/AppContainer';
 import CachedImage from './CachedImage';
 import {translateLocationField} from '../utils/translationHelpers';
+import {catalogImage} from '../utils/catalogDisplay';
 
 interface IBigItemLocationProps {
   location: ILocation;
@@ -17,7 +18,7 @@ interface IBigItemLocationProps {
 }
 
 const BigItemLocation: React.FC<IBigItemLocationProps> = ({location, onPress}) => {
-  const {t} = useTranslation(['common', 'locations']);
+  const {t} = useTranslation('common');
 
   const locationId = location.Id || location.id;
   const translatedName = locationId
@@ -40,7 +41,7 @@ const BigItemLocation: React.FC<IBigItemLocationProps> = ({location, onPress}) =
         });
       }}>
       <CachedImage
-        uri={location.avatar}
+        uri={catalogImage(location)}
         style={styles.icon}
       />
       <View

@@ -8,7 +8,7 @@ import {RootSiblingParent} from 'react-native-root-siblings';
 import {MD3LightTheme as DefaultTheme, PaperProvider} from 'react-native-paper';
 import colors from './src/common/colors';
 import Toast from 'react-native-toast-message';
-import FloatingChatBubble from './src/component/FloatingChatBubble';
+import FEATURE_FLAGS from './src/config/featureFlags';
 
 interface Props {}
 interface States {}
@@ -50,7 +50,9 @@ class App extends React.PureComponent<Props, States> {
               }}>
               <AppContainer />
             </NavigationContainer>
-            <FloatingChatBubble />
+            {FEATURE_FLAGS.ENABLE_AI && React.createElement(
+              require('./src/component/FloatingChatBubble').default,
+            )}
           </View>
         </PaperProvider>
         <Toast />

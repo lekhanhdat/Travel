@@ -1,3 +1,5 @@
+import FEATURE_FLAGS from '../../../config/featureFlags';
+import CatalogStatus from '../../../component/CatalogStatus';
 import React from 'react';
 import {
   FlatList,
@@ -35,6 +37,8 @@ interface IHomeScreenProps extends WithAzureTranslationProps {
 }
 
 interface IHomeScreenState {
+  loading: boolean;
+  error: boolean;
   valueSearch: string;
   locations: ILocation[];
   locationsPopular: ILocation[];
@@ -56,6 +60,8 @@ class HomeScreen extends React.PureComponent<
     super(props);
     this.searchBarRef = React.createRef();
     this.state = {
+      loading: true,
+      error: false,
       valueSearch: '',
       locations: [],
       locationsNearly: [],
@@ -79,9 +85,9 @@ class HomeScreen extends React.PureComponent<
       this.searchBarRef.current?.resetSearch();
     });
 
-    this.requestLocationPermission();
+    if (FEATURE_FLAGS.ENABLE_MAP) {this.requestLocationPermission();}
     this.fetchLocations();
-    this.handleGetUser();
+    if (FEATURE_FLAGS.ENABLE_AUTH) {this.handleGetUser();}
   }
 
   handleGetUser = async () => {
@@ -175,6 +181,7 @@ class HomeScreen extends React.PureComponent<
     return deg * (Math.PI / 180);
   };
 
+  /* P1: Legacy GPS/nearby loader retained while Guest Mode uses the loader below.
   async fetchLocations() {
     const data = await locationApi.getLocations();
 
@@ -213,6 +220,19 @@ class HomeScreen extends React.PureComponent<
         nearestLocations[0]?.distance?.toFixed(2),
         'km',
       );
+    }
+  }
+  */
+
+  async fetchLocations() {
+    this.setState({loading: true, error: false});
+    try {
+      const data = await locationApi.getLocations(true);
+      this.setState({locations: data, locationsPopular: data.slice(0, 20), locationsNearly: []});
+    } catch {
+      this.setState({error: true});
+    } finally {
+      this.setState({loading: false});
     }
   }
 
@@ -393,10 +413,12 @@ class HomeScreen extends React.PureComponent<
           entityType="location"
           idField="Id"
         />
+        <CatalogStatus loading={this.state.loading} error={this.state.error}
+          onRetry={() => this.fetchLocations()} />
         <ScrollView>
           <View style={styles.container}>
             {/* 1. AI-Powered Recommendations - At the top */}
-            {this.state.account?.Id && (
+            {FEATURE_FLAGS.ENABLE_AI && this.state.account?.Id && (
               <RecommendationsWidget
                 userId={this.state.account.Id}
                 title={this.props.t('home.recommendedLocations')}
@@ -439,7 +461,7 @@ class HomeScreen extends React.PureComponent<
               removeClippedSubviews={true}
             />
 
-            {/* 3. Near Me Locations */}
+            {/* P1: Nearby UI is temporarily disabled until GPS/map recovery.
             <View style={[styles.rowCenter, {marginTop: sizes._24sdp}]}>
               <TextBase
                 style={[AppStyle.txt_20_bold, {marginBottom: sizes._16sdp}]}>
@@ -470,6 +492,8 @@ class HomeScreen extends React.PureComponent<
               maxToRenderPerBatch={5}
               removeClippedSubviews={true}
             />
+            */}
+
           </View>
         </ScrollView>
       </Page>

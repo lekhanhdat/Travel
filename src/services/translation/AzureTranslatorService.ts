@@ -1,3 +1,4 @@
+import FEATURE_FLAGS from '../../config/featureFlags';
 import {env} from '../../utils/env';
 
 const API_VERSION = '3.0';
@@ -42,6 +43,7 @@ class AzureTranslatorService {
     sourceLang: string = 'en',
   ): Promise<string[]> {
     if (!texts.length) return [];
+    if (!FEATURE_FLAGS.USE_AZURE_TRANSLATOR) return texts;
     if (!this.key) {
       console.warn('Azure Translator key not configured');
       return texts;
@@ -74,7 +76,7 @@ class AzureTranslatorService {
   }
 
   async detectLanguage(text: string): Promise<string> {
-    if (!this.key) return 'en';
+    if (!FEATURE_FLAGS.USE_AZURE_TRANSLATOR || !this.key) return 'en';
 
     try {
       const url = `${this.endpoint}/detect?api-version=${API_VERSION}`;

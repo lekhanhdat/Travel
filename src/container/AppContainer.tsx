@@ -24,7 +24,7 @@ import {
 // import LoginScreen from './screens/Login/LoginScreen';
 import HomeScreen from './screens/Home/HomeScreen';
 // import NewFeedScreen from './screens/NewFeed/NewFeedScreen';
-// import MapsScreen from './screens/Maps/MapScreenV2';
+import MapsScreen from './screens/Maps/MapScreenV2';
 // import CameraScreen from './screens/Camera/CameraScreen';
 // import ProfileScreen from './screens/Profile/ProfileScreen';
 import ViewAllLocation from './screens/Home/ViewAllLocation';
@@ -37,7 +37,7 @@ import Settings from './screens/Profile/Settings';
 import FAQ from './screens/Profile/FAQ';
 import Policy from './screens/Profile/Policy';
 import About from './screens/Profile/About';
-// import Advise from './screens/Maps/Advise';
+import Advise from './screens/Maps/Advise';
 // import DetailItem from './screens/NewFeed/DetailItem';
 // import AllItemScreen from './screens/NewFeed/AllItemsScreen';
 import FestivalsScreen from './screens/Festival/FestivalsScreen';
@@ -84,6 +84,11 @@ export const TAB_NAMES = {
   CAMERA: 'TabCamera',
   PROFILE: 'TabProfile',
 } as const;
+
+// Fixed icon order for getTabIcon, independent of which tabs are currently enabled
+const TAB_ORDER: string[] = [
+  TAB_NAMES.HOME, TAB_NAMES.FESTIVAL, TAB_NAMES.FEED, TAB_NAMES.MAP, TAB_NAMES.CAMERA, TAB_NAMES.PROFILE,
+];
 
 // Translation keys for tab labels
 const TAB_TRANSLATION_KEYS = {
@@ -170,7 +175,7 @@ function MyTabBar({
             onPress={onPress}
             onLongPress={onLongPress}
             style={[styles.containerTouch]}>
-            {getTabIcon(index, isFocused)}
+            {getTabIcon(TAB_ORDER.indexOf(item.name), isFocused)}
             <TextBase
               style={[
                 styles.title,
@@ -267,7 +272,7 @@ function HomeStack() {
           }}
         />
         */}
-        {/* P1: Temporarily disabled; retain for restoration.
+        {/* P4: Map restored. */}
         <Tabs.Screen
           name={TAB_NAMES.MAP}
           component={MapsScreen}
@@ -281,7 +286,6 @@ function HomeStack() {
             ),
           }}
         />
-        */}
         {/* P1: Temporarily disabled; retain for restoration.
         <Tabs.Screen
           name={TAB_NAMES.CAMERA}
@@ -333,9 +337,8 @@ function AppContainer() {
       {/* P1: Temporarily disabled; retain for restoration.
       <Stack.Screen name="PreviewImage" component={PreviewImage} />
       */}
-      {/* P1: Temporarily disabled; retain for restoration.
+      {/* P4: Map restored. */}
       <Stack.Screen name="MapsScreen" component={MapsScreen} />
-      */}
       <Stack.Screen name="LocationImage" component={LocationImage} />
       <Stack.Screen name="LocationVideo" component={LocationVideo} />
       {/* P1: Temporarily disabled; retain for restoration.
@@ -345,9 +348,8 @@ function AppContainer() {
       <Stack.Screen name="FAQ" component={FAQ} />
       <Stack.Screen name="Policy" component={Policy} />
       <Stack.Screen name="About" component={About} />
-      {/* P1: Temporarily disabled; retain for restoration.
+      {/* P4: restored with Map (popup button). */}
       <Stack.Screen name="Advise" component={Advise} />
-      */}
       {/* P1: Temporarily disabled; retain for restoration.
       <Stack.Screen name="DetailItem" component={DetailItem} />
       */}

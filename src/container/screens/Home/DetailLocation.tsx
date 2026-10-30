@@ -166,6 +166,9 @@ class DetailLocationScreen extends React.PureComponent<
     const {t} = this.props;
 
     const locationId = location.id;
+    // Map/directions only for a valid GPS pair.
+    const hasGps = typeof location.lat === 'number' && typeof location.long === 'number' &&
+      Number.isFinite(location.lat) && Number.isFinite(location.long);
     const translatedName = locationId 
       ? translateLocationField(t, locationId, 'name', location.name)
       : location.name;
@@ -190,7 +193,7 @@ class DetailLocationScreen extends React.PureComponent<
           onLeftIconPress={() => {
             NavigationService.pop();
           }}
-          rightIconSvgOne={FEATURE_FLAGS.ENABLE_MAP &&
+          rightIconSvgOne={FEATURE_FLAGS.ENABLE_MAP && hasGps &&
             <MapSvg
               width={sizes._24sdp}
               height={sizes._24sdp}
@@ -467,7 +470,7 @@ class DetailLocationScreen extends React.PureComponent<
               )}
 
               {/* Buttons: Directions */}
-              {FEATURE_FLAGS.ENABLE_MAP && (
+              {FEATURE_FLAGS.ENABLE_MAP && hasGps && (
               <View style={{
                 flexDirection: 'row',
                 gap: sizes._12sdp,

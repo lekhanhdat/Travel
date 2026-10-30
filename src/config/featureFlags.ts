@@ -4,7 +4,7 @@ export const FEATURE_FLAGS = {
   ENABLE_AUTH: false,
   ENABLE_NOCODB: false,
   ENABLE_AI: false,
-  ENABLE_MAP: false,
+  ENABLE_MAP: true,
   ENABLE_PAYMENT: false,
   ENABLE_UPLOAD: false,
   ENABLE_ITEMS: false,

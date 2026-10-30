@@ -33,8 +33,23 @@ import Tts from 'react-native-tts';
 import {useTranslation} from 'react-i18next';
 import {translateLocationField} from '../../../utils/translationHelpers';
 import catalogRepository from '../../../services/catalogRepository';
+import {catalogImage} from '../../../utils/catalogDisplay';
+import CachedImage from '../../../component/CachedImage';
+import haversineDistance from '../../../utils/haversineDistance';
 
 MapboxGL.setAccessToken(env.MAPBOX_ACCESS_TOKEN || '');
+// "auto" means Android's LocationManager, where high accuracy is GPS-only and rarely gets a fix
+// indoors within the timeout. Use the fused provider (play-services-location is already a dependency).
+Geolocation.setRNConfiguration({skipPermissionRequests: false, locationProvider: 'playServices'});
+
+// Đà Nẵng (same default the screen already falls back to) and how far the user may be
+// from the catalog area for the map to open on the user's position.
+const DEFAULT_CENTER = {latitude: 15.974620784990472, longitude: 108.25290513035998};
+const NEAR_CATALOG_METERS = 100 * 1000;
+
+const hasGps = (location: ILocation): location is ILocation & {lat: number; long: number} =>
+  typeof location.lat === 'number' && Number.isFinite(location.lat) &&
+  typeof location.long === 'number' && Number.isFinite(location.long);
 
 const styles = StyleSheet.create({
   touchableContainer: {borderColor: 'black', borderWidth: 1.0, width: 60},
@@ -135,6 +150,14 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
     null,
   );
   const [locationPermission, setLocationPermission] = useState(false);
+  // True only after a real GPS fix; the Đà Nẵng fallback only centers the camera.
+  const [hasUserLocation, setHasUserLocation] = useState(false);
+  const locationPermissionRef = React.useRef(false);
+  locationPermissionRef.current = locationPermission;
+  // Camera target chosen once (focus place / user near catalog / catalog area), so GPS updates
+  // from watchPosition do not keep pulling the camera back while the user pans.
+  const initialCenterRef = React.useRef<number[] | null>(null);
+  const centeredOnUserRef = React.useRef(false);
 
   // TTS (Text-to-Speech) state - Ultra-simplified: only playing state
   const [isTtsPlaying, setIsTtsPlaying] = useState(false);
@@ -189,22 +212,28 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
     }
   };
 
-  const getCurrentLocation = () => {
+  const getCurrentLocation = (highAccuracy = true) => {
     Geolocation.getCurrentPosition(
       (position) => {
         const {latitude, longitude} = position.coords;
         setCurrentLat(latitude);
         setCurrentLong(longitude);
+        setHasUserLocation(true);
         console.log('Current location:', latitude, longitude);
       },
       (error) => {
         console.log('Error getting location:', error);
+        // Retry once with Wi-Fi/cell accuracy before giving up on a real position.
+        if (highAccuracy && error?.code !== 1) {
+          getCurrentLocation(false);
+          return;
+        }
         // Fallback to default Đà Nẵng coordinates
         setCurrentLat(15.974620784990472);
         setCurrentLong(108.25290513035998);
       },
       {
-        enableHighAccuracy: true,
+        enableHighAccuracy: highAccuracy,
         timeout: 15000,
         maximumAge: 10000,
       },
@@ -217,6 +246,7 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
         const {latitude, longitude} = position.coords;
         setCurrentLat(latitude);
         setCurrentLong(longitude);
+        setHasUserLocation(true);
         console.log('📍 Location updated:', latitude, longitude);
       },
       (error) => {
@@ -304,7 +334,7 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
     } else {
       // Nếu không, fetch từ NocoDB
       catalogRepository.get().then(catalog => {
-        setLocations(catalog.locations);
+        setLocations(catalog.mapMarkers);
       }).catch(error => console.warn('Catalog unavailable for map:', error));
     }
 
@@ -407,7 +437,7 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
 
     const focusListener = navigation.addListener('focus', () => {
       // Refresh location when screen comes into focus
-      if (locationPermission) {
+      if (locationPermissionRef.current) {
         getCurrentLocation();
       }
     });
@@ -435,11 +465,11 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
 
   // Fetch route khi đã có vị trí hiện tại và cần hiển thị đường đi
   useEffect(() => {
-    if (shouldShowRoute && focusLocation && currentLat !== 0 && currentLong !== 0) {
+    if (shouldShowRoute && focusLocation && hasUserLocation && currentLat !== 0 && currentLong !== 0) {
       console.log('🚗 Ready to fetch route - current location available');
       fetchRouteToLocation(focusLocation);
     }
-  }, [shouldShowRoute, focusLocation, currentLat, currentLong]);
+  }, [shouldShowRoute, focusLocation, hasUserLocation, currentLat, currentLong]);
 
   // ✅ Zoom khi camera đã ready và có pending zoom
   useEffect(() => {
@@ -462,14 +492,15 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
   }, [showTraffic]);
 
   const fetchRouteToLocation = async (location: ILocation) => {
-    if (typeof location.lat !== 'number' || typeof location.long !== 'number') {return;}
+    if (typeof location.lat !== 'number' || typeof location.long !== 'number' ||
+        !Number.isFinite(location.lat) || !Number.isFinite(location.long)) {return;}
     try {
       console.log('=== FETCHING ROUTE WITH MAPBOX ===');
       console.log('From:', currentLat, currentLong);
       console.log('To:', location.name, location.lat, location.long);
 
-      // Kiểm tra vị trí hiện tại đã có chưa
-      if (currentLat === 0 || currentLong === 0) {
+      // Kiểm tra vị trí hiện tại đã có chưa (không chỉ đường từ tọa độ mặc định)
+      if (!hasUserLocation || currentLat === 0 || currentLong === 0) {
         console.log('❌ Current location not available yet');
         return;
       }
@@ -695,6 +726,10 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
 
   // Function to recenter map to current location
   const recenterToMyLocation = () => {
+    if (!hasUserLocation) {
+      requestLocationPermission();
+      return;
+    }
     if (cameraRef.current && currentLat !== 0 && currentLong !== 0) {
       cameraRef.current.setCamera({
         centerCoordinate: [currentLong, currentLat],
@@ -840,10 +875,30 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
   console.log({locationProps});
 
   // Xác định tọa độ để focus camera
-  const focusCoordinate =
-    locationProps.length > 0 && typeof locationProps[0].long === 'number' && typeof locationProps[0].lat === 'number'
-      ? [locationProps[0].long, locationProps[0].lat]
-      : [currentLong, currentLat];
+  const markerPoints = locations.filter(hasGps);
+  const catalogCenter = markerPoints.length > 0
+    ? {
+      latitude: markerPoints.reduce((sum, loc) => sum + loc.lat, 0) / markerPoints.length,
+      longitude: markerPoints.reduce((sum, loc) => sum + loc.long, 0) / markerPoints.length,
+    }
+    : DEFAULT_CENTER;
+  const userNearCatalog = hasUserLocation &&
+    haversineDistance({latitude: currentLat, longitude: currentLong}, catalogCenter) <= NEAR_CATALOG_METERS;
+  if (locationProps.length > 0 && hasGps(locationProps[0])) {
+    initialCenterRef.current = [locationProps[0].long, locationProps[0].lat];
+  } else if (userNearCatalog && !centeredOnUserRef.current) {
+    // First nearby fix wins once (the first fix may be a stale cached position far away).
+    centeredOnUserRef.current = true;
+    initialCenterRef.current = [currentLong, currentLat];
+  } else if (!initialCenterRef.current && markerPoints.length > 0) {
+    initialCenterRef.current = [catalogCenter.longitude, catalogCenter.latitude];
+  }
+  const focusCoordinate = initialCenterRef.current ?? [catalogCenter.longitude, catalogCenter.latitude];
+  // Previous rule (kept for reference): followed the GPS on every update.
+  // const focusCoordinate =
+  //   locationProps.length > 0 && typeof locationProps[0].long === 'number' && typeof locationProps[0].lat === 'number'
+  //     ? [locationProps[0].long, locationProps[0].lat]
+  //     : [currentLong, currentLat];
 
   const focusZoomLevel = locationProps.length > 0 ? 14 : 11; // Zoom gần hơn khi focus vào địa điểm cụ thể
 
@@ -887,7 +942,8 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
           ref={mapRef}
           style={{flex: 1}}
           styleURL={MAP_STYLES.find(s => s.id === currentMapStyle)?.url || MapboxGL.StyleURL.Satellite}
-          onRegionDidChange={onRegionChange}
+          // Deprecated in @rnmapbox/maps v10 (dev warning) and a no-op here; onCameraChanged below is used.
+          // onRegionDidChange={onRegionChange}
           onCameraChanged={onRegionDidChange}
           onDidFinishLoadingMap={onMapStyleLoaded}
           onPress={() => {
@@ -910,7 +966,11 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
           />
 
           {
-            locations.filter(isMapLocationVisible).map((location, index) => {
+            locations.filter((loc): loc is ILocation & {lat: number; long: number} =>
+              isMapLocationVisible(loc) ||
+              // Always show the focused/selected place (e.g. opened from Detail) when it has GPS.
+              ((focusLocation?.id === loc.id || selectedLocation?.id === loc.id) && hasGps(loc)),
+            ).map((location, index) => {
               const textColor = getTextColorForMapStyle(currentMapStyle);
               const textShadow = getTextShadowForMapStyle(currentMapStyle);
 
@@ -966,6 +1026,7 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
           }
 
           {/* Current Location Marker - Blue circle like Google Maps */}
+          {hasUserLocation && (
           <MapboxGL.MarkerView
             key={'myLocation'}
             id={'myLocation'}
@@ -996,6 +1057,7 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
               </TextBase>
             </View>
           </MapboxGL.MarkerView>
+          )}
 
           {/* Traffic Layer - Mapbox Traffic v1 Tileset */}
           {showTraffic && (
@@ -1398,10 +1460,21 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
             mode="outlined"
             onPress={() => {
               console.log('🧭 Chỉ đường đến:', selectedLocation.name);
+              if (!hasUserLocation) {
+                Toast.show({
+                  type: 'info',
+                  text1: 'Cần vị trí của bạn',
+                  text2: 'Bật quyền vị trí và GPS để chỉ đường',
+                });
+                requestLocationPermission();
+                return;
+              }
               // Fetch route và hiển thị
               setFocusLocation(selectedLocation);
               setShouldShowRoute(true);
-              fetchRouteToLocation(selectedLocation);
+              // P4: the route effect fetches once focusLocation/shouldShowRoute change; a direct call here
+              // made two paid Directions requests per tap.
+              // fetchRouteToLocation(selectedLocation);
             }}
             style={{
               backgroundColor: colors.white,
@@ -1674,8 +1747,8 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
                   ]}>
                   {t('common:detail.address')}: {translateLocationField(t, selectedLocation.id, 'address', selectedLocation.address)}
                 </TextBase>
-                <Image
-                  source={{uri: selectedLocation.avatar}} // Image URL
+                <CachedImage
+                  uri={catalogImage(selectedLocation)} // avatar -> images[0] -> placeholder
                   style={{
                     width: '100%',
                     height: 200,

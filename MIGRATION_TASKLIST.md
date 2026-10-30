@@ -42,10 +42,10 @@ Gate chung cho mọi phase có sửa code:
 - [x] P3.4 Pull-to-refresh gọi `catalogRepository.refresh()`; lỗi có nút Thử lại
 
 ## P4 — Map
-- [ ] P4.1 `.env`: Mapbox public token `pk.` (D3); bật `ENABLE_MAP`
-- [ ] P4.2 Marker từ `catalogRepository.mapMarkers` (29 = `publishable` + GPS hợp lệ); popup: tên, ảnh, festival tại địa điểm
-- [ ] P4.3 Chỉ đường (Mapbox Directions) chỉ khi có vị trí người dùng + marker hợp lệ; không background location
-- [ ] P4.4 Gỡ code GPS/NocoDB cũ đã comment trong `MapScreenV2.tsx`
+- [x] P4.1 `.env`: Mapbox public token `pk.` (D3); bật `ENABLE_MAP`
+- [x] P4.2 Marker từ `catalogRepository.mapMarkers` (29 = `publishable` + GPS hợp lệ); popup: tên, ảnh, festival tại địa điểm
+- [x] P4.3 Chỉ đường (Mapbox Directions) chỉ khi có vị trí người dùng + marker hợp lệ; không background location
+- [ ] P4.4 Gỡ code GPS/NocoDB cũ đã comment trong `MapScreenV2.tsx` — **bỏ qua theo chỉ đạo User 30/10: giữ nguyên mọi code đã comment, tái sử dụng thay vì viết lại**
 
 ## P5 — Nghiệm thu Android
 - [ ] P5.1 Build debug từ `.env` tối giản (`CATALOG_API_URL`, Mapbox `pk.`)
@@ -92,8 +92,17 @@ Các việc dưới đây nằm ngoài quyền của agent (push, GitHub, cloud,
   4. Rollback nếu lỗi: `update-traffic` về revision đã ghi ở bước 2.
 - [x] **U9 Quyết định mục tiêu payload nén.** → User chấp nhận ~125 KB (29/10); nghiệm thu P2 dùng mức này. Đo trên dữ liệu live với gzip level 9 (như `GZipMiddleware`): locations + festivals = 486 KB → **~125 KB** (kích thước trang 100/200/500 không đổi đáng kể: 124,5/122,8/122,8 KB), hơi vượt mục tiêu < 120 KB. Phần lớn là văn bản dài (`festivals.description` 113 KB, `locations.long_description` 96 KB thô). Lựa chọn: (a) chấp nhận ~125 KB và sửa nghiệm thu P2 (khuyến nghị — đã giảm 4 lần, giữ mô hình tải toàn bộ list); (b) bỏ `long_description` khỏi list và thêm endpoint detail — đổi contract, cần phase riêng.
 - [x] **U10 Commit/push FE P2** (`da4dff1`) (nhánh `migration/p0-p1`, working tree chưa commit theo yêu cầu). Sau khi CI xanh có thể hạ ngưỡng tsc trong `.github/workflows/ci.yml` từ 63 xuống 62 để khóa tiến bộ.
-- [ ] **U11 Commit/push FE P3** (nhánh `migration/p0-p1`, working tree chưa commit). Không có thay đổi BE; không cần deploy.
+- [x] **U11 Commit/push FE P3** (`040662b`) (nhánh `migration/p0-p1`, working tree chưa commit). Không có thay đổi BE; không cần deploy.
 - [ ] **U12 Thử trên máy thật (gộp vào P5.2):** Home → "Dùng vị trí của tôi" → Từ chối (vẫn thấy "Địa điểm phổ biến" + thông báo) → bấm lại → Cho phép (list gần nhất có khoảng cách); kéo xuống để làm mới ở Home/Lễ hội; Detail lễ hội → "Xem địa điểm ›".
+- [ ] **U13 Commit/push FE P4** (nhánh `migration/p0-p1`, working tree chưa commit). Không đổi BE.
+- [ ] **U14 Build lại Android để thử Map (gộp P5.1/P5.2).** _(Đã kiểm chứng trên emulator Pixel_8_API_34 ngày 30/10 với APK debug sẵn có + Metro; còn cần máy thật.)_ Lý do: Map dùng native module (`@rnmapbox/maps`, TTS, sound player) vừa được nạp lại vào navigation. `.env` đã có `MAPBOX_ACCESS_TOKEN` dạng `pk.`; `android/gradle.properties` có `MAPBOX_DOWNLOADS_TOKEN` rỗng — nếu Gradle báo lỗi tải SDK Mapbox thì cần tạo download token (`sk.`, scope `DOWNLOADS:READ`) đặt trong `~/.gradle/gradle.properties` (không commit). Kịch bản: tab Bản đồ → từ chối quyền (bản đồ hiện ở Đà Nẵng, không có "Bạn ở đây", bấm "Chỉ đường" báo cần vị trí) → cho phép → "Chỉ đường" vẽ tuyến; marker chỉ gồm địa điểm `publishable` có GPS (live: 29); popup "Lễ hội tại đây".
+- [ ] **U15 Quyết định:** có khôi phục các đoạn đã comment ở Home bị thay ở P3 không (khối "Nearby UI" P1 đã được mở lại thành mục "Gần bạn"; `requestLocationPermission`/`getCurrentLocation` của Home được viết lại thành bản xin quyền khi bấm). Xem nhật ký P4 trong audit.
+- [ ] **U16 Emulator Pixel_8_API_34 kẹt "offline"** khi boot từ snapshot quickboot hỏng + GPU `lavapipe` (driver NVIDIA 551.76 < 553.35 nên emulator tắt Vulkan phần cứng). Cách chạy ổn định (boot ~35 s):
+  ```bash
+  emulator -avd Pixel_8_API_34 -no-snapshot-load -gpu swiftshader_indirect
+  ```
+  Sau đó mới chạy `npx react-native run-android`. Tùy chọn: cập nhật driver NVIDIA ≥ 553.35, hoặc trong Android Studio → Device Manager → Pixel 8 → Cold Boot Now / Wipe Data. Đặt GPS giả: `adb emu geo fix 108.2270 16.0611` (Cầu Rồng).
+- [ ] **U17 Quyết định: cảnh báo giọng nói khi tới gần địa điểm** (khối `BackgroundGeolocation` đang comment trong `MapScreenV2.tsx` từ commit `5092f15`). Khôi phục cần package `react-native-background-geolocation` (không còn trong `package.json`, bản Android release cần license trả phí), quyền vị trí nền (trái P4.3/P6.3) và dữ liệu `voiceName`/`haveVoice` (API không có). Đề xuất: giữ comment; nếu cần thì làm bản foreground (dùng `watchPosition` sẵn có + TTS sẵn có đọc mô tả) ở phase riêng.
 
 ## Backlog
 - [ ] Nhãn tiếng Việt cho `types` (search "bảo tàng" khớp `museum`) — qua dữ liệu/nhãn UI, không fix cứng theo record
@@ -112,3 +121,5 @@ Các việc dưới đây nằm ngoài quyền của agent (push, GitHub, cloud,
 | 29/10/2026 | P2 | FE (chưa commit): `catalogRepository` tải song song locations + festivals, TTL 10 phút, `refresh()`, chỉ mục `locationById`/`festivalById`/`festivalsByLocationId`/`mapMarkers`; lỗi giữ snapshot cũ; `locations.api`/`festivals.api` và Home/Detail/Festival/Map/AI widget đọc repository; Home không còn `getLocations(true)`; bỏ `Id` catalog (adapter, `ILocation`, `IFestival`, UI); client timeout 12 s, retry 1 lần, deadline 30 s. BE (chưa commit): gzip + Cache-Control + ETag/304 + test. Jest gate 106 pass; tsc 62; BE PASS; live 123/49. Chờ deploy (U8), quyết định payload (U9) |
 | 29/10/2026 | P2.5 deploy | Sự cố: traffic bị chuyển về `travel-api-00001-xlz` (không tương thích schema 005–006) → catalog 503; khôi phục về `00003-smt`, rồi deploy `6ece2540…`. Kiểm tra live: 200 gzip, `cache-control: public, max-age=300`, ETag yếu, 304, 123/49/82. README sửa hướng dẫn rollback |
 | 30/10/2026 | P3 | FE (chưa commit): "Gần bạn" xin quyền khi bấm, sắp xếp `haversineDistance`, hiện khoảng cách, từ chối/không GPS vẫn giữ list; search cục bộ dùng chung `catalogSearch` (bỏ dấu, mọi từ phải khớp; name/description/types + address/venue) cho thanh search và bộ lọc ViewAll; Detail lễ hội → mở địa điểm qua `locationById`; pull-to-refresh Home + Lễ hội gọi `catalogRepository.get(true)`, lỗi giữ list + Thử lại. Jest gate 114 pass; tsc 62; eslint không lỗi mới |
+| 30/10/2026 | P4 | FE (chưa commit): mở lại Map/Advise (import, tab, stack) từ các khối comment P1; `ENABLE_MAP` = true; icon tab theo tên (Map không còn nhận icon Feed); marker từ `catalog.mapMarkers`; chỉ đường chỉ khi có GPS thật (`hasUserLocation`) + đích có tọa độ hợp lệ, không vẽ từ tọa độ mặc định; ẩn "Bạn ở đây" khi chưa có GPS; ảnh popup qua `CachedImage`; sửa 2 lượt gọi Directions/1 lần bấm; Detail ẩn nút bản đồ khi thiếu GPS. P4.4 bỏ qua theo chỉ đạo User. Jest gate 116 pass; tsc 62; lint không lỗi mới |
+| 30/10/2026 | P4 (sửa sau thử máy) | Định vị sai: geolocation "auto" = LocationManager, high accuracy chỉ GPS → trong nhà timeout rơi về tọa độ mặc định Ngũ Hành Sơn → dùng `playServices` + thử lại độ chính xác thường. Camera bám GPS mỗi lần cập nhật + fix đầu là vị trí cache xa (California trên emulator) → không thấy marker → camera chọn 1 lần (vị trí người dùng nếu ≤ 100 km khu catalog, nếu không thì trung tâm marker; chuyển sang người dùng 1 lần khi có fix gần). Khôi phục quy tắc gốc: luôn hiện địa điểm đang focus/chọn. Bỏ prop deprecated `onRegionDidChange`. Kiểm chứng emulator: "Bạn đang ở đây" đúng Cầu Rồng, marker publishable hiện, chỉ đường 3,4 km/2 tuyến (1 request), popup + Advise. Jest gate 119 pass; tsc 62 |

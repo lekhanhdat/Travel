@@ -37,10 +37,10 @@ const Donation = () => {
     (async () => {
       try {
         const acc: IAccount = await LocalStorageCommon.getItem(localStorageKey.AVT);
-        if (acc?.Id) {
-          setUserId(acc.Id);
+        if (acc?.id) {
+          setUserId(acc.id);
           // Fetch latest user data from NocoDB to get updated balance
-          const latestUserData = await authApi.getUserById(acc.Id);
+          const latestUserData = await authApi.getUserById(acc.id);
           if (latestUserData) {
             setUserAccount(latestUserData);
             // Update LocalStorage with latest data

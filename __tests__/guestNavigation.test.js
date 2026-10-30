@@ -20,6 +20,11 @@ jest.mock('../src/container/screens/Profile/Settings', () => 'Settings');
 jest.mock('../src/container/screens/Profile/FAQ', () => 'FAQ');
 jest.mock('../src/container/screens/Profile/Policy', () => 'Policy');
 jest.mock('../src/container/screens/Profile/About', () => 'About');
+// P6: account screens are routed; mocked here so the shell itself never loads auth.api.
+jest.mock('../src/container/screens/Profile/ProfileScreen', () => 'Profile');
+jest.mock('../src/container/screens/Profile/Personal', () => 'Personal');
+jest.mock('../src/container/screens/Login/LoginScreen', () => 'Login');
+jest.mock('../src/container/screens/Login/SignUpScreen', () => 'SignUp');
 // P4: Map tab/route are enabled; the screens are mocked here so Mapbox stays uninitialized in this test.
 jest.mock('../src/container/screens/Maps/MapScreenV2', () => 'Map');
 jest.mock('../src/container/screens/Maps/Advise', () => 'Advise');
@@ -28,19 +33,24 @@ jest.mock('../src/services/auth.api', () => {throw new Error('Guest must not ini
 jest.mock('../src/services/chatbot.api', () => {throw new Error('Guest must not initialize Chatbot');});
 jest.mock('../src/services/payment.api', () => {throw new Error('Guest must not initialize Payment');});
 
-it('registers guest routes plus Map and Home/Festival/Map tabs without initializing deferred modules', () => {
+it('registers guest + account routes and Home/Festival/Map/Profile tabs without initializing deferred modules', () => {
   const AppContainer = require('../src/container/AppContainer').default;
   const {offlineFallback} = require('../src/services/translation');
   let tree;
   renderer.act(() => {tree = renderer.create(React.createElement(AppContainer));});
   const routes = tree.root.findAllByType('Route').map(route => route.props.name);
-  expect(routes).toEqual(['HomeStack', 'ViewAllLocation', 'DetailLocationScreen', 'MapsScreen', 'LocationImage',
-    'LocationVideo', 'Settings', 'FAQ', 'Policy', 'About', 'Advise', 'SearchScreen', 'DetailFestivalScreen', 'ViewAllFestivals']);
+  expect(routes).toEqual(['HomeStack', 'LoginScreen', 'ViewAllLocation', 'DetailLocationScreen', 'MapsScreen', 'LocationImage',
+    'LocationVideo', 'Personal', 'Settings', 'FAQ', 'Policy', 'About', 'Advise', 'SearchScreen', 'DetailFestivalScreen',
+    'ViewAllFestivals', 'SignUpScreen']);
+  // Debt N1 / P9 / N2: still out of navigation.
+  expect(routes).not.toEqual(expect.arrayContaining(['ForgotPasswordScreen']));
+  expect(routes).not.toContain('ChatBotScreen');
+  expect(routes).not.toContain('Donation');
   expect(tree.root.findByType('Stack').props.initialRouteName).toBe('HomeStack');
   const HomeStack = tree.root.findAllByType('Route')[0].props.component;
   let tabs;
   renderer.act(() => {tabs = renderer.create(React.createElement(HomeStack));});
-  expect(tabs.root.findAllByType('Tab').map(tab => tab.props.name)).toEqual(['TabHome', 'TabFestival', 'TabMap']);
+  expect(tabs.root.findAllByType('Tab').map(tab => tab.props.name)).toEqual(['TabHome', 'TabFestival', 'TabMap', 'TabProfile']);
   expect(offlineFallback.initialize).not.toHaveBeenCalled();
   tree.unmount();
   tabs.unmount();

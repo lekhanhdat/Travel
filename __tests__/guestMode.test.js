@@ -133,7 +133,7 @@ describe('Phase 1 Guest Mode', () => {
     tree.unmount();
   });
 
-  it('mounts Home as guest without GPS, account reads or outgoing requests; retry settles', async () => {
+  it('mounts Home as guest without GPS or outgoing requests; only the local profile is read; retry settles', async () => {
     const get = jest.spyOn(catalogRepository, 'get').mockRejectedValue(new Error('Catalog network error'));
     const permission = jest.spyOn(PermissionsAndroid, 'request');
     const account = jest.spyOn(storage, 'getItem');
@@ -146,7 +146,8 @@ describe('Phase 1 Guest Mode', () => {
       expect(tree.getInstance().state).toMatchObject({account: null, loading: false, error: true, locations: []});
       expect(permission).not.toHaveBeenCalled();
       expect(geo.getCurrentPosition).not.toHaveBeenCalled();
-      expect(account).not.toHaveBeenCalled();
+      // P6: Home reads the locally stored profile (AVT) for signed-in features; no account request.
+      expect(account.mock.calls).toEqual([['AVT']]);
       await act(async () => {tree.root.findByType(CatalogStatus).props.onRetry();});
       expect(tree.getInstance().state).toMatchObject({loading: false, error: true});
       // Mount reads the shared cache; only Retry forces a refresh.

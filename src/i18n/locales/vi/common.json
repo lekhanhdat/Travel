@@ -60,7 +60,10 @@
     "faq": "Câu hỏi thường gặp",
     "policy": "Chính sách & Quyền riêng tư",
     "about": "Về ứng dụng",
-    "logout": "Đăng xuất"
+    "logout": "Đăng xuất",
+    "comingSoon": "Tính năng sắp có",
+    "loginRequired": "Vui lòng đăng nhập để dùng tính năng này",
+    "loggedOut": "Đã đăng xuất"
   },
   "settings": {
     "title": "Cài đặt",

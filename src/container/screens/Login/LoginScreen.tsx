@@ -11,9 +11,11 @@ import images from '../../../res/images';
 import { AppStyle } from '../../../common/AppStyle';
 import NavigationService from '../NavigationService';
 import { ScreenName } from '../../AppContainer';
-import { localStorageKey } from '../../../common/constants';
-import LocalStorageCommon from '../../../utils/LocalStorageCommon';
 import authApi from '../../../services/auth.api';
+
+interface ILoginScreenProps {
+  navigation?: {canGoBack: () => boolean; goBack: () => void};
+}
 
 interface ILoginScreenState {
   isSecureTextEntry: boolean;
@@ -23,8 +25,8 @@ interface ILoginScreenState {
   loading: boolean;
 }
 
-export default class LoginScreen extends React.PureComponent<{}, ILoginScreenState> {
-  constructor(props: {}) {
+export default class LoginScreen extends React.PureComponent<ILoginScreenProps, ILoginScreenState> {
+  constructor(props: ILoginScreenProps) {
     super(props);
     this.state = {
       isSecureTextEntry: true,
@@ -60,26 +62,27 @@ export default class LoginScreen extends React.PureComponent<{}, ILoginScreenSta
         return;
       }
 
-      // Save to local storage
-      await LocalStorageCommon.setItem(localStorageKey.USERNAME, account.userName);
-      await LocalStorageCommon.setItem(localStorageKey.PASSWORD, account.password);
-      await LocalStorageCommon.setItem(localStorageKey.AVT, account);
-
+      // authApi.login stored the session (token + profile); the password is never stored.
       Toast.show({
         type: 'success',
         text1: 'Đăng nhập thành công!',
       });
 
       this.setState({loading: false});
-      NavigationService.push(ScreenName.HOME_STACK_SCREEN);
+      // Opened from a screen that needs an account: go back to it; otherwise start at Home.
+      if (this.props.navigation?.canGoBack()) {
+        this.props.navigation.goBack();
+      } else {
+        NavigationService.reset(ScreenName.HOME_STACK_SCREEN);
+      }
     } catch (error: any) {
-      console.error('❌ Login error:', error);
+      console.error('❌ Login error:', error?.message);
       this.setState({loading: false});
 
       Toast.show({
         type: 'error',
         text1: 'Lỗi kết nối',
-        text2: 'Không thể kết nối đến server. Vui lòng thử lại sau.',
+        text2: error?.message || 'Không thể kết nối đến server. Vui lòng thử lại sau.',
       });
     }
   };
@@ -150,7 +153,8 @@ export default class LoginScreen extends React.PureComponent<{}, ILoginScreenSta
           />
 
           <TouchableOpacity
-            onPress={() => NavigationService.reset(ScreenName.FORGOT_PASSWORD)}
+            // Debt N1: email OTP is off in the backend; ForgotPasswordScreen stays out of navigation.
+            onPress={() => Toast.show({type: 'info', text1: 'Tính năng quên mật khẩu sẽ có ở bản sau'})}
           >
             <Text style={styles.forgotPassword}>Quên mật khẩu?</Text>
           </TouchableOpacity>

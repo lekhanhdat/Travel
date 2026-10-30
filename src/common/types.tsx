@@ -1,7 +1,7 @@
+// Profile as returned by the backend (services/auth.api.ts toAccount); never holds a password.
 export interface IAccount {
-  Id?: number; // NocoDB primary key
+  id: number;
   userName: string;
-  password: string;
   fullName?: string; // Họ và tên đầy đủ
   email?: string; // Email for password recovery
   avatar?: string; // Avatar URL (optional, default to ProfileSvg)

@@ -60,7 +60,10 @@
     "faq": "Frequently Asked Questions",
     "policy": "Privacy & Policy",
     "about": "About App",
-    "logout": "Logout"
+    "logout": "Logout",
+    "comingSoon": "Coming soon",
+    "loginRequired": "Please log in to use this feature",
+    "loggedOut": "Logged out"
   },
   "settings": {
     "title": "Settings",

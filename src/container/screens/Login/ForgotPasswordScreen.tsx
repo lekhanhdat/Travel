@@ -102,7 +102,7 @@ export default class ForgotPasswordScreen extends React.PureComponent<
 
       // Save account ID for password reset
       this.setState({
-        accountId: account.Id ?? null,
+        accountId: account.id ?? null,
         step: 2,
         loading: false,
       });

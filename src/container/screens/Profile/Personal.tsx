@@ -27,6 +27,8 @@ import {Avatar, getDisplayName} from '../../../utils/avatarUtils';
 import authApi from '../../../services/auth.api';
 import locationApi from '../../../services/locations.api';
 import {validateEmail} from '../../../utils/Utils';
+import FEATURE_FLAGS from '../../../config/featureFlags';
+import {ScreenName} from '../../AppContainer';
 
 const {StatusBarManager} = NativeModules;
 
@@ -69,6 +71,11 @@ interface IProfileScreenState {
 
   // Gender picker
   showGenderPicker: boolean;
+
+  // Account deletion (Play policy)
+  showDeleteModal: boolean;
+  deletePassword: string;
+  deletingAccount: boolean;
 }
 
 export default class ProfileScreen extends React.PureComponent<
@@ -99,6 +106,9 @@ export default class ProfileScreen extends React.PureComponent<
       savingProfile: false,
       changingPassword: false,
       showGenderPicker: false,
+      showDeleteModal: false,
+      deletePassword: '',
+      deletingAccount: false,
     };
   }
 
@@ -212,7 +222,7 @@ export default class ProfileScreen extends React.PureComponent<
   handleConfirmAvatar = async () => {
     const {previewAvatarUri, account} = this.state;
 
-    if (!previewAvatarUri || !account?.Id) {
+    if (!previewAvatarUri || !account?.id) {
       return;
     }
 
@@ -229,7 +239,7 @@ export default class ProfileScreen extends React.PureComponent<
       const avatarUrl = uploadResult.url;
 
       // Update avatar in database immediately
-      await authApi.updateProfile(account.Id, {
+      await authApi.updateProfile(account.id, {
         avatar: avatarUrl,
       });
 
@@ -267,7 +277,7 @@ export default class ProfileScreen extends React.PureComponent<
   handleDeleteAvatar = async () => {
     const {account} = this.state;
 
-    if (!account?.Id) {
+    if (!account?.id) {
       return;
     }
 
@@ -275,7 +285,7 @@ export default class ProfileScreen extends React.PureComponent<
 
     try {
       // Update avatar to empty string (default avatar will be shown)
-      await authApi.updateProfile(account.Id, {
+      await authApi.updateProfile(account.id, {
         avatar: '',
       });
 
@@ -321,7 +331,7 @@ export default class ProfileScreen extends React.PureComponent<
       editAddress,
     } = this.state;
 
-    if (!account?.Id) {
+    if (!account?.id) {
       Toast.show({
         type: 'error',
         text1: 'Lỗi',
@@ -362,7 +372,7 @@ export default class ProfileScreen extends React.PureComponent<
 
     try {
       // Update profile
-      await authApi.updateProfile(account.Id, {
+      await authApi.updateProfile(account.id, {
         fullName: editFullName.trim(),
         email: editEmail.trim(),
         avatar: editAvatarUri,
@@ -408,10 +418,28 @@ export default class ProfileScreen extends React.PureComponent<
     }
   };
 
+  handleDeleteAccount = async () => {
+    const {deletePassword} = this.state;
+    if (!deletePassword) {
+      Toast.show({type: 'error', text1: 'Lỗi', text2: 'Vui lòng nhập mật khẩu để xác nhận'});
+      return;
+    }
+    this.setState({deletingAccount: true});
+    try {
+      await authApi.deleteAccount(deletePassword);
+      this.setState({showDeleteModal: false, deletePassword: '', deletingAccount: false});
+      Toast.show({type: 'success', text1: 'Đã xóa tài khoản'});
+      NavigationService.reset(ScreenName.HOME_STACK_SCREEN);
+    } catch (error: any) {
+      this.setState({deletingAccount: false});
+      Toast.show({type: 'error', text1: 'Lỗi', text2: error.message || 'Không thể xóa tài khoản'});
+    }
+  };
+
   handleChangePassword = async () => {
     const {account, currentPassword, newPassword, confirmPassword} = this.state;
 
-    if (!account?.Id) {
+    if (!account?.id) {
       Toast.show({
         type: 'error',
         text1: 'Lỗi',
@@ -460,7 +488,7 @@ export default class ProfileScreen extends React.PureComponent<
     this.setState({changingPassword: true});
 
     try {
-      await authApi.changePassword(account.Id, currentPassword, newPassword);
+      await authApi.changePassword(account.id, currentPassword, newPassword);
 
       this.setState({
         currentPassword: '',
@@ -553,6 +581,9 @@ export default class ProfileScreen extends React.PureComponent<
       savingProfile,
       changingPassword,
       showGenderPicker,
+      showDeleteModal,
+      deletePassword,
+      deletingAccount,
     } = this.state;
 
     return (
@@ -709,6 +740,14 @@ export default class ProfileScreen extends React.PureComponent<
                 Đổi mật khẩu
               </TextBase>
             </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.actionButton, styles.secondaryButton, styles.dangerButton]}
+              onPress={() => this.setState({showDeleteModal: true, deletePassword: ''})}>
+              <TextBase style={[AppStyle.txt_16_bold, {color: '#B22222'}]}>
+                Xóa tài khoản
+              </TextBase>
+            </TouchableOpacity>
           </View>
 
           <View style={{height: sizes._32sdp}} />
@@ -734,14 +773,15 @@ export default class ProfileScreen extends React.PureComponent<
                 {/* Avatar */}
                 <View
                   style={{alignItems: 'center', marginBottom: sizes._20sdp}}>
+                  {/* P7.4: avatar upload goes through POST /uploads; ENABLE_UPLOAD turns it on. */}
                   <TouchableOpacity
                     onPress={this.handlePickAvatar}
-                    disabled={uploadingAvatar}>
+                    disabled={uploadingAvatar || !FEATURE_FLAGS.ENABLE_UPLOAD}>
                     <Avatar
                       avatarUrl={editAvatarUri || account?.avatar}
                       size={sizes._80sdp}
                     />
-                    <View style={styles.avatarEditBadge}>
+                    {FEATURE_FLAGS.ENABLE_UPLOAD && <View style={styles.avatarEditBadge}>
                       {uploadingAvatar ? (
                         <ActivityIndicator size="small" color={colors.white} />
                       ) : (
@@ -752,15 +792,15 @@ export default class ProfileScreen extends React.PureComponent<
                           style={{margin: 0}}
                         />
                       )}
-                    </View>
+                    </View>}
                   </TouchableOpacity>
-                  <TextBase
+                  {FEATURE_FLAGS.ENABLE_UPLOAD && <TextBase
                     style={[
                       AppStyle.txt_12_regular,
                       {color: colors.primary_400, marginTop: sizes._8sdp},
                     ]}>
                     Nhấn để thay đổi ảnh đại diện
-                  </TextBase>
+                  </TextBase>}
 
                   {/* Delete Avatar Button */}
                   {(editAvatarUri || account?.avatar) && (
@@ -1094,6 +1134,67 @@ export default class ProfileScreen extends React.PureComponent<
           </View>
         </Modal>
 
+        {/* Delete Account Modal: step 2 of the two-step confirmation */}
+        <Modal
+          visible={showDeleteModal}
+          transparent={true}
+          animationType="slide"
+          onRequestClose={() => this.setState({showDeleteModal: false})}>
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContent}>
+              <TextBase
+                style={[
+                  AppStyle.txt_18_bold,
+                  {marginBottom: sizes._12sdp, textAlign: 'center'},
+                ]}>
+                Xóa tài khoản
+              </TextBase>
+              <TextBase
+                style={[
+                  AppStyle.txt_14_medium,
+                  {color: colors.primary_400, marginBottom: sizes._16sdp},
+                ]}>
+                Thông tin cá nhân (họ tên, email, số điện thoại, ngày sinh, địa chỉ, ảnh đại diện) sẽ bị xóa và
+                không thể khôi phục. Nhập mật khẩu để xác nhận.
+              </TextBase>
+              <TextInput
+                mode="outlined"
+                value={deletePassword}
+                onChangeText={text => this.setState({deletePassword: text})}
+                placeholder="Mật khẩu"
+                secureTextEntry
+                style={styles.textInput}
+                outlineColor={colors.primary_200}
+                activeOutlineColor={colors.primary}
+              />
+              <View style={styles.modalButtons}>
+                <TouchableOpacity
+                  style={[styles.modalButton, styles.cancelButton]}
+                  onPress={() => this.setState({showDeleteModal: false, deletePassword: ''})}
+                  disabled={deletingAccount}>
+                  <TextBase
+                    style={[AppStyle.txt_14_medium, {color: colors.primary}]}>
+                    Hủy
+                  </TextBase>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.modalButton, styles.confirmButton, styles.dangerConfirm]}
+                  onPress={this.handleDeleteAccount}
+                  disabled={deletingAccount}>
+                  {deletingAccount ? (
+                    <ActivityIndicator size="small" color={colors.white} />
+                  ) : (
+                    <TextBase
+                      style={[AppStyle.txt_14_medium, {color: colors.white}]}>
+                      Xóa vĩnh viễn
+                    </TextBase>
+                  )}
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
+
         {/* Avatar Preview Modal */}
         <Modal
           visible={showAvatarPreview}
@@ -1184,6 +1285,12 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     borderWidth: 1,
     borderColor: colors.primary,
+  },
+  dangerButton: {
+    borderColor: '#B22222',
+  },
+  dangerConfirm: {
+    backgroundColor: '#B22222',
   },
   avatarEditBadge: {
     position: 'absolute',

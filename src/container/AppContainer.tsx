@@ -21,18 +21,18 @@ import {
   ProfileSvg,
 } from '../assets/ImageSvg';
 // P1: Keep deferred imports commented to avoid native/service initialization.
-// import LoginScreen from './screens/Login/LoginScreen';
+import LoginScreen from './screens/Login/LoginScreen';
 import HomeScreen from './screens/Home/HomeScreen';
 // import NewFeedScreen from './screens/NewFeed/NewFeedScreen';
 import MapsScreen from './screens/Maps/MapScreenV2';
 // import CameraScreen from './screens/Camera/CameraScreen';
-// import ProfileScreen from './screens/Profile/ProfileScreen';
+import ProfileScreen from './screens/Profile/ProfileScreen';
 import ViewAllLocation from './screens/Home/ViewAllLocation';
 import DetailItemScreen from './screens/Home/DetailLocation';
 // import PreviewImage from './screens/Camera/PreviewImage';
 import LocationImage from './screens/Home/LocationImage';
 import LocationVideo from './screens/Home/LocationVideo';
-// import Personal from './screens/Profile/Personal';
+import Personal from './screens/Profile/Personal';
 import Settings from './screens/Profile/Settings';
 import FAQ from './screens/Profile/FAQ';
 import Policy from './screens/Profile/Policy';
@@ -43,7 +43,7 @@ import Advise from './screens/Maps/Advise';
 import FestivalsScreen from './screens/Festival/FestivalsScreen';
 import DetailFestivalScreen from './screens/Festival/DetailFestival';
 import ViewAllFestivals from './screens/Festival/ViewAllFestivals';
-// import SignUpScreen from './screens/Login/SignUpScreen';
+import SignUpScreen from './screens/Login/SignUpScreen';
 // import ForgotPasswordScreen from './screens/Login/ForgotPasswordScreen';
 // import Donation from './screens/Profile/Donation';
 // import ChatBotScreen from './screens/Profile/ChatbotScreen';
@@ -301,7 +301,7 @@ function HomeStack() {
           }}
         />
         */}
-        {/* P1: Temporarily disabled; retain for restoration.
+        {/* P6: Profile restored (guest sees Settings/FAQ/Policy/About + Login). */}
         <Tabs.Screen
           name={TAB_NAMES.PROFILE}
           component={ProfileScreen}
@@ -315,7 +315,6 @@ function HomeStack() {
             ),
           }}
         />
-        */}
       </Tabs.Navigator>
     </View>
   );
@@ -329,9 +328,8 @@ function AppContainer() {
       initialRouteName={ScreenName.HOME_STACK_SCREEN}
       screenOptions={{headerShown: false}}>
       <Stack.Screen name="HomeStack" component={HomeStack} />
-      {/* P1: Temporarily disabled; retain for restoration.
+      {/* P6: restored. */}
       <Stack.Screen name="LoginScreen" component={LoginScreen} />
-      */}
       <Stack.Screen name="ViewAllLocation" component={ViewAllLocation} />
       <Stack.Screen name="DetailLocationScreen" component={DetailItemScreen} />
       {/* P1: Temporarily disabled; retain for restoration.
@@ -341,9 +339,8 @@ function AppContainer() {
       <Stack.Screen name="MapsScreen" component={MapsScreen} />
       <Stack.Screen name="LocationImage" component={LocationImage} />
       <Stack.Screen name="LocationVideo" component={LocationVideo} />
-      {/* P1: Temporarily disabled; retain for restoration.
+      {/* P6: restored. */}
       <Stack.Screen name="Personal" component={Personal} />
-      */}
       <Stack.Screen name="Settings" component={Settings} />
       <Stack.Screen name="FAQ" component={FAQ} />
       <Stack.Screen name="Policy" component={Policy} />
@@ -362,10 +359,9 @@ function AppContainer() {
         component={DetailFestivalScreen}
       />
       <Stack.Screen name="ViewAllFestivals" component={ViewAllFestivals} />
-      {/* P1: Temporarily disabled; retain for restoration.
+      {/* P6: restored. */}
       <Stack.Screen name="SignUpScreen" component={SignUpScreen} />
-      */}
-      {/* P1: Temporarily disabled; retain for restoration.
+      {/* P1: Temporarily disabled; retain for restoration. Debt N1 (email module off).
       <Stack.Screen
         name="ForgotPasswordScreen"
         component={ForgotPasswordScreen}

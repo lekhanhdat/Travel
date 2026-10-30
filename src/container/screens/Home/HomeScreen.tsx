@@ -438,9 +438,9 @@ class HomeScreen extends React.PureComponent<
           }>
           <View style={styles.container}>
             {/* 1. AI-Powered Recommendations - At the top */}
-            {FEATURE_FLAGS.ENABLE_AI && this.state.account?.Id && (
+            {FEATURE_FLAGS.ENABLE_AI && this.state.account?.id && (
               <RecommendationsWidget
-                userId={this.state.account.Id}
+                userId={this.state.account.id}
                 title={this.props.t('home.recommendedLocations')}
                 limit={10}
               />
@@ -450,7 +450,7 @@ class HomeScreen extends React.PureComponent<
             <View
               style={[
                 styles.rowCenter,
-                {marginTop: this.state.account?.Id ? sizes._24sdp : 0},
+                {marginTop: this.state.account?.id ? sizes._24sdp : 0},
               ]}>
               <TextBase style={[AppStyle.txt_20_bold]}>
                 {this.props.t('home.popularLocations')}

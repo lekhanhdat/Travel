@@ -1,7 +1,7 @@
 /** Phase 1: guest catalog shell. Re-enable integrations only in their recovery phase. */
 export const FEATURE_FLAGS = {
   RECOVERY_MODE: true,
-  ENABLE_AUTH: false,
+  ENABLE_AUTH: true,
   ENABLE_NOCODB: false,
   ENABLE_AI: false,
   ENABLE_MAP: true,

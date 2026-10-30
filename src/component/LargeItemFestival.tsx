@@ -21,7 +21,7 @@ interface ILargeItemFestivalProps {
 const LargeItemFestival: React.FC<ILargeItemFestivalProps> = ({festival, onPress}) => {
   const {t} = useTranslation('common');
 
-  const festivalId = festival.Id;
+  const festivalId = festival.id;
   const translatedName = festivalId
     ? translateFestivalField(t, festivalId, 'name', festival.name)
     : festival.name;

@@ -14,8 +14,7 @@ export interface IAccount {
 }
 
 export interface ILocation {
-  Id?: number; // Optional vì data có cả 'id' và 'Id'
-  id?: number; // Optional vì data có cả 'id' và 'Id'
+  id: number; // API primary key (single key; legacy NocoDB 'Id' removed)
   name: string;
   avatar: string;
   address: string;
@@ -60,7 +59,7 @@ export interface IItem {
   description: string;
   video?: string;
   images?: any[];
-  location?: Pick<ILocation, 'Id' | 'name'>;
+  location?: Pick<ILocation, 'id' | 'name'>;
 }
 
 export interface ITransaction {

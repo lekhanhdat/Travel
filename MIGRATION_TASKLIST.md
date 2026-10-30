@@ -26,14 +26,14 @@ Gate chung cho mọi phase có sửa code:
 **Nghiệm thu P1:** tiếng Việt: card/detail/search khớp API cho mọi id; không crash với null/mảng rỗng.
 
 ## P2 — Data layer
-- [ ] P2.1 `src/services/catalogRepository.ts`: tải locations + festivals song song, TTL 10 phút, `refresh()`; chỉ mục `locationById`, `festivalById`, `festivalsByLocationId`, `mapMarkers` (`isMapLocationVisible`); `festival.location` lấy từ chỉ mục
-- [ ] P2.2 Chuyển màn hình sang repository: `HomeScreen`, `ViewAllLocation`, `DetailLocation`, `FestivalsScreen`, `ViewAllFestivals`, `DetailFestival`, `MapScreenV2`, `SimilarItemsComponent`; bỏ `getLocations(true)` ở Home
-- [ ] P2.3 Thống nhất `id`: bỏ `Id` khỏi adapter, `IFestival`, `ILocation`, ~107 chỗ dùng trong UI/navigation params
-- [ ] P2.4 `catalog.client.ts`: timeout 12 s, retry 1 lần (timeout/5xx/429), deadline tổng 30 s; test
-- [ ] P2.5 BE: `GZipMiddleware` + `Cache-Control: public, max-age=300` + `ETag` cho 3 endpoint catalog; test; deploy (build → replace → kiểm tra)
-- [ ] P2.6 Test repository: 1 lần fetch cho nhiều màn hình, chỉ mục đúng, lỗi mạng giữ cache cũ
+- [x] P2.1 `src/services/catalogRepository.ts`: tải locations + festivals song song, TTL 10 phút, `refresh()`; chỉ mục `locationById`, `festivalById`, `festivalsByLocationId`, `mapMarkers` (`isMapLocationVisible`); `festival.location` lấy từ chỉ mục
+- [x] P2.2 Chuyển màn hình sang repository: `HomeScreen`, `ViewAllLocation`, `DetailLocation`, `FestivalsScreen`, `ViewAllFestivals`, `DetailFestival`, `MapScreenV2`, `SimilarItemsComponent`; bỏ `getLocations(true)` ở Home
+- [x] P2.3 Thống nhất `id`: bỏ `Id` khỏi adapter, `IFestival`, `ILocation`, ~107 chỗ dùng trong UI/navigation params
+- [x] P2.4 `catalog.client.ts`: timeout 12 s, retry 1 lần (timeout/5xx/429), deadline tổng 30 s; test
+- [x] P2.5 BE: `GZipMiddleware` + `Cache-Control: public, max-age=300` + `ETag` cho 3 endpoint catalog; test; deploy (build → replace → kiểm tra) — deploy 29/10 digest `6ece2540…`: gzip + `cache-control` + ETag, If-None-Match → 304, đủ 123/49/82
+- [x] P2.6 Test repository: 1 lần fetch cho nhiều màn hình, chỉ mục đúng, lỗi mạng giữ cache cũ
 
-**Nghiệm thu P2:** Home → Festival → Detail → Map chỉ 1 lượt `/locations` + `/festivals`; không còn `Id`; payload nén < 120 KB.
+**Nghiệm thu P2:** Home → Festival → Detail → Map chỉ 1 lượt `/locations` + `/festivals`; không còn `Id`; payload nén ~125 KB (User chấp nhận, U9).
 
 ## P3 — Home / Festival / Search
 - [ ] P3.1 "Gần bạn": xin quyền vị trí khi cần, khoảng cách bằng `haversineDistance`; từ chối quyền vẫn hiện list
@@ -64,7 +64,7 @@ Gate chung cho mọi phase có sửa code:
 ## Cần User
 Các việc dưới đây nằm ngoài quyền của agent (push, GitHub, cloud, dữ liệu) hoặc cần User quyết định.
 
-- [ ] **U1 Push 2 nhánh và mở PR để CI chạy lần đầu (P0.5/P0.6).** Lý do: agent không được push. Workflow chỉ đọc code, không cần secret.
+- [x] **U1 Push 2 nhánh và mở PR để CI chạy lần đầu (P0.5/P0.6).** Lý do: agent không được push. Workflow chỉ đọc code, không cần secret.
   ```bash
   git -C D:/Project/Travel/Travel_FE/Travel push -u origin migration/p0-p1
   git -C D:/Project/Travel/Travel_BE push -u origin migration/p0-p1
@@ -79,6 +79,19 @@ Các việc dưới đây nằm ngoài quyền của agent (push, GitHub, cloud,
 - [ ] **U5 Mật khẩu dạng chữ trong `authConstants.tsx` vẫn còn trong lịch sử git** dù file đã xóa ở P1. Đổi/vô hiệu các tài khoản đó; gộp vào P6.1 (rotate).
 - [ ] **U6 Suite test hỏng từ trước, không thuộc gate:** `App.test.tsx`, `AzureTranslatorService`, `semantic.api`, và 3 suite cần `@testing-library/react-native` (chưa cài: `languageSwitching`, `RecommendationsWidget`, `SimilarItemsComponent`). Quyết định: cài devDependency (`npm i -D @testing-library/react-native`) và sửa, hay xóa các suite thuộc tính năng đã hoãn.
 - [ ] **U7 Dữ liệu:** 21 festival chưa có `location_id` (app ẩn dòng địa điểm); toàn bộ `rating = null`, `reviews = []` (app hiện "Chưa có đánh giá"). Bổ sung dần qua Neon khi muốn.
+- [x] **U8 Deploy BE cho P2.5 (gzip + Cache-Control + ETag).** Lý do: agent không được build/deploy. Thay đổi nằm trong working tree `Travel_BE` (đang ở `main`, chưa commit): `app.py`, `core_api/catalog.py`, `tests/check_core_api.py`. Các bước:
+  1. Tạo nhánh, commit, push, chờ CI xanh rồi merge:
+     ```bash
+     git -C D:/Project/Travel/Travel_BE switch -c migration/p2
+     ```
+  2. Build + smoke + deploy theo `Travel_BE/deploy/README.md` mục "Build và deploy phiên bản tiếp theo" (cấp quyền secret tạm thời → `builds submit` → thu hồi; sửa digest PASS vào `deploy/service.yaml`; ghi revision tốt hiện tại; `run services replace`).
+  3. Kiểm tra sau deploy (phải thấy `content-encoding: gzip`, `cache-control: public, max-age=300`, `etag: W/"…"`; gửi lại `If-None-Match` thì 304):
+     ```bash
+     curl -s -D - -o /dev/null -H "Accept-Encoding: gzip" "https://travel-api-u2xcse44ca-as.a.run.app/locations?limit=100"
+     ```
+  4. Rollback nếu lỗi: `update-traffic` về revision đã ghi ở bước 2.
+- [x] **U9 Quyết định mục tiêu payload nén.** → User chấp nhận ~125 KB (29/10); nghiệm thu P2 dùng mức này. Đo trên dữ liệu live với gzip level 9 (như `GZipMiddleware`): locations + festivals = 486 KB → **~125 KB** (kích thước trang 100/200/500 không đổi đáng kể: 124,5/122,8/122,8 KB), hơi vượt mục tiêu < 120 KB. Phần lớn là văn bản dài (`festivals.description` 113 KB, `locations.long_description` 96 KB thô). Lựa chọn: (a) chấp nhận ~125 KB và sửa nghiệm thu P2 (khuyến nghị — đã giảm 4 lần, giữ mô hình tải toàn bộ list); (b) bỏ `long_description` khỏi list và thêm endpoint detail — đổi contract, cần phase riêng.
+- [ ] **U10 Commit/push FE P2** (nhánh `migration/p0-p1`, working tree chưa commit theo yêu cầu). Sau khi CI xanh có thể hạ ngưỡng tsc trong `.github/workflows/ci.yml` từ 63 xuống 62 để khóa tiến bộ.
 
 ## Backlog
 - [ ] Nội dung catalog tiếng Anh (qua dữ liệu, không theo ID)
@@ -93,3 +106,5 @@ Các việc dưới đây nằm ngoài quyền của agent (push, GitHub, cloud,
 | 29/10/2026 | Kế hoạch | Chốt D1–D4; audit + tasklist cập nhật |
 | 29/10/2026 | P0 | BE `7e0c1d6`: docs baseline 123/82/49 + 001–006; `tests/check_core_api.py` (fake DB, không cần Neon) + `check_contract.py`; CI Python 3.12. FE: `catalog.contract.test.js`, adapter từ chối 11 trường đã bỏ; CI Node 22 (jest nhóm recovery+catalog, tsc ≤ 63). FE `0cc3cf4` (công việc `location_id` đã stage sẵn) + `7ef3fce`. Jest 88 pass/1 skip; tsc 63; BE PASS. Chưa chạy CI thật (chưa push) |
 | 29/10/2026 | P1 | Helper dịch trả giá trị API; xóa 4 file `{vi,en}/{locations,festivals}.json` + namespace; xóa `authConstants`/`locationConstants`/`reviewsConstants` và fallback (NewFeed chỉ còn review API, Map bỏ fallback đã comment); `src` không còn mảng dữ liệu cứng; empty state ảnh (`catalogImage` + `CachedImage`, bỏ via.placeholder.com), review, video, địa chỉ, lời khuyên; festival không `location_id` ẩn địa điểm. Jest gate 106 pass/1 skip; tsc 63. Commit `migration P1` trên nhánh `migration/p0-p1` |
+| 29/10/2026 | P2 | FE (chưa commit): `catalogRepository` tải song song locations + festivals, TTL 10 phút, `refresh()`, chỉ mục `locationById`/`festivalById`/`festivalsByLocationId`/`mapMarkers`; lỗi giữ snapshot cũ; `locations.api`/`festivals.api` và Home/Detail/Festival/Map/AI widget đọc repository; Home không còn `getLocations(true)`; bỏ `Id` catalog (adapter, `ILocation`, `IFestival`, UI); client timeout 12 s, retry 1 lần, deadline 30 s. BE (chưa commit): gzip + Cache-Control + ETag/304 + test. Jest gate 106 pass; tsc 62; BE PASS; live 123/49. Chờ deploy (U8), quyết định payload (U9) |
+| 29/10/2026 | P2.5 deploy | Sự cố: traffic bị chuyển về `travel-api-00001-xlz` (không tương thích schema 005–006) → catalog 503; khôi phục về `00003-smt`, rồi deploy `6ece2540…`. Kiểm tra live: 200 gzip, `cache-control: public, max-age=300`, ETag yếu, 304, 123/49/82. README sửa hướng dẫn rollback |

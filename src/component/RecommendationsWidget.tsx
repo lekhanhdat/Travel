@@ -23,8 +23,7 @@ import {
   getRecommendations,
   Recommendation,
 } from '../services/semantic.api';
-import locationApi from '../services/locations.api';
-import festivalsApi from '../services/festivals.api';
+import catalogRepository from '../services/catalogRepository';
 
 interface RecommendationsWidgetProps {
   userId: number;
@@ -80,24 +79,19 @@ const RecommendationsWidget: React.FC<RecommendationsWidgetProps> = ({
   const enrichRecommendations = async (
     recs: Recommendation[],
   ): Promise<EnrichedRecommendation[]> => {
-    const [locations, festivals] = await Promise.all([
-      locationApi.getLocations(),
-      festivalsApi.getFestivals(),
-    ]);
+    const {locationById, festivalById} = await catalogRepository.get();
 
     return recs.map(rec => {
       let fullData = null;
       let avatar = rec.images?.[0] || '';
 
       if (rec.entity_type === 'location') {
-        fullData = locations.find(
-          loc => loc.Id === rec.entity_id || loc.id === rec.entity_id,
-        );
+        fullData = locationById.get(rec.entity_id) ?? null;
         if (fullData) {
           avatar = fullData.avatar || (fullData.images?.[0]) || avatar;
         }
       } else if (rec.entity_type === 'festival') {
-        fullData = festivals.find(fest => fest.Id === rec.entity_id);
+        fullData = festivalById.get(rec.entity_id) ?? null;
         // Festival hiện chưa dùng UI BigItem, giữ avatar gốc nếu có
         if (fullData && (fullData as any)?.images?.length) {
           avatar = (fullData as any).images?.[0] || avatar;

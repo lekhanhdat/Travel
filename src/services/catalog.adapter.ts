@@ -54,14 +54,12 @@ function validate(raw: unknown, festival: boolean): void {
   }
 }
 
-export function adaptLocation(raw: unknown): LocationDTO & {Id: number} {
+export function adaptLocation(raw: unknown): LocationDTO {
   validate(raw, false);
-  const row = raw as LocationDTO;
-  return {...row, Id: row.id};
+  return {...(raw as LocationDTO)};
 }
 
-export function adaptFestival(raw: unknown): FestivalDTO & {Id: number} {
+export function adaptFestival(raw: unknown): FestivalDTO {
   validate(raw, true);
-  const row = raw as FestivalDTO;
-  return {...row, Id: row.id};
+  return {...(raw as FestivalDTO)};
 }

@@ -26,13 +26,13 @@ import SoundPlayer from 'react-native-sound-player';
 import mapboxApi from '../../../services/mapbox.api';
 import {Button, Modal} from 'react-native-paper';
 import images from '../../../res/images';
-import locationApi from '../../../services/locations.api';
 import festivalsApi from '../../../services/festivals.api';
 import Toast from 'react-native-toast-message';
 import {env} from '../../../utils/env';
 import Tts from 'react-native-tts';
 import {useTranslation} from 'react-i18next';
 import {translateLocationField} from '../../../utils/translationHelpers';
+import catalogRepository from '../../../services/catalogRepository';
 
 MapboxGL.setAccessToken(env.MAPBOX_ACCESS_TOKEN || '');
 
@@ -303,9 +303,9 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
       // Sẽ fetch trong useEffect riêng khi đã có vị trí
     } else {
       // Nếu không, fetch từ NocoDB
-      locationApi.getLocations().then(data => {
-        setLocations(data);
-      });
+      catalogRepository.get().then(catalog => {
+        setLocations(catalog.locations);
+      }).catch(error => console.warn('Catalog unavailable for map:', error));
     }
 
     const onFinishedPlayingSubscription = SoundPlayer.addEventListener(
@@ -915,7 +915,7 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
               const textShadow = getTextShadowForMapStyle(currentMapStyle);
 
               // Kiểm tra xem location này có được chọn không
-              const isSelected = selectedLocation?.Id === location.Id || focusLocation?.Id === location.Id;
+              const isSelected = selectedLocation?.id === location.id || focusLocation?.id === location.id;
 
               // ✅ Calculate dynamic sizes based on zoom level
               const markerSize = getMarkerSize(currentZoom, isSelected);
@@ -923,7 +923,7 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
               const emojiSize = markerSize * 0.8; // Emoji slightly smaller than marker
 
               // Get translated location name
-              const locationId = location.Id || location.id;
+              const locationId = location.id;
               const translatedName = locationId
                 ? translateLocationField(t, locationId, 'name', location.name)
                 : location.name;
@@ -1658,21 +1658,21 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
                       marginBottom: 10,
                     },
                   ]}>
-                  {translateLocationField(t, selectedLocation.Id || selectedLocation.id || 0, 'name', selectedLocation.name)}
+                  {translateLocationField(t, selectedLocation.id, 'name', selectedLocation.name)}
                 </TextBase>
                 <TextBase
                   style={[
                     AppStyle.txt_16_medium,
                     {marginBottom: 10, textAlign: 'justify'},
                   ]}>
-                  {translateLocationField(t, selectedLocation.Id || selectedLocation.id || 0, 'description', selectedLocation.description)}
+                  {translateLocationField(t, selectedLocation.id, 'description', selectedLocation.description)}
                 </TextBase>
                 <TextBase
                   style={[
                     AppStyle.txt_16_medium,
                     {marginBottom: 10, textAlign: 'justify'},
                   ]}>
-                  {t('common:detail.address')}: {translateLocationField(t, selectedLocation.Id || selectedLocation.id || 0, 'address', selectedLocation.address)}
+                  {t('common:detail.address')}: {translateLocationField(t, selectedLocation.id, 'address', selectedLocation.address)}
                 </TextBase>
                 <Image
                   source={{uri: selectedLocation.avatar}} // Image URL
@@ -1724,11 +1724,11 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
             <Button
               mode="outlined"
               onPress={() => {
-                if (!selectedLocation || !selectedLocation.Id) {
+                if (!selectedLocation) {
                   return;
                 }
                 festivalsApi
-                  .getFestivalsByLocationId(selectedLocation.Id)
+                  .getFestivalsByLocationId(selectedLocation.id)
                   .then(data => {
                     if (!data || data.length === 0) {
                       Toast.show({

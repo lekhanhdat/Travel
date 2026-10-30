@@ -20,7 +20,7 @@ import BigItemLocation from '../../../component/BigItemLocation';
 import LargeItemLocation from '../../../component/LargeItemLocation';
 import NavigationService from '../NavigationService';
 import {ScreenName} from '../../AppContainer';
-import locationApi from '../../../services/locations.api';
+import catalogRepository from '../../../services/catalogRepository';
 import LocalStorageCommon from '../../../utils/LocalStorageCommon';
 import {localStorageKey} from '../../../common/constants';
 import {
@@ -224,10 +224,10 @@ class HomeScreen extends React.PureComponent<
   }
   */
 
-  async fetchLocations() {
+  async fetchLocations(forceRefresh = false) {
     this.setState({loading: true, error: false});
     try {
-      const data = await locationApi.getLocations(true);
+      const {locations: data} = await catalogRepository.get(forceRefresh);
       this.setState({locations: data, locationsPopular: data.slice(0, 20), locationsNearly: []});
     } catch {
       this.setState({error: true});
@@ -242,7 +242,7 @@ class HomeScreen extends React.PureComponent<
       <BigItemLocation 
         location={item} 
         // Force re-render when language changes
-        key={`h-${item.Id || item.id}-${this.props.language}`}
+        key={`h-${item.id}-${this.props.language}`}
       />
     );
   };
@@ -252,13 +252,13 @@ class HomeScreen extends React.PureComponent<
       <LargeItemLocation 
         location={item} 
         // Force re-render when language changes
-        key={`v-${item.Id || item.id}-${this.props.language}`}
+        key={`v-${item.id}-${this.props.language}`}
       />
     );
   };
 
   // Stable keyExtractor functions to prevent re-creation
-  keyExtractorById = (item: ILocation) => item.Id.toString();
+  keyExtractorById = (item: ILocation) => item.id.toString();
 
   // getItemLayout for horizontal FlatList (BigItemLocation)
   // BigItemLocation width: 200 + marginRight: 12 = 212
@@ -411,10 +411,10 @@ class HomeScreen extends React.PureComponent<
           onSubmitSearch={this.handleSearchSubmit}
           placeholder={this.props.t('home.searchPlaceholder')}
           entityType="location"
-          idField="Id"
+          idField="id"
         />
         <CatalogStatus loading={this.state.loading} error={this.state.error}
-          onRetry={() => this.fetchLocations()} />
+          onRetry={() => this.fetchLocations(true)} />
         <ScrollView>
           <View style={styles.container}>
             {/* 1. AI-Powered Recommendations - At the top */}

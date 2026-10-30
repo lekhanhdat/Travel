@@ -133,7 +133,7 @@ export default class SemanticSearchBarComponent<T> extends React.PureComponent<
   // Semantic search using AI - returns results and stores in state
   performSemanticSearch = async (query: string): Promise<T[]> => {
     if (!FEATURE_FLAGS.ENABLE_AI) {return this.filterDataKeyword(query);}
-    const {data, entityType, idField = 'Id' as keyof T} = this.props;
+    const {data, entityType, idField = 'id' as keyof T} = this.props;
 
     console.log('🔍 [SemanticSearch] Starting search...');
     console.log('  📋 Query:', query);
@@ -182,7 +182,7 @@ export default class SemanticSearchBarComponent<T> extends React.PureComponent<
 
         // Log local data IDs for comparison
         const localIds = data.slice(0, 5).map(item => {
-          const id = item[idField] || (item as any).id || (item as any).Id;
+          const id = item[idField];
           return { id, type: typeof id };
         });
         console.log('  📋 Local data IDs (first 5):', localIds);
@@ -200,7 +200,7 @@ export default class SemanticSearchBarComponent<T> extends React.PureComponent<
         // Match local data with API results and attach scores
         const matchedWithScores: Array<{item: T; score: number}> = [];
         data.forEach(item => {
-          const itemId = item[idField] || (item as any).id || (item as any).Id;
+          const itemId = item[idField];
           const matchesNumber = resultIdSet.has(Number(itemId));
           const matchesString = resultIdSet.has(String(itemId));
           if (matchesNumber || matchesString) {
@@ -238,7 +238,7 @@ export default class SemanticSearchBarComponent<T> extends React.PureComponent<
         if (finalResults.length > 0) {
           console.log('  📊 Final results sorted by relevance:');
           finalResults.slice(0, 5).forEach((item, i) => {
-            const id = Number((item[idField] || (item as any).id || (item as any).Id));
+            const id = Number((item[idField]));
             const name = (item as any).name || (item as any).Name || 'Unknown';
             const score = scoreMap.get(id) || 0;
             console.log(`    ${i + 1}. "${name}" (score: ${score.toFixed(2)})`);

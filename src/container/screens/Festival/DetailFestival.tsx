@@ -13,7 +13,6 @@ import {IReview} from '../../../common/types';
 import TextBase from '../../../common/TextBase';
 import {AppStyle} from '../../../common/AppStyle';
 import ReviewItem from '../../../component/ReviewItem';
-import festivalsApi from '../../../services/festivals.api';
 import {StarActive, StarInActive} from '../../../assets/assets/ImageSvg';
 import {MapSvg, CalendarSearchSvg} from '../../../assets/ImageSvg';
 import {ScreenName} from '../../AppContainer';
@@ -24,6 +23,7 @@ import {
   WithAzureTranslationProps,
 } from '../../../hoc/withAzureTranslation';
 import { translateFestivalField } from '../../../utils/translationHelpers';
+import catalogRepository from '../../../services/catalogRepository';
 import { catalogImage } from '../../../utils/catalogDisplay';
 import CachedImage from '../../../component/CachedImage';
 
@@ -61,7 +61,7 @@ class DetailFestivalScreen extends React.PureComponent<
   loadCatalog = async (forceRefresh = false) => {
     this.setState({catalogError: false});
     try {
-      const festivals = await festivalsApi.getFestivals(forceRefresh);
+      const {festivals} = await catalogRepository.get(forceRefresh);
       this.setState({allFestivals: festivals});
     } catch {
       this.setState({catalogError: true});
@@ -108,7 +108,7 @@ class DetailFestivalScreen extends React.PureComponent<
       const festTypes = fest.types || [];
 
       // Không include chính festival hiện tại
-      if (fest.Id === currentFestival.Id) {
+      if (fest.id === currentFestival.id) {
         return false;
       }
 
@@ -128,7 +128,7 @@ class DetailFestivalScreen extends React.PureComponent<
     const festival: IFestival = this.props.route.params?.festival;
     const {t} = this.props;
 
-    const festivalId = festival.Id || festival.id;
+    const festivalId = festival.id;
     const translatedName = festivalId
       ? translateFestivalField(t, festivalId, 'name', festival.name)
       : festival.name;
@@ -368,10 +368,10 @@ class DetailFestivalScreen extends React.PureComponent<
               </View>
 
               {/* Semantic Similar Items from Backend */}
-              {FEATURE_FLAGS.ENABLE_AI && festival.Id && (
+              {FEATURE_FLAGS.ENABLE_AI && (
                 <SimilarItemsComponent
                   entityType="festival"
-                  entityId={festival.Id}
+                  entityId={festival.id}
                   title={t('detail.similarFestivalsAI')}
                   limit={5}
                 />

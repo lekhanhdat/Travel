@@ -251,7 +251,7 @@ class ViewAllLocation extends React.PureComponent<
           <FlatList
             data={locations}
             renderItem={this.renderItem}
-            keyExtractor={(item) => item.Id?.toString() || item.name.toString()}
+            keyExtractor={(item) => item.id.toString()}
             initialNumToRender={10}
             maxToRenderPerBatch={5}
             windowSize={7}

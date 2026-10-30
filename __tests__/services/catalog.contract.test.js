@@ -13,8 +13,8 @@ describe('catalog adapter contract', () => {
   it('accepts exactly the BE field sets', () => {
     expect(Object.keys(LOCATION)).toHaveLength(20);
     expect(Object.keys(FESTIVAL)).toHaveLength(17);
-    expect(adaptLocation(LOCATION)).toEqual({...LOCATION, Id: 1});
-    expect(adaptFestival(FESTIVAL)).toEqual({...FESTIVAL, Id: 1});
+    expect(adaptLocation(LOCATION)).toEqual(LOCATION);
+    expect(adaptFestival(FESTIVAL)).toEqual(FESTIVAL);
     expect(adaptFestival({...FESTIVAL, location_id: null}).location_id).toBeNull();
   });
 

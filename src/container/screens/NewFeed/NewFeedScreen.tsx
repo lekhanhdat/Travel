@@ -267,7 +267,7 @@ export default class NewFeedScreen extends React.PureComponent<
 
   // ============ PERFORMANCE OPTIMIZATION: Stable keyExtractor functions ============
   keyExtractorReview = (item: IReview, index: number) => `${item.id}-${index}`;
-  keyExtractorLocation = (item: ILocation) => item.Id?.toString() || item.id?.toString() || '';
+  keyExtractorLocation = (item: ILocation) => item.id.toString();
 
   // getItemLayout for reviews FlatList (approximate height)
   getItemLayoutReview = (data: IReview[] | null | undefined, index: number) => ({
@@ -288,7 +288,6 @@ export default class NewFeedScreen extends React.PureComponent<
     const filteredReviews = this.state.filterLocationId
       ? this.state.reviews.filter(
           review =>
-            review.location?.Id === this.state.filterLocationId ||
             review.location?.id === this.state.filterLocationId,
         )
       : this.state.reviews;
@@ -386,7 +385,7 @@ export default class NewFeedScreen extends React.PureComponent<
 
                     return filteredLocations.map((loc, index) => (
                       <TouchableOpacity
-                        key={loc.Id || loc.id || index}
+                        key={loc.id}
                         style={{
                           padding: sizes._12sdp,
                           borderBottomWidth: index < filteredLocations.length - 1 ? 1 : 0,
@@ -394,7 +393,7 @@ export default class NewFeedScreen extends React.PureComponent<
                         }}
                         onPress={() => {
                           this.setState({
-                            filterLocationId: loc.Id || loc.id || null,
+                            filterLocationId: loc.id,
                             filterLocationQuery: loc.name,
                             showFilterSuggestions: false,
                           });

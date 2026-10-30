@@ -20,7 +20,7 @@ import {AppStyle} from '../../../common/AppStyle';
 import NavigationService from '../NavigationService';
 import {ScreenName} from '../../AppContainer';
 import HistoricalArtifact from '../../../component/HistoricalArtifact';
-import festivalsApi from '../../../services/festivals.api';
+import catalogRepository from '../../../services/catalogRepository';
 import locationApi from '../../../services/locations.api';
 import SemanticSearchBarComponent from '../../../component/SemanticSearchBarComponent';
 import LargeItemFestival from '../../../component/LargeItemFestival';
@@ -97,7 +97,7 @@ class FestivalsScreen extends React.PureComponent<
   async fetchFestivals(forceRefresh = false) {
     this.setState({loading: true, error: false});
     try {
-      const data = await festivalsApi.getFestivals(forceRefresh);
+      const {festivals: data} = await catalogRepository.get(forceRefresh);
       this.setState({festivals: data, FESTIVALS_POPULAR: data.slice(0, 20)});
     } catch {
       this.setState({error: true});
@@ -108,7 +108,7 @@ class FestivalsScreen extends React.PureComponent<
 
   /* P1: Items renderer retained while Items is temporarily disabled.
   renderItemHorizontal = ({item}: {item: IItem}) => {
-    return <HistoricalArtifact key={`item-${item.Id}`} item={item} />;
+    return <HistoricalArtifact key={`item-${item.id}`} item={item} />;
   };
   */
 
@@ -117,7 +117,7 @@ class FestivalsScreen extends React.PureComponent<
   };
 
   // Stable keyExtractor function to prevent re-creation
-  keyExtractorById = (item: IFestival) => item.Id!.toString();
+  keyExtractorById = (item: IFestival) => item.id.toString();
 
   handleSearch = (isViewAll: boolean, items: IItem[]) => {
     NavigationService.navigate(ScreenName.VIEW_ALL_ITEM, {
@@ -178,7 +178,7 @@ class FestivalsScreen extends React.PureComponent<
           placeholder={t('festivals.searchPlaceholder')}
           containerStyle={{marginTop: sizes._24sdp}}
           entityType="festival"
-          idField="Id"
+          idField="id"
         />
 
         <CatalogStatus loading={this.state.loading} error={this.state.error}

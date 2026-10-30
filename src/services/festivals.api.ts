@@ -1,6 +1,5 @@
-import {createCatalogCache, fetchCatalog} from './catalog.client';
-import {adaptFestival, FestivalDTO} from './catalog.adapter';
-import locationApi from './locations.api';
+import {FestivalDTO} from './catalog.adapter';
+import catalogRepository from './catalogRepository';
 import {request} from './axios';
 
 // ========================================
@@ -30,7 +29,6 @@ export interface IFestivalReview {
 }
 
 export interface IFestival extends FestivalDTO {
-  Id?: number;
   CreatedAt?: string;
   UpdatedAt?: string;
   /** Venue name resolved from location_id; empty when the festival has no linked location. */
@@ -70,29 +68,13 @@ export interface IFestival extends FestivalDTO {
 // API FUNCTIONS
 // ========================================
 
-// The API only carries location_id; resolve the venue name the screens display and search on.
-const catalogFestivals = createCatalogCache(async (): Promise<IFestival[]> => {
-  const festivals = await fetchCatalog('/festivals', adaptFestival);
-  const names = new Map<number, string>();
-  if (festivals.some(festival => festival.location_id !== null)) {
-    try {
-      for (const location of await locationApi.getLocations()) {names.set(location.id, location.name);}
-    } catch (error) {
-      console.warn('⚠️ Festival venues unavailable:', error);
-    }
-  }
-  return festivals.map(festival => ({
-    ...festival,
-    location: festival.location_id !== null ? names.get(festival.location_id) ?? '' : '',
-  }));
-});
-
 const festivalsApi = {
   /**
    * Lấy danh sách tất cả festivals
    */
-  getFestivals: catalogFestivals.get,
-  clearCache: catalogFestivals.clear,
+  getFestivals: async (forceRefresh = false): Promise<IFestival[]> =>
+    (await catalogRepository.get(forceRefresh)).festivals,
+  clearCache: catalogRepository.clear,
 
   // P2: Original NocoDB catalog read retained for recovery history.
   //   getFestivals: async (): Promise<IFestival[]> => {
@@ -132,9 +114,7 @@ const festivalsApi = {
    */
   getFestivalById: async (id: number, forceRefresh = false): Promise<IFestival | null> => {
     try {
-      const festivals = await festivalsApi.getFestivals(forceRefresh);
-      const festival = festivals.find(f => f.id === id);
-      return festival || null;
+      return (await catalogRepository.get(forceRefresh)).festivalById.get(id) ?? null;
     } catch (error) {
       console.error('❌ Error fetching festival by ID:', error);
       throw error;
@@ -174,7 +154,7 @@ const festivalsApi = {
   /**
    * Tạo festival mới
    */
-  createFestival: async (festival: Omit<IFestival, 'Id' | 'CreatedAt' | 'UpdatedAt'>): Promise<IFestival> => {
+  createFestival: async (festival: Omit<IFestival, 'id' | 'CreatedAt' | 'UpdatedAt'>): Promise<IFestival> => {
     try {
       const payload = {
         name: festival.name,
@@ -282,8 +262,7 @@ const festivalsApi = {
   getFestivalsByLocationId: async (locationId: number): Promise<IFestival[]> => {
     if (!Number.isSafeInteger(locationId)) {return [];}
     try {
-      const festivals = await festivalsApi.getFestivals();
-      return festivals.filter(f => f.location_id === locationId);
+      return [...(await catalogRepository.get()).festivalsByLocationId.get(locationId) ?? []];
     } catch (error) {
       console.error('❌ Error fetching festivals by location ID:', error);
       throw error;

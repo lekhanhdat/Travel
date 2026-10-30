@@ -17,13 +17,14 @@ import {StarActive, StarInActive, ThunderSvg} from '../../../assets/assets/Image
 import {MapSvg, Call, GlobeSvg, ClockSvg, DirectionsSvg} from '../../../assets/ImageSvg';
 import {ScreenName} from '../../AppContainer';
 import {Button} from 'react-native-paper';
-import festivalsApi, {IFestival} from '../../../services/festivals.api';
+import {IFestival} from '../../../services/festivals.api';
 import SimilarItemsComponent from '../../../component/SimilarItemsComponent';
 import {
   withAzureTranslation,
   WithAzureTranslationProps,
 } from '../../../hoc/withAzureTranslation';
 import { translateLocationField } from '../../../utils/translationHelpers';
+import catalogRepository from '../../../services/catalogRepository';
 import { catalogImage } from '../../../utils/catalogDisplay';
 import CachedImage from '../../../component/CachedImage';
 
@@ -63,12 +64,10 @@ class DetailLocationScreen extends React.PureComponent<
   loadCatalog = async (forceRefresh = false) => {
     this.setState({catalogError: false});
     try {
-      const locations = await locationApi.getLocations(forceRefresh);
+      const catalog = await catalogRepository.get(forceRefresh);
       const location: ILocation = this.props.route.params?.location;
-      const locationId = location.id ?? location.Id;
-      if (forceRefresh) {festivalsApi.clearCache();}
-      const festivals = locationId == null ? [] : await festivalsApi.getFestivalsByLocationId(locationId);
-      this.setState({allLocations: locations, festivals});
+      const festivals = catalog.festivalsByLocationId.get(location.id) ?? [];
+      this.setState({allLocations: catalog.locations, festivals});
     } catch {
       this.setState({catalogError: true});
     }
@@ -105,9 +104,7 @@ class DetailLocationScreen extends React.PureComponent<
       const locTypes = loc.types || [];
 
       // Không include chính location hiện tại (so sánh bằng Id/id hoặc name)
-      const currentId = currentLocation.Id || currentLocation.id;
-      const locId = loc.Id || loc.id;
-      if (currentId && locId && currentId === locId) {
+      if (currentLocation.id === loc.id) {
         return false;
       }
       if (loc.name === currentLocation.name) {
@@ -168,7 +165,7 @@ class DetailLocationScreen extends React.PureComponent<
     const location: ILocation = this.props.route.params?.location;
     const {t} = this.props;
 
-    const locationId = location.Id || location.id;
+    const locationId = location.id;
     const translatedName = locationId 
       ? translateLocationField(t, locationId, 'name', location.name)
       : location.name;
@@ -374,7 +371,7 @@ class DetailLocationScreen extends React.PureComponent<
                   >
                     {this.state.festivals.map((festival, index) => (
                       <TouchableOpacity
-                        key={`festival-${festival.Id || index}`}
+                        key={`festival-${festival.id}`}
                         onPress={() => {
                           NavigationService.navigate(ScreenName.DETAIL_FESTIVAL_SCREEN, {
                             festival: festival,
@@ -508,10 +505,10 @@ class DetailLocationScreen extends React.PureComponent<
               )}
 
               {/* Semantic Similar Items from Backend */}
-              {FEATURE_FLAGS.ENABLE_AI && (location.Id || location.id) && (
+              {FEATURE_FLAGS.ENABLE_AI && (
                 <SimilarItemsComponent
                   entityType="location"
-                  entityId={location.Id || location.id!}
+                  entityId={location.id}
                   title={t('detail.similarLocations')}
                   limit={5}
                 />

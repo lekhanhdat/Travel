@@ -1,5 +1,4 @@
-import {createCatalogCache, fetchCatalog} from './catalog.client';
-import {adaptLocation} from './catalog.adapter';
+import catalogRepository from './catalogRepository';
 import {IItem, ILocation, IReview} from '../common/types';
 import {request} from './axios';
 
@@ -51,8 +50,7 @@ interface CacheEntry<T> {
 
 // In-memory cache for locations
 // let locationsCache: CacheEntry<ILocation[]> | null = null; // Legacy cache
-const catalogLocations = createCatalogCache(() => fetchCatalog('/locations', adaptLocation));
-let reviewsCache: CacheEntry<IReview[]> | null = null;
+// Catalog reads go through catalogRepository (one shared load for locations + festivals).
 let itemsCache: CacheEntry<IItem[]> | null = null;
 
 // Check if cache is valid
@@ -63,15 +61,13 @@ const isCacheValid = <T>(cache: CacheEntry<T> | null): boolean => {
 
 // Clear all caches (useful after creating/updating data)
 const clearCache = () => {
-  catalogLocations.clear();
-  reviewsCache = null;
+  catalogRepository.clear();
   itemsCache = null;
 };
 
 // Clear only locations cache
 const clearLocationsCache = () => {
-  catalogLocations.clear();
-  reviewsCache = null; // Reviews depend on locations, so clear both
+  catalogRepository.clear();
 };
 
 const locationApi = {
@@ -79,13 +75,10 @@ const locationApi = {
   clearCache,
   clearLocationsCache,
 
-  getLocations: (forceRefresh = false) => {
-    if (forceRefresh) {reviewsCache = null;}
-    return catalogLocations.get(forceRefresh);
-  },
+  getLocations: async (forceRefresh = false) => (await catalogRepository.get(forceRefresh)).locations,
 
   getLocationById: async (id: number, forceRefresh = false) =>
-    (await locationApi.getLocations(forceRefresh)).find(location => location.id === id) ?? null,
+    (await catalogRepository.get(forceRefresh)).locationById.get(id) ?? null,
 
   // P2: Original NocoDB catalog read retained for recovery history.
   //   getLocations: async (forceRefresh: boolean = false) => {
@@ -273,10 +266,10 @@ const locationApi = {
     let data = res.data.list ?? [];
 
     data = data.filter(
-      item => item.location && item.location?.Id === locationId,
+      item => item.location && item.location?.id === locationId,
     );
 
-    // return data.filter(item => item.location?.Id === locationId);
+    // return data.filter(item => item.location?.id === locationId);
     return data;
   },
 
@@ -287,12 +280,6 @@ const locationApi = {
    */
   getReviews: async (forceRefresh: boolean = false) => {
     try {
-      // Return cached reviews if valid
-      if (!forceRefresh && isCacheValid(reviewsCache)) {
-        if (__DEV__) {console.log('📦 Using cached reviews:', reviewsCache!.data.length);}
-        return reviewsCache!.data;
-      }
-
       // Lấy tất cả locations với reviews (uses location cache)
       const locations = await locationApi.getLocations(forceRefresh);
 
@@ -325,12 +312,6 @@ const locationApi = {
 
       if (__DEV__) {console.log('✅ Total reviews from cloud:', allReviews.length);}
 
-      // Store in cache
-      reviewsCache = {
-        data: allReviews,
-        timestamp: Date.now(),
-      };
-
       return allReviews;
     } catch (error) {
       if (__DEV__) {console.error('❌ Error fetching reviews:', error);}
@@ -347,7 +328,7 @@ const locationApi = {
    */
   createReview: async (review: Partial<IReview>) => {
     try {
-      const locationId = review.location?.Id || review.location?.id;
+      const locationId = review.location?.id;
       if (!locationId) {
         throw new Error('Location ID is required');
       }

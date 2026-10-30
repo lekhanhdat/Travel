@@ -30,7 +30,8 @@ const CatalogStatus = require('../src/component/CatalogStatus').default;
 const storage = require('../src/utils/LocalStorageCommon').default;
 const {request} = require('../src/services/axios');
 const locationApi = require('../src/services/locations.api').default;
-const festivalsApi = require('../src/services/festivals.api').default;
+const catalogRepository = require('../src/services/catalogRepository').default;
+const {buildCatalogSnapshot} = require('../src/services/catalogRepository');
 const geo = require('@react-native-community/geolocation');
 const {PermissionsAndroid} = require('react-native');
 
@@ -42,36 +43,34 @@ describe('Phase 1 Guest Mode', () => {
   it('loads detail catalogs and exact FK in recovery, and surfaces failure with a forced retry', async () => {
     const DetailLocation = require('../src/container/screens/Home/DetailLocation').default;
     const DetailFestival = require('../src/container/screens/Festival/DetailFestival').default;
-    const getLocations = jest.spyOn(locationApi, 'getLocations').mockResolvedValue([{id: 7, Id: 7}]);
-    const getFestivals = jest.spyOn(festivalsApi, 'getFestivals').mockResolvedValue([{id: 2, Id: 2}]);
-    const related = jest.spyOn(festivalsApi, 'getFestivalsByLocationId').mockResolvedValue([]);
-    const clear = jest.spyOn(festivalsApi, 'clearCache');
-    const detail = new DetailLocation({...props(), route: {params: {location: {id: 7, Id: 999}}}});
+    const snapshot = buildCatalogSnapshot([{id: 7, name: 'Venue'}, {id: 8, name: 'Other'}],
+      [{id: 2, location_id: 7}, {id: 3, location_id: 8}, {id: 4, location_id: null}]);
+    const get = jest.spyOn(catalogRepository, 'get').mockResolvedValue(snapshot);
+    const detail = new DetailLocation({...props(), route: {params: {location: {id: 7}}}});
     detail.setState = state => {detail.state = {...detail.state, ...state};};
     await detail.loadCatalog();
-    expect(related).toHaveBeenCalledWith(7);
-    expect(detail.state).toMatchObject({catalogError: false, festivals: [], allLocations: [{id: 7, Id: 7}]});
-    getLocations.mockRejectedValueOnce(new Error('offline'));
+    expect(detail.state).toMatchObject({catalogError: false, allLocations: snapshot.locations});
+    expect(detail.state.festivals.map(row => [row.id, row.location])).toEqual([[2, 'Venue']]);
+    get.mockRejectedValueOnce(new Error('offline'));
     await detail.loadCatalog();
     expect(detail.state.catalogError).toBe(true);
     await detail.loadCatalog(true);
-    expect(getLocations).toHaveBeenLastCalledWith(true);
-    expect(clear).toHaveBeenCalledTimes(1);
+    expect(get).toHaveBeenLastCalledWith(true);
     expect(detail.state.catalogError).toBe(false);
     const festival = new DetailFestival(props());
     festival.setState = state => {festival.state = {...festival.state, ...state};};
     await festival.loadCatalog();
-    expect(festival.state.allFestivals).toEqual([{id: 2, Id: 2}]);
-    getFestivals.mockRejectedValueOnce(new Error('offline'));
+    expect(festival.state.allFestivals).toBe(snapshot.festivals);
+    get.mockRejectedValueOnce(new Error('offline'));
     await festival.loadCatalog();
     expect(festival.state.catalogError).toBe(true);
     await festival.loadCatalog(true);
-    expect(getFestivals).toHaveBeenLastCalledWith(true);
+    expect(get).toHaveBeenLastCalledWith(true);
     expect(festival.state.catalogError).toBe(false);
   });
 
   it('mounts Home as guest without GPS, account reads or outgoing requests; retry settles', async () => {
-    jest.spyOn(locationApi, 'getLocations').mockRejectedValue(new Error('Catalog network error'));
+    const get = jest.spyOn(catalogRepository, 'get').mockRejectedValue(new Error('Catalog network error'));
     const permission = jest.spyOn(PermissionsAndroid, 'request');
     const account = jest.spyOn(storage, 'getItem');
     const adapter = jest.fn(() => {throw new Error('Unexpected network');});
@@ -86,6 +85,8 @@ describe('Phase 1 Guest Mode', () => {
       expect(account).not.toHaveBeenCalled();
       await act(async () => {tree.root.findByType(CatalogStatus).props.onRetry();});
       expect(tree.getInstance().state).toMatchObject({loading: false, error: true});
+      // Mount reads the shared cache; only Retry forces a refresh.
+      expect(get.mock.calls).toEqual([[false], [true]]);
       expect(adapter).not.toHaveBeenCalled();
       expect(tree.root.findAllByType('Recommendations')).toHaveLength(0);
     } finally {request.defaults.adapter = oldAdapter; tree?.unmount();}
@@ -93,7 +94,7 @@ describe('Phase 1 Guest Mode', () => {
 
   it('mounts Festival with an explicit error and retry, without fetching Items', async () => {
     const items = jest.spyOn(locationApi, 'getItems');
-    jest.spyOn(festivalsApi, 'getFestivals').mockRejectedValue(new Error('Catalog network error'));
+    jest.spyOn(catalogRepository, 'get').mockRejectedValue(new Error('Catalog network error'));
     let tree;
     await act(async () => {tree = renderer.create(React.createElement(Festival, props()));});
     expect(tree.getInstance().state).toMatchObject({loading: false, error: true, festivals: []});
@@ -107,13 +108,13 @@ describe('Phase 1 Guest Mode', () => {
     const onSubmitSearch = jest.fn();
     let tree;
     await act(async () => {tree = renderer.create(React.createElement(Search, {
-      data: [{Id: 1, name: 'Đà Nẵng'}, {Id: 2, name: 'Hội An'}], searchFields: ['name'],
+      data: [{id: 1, name: 'Đà Nẵng'}, {id: 2, name: 'Hội An'}], searchFields: ['name'],
       entityType: 'location', onSearch: jest.fn(), onSubmitSearch,
     }));});
     const search = tree.getInstance();
     await act(async () => {search.handleSearchChange('da nang');});
     await act(async () => {await search.handleSubmitSearch();});
-    expect(onSubmitSearch).toHaveBeenCalledWith([{Id: 1, name: 'Đà Nẵng'}], 'da nang', false);
+    expect(onSubmitSearch).toHaveBeenCalledWith([{id: 1, name: 'Đà Nẵng'}], 'da nang', false);
     await act(async () => {search.toggleSearchMode();});
     expect(search.state.useSemanticSearch).toBe(false);
     tree.unmount();

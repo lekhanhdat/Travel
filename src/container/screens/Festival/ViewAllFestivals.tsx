@@ -255,7 +255,7 @@ class ViewAllFestivals extends React.PureComponent<
           <FlatList
             data={festivals}
             renderItem={this.renderItem}
-            keyExtractor={item => item.Id?.toString() ?? Math.random().toString()}
+            keyExtractor={item => item.id.toString()}
           />
         </View>
 

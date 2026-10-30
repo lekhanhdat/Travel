@@ -8,7 +8,8 @@ module.exports = {
         moduleName: '@env',
         path: '.env',
         blocklist: null,
-        allowlist: null,
+        // Values imported from '@env' are inlined into the bundle: public values only.
+        allowlist: ['CATALOG_API_URL', 'API_BASE_URL', 'MAPBOX_ACCESS_TOKEN'],
         safe: false,
         allowUndefined: true,
         verbose: false,

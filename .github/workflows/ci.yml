@@ -27,9 +27,9 @@ jobs:
           __tests__/services/catalogDisplay.test.js __tests__/services/catalogSearch.test.js
           __tests__/i18n/translationHelpers.test.ts __tests__/i18n/i18n.test.ts
           __tests__/guestMode.test.js __tests__/guestNavigation.test.js __tests__/guestTranslation.test.js
-          __tests__/mapScreen.test.js
-      - name: tsc (baseline 63 errors, must not grow)
+          __tests__/mapScreen.test.js __tests__/env.test.js
+      - name: tsc (baseline 62 errors, must not grow)
         run: |
           count=$(node node_modules/typescript/bin/tsc --noEmit | grep -c "error TS" || true)
-          echo "tsc errors: $count (baseline 63)"
-          test "$count" -le 63
+          echo "tsc errors: $count (baseline 62)"
+          test "$count" -le 62

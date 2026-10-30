@@ -1,16 +1,6 @@
 /**
- * Mock environment variables for testing
+ * Mock environment variables for testing (same public allowlist as babel.config.js)
  */
-export const SERVER_URL = 'http://localhost:8080';
-export const DB_URL = 'https://app.nocodb.com';
-export const NOCODB_TOKEN = 'test-token';
 export const MAPBOX_ACCESS_TOKEN = 'pk.test-mapbox-token';
-export const PAYOS_BACKEND_URL = 'http://localhost:8080';
-export const SENDGRID_API_KEY = 'SG.test-key';
-export const PASSWORD_SALT = 'test-salt';
-export const OPENAI_API_KEY = 'sk-test-key';
-export const UNSPLASH_ACCESS_KEY = 'test-unsplash-key';
-export const SERPAPI_KEY = 'test-serpapi-key';
-
-
 export const CATALOG_API_URL = 'https://travel-api-u2xcse44ca-as.a.run.app';
+export const API_BASE_URL = 'https://travel-api-u2xcse44ca-as.a.run.app';

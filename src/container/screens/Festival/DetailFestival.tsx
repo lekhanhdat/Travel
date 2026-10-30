@@ -9,7 +9,7 @@ import sizes from '../../../common/sizes';
 import colors from '../../../common/colors';
 import NavigationService from '../NavigationService';
 import {IFestival, IFestivalReview} from '../../../services/festivals.api';
-import {IReview} from '../../../common/types';
+import {ILocation, IReview} from '../../../common/types';
 import TextBase from '../../../common/TextBase';
 import {AppStyle} from '../../../common/AppStyle';
 import ReviewItem from '../../../component/ReviewItem';
@@ -35,6 +35,8 @@ interface IDetailFestivalScreenProps extends WithAzureTranslationProps {
 interface IDetailFestivalScreenState {
   catalogError: boolean;
   allFestivals: IFestival[];
+  /** Linked location from location_id, resolved via the repository index. */
+  venue: ILocation | null;
   showImageModal: boolean;
   selectedImageIndex: number;
 }
@@ -48,6 +50,7 @@ class DetailFestivalScreen extends React.PureComponent<
     this.state = {
       catalogError: false,
       allFestivals: [],
+      venue: null,
       showImageModal: false,
       selectedImageIndex: 0,
     };
@@ -61,8 +64,10 @@ class DetailFestivalScreen extends React.PureComponent<
   loadCatalog = async (forceRefresh = false) => {
     this.setState({catalogError: false});
     try {
-      const {festivals} = await catalogRepository.get(forceRefresh);
-      this.setState({allFestivals: festivals});
+      const {festivals, locationById} = await catalogRepository.get(forceRefresh);
+      const festival: IFestival | undefined = this.props.route?.params?.festival;
+      const venue = festival?.location_id != null ? locationById.get(festival.location_id) ?? null : null;
+      this.setState({allFestivals: festivals, venue});
     } catch {
       this.setState({catalogError: true});
     }
@@ -234,7 +239,15 @@ class DetailFestivalScreen extends React.PureComponent<
 
               {/* Location: hidden when the festival has no location_id */}
               {festival.location_id !== null && translatedLocation ? (
-                <View style={{flexDirection: 'row', alignItems: 'center', marginTop: sizes._12sdp}}>
+                <TouchableOpacity
+                  disabled={!this.state.venue}
+                  accessibilityRole="link"
+                  onPress={() => {
+                    if (this.state.venue) {
+                      NavigationService.navigate(ScreenName.DETAIL_LOCATION_SCREEN, {location: this.state.venue});
+                    }
+                  }}
+                  style={{flexDirection: 'row', alignItems: 'center', marginTop: sizes._12sdp}}>
                   <MapSvg
                     width={sizes._20sdp}
                     height={sizes._20sdp}
@@ -244,7 +257,12 @@ class DetailFestivalScreen extends React.PureComponent<
                     style={[AppStyle.txt_16_medium_detail, {marginLeft: sizes._8sdp, flex: 1, textAlign: 'justify'}]}>
                     {t('detail.location')}: {translatedLocation}
                   </TextBase>
-                </View>
+                  {this.state.venue ? (
+                    <TextBase style={[AppStyle.txt_14_bold, {color: colors.primary, marginLeft: sizes._8sdp}]}>
+                      {t('detail.viewLocation')} ›
+                    </TextBase>
+                  ) : null}
+                </TouchableOpacity>
               ) : null}
 
               {/* Ticket information */}

@@ -36,7 +36,15 @@
     "searchPlaceholder": "Tìm kiếm địa điểm, địa chỉ, mô tả...",
     "viewAll": "Xem tất cả",
     "search": "Tìm kiếm",
-    "aiSearchResults": "Kết quả tìm kiếm AI"
+    "aiSearchResults": "Kết quả tìm kiếm AI",
+    "useMyLocation": "Dùng vị trí của tôi",
+    "locating": "Đang xác định vị trí...",
+    "locationDenied": "Chưa có quyền vị trí. Bạn vẫn xem được các địa điểm khác; bật quyền để xem địa điểm gần bạn.",
+    "locationUnavailable": "Không lấy được vị trí. Vui lòng bật GPS và thử lại.",
+    "noNearby": "Chưa có địa điểm có tọa độ gần bạn.",
+    "locationPermissionTitle": "Quyền vị trí",
+    "locationPermissionMessage": "Ứng dụng cần vị trí của bạn để tìm địa điểm gần bạn.",
+    "cancel": "Hủy"
   },
   "recommendations": {
     "title": "Đề xuất cho bạn",
@@ -162,7 +170,8 @@
     "festivalImages": "Hình ảnh lễ hội",
     "similarFestivals": "Lễ hội tương tự",
     "noReviews": "Chưa có đánh giá",
-    "similarFestivalsAI": "Lễ hội tương tự (AI gợi ý)"
+    "similarFestivalsAI": "Lễ hội tương tự (AI gợi ý)",
+    "viewLocation": "Xem địa điểm"
   },
   "priceLevel": {
     "free": "Miễn phí",

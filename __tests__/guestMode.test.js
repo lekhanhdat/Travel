@@ -4,7 +4,7 @@ const {act} = renderer;
 
 jest.mock('../src/assets/ImageSvg', () => new Proxy({}, {get: (_, name) => name === '__esModule' ? false : 'Icon'}));
 jest.mock('../src/assets/assets/ImageSvg', () => new Proxy({}, {get: (_, name) => name === '__esModule' ? false : 'Icon'}));
-jest.mock('../src/container/AppContainer', () => ({ScreenName: {VIEW_ALL_SCREEN: 'ViewAllLocation'}}));
+jest.mock('../src/container/AppContainer', () => ({ScreenName: {VIEW_ALL_SCREEN: 'ViewAllLocation', DETAIL_LOCATION_SCREEN: 'DetailLocationScreen'}}));
 jest.mock('../src/container/screens/NavigationService', () => ({navigate: jest.fn()}));
 jest.mock('../src/hoc/withAzureTranslation', () => ({withAzureTranslation: component => component}));
 jest.mock('../src/hooks/useTranslation', () => ({useTranslation: () => ({t: key => key})}));
@@ -67,6 +67,70 @@ describe('Phase 1 Guest Mode', () => {
     await festival.loadCatalog(true);
     expect(get).toHaveBeenLastCalledWith(true);
     expect(festival.state.catalogError).toBe(false);
+    // Festival -> its location via the repository index; none without location_id.
+    const linked = new DetailFestival({...props(), route: {params: {festival: snapshot.festivalById.get(2)}}});
+    linked.setState = state => {linked.state = {...linked.state, ...state};};
+    await linked.loadCatalog();
+    expect(linked.state.venue).toBe(snapshot.locationById.get(7));
+    const unlinked = new DetailFestival({...props(), route: {params: {festival: snapshot.festivalById.get(4)}}});
+    unlinked.setState = state => {unlinked.state = {...unlinked.state, ...state};};
+    await unlinked.loadCatalog();
+    expect(unlinked.state.venue).toBeNull();
+  });
+
+  const nearbyCatalog = () => buildCatalogSnapshot([
+    {id: 1, name: 'Far', lat: 15.88, long: 108.33},
+    {id: 2, name: 'No GPS', lat: null, long: null},
+    {id: 3, name: 'Near', lat: 16.0545, long: 108.2023},
+  ], []);
+  const findButton = (tree, label) => tree.root.find(node => node.type === 'Button' && node.props.children === label);
+
+  it('asks for location only on demand; a denial keeps Home lists and explains', async () => {
+    jest.replaceProperty(require('react-native').Platform, 'OS', 'android');
+    jest.spyOn(catalogRepository, 'get').mockResolvedValue(nearbyCatalog());
+    const permission = jest.spyOn(PermissionsAndroid, 'request').mockResolvedValue(PermissionsAndroid.RESULTS.DENIED);
+    let tree;
+    await act(async () => {tree = renderer.create(React.createElement(Home, props()));});
+    expect(permission).not.toHaveBeenCalled();
+    expect(tree.getInstance().state.locationsPopular).toHaveLength(3);
+    await act(async () => {await findButton(tree, 'home.useMyLocation').props.onPress();});
+    expect(permission).toHaveBeenCalledTimes(1);
+    expect(geo.getCurrentPosition).not.toHaveBeenCalled();
+    expect(tree.getInstance().state).toMatchObject({nearbyStatus: 'denied', locationsNearly: []});
+    expect(tree.getInstance().state.locationsPopular).toHaveLength(3);
+    expect(tree.root.findAll(node => node.props.children === 'home.locationDenied').length).toBeGreaterThan(0);
+    tree.unmount();
+  });
+
+  it('shows nearest places with distance after permission is granted', async () => {
+    jest.replaceProperty(require('react-native').Platform, 'OS', 'android');
+    jest.spyOn(catalogRepository, 'get').mockResolvedValue(nearbyCatalog());
+    jest.spyOn(PermissionsAndroid, 'request').mockResolvedValue(PermissionsAndroid.RESULTS.GRANTED);
+    geo.getCurrentPosition.mockImplementationOnce(success => success({coords: {latitude: 16.0544, longitude: 108.2022}}));
+    let tree;
+    await act(async () => {tree = renderer.create(React.createElement(Home, props()));});
+    await act(async () => {await findButton(tree, 'home.useMyLocation').props.onPress();});
+    const state = tree.getInstance().state;
+    expect(state.nearbyStatus).toBe('ready');
+    expect(state.locationsNearly.map(row => row.id)).toEqual([3, 1]);
+    expect(state.locationsNearly[0].distanceKm).toBeLessThan(0.1);
+    geo.getCurrentPosition.mockClear();
+    tree.unmount();
+  });
+
+  it('pull-to-refresh forces a repository refresh and keeps the list when it fails', async () => {
+    const snapshot = nearbyCatalog();
+    const get = jest.spyOn(catalogRepository, 'get').mockResolvedValueOnce(snapshot)
+      .mockRejectedValueOnce(new Error('offline'));
+    let tree;
+    await act(async () => {tree = renderer.create(React.createElement(Home, props()));});
+    const {RefreshControl} = require('react-native');
+    await act(async () => {await tree.root.findByType(RefreshControl).props.onRefresh();});
+    expect(get.mock.calls).toEqual([[false], [true]]);
+    expect(tree.getInstance().state).toMatchObject({refreshing: false, loading: false, error: true});
+    expect(tree.getInstance().state.locations).toBe(snapshot.locations);
+    expect(tree.root.findByType(CatalogStatus).props.error).toBe(true);
+    tree.unmount();
   });
 
   it('mounts Home as guest without GPS, account reads or outgoing requests; retry settles', async () => {
@@ -101,6 +165,10 @@ describe('Phase 1 Guest Mode', () => {
     expect(items).not.toHaveBeenCalled();
     await act(async () => {tree.root.findByType(CatalogStatus).props.onRetry();});
     expect(tree.getInstance().state.loading).toBe(false);
+    const {RefreshControl} = require('react-native');
+    await act(async () => {await tree.root.findByType(RefreshControl).props.onRefresh();});
+    expect(catalogRepository.get).toHaveBeenLastCalledWith(true);
+    expect(tree.getInstance().state.refreshing).toBe(false);
     tree.unmount();
   });
 

@@ -3,6 +3,7 @@ import CatalogStatus from '../../../component/CatalogStatus';
 import React from 'react';
 import {
   FlatList,
+  RefreshControl,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
@@ -31,18 +32,26 @@ import LanguageDropdown from '../../../component/LanguageDropdown';
 import Geolocation from '@react-native-community/geolocation';
 import SemanticSearchBarComponent from '../../../component/SemanticSearchBarComponent';
 import RecommendationsWidget from '../../../component/RecommendationsWidget';
+import {Button} from 'react-native-paper';
+import {sortByDistance} from '../../../utils/nearby';
+import {LOCATION_SEARCH_FIELDS} from '../../../utils/catalogSearch';
 
 interface IHomeScreenProps extends WithAzureTranslationProps {
   navigation: any;
 }
 
+type NearbyStatus = 'idle' | 'locating' | 'denied' | 'unavailable' | 'ready';
+type NearbyLocation = ILocation & {distanceKm: number};
+
 interface IHomeScreenState {
   loading: boolean;
+  refreshing: boolean;
   error: boolean;
   valueSearch: string;
   locations: ILocation[];
   locationsPopular: ILocation[];
-  locationsNearly: ILocation[];
+  locationsNearly: NearbyLocation[];
+  nearbyStatus: NearbyStatus;
   account: IAccount | null;
   currentLat: number;
   currentLong: number;
@@ -61,11 +70,13 @@ class HomeScreen extends React.PureComponent<
     this.searchBarRef = React.createRef();
     this.state = {
       loading: true,
+      refreshing: false,
       error: false,
       valueSearch: '',
       locations: [],
       locationsNearly: [],
       locationsPopular: [],
+      nearbyStatus: 'idle',
       account: null,
       currentLat: 15.974620784990472,
       currentLong: 108.25290513035998,
@@ -85,7 +96,6 @@ class HomeScreen extends React.PureComponent<
       this.searchBarRef.current?.resetSearch();
     });
 
-    if (FEATURE_FLAGS.ENABLE_MAP) {this.requestLocationPermission();}
     this.fetchLocations();
     if (FEATURE_FLAGS.ENABLE_AUTH) {this.handleGetUser();}
   }
@@ -99,61 +109,61 @@ class HomeScreen extends React.PureComponent<
     });
   };
 
-  // Request location permission
-  requestLocationPermission = async () => {
+  // "Gần bạn": ask for location only on demand; a denial keeps the rest of Home usable.
+  handleUseMyLocation = async () => {
+    const {t} = this.props;
+    this.setState({nearbyStatus: 'locating'});
     if (Platform.OS === 'android') {
+      let granted: string | null = null;
       try {
-        const granted = await PermissionsAndroid.request(
+        granted = await PermissionsAndroid.request(
           PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
           {
-            title: 'Location Permission',
-            message:
-              'This app needs access to your location to show nearby places.',
-            buttonNeutral: 'Ask Me Later',
-            buttonNegative: 'Cancel',
+            title: t('home.locationPermissionTitle'),
+            message: t('home.locationPermissionMessage'),
+            buttonNegative: t('home.cancel'),
             buttonPositive: 'OK',
           },
         );
-        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-          this.setState({locationPermission: true});
-          this.getCurrentLocation();
-        } else {
-          console.log('Location permission denied');
-        }
       } catch (err) {
         console.warn(err);
       }
-    } else {
-      // iOS
-      this.setState({locationPermission: true});
-      this.getCurrentLocation();
+      if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+        this.setState({locationPermission: false, nearbyStatus: 'denied'});
+        return;
+      }
     }
+    this.setState({locationPermission: true});
+    this.getCurrentLocation();
   };
 
-  // Get current GPS location
+  // Get current GPS location (foreground only)
   getCurrentLocation = () => {
     Geolocation.getCurrentPosition(
       position => {
         const {latitude, longitude} = position.coords;
-        this.setState({
-          currentLat: latitude,
-          currentLong: longitude,
-        });
-        console.log('📍 Current location:', latitude, longitude);
-        // Re-fetch locations to sort by distance
-        this.fetchLocations();
+        this.setState({currentLat: latitude, currentLong: longitude}, this.updateNearby);
       },
       error => {
         console.log('❌ Error getting location:', error);
-        // Use default Đà Nẵng coordinates
-        this.fetchLocations();
+        this.setState({nearbyStatus: 'unavailable'});
       },
       {
-        enableHighAccuracy: true,
+        enableHighAccuracy: false,
         timeout: 15000,
-        maximumAge: 10000,
+        maximumAge: 60000,
       },
     );
+  };
+
+  updateNearby = () => {
+    if (!this.state.locationPermission || this.state.nearbyStatus === 'denied') {return;}
+    if (this.state.nearbyStatus !== 'locating' && this.state.nearbyStatus !== 'ready') {return;}
+    this.setState({
+      locationsNearly: sortByDistance(this.state.locations,
+        {latitude: this.state.currentLat, longitude: this.state.currentLong}),
+      nearbyStatus: 'ready',
+    });
   };
 
   // Calculate distance between two coordinates using Haversine formula
@@ -224,17 +234,24 @@ class HomeScreen extends React.PureComponent<
   }
   */
 
-  async fetchLocations(forceRefresh = false) {
-    this.setState({loading: true, error: false});
+  async fetchLocations(forceRefresh = false, pullToRefresh = false) {
+    this.setState({loading: !pullToRefresh, refreshing: pullToRefresh, error: false});
     try {
       const {locations: data} = await catalogRepository.get(forceRefresh);
-      this.setState({locations: data, locationsPopular: data.slice(0, 20), locationsNearly: []});
+      this.setState({locations: data, locationsPopular: data.slice(0, 20)}, this.updateNearby);
     } catch {
+      // A failed refresh keeps the list already shown; CatalogStatus offers Retry.
       this.setState({error: true});
     } finally {
-      this.setState({loading: false});
+      this.setState({loading: false, refreshing: false});
     }
   }
+
+  handlePullToRefresh = () => this.fetchLocations(true, true);
+
+  renderItemNearby = ({item}: {item: NearbyLocation}) => (
+    <LargeItemLocation location={item} distanceKm={item.distanceKm} />
+  );
 
   // ============ PERFORMANCE OPTIMIZATION: Memoized render functions ============
   renderItemHorizontal = ({item, index}: {item: ILocation; index: number}) => {
@@ -406,7 +423,7 @@ class HomeScreen extends React.PureComponent<
         <SemanticSearchBarComponent<ILocation>
           ref={this.searchBarRef}
           data={this.state.locations}
-          searchFields={['name', 'address', 'description']}
+          searchFields={[...LOCATION_SEARCH_FIELDS]}
           onSearch={this.handleSearchCallback}
           onSubmitSearch={this.handleSearchSubmit}
           placeholder={this.props.t('home.searchPlaceholder')}
@@ -415,7 +432,10 @@ class HomeScreen extends React.PureComponent<
         />
         <CatalogStatus loading={this.state.loading} error={this.state.error}
           onRetry={() => this.fetchLocations(true)} />
-        <ScrollView>
+        <ScrollView
+          refreshControl={
+            <RefreshControl refreshing={this.state.refreshing} onRefresh={this.handlePullToRefresh} />
+          }>
           <View style={styles.container}>
             {/* 1. AI-Powered Recommendations - At the top */}
             {FEATURE_FLAGS.ENABLE_AI && this.state.account?.Id && (
@@ -461,38 +481,59 @@ class HomeScreen extends React.PureComponent<
               removeClippedSubviews={true}
             />
 
-            {/* P1: Nearby UI is temporarily disabled until GPS/map recovery.
+            {/* 3. Nearby: on-demand location, distance by haversine */}
             <View style={[styles.rowCenter, {marginTop: sizes._24sdp}]}>
               <TextBase
                 style={[AppStyle.txt_20_bold, {marginBottom: sizes._16sdp}]}>
                 {this.props.t('home.nearbyLocations')}
               </TextBase>
-              <TouchableOpacity
-                onPress={() =>
-                  this.handleSearch(true, this.state.locationsNearly)
-                }>
-                <TextBase
-                  style={[
-                    AppStyle.txt_18_regular,
-                    {marginBottom: sizes._16sdp},
-                  ]}>
-                  {this.props.t('home.viewAll')}
-                </TextBase>
-              </TouchableOpacity>
+              {this.state.nearbyStatus === 'ready' && this.state.locationsNearly.length > 0 ? (
+                <TouchableOpacity
+                  onPress={() =>
+                    this.handleSearch(true, this.state.locationsNearly)
+                  }>
+                  <TextBase
+                    style={[
+                      AppStyle.txt_18_regular,
+                      {marginBottom: sizes._16sdp},
+                    ]}>
+                    {this.props.t('home.viewAll')}
+                  </TextBase>
+                </TouchableOpacity>
+              ) : null}
             </View>
 
-            <FlatList
-              data={this.state.locationsNearly}
-              renderItem={this.renderItemLarge}
-              keyExtractor={this.keyExtractorById}
-              getItemLayout={this.getItemLayoutVertical}
-              showsHorizontalScrollIndicator={false}
-              scrollEnabled={false}
-              initialNumToRender={5}
-              maxToRenderPerBatch={5}
-              removeClippedSubviews={true}
-            />
-            */}
+            {this.state.nearbyStatus === 'ready' ? (
+              this.state.locationsNearly.length > 0 ? (
+                <FlatList
+                  data={this.state.locationsNearly}
+                  renderItem={this.renderItemNearby}
+                  keyExtractor={this.keyExtractorById}
+                  showsHorizontalScrollIndicator={false}
+                  scrollEnabled={false}
+                  initialNumToRender={5}
+                  maxToRenderPerBatch={5}
+                  removeClippedSubviews={true}
+                />
+              ) : (
+                <TextBase style={AppStyle.txt_16_regular}>{this.props.t('home.noNearby')}</TextBase>
+              )
+            ) : (
+              <View>
+                {this.state.nearbyStatus === 'denied' || this.state.nearbyStatus === 'unavailable' ? (
+                  <TextBase style={[AppStyle.txt_16_regular, {marginBottom: sizes._12sdp}]}>
+                    {this.props.t(this.state.nearbyStatus === 'denied' ? 'home.locationDenied' : 'home.locationUnavailable')}
+                  </TextBase>
+                ) : null}
+                <Button
+                  mode="outlined"
+                  loading={this.state.nearbyStatus === 'locating'}
+                  disabled={this.state.nearbyStatus === 'locating'}
+                  onPress={this.handleUseMyLocation}>
+                  {this.props.t(this.state.nearbyStatus === 'locating' ? 'home.locating' : 'home.useMyLocation')}
+                </Button>
+              </View>
+            )}
 
           </View>
         </ScrollView>

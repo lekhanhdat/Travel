@@ -3,6 +3,7 @@ import CatalogStatus from '../../../component/CatalogStatus';
 import React from 'react';
 import {
   FlatList,
+  RefreshControl,
   TouchableOpacity,
   View,
   ScrollView,
@@ -24,6 +25,7 @@ import catalogRepository from '../../../services/catalogRepository';
 import locationApi from '../../../services/locations.api';
 import SemanticSearchBarComponent from '../../../component/SemanticSearchBarComponent';
 import LargeItemFestival from '../../../component/LargeItemFestival';
+import {FESTIVAL_SEARCH_FIELDS} from '../../../utils/catalogSearch';
 import {
   withAzureTranslation,
   WithAzureTranslationProps,
@@ -37,6 +39,7 @@ interface IFestivalsScreenProps extends WithAzureTranslationProps {
 
 interface IFestivalsScreenState {
   loading: boolean;
+  refreshing: boolean;
   error: boolean;
   valueSearch: string;
   items: IItem[];
@@ -59,6 +62,7 @@ class FestivalsScreen extends React.PureComponent<
     this.searchBarRef = React.createRef();
     this.state = {
       loading: true,
+      refreshing: false,
       error: false,
       valueSearch: '',
       items: [],
@@ -94,15 +98,16 @@ class FestivalsScreen extends React.PureComponent<
     });
   }
 
-  async fetchFestivals(forceRefresh = false) {
-    this.setState({loading: true, error: false});
+  async fetchFestivals(forceRefresh = false, pullToRefresh = false) {
+    this.setState({loading: !pullToRefresh, refreshing: pullToRefresh, error: false});
     try {
       const {festivals: data} = await catalogRepository.get(forceRefresh);
       this.setState({festivals: data, FESTIVALS_POPULAR: data.slice(0, 20)});
     } catch {
+      // A failed refresh keeps the list already shown; CatalogStatus offers Retry.
       this.setState({error: true});
     } finally {
-      this.setState({loading: false});
+      this.setState({loading: false, refreshing: false});
     }
   }
 
@@ -172,7 +177,7 @@ class FestivalsScreen extends React.PureComponent<
         <SemanticSearchBarComponent<IFestival>
           ref={this.searchBarRef}
           data={this.state.festivals}
-          searchFields={['name', 'location', 'description']}
+          searchFields={[...FESTIVAL_SEARCH_FIELDS]}
           onSearch={this.handleFestivalSearch}
           onSubmitSearch={this.handleFestivalSearchSubmit}
           placeholder={t('festivals.searchPlaceholder')}
@@ -183,7 +188,10 @@ class FestivalsScreen extends React.PureComponent<
 
         <CatalogStatus loading={this.state.loading} error={this.state.error}
           onRetry={() => this.fetchFestivals(true)} />
-        <ScrollView>
+        <ScrollView
+          refreshControl={
+            <RefreshControl refreshing={this.state.refreshing} onRefresh={() => this.fetchFestivals(true, true)} />
+          }>
           <View style={styles.container}>
             {/* FESTIVALS SECTION - Matching "Gần tôi" layout */}
             <View style={[styles.rowCenter]}>

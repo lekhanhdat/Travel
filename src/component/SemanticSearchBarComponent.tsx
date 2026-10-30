@@ -12,7 +12,7 @@ import Svg, {Circle, Line} from 'react-native-svg';
 import {CloseSvg} from '../assets/ImageSvg';
 import colors from '../common/colors';
 import sizes from '../common/sizes';
-import {convertCitationVietnameseUnsigned} from '../utils/Utils';
+import {searchCatalog} from '../utils/catalogSearch';
 import {
   searchSemantic,
   EntityType,
@@ -99,20 +99,7 @@ export default class SemanticSearchBarComponent<T> extends React.PureComponent<
     const {data, searchFields} = this.props;
     if (!searchValue || searchValue.trim().length === 0) {return data;}
 
-    const normalizedSearch = convertCitationVietnameseUnsigned(searchValue)
-      ?.toLowerCase()
-      .trim();
-
-    return data.filter(item => {
-      return searchFields.some(field => {
-        const fieldValue = item[field];
-        if (fieldValue === null || fieldValue === undefined) {return false;}
-        const normalizedFieldValue = convertCitationVietnameseUnsigned(
-          String(fieldValue),
-        )?.toLowerCase();
-        return normalizedFieldValue?.includes(normalizedSearch);
-      });
-    });
+    return searchCatalog(data, searchValue, searchFields);
   };
 
   /**

@@ -36,10 +36,10 @@ Gate chung cho mọi phase có sửa code:
 **Nghiệm thu P2:** Home → Festival → Detail → Map chỉ 1 lượt `/locations` + `/festivals`; không còn `Id`; payload nén ~125 KB (User chấp nhận, U9).
 
 ## P3 — Home / Festival / Search
-- [ ] P3.1 "Gần bạn": xin quyền vị trí khi cần, khoảng cách bằng `haversineDistance`; từ chối quyền vẫn hiện list
-- [ ] P3.2 Search cục bộ (bỏ dấu) trên tên/mô tả/loại của location + festival
-- [ ] P3.3 Liên kết hai chiều: Detail location → festival tại đây; Detail festival → mở location
-- [ ] P3.4 Pull-to-refresh gọi `catalogRepository.refresh()`; lỗi có nút Thử lại
+- [x] P3.1 "Gần bạn": xin quyền vị trí khi cần, khoảng cách bằng `haversineDistance`; từ chối quyền vẫn hiện list
+- [x] P3.2 Search cục bộ (bỏ dấu) trên tên/mô tả/loại của location + festival
+- [x] P3.3 Liên kết hai chiều: Detail location → festival tại đây; Detail festival → mở location
+- [x] P3.4 Pull-to-refresh gọi `catalogRepository.refresh()`; lỗi có nút Thử lại
 
 ## P4 — Map
 - [ ] P4.1 `.env`: Mapbox public token `pk.` (D3); bật `ENABLE_MAP`
@@ -91,9 +91,12 @@ Các việc dưới đây nằm ngoài quyền của agent (push, GitHub, cloud,
      ```
   4. Rollback nếu lỗi: `update-traffic` về revision đã ghi ở bước 2.
 - [x] **U9 Quyết định mục tiêu payload nén.** → User chấp nhận ~125 KB (29/10); nghiệm thu P2 dùng mức này. Đo trên dữ liệu live với gzip level 9 (như `GZipMiddleware`): locations + festivals = 486 KB → **~125 KB** (kích thước trang 100/200/500 không đổi đáng kể: 124,5/122,8/122,8 KB), hơi vượt mục tiêu < 120 KB. Phần lớn là văn bản dài (`festivals.description` 113 KB, `locations.long_description` 96 KB thô). Lựa chọn: (a) chấp nhận ~125 KB và sửa nghiệm thu P2 (khuyến nghị — đã giảm 4 lần, giữ mô hình tải toàn bộ list); (b) bỏ `long_description` khỏi list và thêm endpoint detail — đổi contract, cần phase riêng.
-- [ ] **U10 Commit/push FE P2** (nhánh `migration/p0-p1`, working tree chưa commit theo yêu cầu). Sau khi CI xanh có thể hạ ngưỡng tsc trong `.github/workflows/ci.yml` từ 63 xuống 62 để khóa tiến bộ.
+- [x] **U10 Commit/push FE P2** (`da4dff1`) (nhánh `migration/p0-p1`, working tree chưa commit theo yêu cầu). Sau khi CI xanh có thể hạ ngưỡng tsc trong `.github/workflows/ci.yml` từ 63 xuống 62 để khóa tiến bộ.
+- [ ] **U11 Commit/push FE P3** (nhánh `migration/p0-p1`, working tree chưa commit). Không có thay đổi BE; không cần deploy.
+- [ ] **U12 Thử trên máy thật (gộp vào P5.2):** Home → "Dùng vị trí của tôi" → Từ chối (vẫn thấy "Địa điểm phổ biến" + thông báo) → bấm lại → Cho phép (list gần nhất có khoảng cách); kéo xuống để làm mới ở Home/Lễ hội; Detail lễ hội → "Xem địa điểm ›".
 
 ## Backlog
+- [ ] Nhãn tiếng Việt cho `types` (search "bảo tàng" khớp `museum`) — qua dữ liệu/nhãn UI, không fix cứng theo record
 - [ ] Nội dung catalog tiếng Anh (qua dữ liệu, không theo ID)
 - [ ] Hotels trong search (`/hotels` vào repository, chỉ dùng cho search)
 - [ ] Auth phía BE + migrate accounts/transactions/objects (D2)
@@ -108,3 +111,4 @@ Các việc dưới đây nằm ngoài quyền của agent (push, GitHub, cloud,
 | 29/10/2026 | P1 | Helper dịch trả giá trị API; xóa 4 file `{vi,en}/{locations,festivals}.json` + namespace; xóa `authConstants`/`locationConstants`/`reviewsConstants` và fallback (NewFeed chỉ còn review API, Map bỏ fallback đã comment); `src` không còn mảng dữ liệu cứng; empty state ảnh (`catalogImage` + `CachedImage`, bỏ via.placeholder.com), review, video, địa chỉ, lời khuyên; festival không `location_id` ẩn địa điểm. Jest gate 106 pass/1 skip; tsc 63. Commit `migration P1` trên nhánh `migration/p0-p1` |
 | 29/10/2026 | P2 | FE (chưa commit): `catalogRepository` tải song song locations + festivals, TTL 10 phút, `refresh()`, chỉ mục `locationById`/`festivalById`/`festivalsByLocationId`/`mapMarkers`; lỗi giữ snapshot cũ; `locations.api`/`festivals.api` và Home/Detail/Festival/Map/AI widget đọc repository; Home không còn `getLocations(true)`; bỏ `Id` catalog (adapter, `ILocation`, `IFestival`, UI); client timeout 12 s, retry 1 lần, deadline 30 s. BE (chưa commit): gzip + Cache-Control + ETag/304 + test. Jest gate 106 pass; tsc 62; BE PASS; live 123/49. Chờ deploy (U8), quyết định payload (U9) |
 | 29/10/2026 | P2.5 deploy | Sự cố: traffic bị chuyển về `travel-api-00001-xlz` (không tương thích schema 005–006) → catalog 503; khôi phục về `00003-smt`, rồi deploy `6ece2540…`. Kiểm tra live: 200 gzip, `cache-control: public, max-age=300`, ETag yếu, 304, 123/49/82. README sửa hướng dẫn rollback |
+| 30/10/2026 | P3 | FE (chưa commit): "Gần bạn" xin quyền khi bấm, sắp xếp `haversineDistance`, hiện khoảng cách, từ chối/không GPS vẫn giữ list; search cục bộ dùng chung `catalogSearch` (bỏ dấu, mọi từ phải khớp; name/description/types + address/venue) cho thanh search và bộ lọc ViewAll; Detail lễ hội → mở địa điểm qua `locationById`; pull-to-refresh Home + Lễ hội gọi `catalogRepository.get(true)`, lỗi giữ list + Thử lại. Jest gate 114 pass; tsc 62; eslint không lỗi mới |

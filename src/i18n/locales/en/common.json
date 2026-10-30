@@ -36,7 +36,15 @@
     "searchPlaceholder": "Search places, addresses, descriptions...",
     "viewAll": "View All",
     "search": "Search",
-    "aiSearchResults": "AI Search Results"
+    "aiSearchResults": "AI Search Results",
+    "useMyLocation": "Use my location",
+    "locating": "Finding your location...",
+    "locationDenied": "Location permission is off. You can still browse other places; allow it to see places near you.",
+    "locationUnavailable": "Could not get your location. Please turn on GPS and try again.",
+    "noNearby": "No places with coordinates near you yet.",
+    "locationPermissionTitle": "Location permission",
+    "locationPermissionMessage": "The app needs your location to find places near you.",
+    "cancel": "Cancel"
   },
   "recommendations": {
     "title": "Recommended for You",
@@ -162,7 +170,8 @@
     "festivalImages": "Festival Images",
     "similarFestivals": "Similar Festivals",
     "noReviews": "No reviews yet",
-    "similarFestivalsAI": "Similar Festivals (AI Suggestions)"
+    "similarFestivalsAI": "Similar Festivals (AI Suggestions)",
+    "viewLocation": "View location"
   },
   "priceLevel": {
     "free": "Free",

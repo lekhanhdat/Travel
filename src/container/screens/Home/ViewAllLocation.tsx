@@ -9,7 +9,7 @@ import colors from '../../../common/colors';
 import { ILocation } from '../../../common/types';
 import LargeItemLocation from '../../../component/LargeItemLocation';
 import NavigationService from '../NavigationService';
-import { convertCitationVietnameseUnsigned } from '../../../utils/Utils';
+import { LOCATION_SEARCH_FIELDS, searchCatalog } from '../../../utils/catalogSearch';
 import TextBase from '../../../common/TextBase';
 import { AppStyle } from '../../../common/AppStyle';
 import {
@@ -83,48 +83,14 @@ class ViewAllLocation extends React.PureComponent<
       return;
     }
 
-    // For keyword search, apply additional filtering
-    let locationOut: ILocation[] = [];
-
-    allLocations.forEach(location => {
-      const normalizedSearch = convertCitationVietnameseUnsigned(valueSearch)?.toLowerCase();
-
-      // Apply filter based on selected filter type
-      let matches = false;
-
-      if (selectedFilter === 'all') {
-        // Search by name, address, and description
-        const nameMatch = convertCitationVietnameseUnsigned(location.name ?? '')
-          ?.toLowerCase()
-          ?.includes(normalizedSearch);
-
-        const addressMatch = convertCitationVietnameseUnsigned(location.address ?? '')
-          ?.toLowerCase()
-          ?.includes(normalizedSearch);
-
-        const descriptionMatch = convertCitationVietnameseUnsigned(location.description ?? '')
-          ?.toLowerCase()
-          ?.includes(normalizedSearch);
-
-        matches = nameMatch || addressMatch || descriptionMatch;
-      } else if (selectedFilter === 'name') {
-        matches = convertCitationVietnameseUnsigned(location.name ?? '')
-          ?.toLowerCase()
-          ?.includes(normalizedSearch);
-      } else if (selectedFilter === 'address') {
-        matches = convertCitationVietnameseUnsigned(location.address ?? '')
-          ?.toLowerCase()
-          ?.includes(normalizedSearch);
-      } else if (selectedFilter === 'description') {
-        matches = convertCitationVietnameseUnsigned(location.description ?? '')
-          ?.toLowerCase()
-          ?.includes(normalizedSearch);
-      }
-
-      if (matches) {
-        locationOut = locationOut.concat(location);
-      }
-    });
+    // Keyword search: accent-insensitive, every word must match (see catalogSearch).
+    const fields: Record<SearchFilterType, (keyof ILocation)[]> = {
+      all: [...LOCATION_SEARCH_FIELDS],
+      name: ['name'],
+      address: ['address'],
+      description: ['description'],
+    };
+    const locationOut = searchCatalog(allLocations, valueSearch, fields[selectedFilter] ?? fields.all);
 
     if (__DEV__) {console.log('🔤 Keyword search results:', locationOut.length, 'items');}
     this.setState({ locations: locationOut });

@@ -11,13 +11,16 @@ import NavigationService from '../container/screens/NavigationService';
 import CachedImage from './CachedImage';
 import {translateLocationField} from '../utils/translationHelpers';
 import {catalogImage} from '../utils/catalogDisplay';
+import {formatDistance} from '../utils/nearby';
 
 interface ILargeItemLocationProps {
   location: ILocation;
   onPress?: () => void;
+  /** Shown under the description when the list is sorted by distance ("Gần bạn"). */
+  distanceKm?: number;
 }
 
-const LargeItemLocation: React.FC<ILargeItemLocationProps> = ({location, onPress}) => {
+const LargeItemLocation: React.FC<ILargeItemLocationProps> = ({location, onPress, distanceKm}) => {
   const {t} = useTranslation('common');
 
   const locationId = location.id;
@@ -68,6 +71,11 @@ const LargeItemLocation: React.FC<ILargeItemLocationProps> = ({location, onPress
             style={[AppStyle.txt_14_regular, {marginTop: sizes._8sdp}]}>
             {translatedDescription}
           </TextBase>
+          {distanceKm !== undefined ? (
+            <TextBase style={[AppStyle.txt_14_bold, {marginTop: sizes._4sdp}]}>
+              📍 {formatDistance(distanceKm)}
+            </TextBase>
+          ) : null}
         </View>
       </View>
     </TouchableOpacity>

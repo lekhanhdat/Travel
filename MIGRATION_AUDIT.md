@@ -104,3 +104,13 @@ Nguyên tắc: không dữ liệu fix cứng; nội dung chỉ từ API; một k
 - **Payload:** đo live gzip level 9: 486 KB → ~125 KB, hơi vượt mục tiêu < 120 KB (xem U9). FE chưa gửi `If-None-Match` nên 304 chỉ có lợi khi có HTTP cache/proxy.
 - **Commit:** không commit theo yêu cầu User (FE nhánh `migration/p0-p1`, BE working tree trên `main`).
 - **Cần User:** U8 (deploy BE), U9 (mục tiêu payload), U10 (commit/push FE).
+
+### P3 — 30/10/2026
+- **P3.1 Gần bạn:** Home không xin quyền khi mở. Mục "Địa điểm gần bạn" có nút "Dùng vị trí của tôi": Android xin `ACCESS_FINE_LOCATION` (chỉ foreground) → `getCurrentPosition` → `sortByDistance` (`src/utils/nearby.ts`, dùng `haversineDistance`, bỏ record thiếu/sai GPS, 20 gần nhất) → card hiện khoảng cách (`LargeItemLocation.distanceKm`). Từ chối quyền hoặc không lấy được GPS: hiện thông báo, các list khác giữ nguyên, có thể bấm lại. Đã gỡ việc tự xin quyền lúc mount.
+- **P3.2 Search:** `src/utils/catalogSearch.ts` — chuẩn hóa bỏ dấu bằng `removeSign` sẵn có (an toàn trên Hermes, không dùng `normalize('NFD')`), mảng `types` và `_`/`-` thành chữ, mọi từ trong truy vấn phải khớp. Location: name/description/types/address; festival: name/description/types/location (tên địa điểm). Dùng chung cho `SemanticSearchBarComponent` (chế độ keyword) và bộ lọc ViewAllLocation/ViewAllFestivals. `types` là slug tiếng Anh (`museum`, `beach`…) nên khớp theo slug; nhãn tiếng Việt đưa vào Backlog.
+- **P3.3 Liên kết:** Detail lễ hội: dòng địa điểm bấm được ("Xem địa điểm ›") khi `location_id` tìm thấy trong `locationById`; không có thì không bấm được/ẩn như P1. Chiều Detail địa điểm → "Lễ hội tại địa điểm" đã có từ P2 (`festivalsByLocationId`).
+- **P3.4 Pull-to-refresh:** Home và Lễ hội có `RefreshControl` → `catalogRepository.get(true)`; lỗi giữ list đang hiện, `CatalogStatus` báo lỗi + "Thử lại".
+- **Kiểm chứng:** `catalogSearch.test.js` (bỏ dấu, nhiều từ, types/venue, khoảng cách, bỏ GPS null) + 3 test màn hình trong `guestMode.test.js` (không xin quyền lúc mount; từ chối → list vẫn còn + thông báo; cho phép → sắp xếp gần nhất; pull-to-refresh lỗi giữ list) + liên kết festival → location. Gate jest 114 pass/1 skip; full jest chỉ 6 suite hỏng từ trước; `tsc` 62; eslint không lỗi mới; diff không thêm URL/secret. Chưa thử trên thiết bị (P5).
+- **Lưu ý:** `NavigationService.navigate` tới màn đã có trong stack có thể quay lại màn đó thay vì mở mới (Detail lễ hội ↔ Detail địa điểm); kiểm tra khi nghiệm thu P5.
+- **Commit:** không commit (User tự commit/push).
+- **Cần User:** U11 (commit/push), U12 (thử trên máy thật).

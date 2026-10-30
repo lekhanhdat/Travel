@@ -22,6 +22,7 @@ jest.mock('../src/component/SimilarItemsComponent', () => 'SimilarItems');
 jest.mock('react-native-paper', () => ({Button: 'Button', Searchbar: 'Searchbar'}));
 jest.mock('react-native-svg', () => ({__esModule: true, default: 'Svg', Circle: 'Circle', Line: 'Line'}));
 jest.mock('@react-native-community/geolocation', () => ({getCurrentPosition: jest.fn()}));
+jest.mock('react-native-toast-message', () => ({show: jest.fn()}));
 
 const Home = require('../src/container/screens/Home/HomeScreen').default;
 const Festival = require('../src/container/screens/Festival/FestivalsScreen').default;

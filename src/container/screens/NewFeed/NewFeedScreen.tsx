@@ -21,6 +21,7 @@ import LargeItemLocation from '../../../component/LargeItemLocation';
 import locationApi from '../../../services/locations.api';
 import {launchImageLibrary} from 'react-native-image-picker';
 import {convertCitationVietnameseUnsigned} from '../../../utils/Utils';
+import {requireLogin} from '../../../utils/requireLogin';
 
 
 // ĐÂY LÀ TRANG NEWFEED CHUẨN
@@ -28,7 +29,7 @@ import {convertCitationVietnameseUnsigned} from '../../../utils/Utils';
 // ĐÂY LÀ TRANG NEWFEED CHUẨN
 
 interface INewFeedScreenProps {
-  navigation: any;
+  navigation?: any; // optional: the tab navigator passes it, tests may not
 }
 
 interface INewFeedScreenState {
@@ -56,6 +57,7 @@ export default class NewFeedScreen extends React.PureComponent<
   refSheet: BottomSheet | null | undefined;
   refSheetLocation: BottomSheet | null | undefined;
   refSheetFilterLocation: BottomSheet | null | undefined;
+  unsubscribeFocus?: () => void;
 
   constructor(props: INewFeedScreenProps) {
     super(props);
@@ -82,7 +84,27 @@ export default class NewFeedScreen extends React.PureComponent<
     this.handleGetReviews();
     this.handleGetAvt();
     this.fetchLocations();
+    // P7: back on the tab (e.g. after Login) → fresh account + reviews.
+    this.unsubscribeFocus = this.props.navigation?.addListener?.('focus', () => {
+      this.handleGetAvt();
+      this.handleGetReviews();
+    });
   }
+
+  componentWillUnmount(): void {
+    this.unsubscribeFocus?.();
+  }
+
+  // P7: writing needs an account (D13); guests are sent to Login and come back here.
+  handleOpenReviewSheet = async () => {
+    if (!(await requireLogin())) {return;}
+    await this.handleGetAvt();
+    this.refSheet?.open();
+  };
+
+  handleReviewDeleted = (reviewId: number) => {
+    this.setState({reviews: this.state.reviews.filter(review => review.id !== reviewId)});
+  };
 
   async fetchLocations() {
     const data = await locationApi.getLocations();
@@ -150,6 +172,9 @@ export default class NewFeedScreen extends React.PureComponent<
         mediaType: 'photo',
         selectionLimit: 5, // Cho phép chọn tối đa 5 ảnh
         quality: 0.8,
+        // P7: BE accepts ≤ 2 MB per image; resizing keeps photos well under it.
+        maxWidth: 1600,
+        maxHeight: 1600,
       },
       (response) => {
         if (response.didCancel) {
@@ -179,50 +204,33 @@ export default class NewFeedScreen extends React.PureComponent<
     try {
       this.setState({uploading: true});
 
-      // 1. Upload images nếu có
+      // 1. Upload images nếu có (POST /uploads; lỗi một ảnh thì dừng, không đăng thiếu ảnh)
       let imageUrls: string[] = [];
       if (this.state.selectedImages.length > 0) {
         if (__DEV__) {console.log('📤 Uploading images...');}
         for (const image of this.state.selectedImages) {
-          try {
-            const uploadResult = await locationApi.uploadImage(image);
-            // uploadResult.url đã là signedUrl từ API
-            imageUrls.push(uploadResult.url);
-          } catch (error) {
-            if (__DEV__) {console.error('Error uploading image:', error);}
-          }
+          const uploadResult = await locationApi.uploadImage(image);
+          imageUrls.push(uploadResult.url);
         }
         if (__DEV__) {console.log('✅ Images uploaded:', imageUrls.length);}
       }
 
-      // 2. Create review object
-      // Dùng timestamp để tránh trùng ID với data cũ
-      const newReview: IReview = {
-        id: Date.now(), // Timestamp unique ID
+      // 2. Review gửi lên BE (tác giả, thời gian, id do BE gán từ tài khoản đăng nhập)
+      const newReview: Partial<IReview> = {
         content: this.state.content,
-        name_user_review: this.state.avt?.userName ?? '',
-        fullName: this.state.avt?.fullName, // Add fullName field
-        time_review: moment().format('HH:mm DD/MM/YYYY'), // Format: "HH:mm DD/MM/YYYY"
         start: this.state.star,
-        avatar: '', // Luôn dùng ProfileSvg mặc định
-        //@ts-ignore
-        location: this.state.location,
+        location: this.state.location ?? undefined,
         images: imageUrls,
       };
 
-      // 3. Save to NocoDB
-      try {
-        await locationApi.createReview(newReview);
-        if (__DEV__) {console.log('✅ Review saved to cloud');}
-      } catch (error) {
-        if (__DEV__) {console.error('❌ Error saving review to cloud:', error);}
-        Alert.alert('Thông báo', 'Không thể lưu đánh giá lên server, nhưng đã lưu local.');
-      }
+      // 3. Save to BE (POST /reviews)
+      const savedReview = await locationApi.createReview(newReview);
+      if (__DEV__) {console.log('✅ Review saved to cloud');}
 
       // 4. Update local state
       this.setState(
         {
-          reviews: [...[newReview], ...this.state.reviews],
+          reviews: [savedReview, ...this.state.reviews],
         },
         () => {
           this.setState({
@@ -237,10 +245,10 @@ export default class NewFeedScreen extends React.PureComponent<
       );
 
       this.refSheet?.close();
-    } catch (error) {
+    } catch (error: any) {
       if (__DEV__) {console.error('❌ Error submitting review:', error);}
       this.setState({uploading: false});
-      Alert.alert('Lỗi', 'Không thể gửi đánh giá. Vui lòng thử lại.');
+      Alert.alert('Lỗi', error?.message || 'Không thể gửi đánh giá. Vui lòng thử lại.');
     }
   };
 
@@ -261,7 +269,8 @@ export default class NewFeedScreen extends React.PureComponent<
 
   renderItem = ({item, index}: {item: IReview; index: number}) => {
     return (
-      <ReviewItem key={`feed-${index}`} review={item} isShowLocation={true} />
+      <ReviewItem key={`feed-${index}`} review={item} isShowLocation={true}
+        currentAccountId={this.state.avt?.id} onDeleted={this.handleReviewDeleted} />
     );
   };
 
@@ -455,9 +464,7 @@ export default class NewFeedScreen extends React.PureComponent<
               borderRadius: sizes._200sdp,
               right: sizes._16sdp,
             }}
-            onPress={() => {
-              this.refSheet?.open();
-            }}>
+            onPress={this.handleOpenReviewSheet}>
             <Add
               width={sizes._40sdp}
               height={sizes._40sdp}
@@ -711,14 +718,14 @@ export default class NewFeedScreen extends React.PureComponent<
 
             <TouchableOpacity
               onPress={this.handleSubmitReview}
-              disabled={this.state.content.length === 0 || !this.state.location || this.state.uploading}
+              disabled={this.state.content.trim().length === 0 || !this.state.location || this.state.star === 0 || this.state.uploading}
               style={{
                 position: 'absolute',
                 bottom: sizes._32sdp,
                 width: sizes.width - sizes._32sdp,
                 left: sizes._16sdp,
                 backgroundColor:
-                  this.state.content.length === 0 || !this.state.location || this.state.uploading
+                  this.state.content.trim().length === 0 || !this.state.location || this.state.star === 0 || this.state.uploading
                     ? colors.primary_100
                     : colors.primary,
                 alignItems: 'center',
@@ -732,7 +739,7 @@ export default class NewFeedScreen extends React.PureComponent<
                 <TextBase
                   style={[
                     AppStyle.txt_18_bold,
-                    (this.state.content.length === 0 || !this.state.location) && {
+                    (this.state.content.trim().length === 0 || !this.state.location || this.state.star === 0) && {
                       color: colors.primary_400,
                     },
                   ]}>

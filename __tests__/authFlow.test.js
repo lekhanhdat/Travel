@@ -13,7 +13,7 @@ jest.mock('../src/services/auth.api', () => ({__esModule: true, default: {
   login: jest.fn(), logout: jest.fn(), isLoggedIn: jest.fn(), deleteAccount: jest.fn(),
   updateProfile: jest.fn(), changePassword: jest.fn(),
 }}));
-jest.mock('../src/services/locations.api', () => ({__esModule: true, default: {}}));
+jest.mock('../src/services/locations.api', () => ({__esModule: true, default: {uploadImage: jest.fn()}}));
 jest.mock('react-native-toast-message', () => ({show: jest.fn()}));
 jest.mock('react-native-swiper', () => 'Swiper');
 jest.mock('react-native-paper', () => ({TextInput: Object.assign(() => null, {Icon: () => null}), IconButton: 'IconButton', Button: 'Button'}));
@@ -29,6 +29,7 @@ const LoginScreen = require('../src/container/screens/Login/LoginScreen').defaul
 const ProfileScreen = require('../src/container/screens/Profile/ProfileScreen').default;
 const Personal = require('../src/container/screens/Profile/Personal').default;
 const FEATURE_FLAGS = require('../src/config/featureFlags').default;
+const locationApi = require('../src/services/locations.api').default;
 
 function instance(Component, props) {
   const screen = new Component(props);
@@ -132,8 +133,21 @@ describe('Personal: account deletion (Play policy)', () => {
     expect(NavigationService.reset).not.toHaveBeenCalled();
   });
 
-  it('avatar change stays off until uploads exist (P7)', () => {
-    expect(FEATURE_FLAGS.ENABLE_UPLOAD).toBe(false);
-    expect(FEATURE_FLAGS.ENABLE_AUTH).toBe(true);
+  it('avatar change uploads through the BE, then saves the returned URL in the profile (P7)', async () => {
+    expect(FEATURE_FLAGS.ENABLE_UPLOAD).toBe(true);
+    const url = 'https://storage.googleapis.com/bucket/uploads/7/20261030/a.jpg';
+    locationApi.uploadImage.mockResolvedValue({url});
+    authApi.updateProfile.mockResolvedValue({id: 7, userName: 'seed1', avatar: url});
+    const personal = instance(Personal, {});
+    personal.state = {...personal.state, account: {id: 7, userName: 'seed1'}, previewAvatarUri: 'file:///a.jpg'};
+    await personal.handleConfirmAvatar();
+    expect(locationApi.uploadImage).toHaveBeenCalledWith(expect.objectContaining({uri: 'file:///a.jpg'}));
+    expect(authApi.updateProfile).toHaveBeenCalledWith(7, {avatar: url});
+    expect(personal.state).toMatchObject({uploadingAvatar: false, editAvatarUri: url, account: {avatar: url}});
+    locationApi.uploadImage.mockRejectedValue(new Error('Ảnh vượt quá 2 MB'));
+    personal.state = {...personal.state, previewAvatarUri: 'file:///b.jpg'};
+    await personal.handleConfirmAvatar();
+    expect(authApi.updateProfile).toHaveBeenCalledTimes(1);
+    expect(Toast.show).toHaveBeenLastCalledWith(expect.objectContaining({type: 'error'}));
   });
 });

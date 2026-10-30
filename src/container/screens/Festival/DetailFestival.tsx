@@ -8,7 +8,7 @@ import {BackSvg, Clock, CardSvg, ThunderSvg} from '../../../assets/assets/ImageS
 import sizes from '../../../common/sizes';
 import colors from '../../../common/colors';
 import NavigationService from '../NavigationService';
-import {IFestival, IFestivalReview} from '../../../services/festivals.api';
+import festivalsApi, {IFestival, IFestivalReview} from '../../../services/festivals.api';
 import {ILocation, IReview} from '../../../common/types';
 import TextBase from '../../../common/TextBase';
 import {AppStyle} from '../../../common/AppStyle';
@@ -39,6 +39,7 @@ interface IDetailFestivalScreenState {
   venue: ILocation | null;
   showImageModal: boolean;
   selectedImageIndex: number;
+  reviews: IFestivalReview[] | null; // P7: GET /reviews?festival_id (null until loaded)
 }
 
 class DetailFestivalScreen extends React.PureComponent<
@@ -53,13 +54,25 @@ class DetailFestivalScreen extends React.PureComponent<
       venue: null,
       showImageModal: false,
       selectedImageIndex: 0,
+      reviews: null,
     };
   }
 
   componentDidMount() {
     // P1: if (FEATURE_FLAGS.RECOVERY_MODE) {return;}
     this.loadCatalog();
+    this.loadReviews();
   }
+
+  loadReviews = async () => {
+    const festival: IFestival | undefined = this.props.route?.params?.festival;
+    if (!festival) {return;}
+    try {
+      this.setState({reviews: await festivalsApi.getReviews(festival.id)});
+    } catch {
+      this.setState({reviews: []});
+    }
+  };
 
   loadCatalog = async (forceRefresh = false) => {
     this.setState({catalogError: false});
@@ -151,7 +164,10 @@ class DetailFestivalScreen extends React.PureComponent<
       : festival.ticket_info;
 
 
-    const avgRating = this.calculateAverageRating(festival.reviews);
+    // P7: fresh reviews when loaded, otherwise the catalog's BE-computed rating/review_count.
+    const reviews = this.state.reviews;
+    const avgRating = reviews ? this.calculateAverageRating(reviews) : festival.rating ?? 0;
+    const reviewCount = reviews ? reviews.length : festival.review_count ?? 0;
 
     return (
       <Page>
@@ -186,7 +202,7 @@ class DetailFestivalScreen extends React.PureComponent<
               </TextBase>
 
               {/* Average Rating Display */}
-              {festival.reviews && festival.reviews.length > 0 && (
+              {reviewCount > 0 && (
                 <View style={{
                   flexDirection: 'row',
                   alignItems: 'center',
@@ -211,7 +227,7 @@ class DetailFestivalScreen extends React.PureComponent<
                     );
                   })}
                   <TextBase style={[AppStyle.txt_16_regular, {marginLeft: sizes._8sdp}]}>
-                    {avgRating.toFixed(1)} ({festival.reviews.length})
+                    {avgRating.toFixed(1)} ({reviewCount})
                   </TextBase>
                 </View>
               )}
@@ -411,7 +427,7 @@ class DetailFestivalScreen extends React.PureComponent<
               </TextBase>
 
               <FlatList
-                data={festival.reviews}
+                data={reviews ?? []}
                 scrollEnabled={false}
                 renderItem={this.renderReviewItem}
                 keyExtractor={(item, index) => index.toString() + item.id}

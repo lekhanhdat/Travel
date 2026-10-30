@@ -39,6 +39,7 @@ interface IDetailLocationScreenState {
   showImageModal: boolean;
   selectedImageIndex: number;
   festivals: IFestival[];
+  reviews: IReview[] | null; // P7: GET /reviews?location_id (null until loaded)
 }
 
 class DetailLocationScreen extends React.PureComponent<
@@ -53,13 +54,34 @@ class DetailLocationScreen extends React.PureComponent<
       showImageModal: false,
       selectedImageIndex: 0,
       festivals: [],
+      reviews: null,
     };
   }
 
   componentDidMount() {
     // P1: if (FEATURE_FLAGS.RECOVERY_MODE) {return;}
     this.loadCatalog();
+    this.loadReviews();
   }
+
+  loadReviews = async () => {
+    const location: ILocation = this.props.route.params?.location;
+    try {
+      this.setState({reviews: await locationApi.getReviews(false, location.id)});
+    } catch {
+      // Detail still works without reviews; the list shows "no reviews".
+      this.setState({reviews: []});
+    }
+  };
+
+  /** Fresh reviews when loaded, otherwise the catalog's BE-computed rating/review_count. */
+  getRatingSummary = (location: ILocation): {rating: number; count: number} => {
+    const {reviews} = this.state;
+    if (reviews) {
+      return {rating: locationApi.calculateAverageRating(reviews), count: reviews.length};
+    }
+    return {rating: location.rating ?? 0, count: location.review_count ?? 0};
+  };
 
   loadCatalog = async (forceRefresh = false) => {
     this.setState({catalogError: false});
@@ -225,7 +247,7 @@ class DetailLocationScreen extends React.PureComponent<
               </TextBase>
 
               {/* Average Rating Display */}
-              {location.reviews && location.reviews.length > 0 && (
+              {this.getRatingSummary(location).count > 0 && (
                 <View style={{
                   flexDirection: 'row',
                   alignItems: 'center',
@@ -233,7 +255,7 @@ class DetailLocationScreen extends React.PureComponent<
                   marginTop: sizes._12sdp,
                 }}>
                   {Array.from([1, 2, 3, 4, 5]).map((i) => {
-                    const avgRating = locationApi.calculateAverageRating(location.reviews);
+                    const avgRating = this.getRatingSummary(location).rating;
                     return i <= Math.round(avgRating) ? (
                       <StarActive
                         key={i}
@@ -251,7 +273,7 @@ class DetailLocationScreen extends React.PureComponent<
                     );
                   })}
                   <TextBase style={[AppStyle.txt_16_regular, {marginLeft: sizes._8sdp}]}>
-                    {locationApi.calculateAverageRating(location.reviews).toFixed(1)} ({location.reviews.length})
+                    {this.getRatingSummary(location).rating.toFixed(1)} ({this.getRatingSummary(location).count})
                   </TextBase>
                 </View>
               )}
@@ -533,7 +555,7 @@ class DetailLocationScreen extends React.PureComponent<
               </TextBase>
 
               <FlatList
-                data={location.reviews}
+                data={this.state.reviews ?? []}
                 scrollEnabled={false}
                 renderItem={this.renderItem}
                 keyExtractor={(item, index) => index.toString() + item.id}

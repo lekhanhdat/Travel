@@ -22,6 +22,7 @@ export interface ILocation {
   long_description?: string; // Detailed description for DetailLocation screen (falls back to description if empty)
   record_id?: string;
   rating?: number | null;
+  review_count?: number; // P7: number of visible reviews (BE); rating is their average
   lat: number | null;
   long: number | null;
   types?: string[]; // Array of location types (e.g., ["museum", "attraction", "historical"])
@@ -43,6 +44,7 @@ export interface ILocation {
 
 export interface IReview {
   id: number;
+  accountId?: number; // P7: author's account (BE reviews); used to show "Xóa" on own reviews
   content: string;
   name_user_review: string;
   fullName?: string; // Full name of user (preferred over name_user_review)
@@ -50,6 +52,7 @@ export interface IReview {
   start: number;
   avatar: string;
   location?: ILocation;
+  festival?: {id: number; name: string}; // P7: set for festival reviews (Feed shows its name)
   images?: string[]; // Array of image URLs uploaded by user
 }
 

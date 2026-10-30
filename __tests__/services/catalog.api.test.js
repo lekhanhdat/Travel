@@ -8,7 +8,7 @@ const festivals = require('../../src/services/festivals.api').default;
 const {request: legacyRequest} = require('../../src/services/axios');
 
 const common = id => ({id, record_id: `source-${id}`, name: `Catalog ${id}`, types: ['culture'],
-  description: '', long_description: '', rating: null, reviews: [], images: [], videos: [],
+  description: '', long_description: '', rating: null, review_count: 0, reviews: [], images: [], videos: [],
   advise: ['Advice'], website: '', phone: '', ticket_info: '', publishable: false});
 const location = id => ({...common(id), address: '', lat: null, long: null, opening_hours: '', avatar: ''});
 const festival = id => ({...common(id), event_time: '', location_id: null});
@@ -172,15 +172,21 @@ describe('Cloud Run catalog contract', () => {
     expect(await empty).toMatchObject({kind: 'network'});
   });
 
-  it('derives reviews from the current snapshot and propagates catalog errors', async () => {
-    catalogRequest.defaults.adapter = serve({'/locations': [{...location(1), reviews: [{id: 9, images: []}]}]});
-    expect((await locations.getReviews())[0].id).toBe(9);
-    catalogRequest.defaults.adapter = serve({'/locations': [location(1)]});
-    await locations.getLocations(true);
-    expect(await locations.getReviews()).toEqual([]);
+  // P7: reviews come from GET /reviews (BE table), no longer from the catalog's legacy `reviews` column.
+  it('reads reviews from the BE, ignores the legacy catalog column, and still lists them without a catalog', async () => {
+    const {apiRequest} = require('../../src/services/api.client');
+    const dto = {id: 9, location_id: 1, festival_id: null, rating: 4, content: 'Đẹp', images: [],
+      created_at: '2026-10-30T02:05:00Z', author: {id: 3, user_name: 'u3', full_name: null, avatar: null}};
+    const request = jest.spyOn(apiRequest, 'request').mockResolvedValue({data: page([dto])});
+    catalogRequest.defaults.adapter = serve({'/locations': [{...location(1), reviews: [{id: 99}]}]});
+    const [review] = await locations.getReviews(false, 1);
+    expect(request.mock.calls[0][0]).toMatchObject({method: 'get', url: '/reviews', params: {location_id: 1, limit: 100}});
+    expect(request.mock.calls[0][0].headers.Authorization).toBeUndefined();
+    expect(review).toMatchObject({id: 9, accountId: 3, start: 4, name_user_review: 'u3', location: {id: 1}});
+    expect((await catalogRepository.get()).locations[0].reviews).toEqual([{id: 99}]);
     catalogRepository.clear();
     catalogRequest.defaults.adapter = serve({'/locations': () => ({list: []})});
-    await expect(locations.getReviews(true)).rejects.toMatchObject({kind: 'contract'});
+    expect((await locations.getReviews())[0]).toMatchObject({id: 9, location: undefined});
   });
 
   it('keeps nullable GPS out of marker visibility and preserves non-null coordinates', () => {

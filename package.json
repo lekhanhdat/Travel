@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "android": "react-native run-android",
+    "android:fresh": "node scripts/android-fresh.js",
     "ios": "react-native run-ios",
     "start": "react-native start",
     "test": "jest",

@@ -16,6 +16,8 @@ jest.mock('../src/container/screens/Home/LocationVideo', () => 'Videos');
 jest.mock('../src/container/screens/Festival/FestivalsScreen', () => 'Festivals');
 jest.mock('../src/container/screens/Festival/DetailFestival', () => 'DetailFestival');
 jest.mock('../src/container/screens/Festival/ViewAllFestivals', () => 'AllFestivals');
+// P7: Feed tab (screen covered by __tests__/newFeed.test.js).
+jest.mock('../src/container/screens/NewFeed/NewFeedScreen', () => 'Feed');
 jest.mock('../src/container/screens/Profile/Settings', () => 'Settings');
 jest.mock('../src/container/screens/Profile/FAQ', () => 'FAQ');
 jest.mock('../src/container/screens/Profile/Policy', () => 'Policy');
@@ -33,7 +35,7 @@ jest.mock('../src/services/auth.api', () => {throw new Error('Guest must not ini
 jest.mock('../src/services/chatbot.api', () => {throw new Error('Guest must not initialize Chatbot');});
 jest.mock('../src/services/payment.api', () => {throw new Error('Guest must not initialize Payment');});
 
-it('registers guest + account routes and Home/Festival/Map/Profile tabs without initializing deferred modules', () => {
+it('registers guest + account routes and Home/Festival/Feed/Map/Profile tabs without initializing deferred modules', () => {
   const AppContainer = require('../src/container/AppContainer').default;
   const {offlineFallback} = require('../src/services/translation');
   let tree;
@@ -50,7 +52,7 @@ it('registers guest + account routes and Home/Festival/Map/Profile tabs without 
   const HomeStack = tree.root.findAllByType('Route')[0].props.component;
   let tabs;
   renderer.act(() => {tabs = renderer.create(React.createElement(HomeStack));});
-  expect(tabs.root.findAllByType('Tab').map(tab => tab.props.name)).toEqual(['TabHome', 'TabFestival', 'TabMap', 'TabProfile']);
+  expect(tabs.root.findAllByType('Tab').map(tab => tab.props.name)).toEqual(['TabHome', 'TabFestival', 'TabFeed', 'TabMap', 'TabProfile']);
   expect(offlineFallback.initialize).not.toHaveBeenCalled();
   tree.unmount();
   tabs.unmount();

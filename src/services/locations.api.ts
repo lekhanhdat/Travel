@@ -1,6 +1,12 @@
 import catalogRepository from './catalogRepository';
 import {IItem, ILocation, IReview} from '../common/types';
 import {request} from './axios';
+import {apiCall, ApiError} from './api.client';
+import reviewsApi from './reviews.api';
+
+// Same limit as the BE (core_api/uploads.py); uploads get more time than the 12 s default.
+export const MAX_UPLOAD_BYTES = 2 * 1024 * 1024;
+const UPLOAD_TIMEOUT_MS = 60000;
 
 export type GetLocationsResponse = {
   list: ILocation[];
@@ -273,169 +279,212 @@ const locationApi = {
     return data;
   },
 
-  /**
-   * Get all reviews from NocoDB
-   * Reviews nằm trong field 'reviews' của bảng Locations
-   * Uses caching to avoid redundant API calls
-   */
-  getReviews: async (forceRefresh: boolean = false) => {
-    try {
-      // Lấy tất cả locations với reviews (uses location cache)
-      const locations = await locationApi.getLocations(forceRefresh);
+  // P7: reviews + uploads go through the Cloud Run API (reviews.api, POST /uploads); same names/signatures.
+  /** Every visible review (newest first), or one location's when `locationId` is given. */
+  getReviews: async (_forceRefresh: boolean = false, locationId?: number): Promise<IReview[]> =>
+    reviewsApi.list(locationId ? {location_id: locationId} : {}),
 
-      // Extract tất cả reviews từ locations
-      let allReviews: IReview[] = [];
-      locations.forEach(location => {
-        if (location.reviews && Array.isArray(location.reviews)) {
-          // Gắn location vào mỗi review và parse images nếu cần
-          const reviewsWithLocation = location.reviews.map((review: IReview) => {
-            const parsedReview = {...review};
-
-            // Parse images nếu là JSON string
-            if (parsedReview.images && typeof parsedReview.images === 'string') {
-              try {
-                parsedReview.images = JSON.parse(parsedReview.images);
-              } catch (e) {
-                if (__DEV__) {console.error('Error parsing review images:', e);}
-                parsedReview.images = [];
-              }
-            }
-
-            // Gắn location
-            parsedReview.location = location;
-
-            return parsedReview;
-          });
-          allReviews = allReviews.concat(reviewsWithLocation);
-        }
-      });
-
-      if (__DEV__) {console.log('✅ Total reviews from cloud:', allReviews.length);}
-
-      return allReviews;
-    } catch (error) {
-      if (__DEV__) {console.error('❌ Error fetching reviews:', error);}
-      throw error;
+  /** Creates a review for `review.location`; returns it as stored by the BE (id, author, time). */
+  createReview: async (review: Partial<IReview>): Promise<IReview> => {
+    const locationId = review.location?.id;
+    if (!locationId) {
+      throw new Error('Location ID is required');
     }
+    return reviewsApi.create({
+      location_id: locationId,
+      rating: review.start ?? 0,
+      content: review.content ?? '',
+      images: review.images ?? [],
+    });
   },
 
   /**
-   * Create a new review
-   * Reviews nằm trong field 'reviews' của Location, nên cần:
-   * 1. Lấy location hiện tại
-   * 2. Thêm review mới vào array reviews
-   * 3. Update location với reviews mới
+   * Upload one picked image (react-native-image-picker asset) for a review or the avatar.
+   * The BE checks type (JPEG/PNG/WebP), size and the daily quota; returns its public URL.
    */
-  createReview: async (review: Partial<IReview>) => {
-    try {
-      const locationId = review.location?.id;
-      if (!locationId) {
-        throw new Error('Location ID is required');
-      }
-
-      if (__DEV__) {console.log('📝 Creating review for location:', locationId);}
-
-      // 1. Lấy location hiện tại
-      const res = await request.get(`${URL_GET_LOCATIONS}/${locationId}`);
-      const location = res.data;
-
-      // 2. Parse reviews hiện tại
-      let currentReviews: any[] = [];
-      if (location.reviews) {
-        if (typeof location.reviews === 'string') {
-          try {
-            currentReviews = JSON.parse(location.reviews);
-          } catch (e) {
-            if (__DEV__) {console.error('Error parsing current reviews:', e);}
-            currentReviews = [];
-          }
-        } else if (Array.isArray(location.reviews)) {
-          currentReviews = location.reviews;
-        }
-      }
-
-      // 3. Thêm review mới (không bao gồm location để tránh circular reference)
-      const newReview = {
-        id: review.id,
-        content: review.content,
-        name_user_review: review.name_user_review,
-        time_review: review.time_review,
-        start: review.start,
-        avatar: review.avatar,
-        images: review.images || [], // Giữ nguyên array, sẽ stringify khi lưu vào NocoDB
-      };
-      currentReviews.push(newReview);
-
-      // 4. Update location với reviews mới
-      // NocoDB PATCH endpoint: /api/v2/tables/{tableId}/records
-      // Body phải là array: [{Id: ..., field: ...}]
-
-      const updateUrl = URL_GET_LOCATIONS;
-      const updatePayload = [
-        {
-          Id: locationId, // Primary key field (viết hoa)
-          reviews: JSON.stringify(currentReviews),
-        },
-      ];
-
-      const updateRes = await request.patch(updateUrl, updatePayload);
-
-      // Clear cache after creating review to ensure fresh data
-      clearLocationsCache();
-
-      if (__DEV__) {console.log('✅ Review added to location:', locationId);}
-      return updateRes.data;
-    } catch (error: any) {
-      if (__DEV__) {
-        console.error('❌ Error creating review:', error);
-        console.error('❌ Error response:', error.response?.data);
-      }
-      throw error;
+  uploadImage: async (file: any): Promise<{url: string}> => {
+    if (file.fileSize && file.fileSize > MAX_UPLOAD_BYTES) {
+      throw new ApiError('http', 413, 'Ảnh vượt quá 2 MB');
     }
+    const formData = new FormData();
+    formData.append('file', {
+      uri: file.uri,
+      type: file.type || 'image/jpeg',
+      name: file.fileName || `photo_${Date.now()}.jpg`,
+    } as any);
+    return apiCall<{url: string}>({
+      method: 'post',
+      url: '/uploads',
+      data: formData,
+      headers: {'Content-Type': 'multipart/form-data'},
+      timeout: UPLOAD_TIMEOUT_MS,
+    });
   },
 
-  /**
-   * Upload image to NocoDB Storage
-   * @param file File object from image picker
-   * @returns Object with url/path of uploaded image
-   */
-  uploadImage: async (file: any) => {
-    try {
-      const formData = new FormData();
-
-      // NocoDB expects 'files' (plural) as field name
-      formData.append('files', {
-        uri: file.uri,
-        type: file.type || 'image/jpeg',
-        name: file.fileName || `photo_${Date.now()}.jpg`,
-      } as any);
-
-      const res = await request.post(URL_UPLOAD, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-
-      // NocoDB trả về array of uploaded files
-      // Format: [{ url: "...", signedUrl: "...", title: "...", mimetype: "...", size: ... }]
-      // ⚠️ QUAN TRỌNG: Phải dùng signedUrl thay vì url để tránh 403 Forbidden
-      if (res.data && Array.isArray(res.data) && res.data.length > 0) {
-        const uploadedFile = res.data[0];
-        if (__DEV__) {console.log('📸 Image uploaded successfully');}
-
-        return {
-          // Dùng signedUrl (có quyền truy cập) thay vì url (private)
-          url: uploadedFile.signedUrl || uploadedFile.url,
-          title: uploadedFile.title,
-        };
-      }
-
-      throw new Error('Upload response invalid');
-    } catch (error: any) {
-      if (__DEV__) {console.error('❌ Error uploading image:', error);}
-      throw error;
-    }
-  },
+  // P7: NocoDB implementations retained for recovery history (removed at P12).
+  // /**
+  // * Get all reviews from NocoDB
+  // * Reviews nằm trong field 'reviews' của bảng Locations
+  // * Uses caching to avoid redundant API calls
+  // */
+  // getReviews: async (forceRefresh: boolean = false) => {
+  //  try {
+  //    // Lấy tất cả locations với reviews (uses location cache)
+  //    const locations = await locationApi.getLocations(forceRefresh);
+  //
+  //    // Extract tất cả reviews từ locations
+  //    let allReviews: IReview[] = [];
+  //    locations.forEach(location => {
+  //      if (location.reviews && Array.isArray(location.reviews)) {
+  //        // Gắn location vào mỗi review và parse images nếu cần
+  //        const reviewsWithLocation = location.reviews.map((review: IReview) => {
+  //          const parsedReview = {...review};
+  //
+  //          // Parse images nếu là JSON string
+  //          if (parsedReview.images && typeof parsedReview.images === 'string') {
+  //            try {
+  //              parsedReview.images = JSON.parse(parsedReview.images);
+  //            } catch (e) {
+  //              if (__DEV__) {console.error('Error parsing review images:', e);}
+  //              parsedReview.images = [];
+  //            }
+  //          }
+  //
+  //          // Gắn location
+  //          parsedReview.location = location;
+  //
+  //          return parsedReview;
+  //        });
+  //        allReviews = allReviews.concat(reviewsWithLocation);
+  //      }
+  //    });
+  //
+  //    if (__DEV__) {console.log('✅ Total reviews from cloud:', allReviews.length);}
+  //
+  //    return allReviews;
+  //  } catch (error) {
+  //    if (__DEV__) {console.error('❌ Error fetching reviews:', error);}
+  //    throw error;
+  //  }
+  // },
+  //
+  // /**
+  // * Create a new review
+  // * Reviews nằm trong field 'reviews' của Location, nên cần:
+  // * 1. Lấy location hiện tại
+  // * 2. Thêm review mới vào array reviews
+  // * 3. Update location với reviews mới
+  // */
+  // createReview: async (review: Partial<IReview>) => {
+  //  try {
+  //    const locationId = review.location?.id;
+  //    if (!locationId) {
+  //      throw new Error('Location ID is required');
+  //    }
+  //
+  //    if (__DEV__) {console.log('📝 Creating review for location:', locationId);}
+  //
+  //    // 1. Lấy location hiện tại
+  //    const res = await request.get(`${URL_GET_LOCATIONS}/${locationId}`);
+  //    const location = res.data;
+  //
+  //    // 2. Parse reviews hiện tại
+  //    let currentReviews: any[] = [];
+  //    if (location.reviews) {
+  //      if (typeof location.reviews === 'string') {
+  //        try {
+  //          currentReviews = JSON.parse(location.reviews);
+  //        } catch (e) {
+  //          if (__DEV__) {console.error('Error parsing current reviews:', e);}
+  //          currentReviews = [];
+  //        }
+  //      } else if (Array.isArray(location.reviews)) {
+  //        currentReviews = location.reviews;
+  //      }
+  //    }
+  //
+  //    // 3. Thêm review mới (không bao gồm location để tránh circular reference)
+  //    const newReview = {
+  //      id: review.id,
+  //      content: review.content,
+  //      name_user_review: review.name_user_review,
+  //      time_review: review.time_review,
+  //      start: review.start,
+  //      avatar: review.avatar,
+  //      images: review.images || [], // Giữ nguyên array, sẽ stringify khi lưu vào NocoDB
+  //    };
+  //    currentReviews.push(newReview);
+  //
+  //    // 4. Update location với reviews mới
+  //    // NocoDB PATCH endpoint: /api/v2/tables/{tableId}/records
+  //    // Body phải là array: [{Id: ..., field: ...}]
+  //
+  //    const updateUrl = URL_GET_LOCATIONS;
+  //    const updatePayload = [
+  //      {
+  //        Id: locationId, // Primary key field (viết hoa)
+  //        reviews: JSON.stringify(currentReviews),
+  //      },
+  //    ];
+  //
+  //    const updateRes = await request.patch(updateUrl, updatePayload);
+  //
+  //    // Clear cache after creating review to ensure fresh data
+  //    clearLocationsCache();
+  //
+  //    if (__DEV__) {console.log('✅ Review added to location:', locationId);}
+  //    return updateRes.data;
+  //  } catch (error: any) {
+  //    if (__DEV__) {
+  //      console.error('❌ Error creating review:', error);
+  //      console.error('❌ Error response:', error.response?.data);
+  //    }
+  //    throw error;
+  //  }
+  // },
+  //
+  // /**
+  // * Upload image to NocoDB Storage
+  // * @param file File object from image picker
+  // * @returns Object with url/path of uploaded image
+  // */
+  // uploadImage: async (file: any) => {
+  //  try {
+  //    const formData = new FormData();
+  //
+  //    // NocoDB expects 'files' (plural) as field name
+  //    formData.append('files', {
+  //      uri: file.uri,
+  //      type: file.type || 'image/jpeg',
+  //      name: file.fileName || `photo_${Date.now()}.jpg`,
+  //    } as any);
+  //
+  //    const res = await request.post(URL_UPLOAD, formData, {
+  //      headers: {
+  //        'Content-Type': 'multipart/form-data',
+  //      },
+  //    });
+  //
+  //    // NocoDB trả về array of uploaded files
+  //    // Format: [{ url: "...", signedUrl: "...", title: "...", mimetype: "...", size: ... }]
+  //    // ⚠️ QUAN TRỌNG: Phải dùng signedUrl thay vì url để tránh 403 Forbidden
+  //    if (res.data && Array.isArray(res.data) && res.data.length > 0) {
+  //      const uploadedFile = res.data[0];
+  //      if (__DEV__) {console.log('📸 Image uploaded successfully');}
+  //
+  //      return {
+  //        // Dùng signedUrl (có quyền truy cập) thay vì url (private)
+  //        url: uploadedFile.signedUrl || uploadedFile.url,
+  //        title: uploadedFile.title,
+  //      };
+  //    }
+  //
+  //    throw new Error('Upload response invalid');
+  //  } catch (error: any) {
+  //    if (__DEV__) {console.error('❌ Error uploading image:', error);}
+  //    throw error;
+  //  }
+  // },
 
   /**
    * Calculate average rating for a location

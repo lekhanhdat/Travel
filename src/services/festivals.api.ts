@@ -1,5 +1,6 @@
 import {FestivalDTO} from './catalog.adapter';
 import catalogRepository from './catalogRepository';
+import reviewsApi from './reviews.api';
 import {request} from './axios';
 
 // ========================================
@@ -19,6 +20,7 @@ export const URL_UPDATE_FESTIVAL = `/api/v2/tables/${FESTIVALS_TABLE_ID}/records
 
 export interface IFestivalReview {
   id: number;
+  accountId?: number; // P7: author's account (BE reviews)
   content: string;
   name_user_review: string;
   fullName?: string; // Full name of user (preferred over name_user_review)
@@ -212,29 +214,48 @@ const festivalsApi = {
   },
 
   /**
-   * Thêm review vào festival
+   * Thêm review vào festival (P7: POST /reviews; rating tính ở BE từ bảng reviews)
    */
   addReview: async (festivalId: number, review: IFestivalReview): Promise<void> => {
-    try {
-      const festival = await festivalsApi.getFestivalById(festivalId);
-      if (!festival) {
-        throw new Error('Festival not found');
-      }
-
-      const currentReviews = festival.reviews || [];
-      currentReviews.push(review);
-
-      await festivalsApi.updateFestival(festivalId, {
-        reviews: currentReviews,
-        rating: currentReviews.reduce((sum, r) => sum + r.start, 0) / currentReviews.length,
-      });
-
-      console.log('✅ Review added to festival:', festivalId);
-    } catch (error) {
-      console.error('❌ Error adding review:', error);
-      throw error;
-    }
+    await reviewsApi.create({
+      festival_id: festivalId,
+      rating: review.start,
+      content: review.content,
+      images: review.images ?? [],
+    });
   },
+
+  /**
+   * Review của một festival (mới nhất trước) từ GET /reviews.
+   */
+  getReviews: async (festivalId: number): Promise<IFestivalReview[]> =>
+    reviewsApi.list({festival_id: festivalId}),
+
+  // P7: NocoDB version retained for recovery history (removed at P12).
+  // /**
+  //  * Thêm review vào festival
+  //  */
+  // addReview: async (festivalId: number, review: IFestivalReview): Promise<void> => {
+  //   try {
+  //     const festival = await festivalsApi.getFestivalById(festivalId);
+  //     if (!festival) {
+  //       throw new Error('Festival not found');
+  //     }
+  //
+  //     const currentReviews = festival.reviews || [];
+  //     currentReviews.push(review);
+  //
+  //     await festivalsApi.updateFestival(festivalId, {
+  //       reviews: currentReviews,
+  //       rating: currentReviews.reduce((sum, r) => sum + r.start, 0) / currentReviews.length,
+  //     });
+  //
+  //     console.log('✅ Review added to festival:', festivalId);
+  //   } catch (error) {
+  //     console.error('❌ Error adding review:', error);
+  //     throw error;
+  //   }
+  // },
 
   /**
    * Lấy festivals theo tháng (dựa vào event_time)

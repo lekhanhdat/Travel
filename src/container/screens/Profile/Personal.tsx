@@ -195,6 +195,9 @@ export default class ProfileScreen extends React.PureComponent<
         mediaType: 'photo',
         quality: 0.8,
         selectionLimit: 1,
+        // P7: avatars are small; keeps the upload far below the BE limit (2 MB).
+        maxWidth: 800,
+        maxHeight: 800,
       },
       async response => {
         if (response.didCancel) {
@@ -229,7 +232,7 @@ export default class ProfileScreen extends React.PureComponent<
     this.setState({uploadingAvatar: true, showAvatarPreview: false});
 
     try {
-      // Upload to NocoDB
+      // P7: upload qua BE (POST /uploads → GCS)
       const uploadResult = await locationApi.uploadImage({
         uri: previewAvatarUri,
         type: 'image/jpeg',

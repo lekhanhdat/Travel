@@ -2,7 +2,7 @@
 
 Theo [MIGRATION_AUDIT.md](MIGRATION_AUDIT.md): quyết định (mục 2), kiểm kê F01–F38 (mục 3), kiến trúc đích (mục 5), danh sách Clean CF/CB (mục 6), chi phí + key (mục 7). Mỗi phase chỉ bắt đầu khi User duyệt; xong thì tick và ghi một dòng nhật ký.
 
-**Thứ tự:** P0–P6 ✅ → P7 upload + reviews + Bảng tin → P8 `objects` + Camera → P9 AI → P10 payment sang Neon/Cloud Run (giữ tắt) → P11 i18n + dịch nội dung + Hotels → P12 CLEAN → P13 nghiệm thu Android → P14 phát hành. Sau đó: Nợ N1–N4. Refactor/tối ưu: Backlog.
+**Thứ tự:** P0–P7 ✅ → P8 `objects` + Camera → P9 AI → P10 payment sang Neon/Cloud Run (giữ tắt) → P11 i18n + dịch nội dung + Hotels → P12 CLEAN → P13 nghiệm thu Android → P14 phát hành. Sau đó: Nợ N1–N4. Refactor/tối ưu: Backlog.
 
 **Quy tắc:** dùng lại / mở comment code có sẵn, không viết lại tính năng tương tự. Không xóa code/tài liệu có sẵn trước P12. Không dữ liệu fix cứng, không secret trong repo. Dịch vụ bên thứ ba chỉ gọi qua BE, key ở Secret Manager `travel-app-config`. NocoDB → Neon, DigitalOcean → Cloud Run, sau migration không còn dính dáng (P12.9). Không copy dữ liệu export vào repo.
 
@@ -43,26 +43,28 @@ Theo [MIGRATION_AUDIT.md](MIGRATION_AUDIT.md): quyết định (mục 2), kiểm
 
 **Nghiệm thu:** User thử trên emulator 30/10 — đăng ký, đăng nhập (cả tài khoản seed), sửa hồ sơ, đổi mật khẩu, đăng xuất (về Home), đổi ngôn ngữ, xóa tài khoản; guest vẫn xem catalog/map: pass.
 
-## P7 — Upload ảnh + reviews ghi qua BE + Bảng tin (F15–F18)
+## P7 — Upload ảnh + reviews ghi qua BE + Bảng tin (F15–F18) ✅
 Phụ thuộc: P6. Ước lượng: BE M + FE M.
-- [ ] **P7.0 Chốt nhà cung cấp ảnh.** Thử key imgbb từ Cloud Run/Singapore (máy dev bị imgbb chặn, lỗi 103). Được → imgbb. Vẫn lỗi → bucket GCS trong `travel2026-511805` (ADC runtime SA, public-read, quota/user, ~7.000 VND/GB lưu+tải); sửa P7.1/P8.3 tương ứng.
-- [ ] **P7.1 BE `POST /uploads`** (JWT, `image/jpeg|png|webp`, ≤ 2 MB, quota/user/ngày) → trả `{url, delete_url}`.
-  - Dùng lại: `service.image_to_url` (`service.py:189-210`) tách thành hàm chung cho upload + detect (tham số `expiration`); bỏ comment `python-multipart`, `requests` trong `requirements.txt`.
+- [x] **P7.0 Chốt nhà cung cấp ảnh.** imgbb trả 103 cả từ Cloud Run Singapore (30/10, chặn theo tài khoản) → **GCS** bucket `travel2026-511805-uploads` (`us-central1`, Always Free; public-read; runtime SA ghi bằng ADC, không key; lifecycle xóa `tmp/` sau 1 ngày cho detect P8).
+- [x] **P7.1 BE `POST /uploads`** (JWT, `image/jpeg|png|webp` theo chữ ký file, ≤ 2 MB, 20 ảnh/user/ngày) → trả `{url}`.
+  - `core_api/uploads.py`: `store_image` dùng chung cho upload + detect P8 (`temporary=True` → `tmp/`, thay tham số `expiration` của imgbb); GCS JSON API bằng urllib + token metadata (không thêm `requests`); bỏ comment `python-multipart`. Module `uploads` + env `UPLOAD_BUCKET`.
   - Test: `tests/check_uploads.py` (415, 413, 401, 429, nhà cung cấp lỗi → 502).
-- [ ] **P7.2 Migration `008_reviews.sql`** (`reviews`, `review_reports`, index `location_id`/`festival_id`, quyền runtime). Bảng bắt đầu rỗng.
-- [ ] **P7.3 BE reviews + rating.**
+- [x] **P7.2 Migration `008_reviews.sql`** (`reviews`, `review_reports`, index `location_id`/`festival_id`, quyền runtime). Bảng bắt đầu rỗng.
+- [x] **P7.3 BE reviews + rating.**
   - Endpoint: `GET /reviews?location_id|festival_id&limit&offset` (công khai, không email), `POST /reviews` (JWT, 1–5 sao, giới hạn độ dài, ảnh phải từ `/uploads`), `DELETE /reviews/{id}` (chủ review), `POST /reviews/{id}/report`; rate limit.
   - Catalog: `rating` = AVG review hiển thị + `review_count`; mảng `reviews` trả `[]` tới khi bỏ cột ở P12.
   - Dùng lại: shape `IReview`/`IFestivalReview`, `calculateAverageRating`, `core_api/catalog.py` (ETag).
   - Test: `tests/check_reviews.py` (tạo/đọc/xóa/report, rating đúng, review ẩn không tính, ETag đổi); `check_contract.py` thêm `review_count`.
-- [ ] **P7.4 FE service:** `locations.api.getReviews/createReview/uploadImage`, `festivals.api.addReview` gọi BE (giữ chữ ký); adapter thêm `review_count`; mở nút đổi avatar (`Personal`).
-- [ ] **P7.5 FE Bảng tin + Detail.**
+- [x] **P7.4 FE service:** `locations.api.getReviews/createReview/uploadImage`, `festivals.api.addReview` gọi BE (giữ chữ ký); adapter thêm `review_count`; mở nút đổi avatar (`Personal`).
+- [x] **P7.5 FE Bảng tin + Detail.**
   - Sửa: `AppContainer.tsx:26,258-274` (mở `NewFeedScreen` + tab Feed), `ENABLE_FEED`, `ENABLE_UPLOAD`; `DetailLocation`/`DetailFestival` đọc `GET /reviews`; nút "Báo cáo" trong `ReviewItem`.
   - Dùng lại: toàn bộ `NewFeedScreen` (BottomSheet, sao, `launchImageLibrary`, lọc địa điểm).
   - Nghiệm thu: review có ảnh hiện ở Feed + Detail, rating cập nhật; guest đọc được, viết thì mời đăng nhập.
   - Test: `__tests__/newFeed.test.js`; `guestNavigation.test.js` (tab Feed).
 
-**Nghiệm thu P7:** luồng review đầy đủ trên emulator; không request NocoDB/Firebase.
+**Nghiệm thu P7:** luồng review đầy đủ trên emulator; không request NocoDB/Firebase — User thử emulator 30/10: pass.
+
+**Deploy P7 (30/10):** bucket `travel2026-511805-uploads`, migration 008 + quyền 003 (kiểm live PASS); image `sha256:66e11a46…` → revision `travel-api-00006-rx4` (100% traffic); rollback về `travel-api-00005-82j`. Smoke: `uploads`/`reviews` operational, ready, `/reviews` rỗng, catalog có `review_count`.
 
 ## P8 — Bảng `objects` (Items = Objects) + Camera / nhận diện (F19, F20)
 Phụ thuộc: P7. Ước lượng: BE M + FE S.
@@ -174,3 +176,4 @@ Mỗi mục một commit riêng. Không refactor, không tối ưu.
 | 30/10/2026 | Kế hoạch | Kiểm kê 38 tính năng; User chốt quyết định (audit mục 2); kiểm tra key; thêm P5–P14 + Nợ |
 | 30/10/2026 | P5 | Auth + accounts BE, FE chặn lộ key; migration 007 + quyền 002, import 3 accounts + 7 transactions; deploy `d06a0c3c…`; đăng nhập seed OK. FE `39fc44a` (jest 122 pass, tsc 62); BE PASS |
 | 30/10/2026 | P6 | `api.client` + `auth.api` qua BE; Login/SignUp/Personal/Profile mở lại; xóa tài khoản; `requireLogin`; đăng xuất về Home. Jest CI 13 suite 142 pass, tsc 62. User nghiệm thu emulator: pass |
+| 30/10/2026 | P7 | imgbb 103 cả từ Cloud Run → GCS; `/uploads`, `/reviews` (+report, ẩn sau 3 báo cáo), rating/`review_count` từ bảng reviews; migration 008 + quyền 003; Feed/Detail/avatar. Deploy `travel-api-00006-rx4` (`66e11a46…`). Jest CI 14 suite 154 pass, tsc 62; BE 6 test PASS. User nghiệm thu emulator: pass |

@@ -36,7 +36,7 @@ RN app (Android) ── catalog.client / (P6) api.client ──HTTPS──► Cl
 | D5 | NocoDB → Neon, DigitalOcean → Cloud Run; sau migration không còn dính dáng (P12.9) |
 | D6 | Dùng lại / mở comment code có sẵn; chỉ xóa ở P12 khi User duyệt từng mục; file tạm dọn ngay trong phase |
 | D7 | Auth: hash scrypt; hash cũ `SHA256(password + salt)` tự nâng cấp khi đăng nhập; JWT 30 ngày + `token_version` |
-| D8 | Ảnh: ưu tiên miễn phí, một nhà cung cấp → imgbb (máy dev bị chặn, thử từ Cloud Run ở P7.0; dự phòng GCS). Bỏ Firebase |
+| D8 | Ảnh: ưu tiên miễn phí, một nhà cung cấp → **GCS** `travel2026-511805-uploads` (`us-central1`, Always Free) vì imgbb trả 103 cả từ Cloud Run (P7.0). Bỏ Firebase, imgbb |
 | D9 | Bảng `reviews` là nguồn duy nhất của review và rating (`rating` = AVG, kèm `review_count`); bỏ cột `reviews`/`rating` của catalog ở P12; không import review cũ |
 | D10 | Items = Objects (+ `data.py`) → một bảng `objects`, dùng làm dữ liệu RAG |
 | D11 | Bật đủ AI (OpenAI trả trước 5 USD); FAISS build lại từ Neon lúc build image |
@@ -154,7 +154,7 @@ Trong 22 tính năng 💤/🚩, có **15** tính năng vẫn trỏ tới NocoDB 
 | G12 | Medium | Suite test hỏng từ trước: `App.test`, `semantic.api`, `RecommendationsWidget`, `SimilarItemsComponent`, `languageSwitching`, `AzureTranslatorService` | Sửa trong P9, P11, P13; Azure bỏ cùng CF21 |
 | G13 | Medium | `IAccount.Id`, `IItem.Id`, `ITransaction.Id` còn khóa NocoDB | P6.2, P8.4, P10 |
 | G15 | Medium | Bundle JS cũ và APK release 93 MB đang được track trong git | CF22 |
-| G17 | Low | imgbb không xóa ảnh được qua API (chỉ `delete_url` dạng trang web) → xóa tài khoản không tự xóa ảnh | Lưu `delete_url`; ghi trong Policy |
+| G17 | Low | Xóa review/tài khoản chưa xóa ảnh trên GCS (ảnh vẫn public theo URL) | Xóa object theo prefix `uploads/{id}/` (cần quyền delete) ở P12/P14; ghi trong Policy |
 
 ---
 
@@ -175,15 +175,15 @@ Trong 22 tính năng 💤/🚩, có **15** tính năng vẫn trỏ tới NocoDB 
           │            rating + review_count tính từ bảng reviews)                    │
           │ auth     : /auth/signup|login · /me (GET/PATCH/DELETE) · đổi mật khẩu     │
           │ reviews  : GET/POST/DELETE /reviews · POST /reviews/{id}/report           │
-          │ uploads  : POST /uploads → imgbb (ảnh ≤ 2 MB, chỉ user)                   │
-          │ detect   : POST /detect → imgbb (tạm 600 s) → SerpAPI Lens → OpenAI       │
+          │ uploads  : POST /uploads → GCS (ảnh ≤ 2 MB, chỉ user)                     │
+          │ detect   : POST /detect → GCS tmp/ (1 ngày) → SerpAPI Lens → OpenAI       │
           │ AI       : /api/v1/search|similar|recommendations|chat|memory (router cũ) │
           │ NỢ (code đã chuyển sang Neon/Cloud Run nhưng để tắt):                     │
           │            quên mật khẩu qua email · /payments/* · /webhook/payos         │
           └──┬──────────────┬──────────────────────┬───────────────────────┬──────────┘
              │ pooled TLS   │ Secret Manager       │ HTTPS                 │ HTTPS
              ▼              ▼                      ▼                       ▼
-        Neon PostgreSQL   1 secret JSON +       imgbb (ảnh)            OpenAI, SerpAPI
+        Neon PostgreSQL   1 secret JSON +       GCS (ảnh)              OpenAI, SerpAPI
         (catalog, accounts, DB URL riêng
          transactions, reviews,
          objects, user_memories,
@@ -193,7 +193,7 @@ Trong 22 tính năng 💤/🚩, có **15** tính năng vẫn trỏ tới NocoDB 
 Không còn: NocoDB, DigitalOcean, Firebase, Azure Translator, SendGrid gọi từ app, Unsplash.
 
 ### 5.1 Nguyên tắc
-- App chỉ nói chuyện với **Cloud Run**, host ảnh (catalog + imgbb), Mapbox. Mọi key trả phí chỉ nằm ở Secret Manager; `.env` của FE chỉ còn `CATALOG_API_URL`, `API_BASE_URL` (cùng URL Cloud Run), `MAPBOX_ACCESS_TOKEN` (`pk.`).
+- App chỉ nói chuyện với **Cloud Run**, host ảnh (catalog + GCS), Mapbox. Mọi key trả phí chỉ nằm ở Secret Manager; `.env` của FE chỉ còn `CATALOG_API_URL`, `API_BASE_URL` (cùng URL Cloud Run), `MAPBOX_ACCESS_TOKEN` (`pk.`).
 - **Dùng lại code đã có**: màn hình FE giữ nguyên, chỉ đổi phần ruột của service (`auth.api`, `locations.api` review/upload/items, `semantic.api`, `chatbot.api`, `payment.api`) sang gọi BE, giữ tên hàm. BE bật lại router/endpoint đang comment, thay lớp NocoDB bằng repository Neon cùng chữ ký hàm (`create_transaction`, `get_user_by_id`, `update_user_balance`, `MemoryService`…), thay URL DigitalOcean bằng Cloud Run.
 - **NocoDB và DigitalOcean phải sạch hoàn toàn** sau migration: không còn code, biến môi trường, script, file cấu hình (`.do/`, `Procfile`), tài liệu hướng dẫn hay dữ liệu mẫu nào trỏ tới hai dịch vụ này. Ngoại lệ duy nhất: phần lịch sử trong `MIGRATION_AUDIT.md`/`MIGRATION_TASKLIST.md` và lịch sử git (tiêu chí ở P12).
 - Tính năng **Nợ** (email quên mật khẩu, PayOS) vẫn phải bỏ NocoDB/DO ngay trong migration: lớp dữ liệu chuyển sang Neon, URL sang Cloud Run, nhưng endpoint/màn hình giữ tắt tới phase hoàn thiện sau.
@@ -217,8 +217,8 @@ Không còn: NocoDB, DigitalOcean, Firebase, Azure Translator, SendGrid gọi t�
 
 ### 5.3 Luồng chính
 - **Auth:** SignUp → `POST /auth/signup` (hash scrypt ở BE) → JWT; Login → JWT lưu `localStorageKey.AUTH_TOKEN`, **không lưu mật khẩu**. Tài khoản import có hash cũ: BE kiểm bằng đúng công thức cũ `SHA256(password + PASSWORD_SALT)` (`auth.api.ts:28-33`), salt chuyển vào secret; đúng thì rehash scrypt ngay. Quên mật khẩu: **Nợ** (`ForgotPasswordScreen` giữ comment).
-- **Review:** chọn ảnh → `POST /uploads` (BE đẩy lên imgbb, lưu `url` + `delete_url`) → `POST /reviews` → Feed/Detail đọc `GET /reviews?location_id=`; rating tính ở BE.
-- **Detect:** Camera → `POST /detect` (multipart, JWT) → imgbb tạm 600 s → SerpAPI Lens → OpenAI → tra `objects` → `{name, description}`.
+- **Review:** chọn ảnh → `POST /uploads` (BE ghi GCS, trả `url`) → `POST /reviews` (chỉ nhận ảnh của chính user) → Feed/Detail đọc `GET /reviews?location_id=|festival_id=`; rating tính ở BE; 3 báo cáo → ẩn.
+- **Detect:** Camera → `POST /detect` (multipart, JWT) → GCS `tmp/` (lifecycle 1 ngày) → SerpAPI Lens → OpenAI → tra `objects` → `{name, description}`.
 - **AI:** catalog + `objects` trong Neon → script build FAISS (OpenAI embeddings) lúc build image → `/api/v1/search|similar|recommendations`; `objects` là nguồn RAG cho search/chatbot; Chat → `/api/v1/chat/rag` (RAG + memory theo user).
 - **Payment (Nợ):** code chạy trên Neon/Cloud Run nhưng endpoint tắt. Khi hoàn thiện: Donation → `POST /payments/create` → PayOS → webhook có chữ ký → PAID + cộng `balance` (idempotent theo `order_code`).
 
@@ -228,7 +228,7 @@ Không còn: NocoDB, DigitalOcean, Firebase, Azure Translator, SendGrid gọi t�
 | P0–P4 | Đã xong (guest catalog + map) | — |
 | **P5** ✅ | Nền BE: kiểm tra key + gom vào Secret Manager, chặn lộ key ở APK, module flag, migration 007, import accounts/transactions, auth API | — |
 | **P6** | FE Login/SignUp/Profile/Personal/Settings + xóa tài khoản (Forgot = Nợ) | P5 |
-| **P7** | Upload (imgbb) + bảng reviews + rating tính từ reviews + Bảng tin + báo cáo review | P5, P6 |
+| **P7** | Upload (GCS) + bảng reviews + rating tính từ reviews + Bảng tin + báo cáo review | P5, P6 |
 | **P8** | Bảng `objects` + Items/Camera/detect | P7 |
 | **P9** | AI: FAISS từ Neon, semantic search, tương tự, gợi ý, chatbot RAG, memory | P6, P8 |
 | **P10** | Payment: bỏ NocoDB/DO khỏi code payment, chuyển sang Neon/Cloud Run, **giữ tắt** (Nợ) | P5 |
@@ -300,7 +300,7 @@ Giả định: 1 USD ≈ 26.000 VND; demo ~100 người dùng/tháng. Guard 26.0
 | Cloud Run | Có | free tier request/vCPU-s/GiB-s; min 0, max 1 | ~0 VND | không build FAISS khi startup |
 | Artifact Registry | Có | 0,5 GB free, ~0,10 USD/GB-tháng | image AI ~0,6–0,8 GB → ~0–2.000 VND | giữ ≤ 2 image |
 | Secret Manager | Có | 6 version free, ~0,06 USD/version-tháng | 0 VND với 1 secret JSON + DB URL | gộp key (D15) |
-| imgbb (upload + ảnh tạm detect) | Không | miễn phí, ≤ 32 MB/ảnh | 0 VND | ảnh ≤ 2 MB, quota/user |
+| GCS ảnh (upload + ảnh tạm detect) | Có | Always Free `us-central1`: 5 GB lưu, 100 GB tải ra/tháng | ~0 VND (vài trăm VND nếu vượt) | ảnh ≤ 2 MB, 20 ảnh/user/ngày, `tmp/` xóa sau 1 ngày, tắt soft delete |
 | Neon | Không | Free plan (xác nhận) | 0 VND | theo dõi dashboard |
 | OpenAI | Không | gpt-4o-mini 0,15/0,60 USD mỗi 1M token vào/ra; embedding 0,02 USD/1M | chat ≈ 16 VND/tin; detect ≈ 26 VND/lần; build index ≈ 80 VND/lần; **dịch nội dung một lần (P11) ≈ 0,3 USD ≈ 8.000 VND** | User đã trả trước 5 USD (D11) |
 | SerpAPI | Không | Free Plan 250 lượt/tháng | 0 VND nếu ≤ free | đếm lượt ở BE |
@@ -314,7 +314,7 @@ Giả định: 1 USD ≈ 26.000 VND; demo ~100 người dùng/tháng. Guard 26.0
 |---|---|---|---|
 | `OPENAI_API_KEY` | `.env` BE (+ bản cũ ở `.env` FE) | ✅ có `gpt-4o-mini`, `text-embedding-3-small` | Đưa vào `travel-app-config` ở P8; xóa bản ở FE |
 | `SERPAPI_KEY` | `.env` BE (+ FE) | ✅ Free Plan, 250 lượt/tháng | Như trên |
-| `IMGBB_API_KEY` | `.env` BE | ❌ lỗi 103 từ máy dev (cả key mới) | P7.0 thử từ Cloud Run; dự phòng GCS |
+| `IMGBB_API_KEY` | `.env` BE | ❌ lỗi 103 cả từ máy dev và Cloud Run (30/10) | Không dùng (D8 → GCS); xóa khỏi `.env` ở P12 |
 | `MAPBOX_ACCESS_TOKEN` (`pk.`) | `.env` FE | ✅ | Giữ (public) |
 | `SENDGRID_API_KEY` | `.env` FE | ✅ key hợp lệ, chưa thử gửi | Giữ tới N1 |
 | `PAYOS_*` (3 key) | `.env` BE | ✅ xác thực qua | Giữ tới N2 |
@@ -337,3 +337,4 @@ Giả định: 1 USD ≈ 26.000 VND; demo ~100 người dùng/tháng. Guard 26.0
 | 30/10 | Kế hoạch | Kiểm kê 38 tính năng (mục 3); User chốt D1–D15; kiểm tra key (mục 7.1); thêm P5–P14 + Nợ |
 | 30/10 | P5 | FE: `babel.config.js` allowlist 3 biến public, bundle không còn key. BE: module `APP_FEATURES` + secret JSON; `security.py` (scrypt, JWT, rate limit), `auth.py`, `email.py` (tắt); migration 007 + quyền 002; import 3 accounts + 7 transactions (tổng giao dịch 172.000 VND, tổng `balance` 167.000 VND — giữ nguyên dữ liệu seed). Deploy `d06a0c3c…`; đăng nhập tài khoản seed bằng mật khẩu cũ thành công. FE `39fc44a` |
 | 30/10 | P6 | FE: `api.client.ts`, `auth.api.ts` gọi BE (giữ tên hàm, chỉ lưu token + hồ sơ); `IAccount.id`; mở Login/SignUp/Personal + tab Profile; xóa tài khoản; `requireLogin`; Chatbot/Ủng hộ báo "sắp có"; đăng xuất về Home. User nghiệm thu emulator: pass |
+| 30/10 | P7 | D8 đổi sang GCS `travel2026-511805-uploads` (imgbb 103 cả từ Cloud Run). BE module `uploads` + `reviews`, schema 008 + quyền 003 (bảng rỗng), catalog `rating` = AVG review + `review_count`; FE Feed/Detail/Báo cáo/avatar qua BE. Deploy `travel-api-00006-rx4`. User nghiệm thu emulator: pass |

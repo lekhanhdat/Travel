@@ -23,7 +23,7 @@ import {
 // P1: Keep deferred imports commented to avoid native/service initialization.
 import LoginScreen from './screens/Login/LoginScreen';
 import HomeScreen from './screens/Home/HomeScreen';
-// import NewFeedScreen from './screens/NewFeed/NewFeedScreen';
+import NewFeedScreen from './screens/NewFeed/NewFeedScreen';
 import MapsScreen from './screens/Maps/MapScreenV2';
 // import CameraScreen from './screens/Camera/CameraScreen';
 import ProfileScreen from './screens/Profile/ProfileScreen';
@@ -255,7 +255,8 @@ function HomeStack() {
             ),
           }}
         />
-        {/* P1: Temporarily disabled; retain for restoration.
+        {/* P7: Feed restored (reviews via BE; writing needs an account). */}
+        {FEATURE_FLAGS.ENABLE_FEED && (
         <Tabs.Screen
           name={TAB_NAMES.FEED}
           component={NewFeedScreen}
@@ -271,7 +272,7 @@ function HomeStack() {
             ),
           }}
         />
-        */}
+        )}
         {/* P4: Map restored. */}
         <Tabs.Screen
           name={TAB_NAMES.MAP}

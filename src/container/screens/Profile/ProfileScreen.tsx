@@ -80,6 +80,12 @@ class ProfileScreen extends React.PureComponent<
   };
 
   // P6: guests are sent to Login; Chatbot (P9) and Donation (debt N2) are not routed yet.
+  openDonation = async () => {
+    if (await requireLogin()) {
+      NavigationService.navigate(ScreenName.DONATION);
+    }
+  };
+
   openChatbot = async () => {
     if (await requireLogin()) {
       NavigationService.navigate(ScreenName.CHATBOT);
@@ -247,8 +253,8 @@ class ProfileScreen extends React.PureComponent<
                 alignItems: 'center',
                 justifyContent: 'center',
               }}
-              // Debt N2: restore NavigationService.navigate(ScreenName.DONATION) with the Donation route.
-              onPress={this.showComingSoon}>
+              // N2: Donation routed; guests are asked to log in first.
+              onPress={this.openDonation}>
               <TextBase style={{
                 fontSize: sizes._16sdp,
                 fontWeight: 'bold',

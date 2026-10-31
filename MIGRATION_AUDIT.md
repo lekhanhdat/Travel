@@ -209,7 +209,7 @@ Không còn: NocoDB, DigitalOcean, Firebase, Azure Translator, SendGrid gọi t�
 | 008_reviews | P7 | `reviews` (account_id FK, location_id \| festival_id, rating 1–5, content, images JSONB gồm `url` + `delete_url`, status, created_at), `review_reports`; quyền runtime INSERT/UPDATE | **không import** — 388 + 92 review cũ trong export bỏ (D9). Bảng bắt đầu rỗng; review mẫu do tài khoản seeding tạo sau (Nợ N4) |
 | 009_objects | P8 | bảng **`objects`** (gộp Items + Objects + `data.py`): record_id, title, content, images, video, location_id FK nullable, aliases | `objects.json` (11 bản ghi = 9 của `data.py` + "Cầu Rồng" + "Trường Đại học CNTT&TT Việt - Hàn"; chỉ có `title`, `content`) |
 | 010_ai_memory | P9 | `user_memories`, `conversations` (thay bảng NocoDB) | không có (bắt đầu rỗng) |
-| 011_payments | P10 | quyền INSERT/UPDATE `transactions`, UPDATE `accounts.balance` — **soạn + test, chưa áp dụng** (Nợ PayOS) | — |
+| 011_payments → `db/permissions/006_payments.sql` | P10 | chỉ quyền (không đổi schema): SELECT/INSERT/UPDATE (`payment_link_id`, `status`, `updated_at`) `transactions`, UPDATE `accounts.balance` — **soạn + test, chưa áp dụng** (Nợ PayOS N2) | — |
 | 012_i18n_content | P11 | cột `*_en` nullable cho locations/festivals/hotels/objects | script dịch một lần (OpenAI) |
 | 013_drop_legacy_catalog_columns | P12 | bỏ cột `reviews` JSONB và `rating` khỏi locations/festivals/hotels (đã thay bằng bảng `reviews`) | — |
 

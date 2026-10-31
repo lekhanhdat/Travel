@@ -94,10 +94,10 @@ Phụ thuộc: P6, P8. Ước lượng: BE L + FE M.
 
 ## P10 — Payment: bỏ NocoDB/DO, chuyển sang Neon/Cloud Run, giữ tắt (F27, F28)
 Phụ thuộc: P5. Ước lượng: BE S–M + FE S.
-- [ ] **P10.1** Soạn `011_payments.sql` (quyền `transactions`, `accounts.balance`), test fake DB, chưa áp dụng.
-- [ ] **P10.2** `core_api/payments_repo.py` thay `create_transaction`, `get_user_by_id`, `update_user_balance` của `nocodb_service.py` (giữ chữ ký).
-- [ ] **P10.3** Sửa sẵn `/payments/*`, `/webhook/payos` (`app.py:105-189`): user từ JWT, bắt buộc `verify_webhook_signature`, idempotent theo `order_code`, `PUBLIC_BASE_URL` mặc định Cloud Run; module `payments` vẫn tắt. Test: `tests/check_payments.py`.
-- [ ] **P10.4** FE `payment.api.ts` → `API_BASE_URL` + token; `Donation` giữ comment; mục "Ủng hộ" hiện "sắp có".
+- [ ] **P10.1** Quyền `db/permissions/006_payments.sql` (SELECT/INSERT/UPDATE trạng thái `transactions`, UPDATE `accounts.balance`; không đổi schema — thay cho tên `011_payments` dự kiến), test, **chưa áp dụng**.
+- [ ] **P10.2** `core_api/payments.py` `PaymentsRepository` (Neon) thay `create_transaction`, `get_user_by_id`, `update_user_balance` của `nocodb_service.py` (giữ chữ ký) + `mark_paid` (một transaction, khóa dòng).
+- [ ] **P10.3** Module `payments` (3 key PayOS, cần `auth`; **không bật** trong `service.yaml`): `/payments/create` (user từ JWT, ghi PENDING trước khi tạo link), `/payments/status/{order_code}` (chỉ chủ giao dịch), `/webhook/payos` (bắt buộc chữ ký HMAC-SHA256, idempotent theo `order_code`, sai số tiền không cộng), `/payment/return|cancel`; URL trả về = Cloud Run; SDK `payos` chỉ import khi bật. Test: `tests/check_payments.py`.
+- [ ] **P10.4** FE `payment.api.ts` → `apiCall` (`API_BASE_URL` + token, không gửi `userId`); `Donation` giữ comment; "Ủng hộ" vẫn báo "sắp có". Test: `__tests__/services/payment.api.test.js`.
 
 **Nghiệm thu P10:** code payment không còn NocoDB/DO; test PASS; không endpoint payment public.
 
@@ -149,7 +149,7 @@ Mỗi mục một commit riêng. Không refactor, không tối ưu.
 
 ## Nợ (sau migration)
 - [ ] **N1 Quên mật khẩu qua email:** chọn nhà cung cấp (key SendGrid còn hiệu lực nhưng chưa thử gửi), thêm key vào `travel-app-config`, bật module `email` (code có ở P5.6), mở `ForgotPasswordScreen` + route, test email thật.
-- [ ] **N2 PayOS / Donation:** 3 key PayOS vào secret, áp dụng `011_payments.sql`, bật module `payments`, webhook `https://travel-api-u2xcse44ca-as.a.run.app/webhook/payos` trên my.payos.vn, mở `Donation`, giao dịch thật → số dư tăng đúng 1 lần.
+- [ ] **N2 PayOS / Donation:** 3 key PayOS vào secret, áp dụng `db/permissions/006_payments.sql`, cài `payos` (SDK, bỏ comment `requirements.txt`), thử chữ ký webhook với giao dịch sandbox, bật module `payments`, webhook `https://travel-api-u2xcse44ca-as.a.run.app/webhook/payos` trên my.payos.vn, mở `Donation`, giao dịch thật → số dư tăng đúng 1 lần.
 - [ ] **N3 i18n nâng cao / dịch tự động** nếu cần thêm ngôn ngữ hoặc dịch nội dung người dùng.
 - [ ] **N4 Seeding:** sau P7 tạo tài khoản mẫu + review như reviewer, qua API (không fix cứng, không SQL tay).
 

@@ -10,7 +10,7 @@ import InputBase from '../../../component/InputBase';
 import {Button} from 'react-native-paper';
 import {AppStyle} from '../../../common/AppStyle';
 import paymentApi from '../../../services/payment.api';
-import {env} from '../../../utils/env';
+// import {env} from '../../../utils/env'; // N2: PAYOS_BACKEND_URL no longer used
 import LocalStorageCommon from '../../../utils/LocalStorageCommon';
 import {localStorageKey} from '../../../common/constants';
 import {IAccount} from '../../../common/types';
@@ -61,13 +61,14 @@ const Donation = () => {
 
   const onCreate = async () => {
     try {
-      if (!env.PAYOS_BACKEND_URL) {
-        alert('Chưa cấu hình PAYOS_BACKEND_URL trong env.local.json');
-        return;
-      }
+      // N2: payments go to the Cloud Run API (payment.api, JWT); no PAYOS_BACKEND_URL any more.
+      // if (!env.PAYOS_BACKEND_URL) {
+      //   alert('Chưa cấu hình PAYOS_BACKEND_URL trong env.local.json');
+      //   return;
+      // }
       const amt = parseInt(amount || '0', 10);
-      if (!amt || amt < 1000) {
-        alert('Số tiền không hợp lệ (>= 1.000 VND)');
+      if (!amt || amt < 1000 || amt > 50000000) {
+        alert('Số tiền không hợp lệ (1.000 – 50.000.000 VND)');
         return;
       }
       setCreating(true);
@@ -81,7 +82,12 @@ const Donation = () => {
         pollRef.current = (setInterval(async () => {
           try {
             const status = await paymentApi.getStatus(res.orderCode);
-            if (status.status === 'PAID') {
+            if (status.status === 'CANCELLED' || status.status === 'EXPIRED') {
+              if (pollRef.current != null) {clearInterval(pollRef.current as any);}
+              pollRef.current = null;
+              setQrCode(undefined);
+              alert('Mã thanh toán đã hủy hoặc hết hạn, vui lòng tạo mã mới.');
+            } else if (status.status === 'PAID') {
               if (pollRef.current != null) {clearInterval(pollRef.current as any);}
               pollRef.current = null;
               alert('Thanh toán thành công! Số dư sẽ được cộng tự động.');

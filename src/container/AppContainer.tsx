@@ -45,7 +45,7 @@ import DetailFestivalScreen from './screens/Festival/DetailFestival';
 import ViewAllFestivals from './screens/Festival/ViewAllFestivals';
 import SignUpScreen from './screens/Login/SignUpScreen';
 // import ForgotPasswordScreen from './screens/Login/ForgotPasswordScreen';
-// import Donation from './screens/Profile/Donation';
+import Donation from './screens/Profile/Donation';
 import ChatBotScreen from './screens/Profile/ChatbotScreen';
 
 export enum ScreenName {
@@ -368,9 +368,8 @@ function AppContainer() {
         component={ForgotPasswordScreen}
       />
       */}
-      {/* P1: Temporarily disabled; retain for restoration.
+      {/* N2: Donation restored (PayOS via the Cloud Run API, module payments). */}
       <Stack.Screen name="Donation" component={Donation} />
-      */}
       {/* P9: restored (RAG chat on the BE; needs an account). */}
       <Stack.Screen name="ChatBotScreen" component={ChatBotScreen} />
     </Stack.Navigator>

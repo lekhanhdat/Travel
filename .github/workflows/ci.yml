@@ -31,6 +31,7 @@ jobs:
           __tests__/services/auth.api.test.js __tests__/authFlow.test.js __tests__/newFeed.test.js
           __tests__/camera.test.js __tests__/chatbot.test.js __tests__/services/semantic.api.test.ts
           __tests__/components/RecommendationsWidget.test.tsx __tests__/components/SimilarItemsComponent.test.tsx
+          __tests__/services/payment.api.test.js
       - name: tsc (baseline 62 errors, must not grow)
         run: |
           count=$(node node_modules/typescript/bin/tsc --noEmit | grep -c "error TS" || true)

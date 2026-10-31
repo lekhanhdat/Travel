@@ -18,6 +18,10 @@ jest.mock('../src/container/screens/Festival/DetailFestival', () => 'DetailFesti
 jest.mock('../src/container/screens/Festival/ViewAllFestivals', () => 'AllFestivals');
 // P7: Feed tab (screen covered by __tests__/newFeed.test.js).
 jest.mock('../src/container/screens/NewFeed/NewFeedScreen', () => 'Feed');
+// P8: Camera tab (covered by __tests__/camera.test.js); vision-camera stays unloaded.
+jest.mock('../src/container/screens/Camera/CameraScreen', () => 'Camera');
+jest.mock('../src/container/screens/Camera/PreviewImage', () => 'PreviewImage');
+jest.mock('react-native-vision-camera', () => {throw new Error('Guest must not initialize the camera');});
 jest.mock('../src/container/screens/Profile/Settings', () => 'Settings');
 jest.mock('../src/container/screens/Profile/FAQ', () => 'FAQ');
 jest.mock('../src/container/screens/Profile/Policy', () => 'Policy');
@@ -35,15 +39,15 @@ jest.mock('../src/services/auth.api', () => {throw new Error('Guest must not ini
 jest.mock('../src/services/chatbot.api', () => {throw new Error('Guest must not initialize Chatbot');});
 jest.mock('../src/services/payment.api', () => {throw new Error('Guest must not initialize Payment');});
 
-it('registers guest + account routes and Home/Festival/Feed/Map/Profile tabs without initializing deferred modules', () => {
+it('registers guest + account routes and Home/Festival/Feed/Map/Camera/Profile tabs without initializing deferred modules', () => {
   const AppContainer = require('../src/container/AppContainer').default;
   const {offlineFallback} = require('../src/services/translation');
   let tree;
   renderer.act(() => {tree = renderer.create(React.createElement(AppContainer));});
   const routes = tree.root.findAllByType('Route').map(route => route.props.name);
-  expect(routes).toEqual(['HomeStack', 'LoginScreen', 'ViewAllLocation', 'DetailLocationScreen', 'MapsScreen', 'LocationImage',
-    'LocationVideo', 'Personal', 'Settings', 'FAQ', 'Policy', 'About', 'Advise', 'SearchScreen', 'DetailFestivalScreen',
-    'ViewAllFestivals', 'SignUpScreen']);
+  expect(routes).toEqual(['HomeStack', 'LoginScreen', 'ViewAllLocation', 'DetailLocationScreen', 'PreviewImage', 'MapsScreen',
+    'LocationImage', 'LocationVideo', 'Personal', 'Settings', 'FAQ', 'Policy', 'About', 'Advise',
+    'SearchScreen', 'DetailFestivalScreen', 'ViewAllFestivals', 'SignUpScreen']);
   // Debt N1 / P9 / N2: still out of navigation.
   expect(routes).not.toEqual(expect.arrayContaining(['ForgotPasswordScreen']));
   expect(routes).not.toContain('ChatBotScreen');
@@ -52,7 +56,7 @@ it('registers guest + account routes and Home/Festival/Feed/Map/Profile tabs wit
   const HomeStack = tree.root.findAllByType('Route')[0].props.component;
   let tabs;
   renderer.act(() => {tabs = renderer.create(React.createElement(HomeStack));});
-  expect(tabs.root.findAllByType('Tab').map(tab => tab.props.name)).toEqual(['TabHome', 'TabFestival', 'TabFeed', 'TabMap', 'TabProfile']);
+  expect(tabs.root.findAllByType('Tab').map(tab => tab.props.name)).toEqual(['TabHome', 'TabFestival', 'TabFeed', 'TabMap', 'TabCamera', 'TabProfile']);
   expect(offlineFallback.initialize).not.toHaveBeenCalled();
   tree.unmount();
   tabs.unmount();

@@ -9,7 +9,7 @@ export const FEATURE_FLAGS = {
   ENABLE_UPLOAD: true,
   ENABLE_ITEMS: false,
   ENABLE_FEED: true,
-  ENABLE_CAMERA: false,
+  ENABLE_CAMERA: true,
   USE_AZURE_TRANSLATOR: false,
   ENABLE_OFFLINE_CACHE: false,
   ENABLE_TRANSLATION_BATCHING: false,

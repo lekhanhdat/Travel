@@ -2,7 +2,7 @@
 
 Theo [MIGRATION_AUDIT.md](MIGRATION_AUDIT.md): quyết định (mục 2), kiểm kê F01–F38 (mục 3), kiến trúc đích (mục 5), danh sách Clean CF/CB (mục 6), chi phí + key (mục 7). Mỗi phase chỉ bắt đầu khi User duyệt; xong thì tick và ghi một dòng nhật ký.
 
-**Thứ tự:** P0–P7 ✅ → P8 `objects` + Camera → P9 AI → P10 payment sang Neon/Cloud Run (giữ tắt) → P11 i18n + dịch nội dung + Hotels → P12 CLEAN → P13 nghiệm thu Android → P14 phát hành. Sau đó: Nợ N1–N4. Refactor/tối ưu: Backlog.
+**Thứ tự:** P0–P8 ✅ → P9 AI → P10 payment sang Neon/Cloud Run (giữ tắt) → P11 i18n + dịch nội dung + Hotels → P12 CLEAN → P13 nghiệm thu Android → P14 phát hành. Sau đó: Nợ N1–N4. Refactor/tối ưu: Backlog.
 
 **Quy tắc:** dùng lại / mở comment code có sẵn, không viết lại tính năng tương tự. Không xóa code/tài liệu có sẵn trước P12. Không dữ liệu fix cứng, không secret trong repo. Dịch vụ bên thứ ba chỉ gọi qua BE, key ở Secret Manager `travel-app-config`. NocoDB → Neon, DigitalOcean → Cloud Run, sau migration không còn dính dáng (P12.9). Không copy dữ liệu export vào repo.
 
@@ -66,18 +66,18 @@ Phụ thuộc: P6. Ước lượng: BE M + FE M.
 
 **Deploy P7 (30/10):** bucket `travel2026-511805-uploads`, migration 008 + quyền 003 (kiểm live PASS); image `sha256:66e11a46…` → revision `travel-api-00006-rx4` (100% traffic); rollback về `travel-api-00005-82j`. Smoke: `uploads`/`reviews` operational, ready, `/reviews` rỗng, catalog có `review_count`.
 
-## P8 — Bảng `objects` (Items = Objects) + Camera / nhận diện (F19, F20)
+## P8 — Bảng `objects` (Items = Objects) + Camera / nhận diện (F19, F20) ✅
 Phụ thuộc: P7. Ước lượng: BE M + FE S.
-- [ ] **P8.1 Dữ liệu:** `009_objects.sql` (`record_id`, `title`, `content`, `images`, `video`, `location_id` FK nullable, `aliases`); script import một lần từ `objects.json` (11 bản ghi, gồm 9 của `data.py`); xóa script sau khi đối chiếu.
-- [ ] **P8.2 BE `GET /objects`** (phân trang, gzip/ETag; dùng lại `core_api/catalog.py`, `models.py`). Test: `check_core_api.py`, `check_contract.py`.
-- [ ] **P8.3 BE `/detect` bật lại.**
-  - Sửa: `app.py:18,92-96` (route + JWT + quota/ngày); `service.py` tra bảng `objects` thay NocoDB, ảnh tạm qua hàm upload chung (`expiration=600`), bỏ nhánh Firebase, khởi tạo OpenAI/SerpAPI lười; bỏ comment `openai`, `serpapi`; key vào `travel-app-config`.
-  - Dùng lại: pipeline `get_object_name` (Lens → OpenAI → khớp tên có sẵn).
-  - Test: `tests/check_detect.py` (khớp object → mô tả DB; không khớp → OpenAI; 429; thiếu key → 503).
-- [ ] **P8.4 FE Items:** `locations.api.getItems/getItemsWithLocationId` → `GET /objects` (nạp lười; `title`→`name`, `content`→`description`); khôi phục JSX mục Items ở `FestivalsScreen` từ `git show 3583e90^:src/container/screens/Festival/FestivalsScreen.tsx` + renderer (`:114-118`); mở route `DetailItem`, `ViewAllItem` (`AppContainer.tsx:41-42,353-358`); `ENABLE_ITEMS`; `IItem.Id` → `id`; `DetailItem.tsx:15` bỏ `DB_URL`. Test: `__tests__/items.test.js`.
-- [ ] **P8.5 FE Camera:** mở `CameraScreen`, `PreviewImage` + tab Camera (`AppContainer.tsx:28,32,289-303,337-339`); `SERVER_URL` → `API_BASE_URL` (`CameraScreen.tsx:96,186`, `PreviewImage.tsx`); gửi JWT; `ENABLE_CAMERA`. Test: `__tests__/camera.test.js`.
+- [x] **P8.1 Dữ liệu:** `009_objects.sql` (`record_id`, `title`, `content`, `images`, `video`, `location_id` FK nullable, `aliases`); script import một lần từ `objects.json` (11 bản ghi, gồm 9 của `data.py`); xóa script sau khi đối chiếu.
+- [x] **P8.2 BE `GET /objects`** (phân trang, gzip/ETag; dùng lại `core_api/catalog.py`, `models.py`). Test: `check_core_api.py`, `check_contract.py`.
+- [x] **P8.3 BE `/detect` bật lại.** `core_api/detect.py` (module `detect`, cần `auth` + `uploads`): port pipeline `service.get_object_name/get_full_description` (cùng prompt; Lens → OpenAI → khớp `objects` theo title/alias rồi prompt "available object" → mô tả DB, không khớp thì OpenAI viết). OpenAI/SerpAPI gọi bằng urllib (image không cần SDK/Firebase/NocoDB). Ảnh tạm `store_image(temporary=True)` → `tmp/<ngày>/` (≤ 8 MB, lifecycle 1 ngày). Quota 5/user/ngày + 8/ngày tổng (SerpAPI free 250/tháng). Key `OPENAI_API_KEY`, `SERPAPI_KEY` → `travel-app-config:2`; Cloud Run timeout 60 s.
+  - Test: `tests/check_detect.py` (khớp title/alias/OpenAI → mô tả DB; không khớp → OpenAI; 404; 413/415; 429 user + tổng; lỗi nhà cung cấp/GCS → 502; key không lọt log).
+- [x] **P8.4 Bỏ theo User (31/10):** `objects` là dữ liệu admin (xem trên Neon) cho `/detect` + RAG, không hiện trong app; Items/`DetailItem`/`ViewAllItem` giữ tắt (`ENABLE_ITEMS = false`). Kế hoạch cũ: ~~**FE Items:** `locations.api.getItems/getItemsWithLocationId` → `GET /objects` (nạp lười; `title`→`name`, `content`→`description`); khôi phục JSX mục Items ở `FestivalsScreen` từ `git show 3583e90^:src/container/screens/Festival/FestivalsScreen.tsx` + renderer (`:114-118`); mở route `DetailItem`, `ViewAllItem` (`AppContainer.tsx:41-42,353-358`); `ENABLE_ITEMS`; `IItem.Id` → `id`; `DetailItem.tsx:15` bỏ `DB_URL`. Test: `__tests__/items.test.js`.~~
+- [x] **P8.5 FE Camera:** mở `CameraScreen`, `PreviewImage` + tab Camera (`AppContainer.tsx:28,32,289-303,337-339`); `SERVER_URL` → `API_BASE_URL` (`CameraScreen.tsx:96,186`, `PreviewImage.tsx`); gửi JWT; `ENABLE_CAMERA`. Test: `__tests__/camera.test.js`.
 
-**Nghiệm thu P8:** Items từ Neon; chụp hiện vật (ví dụ Cầu Rồng) → tên + mô tả qua Cloud Run.
+**Nghiệm thu P8:** chụp hiện vật → tên + mô tả (từ `objects` khi khớp) qua Cloud Run — User thử emulator 31/10: pass.
+
+**Deploy P8 (31/10):** migration 009 + quyền 004, import 11 objects; `travel-app-config:2` (+ `OPENAI_API_KEY`, `SERPAPI_KEY`); image `sha256:c13a57a3…` → revision `travel-api-00007-68l` (100%); rollback về `travel-api-00006-rx4`.
 
 ## P9 — AI: semantic search, tương tự, gợi ý, chatbot RAG, bộ nhớ (F21–F26)
 Phụ thuộc: P6, P8. Ước lượng: BE L + FE M.
@@ -177,3 +177,4 @@ Mỗi mục một commit riêng. Không refactor, không tối ưu.
 | 30/10/2026 | P5 | Auth + accounts BE, FE chặn lộ key; migration 007 + quyền 002, import 3 accounts + 7 transactions; deploy `d06a0c3c…`; đăng nhập seed OK. FE `39fc44a` (jest 122 pass, tsc 62); BE PASS |
 | 30/10/2026 | P6 | `api.client` + `auth.api` qua BE; Login/SignUp/Personal/Profile mở lại; xóa tài khoản; `requireLogin`; đăng xuất về Home. Jest CI 13 suite 142 pass, tsc 62. User nghiệm thu emulator: pass |
 | 30/10/2026 | P7 | imgbb 103 cả từ Cloud Run → GCS; `/uploads`, `/reviews` (+report, ẩn sau 3 báo cáo), rating/`review_count` từ bảng reviews; migration 008 + quyền 003; Feed/Detail/avatar. Deploy `travel-api-00006-rx4` (`66e11a46…`). Jest CI 14 suite 154 pass, tsc 62; BE 6 test PASS. User nghiệm thu emulator: pass |
+| 31/10/2026 | P8 | Bảng `objects` (11, admin/RAG, không hiện trong app); `/detect` port pipeline cũ (Lens → OpenAI → khớp `objects`), ảnh tạm GCS `tmp/`, quota 5/user + 8/ngày; Camera + PreviewImage qua BE (JWT). Deploy `travel-api-00007-68l` (`c13a57a3…`). Jest CI 15 suite 161 pass, tsc 62; BE 7 test PASS. User nghiệm thu emulator: pass |

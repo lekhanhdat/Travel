@@ -25,11 +25,11 @@ import LoginScreen from './screens/Login/LoginScreen';
 import HomeScreen from './screens/Home/HomeScreen';
 import NewFeedScreen from './screens/NewFeed/NewFeedScreen';
 import MapsScreen from './screens/Maps/MapScreenV2';
-// import CameraScreen from './screens/Camera/CameraScreen';
+import CameraScreen from './screens/Camera/CameraScreen';
 import ProfileScreen from './screens/Profile/ProfileScreen';
 import ViewAllLocation from './screens/Home/ViewAllLocation';
 import DetailItemScreen from './screens/Home/DetailLocation';
-// import PreviewImage from './screens/Camera/PreviewImage';
+import PreviewImage from './screens/Camera/PreviewImage';
 import LocationImage from './screens/Home/LocationImage';
 import LocationVideo from './screens/Home/LocationVideo';
 import Personal from './screens/Profile/Personal';
@@ -287,7 +287,8 @@ function HomeStack() {
             ),
           }}
         />
-        {/* P1: Temporarily disabled; retain for restoration.
+        {/* P8: Camera restored (POST /detect; recognising needs an account). */}
+        {FEATURE_FLAGS.ENABLE_CAMERA && (
         <Tabs.Screen
           name={TAB_NAMES.CAMERA}
           component={CameraScreen}
@@ -301,7 +302,7 @@ function HomeStack() {
             ),
           }}
         />
-        */}
+        )}
         {/* P6: Profile restored (guest sees Settings/FAQ/Policy/About + Login). */}
         <Tabs.Screen
           name={TAB_NAMES.PROFILE}
@@ -333,9 +334,8 @@ function AppContainer() {
       <Stack.Screen name="LoginScreen" component={LoginScreen} />
       <Stack.Screen name="ViewAllLocation" component={ViewAllLocation} />
       <Stack.Screen name="DetailLocationScreen" component={DetailItemScreen} />
-      {/* P1: Temporarily disabled; retain for restoration.
+      {/* P8: restored with Camera. */}
       <Stack.Screen name="PreviewImage" component={PreviewImage} />
-      */}
       {/* P4: Map restored. */}
       <Stack.Screen name="MapsScreen" component={MapsScreen} />
       <Stack.Screen name="LocationImage" component={LocationImage} />
@@ -348,7 +348,7 @@ function AppContainer() {
       <Stack.Screen name="About" component={About} />
       {/* P4: restored with Map (popup button). */}
       <Stack.Screen name="Advise" component={Advise} />
-      {/* P1: Temporarily disabled; retain for restoration.
+      {/* P8: Items stay off (User 31/10): table `objects` is admin data for /detect + RAG only.
       <Stack.Screen name="DetailItem" component={DetailItem} />
       */}
       {/* P1: Temporarily disabled; retain for restoration.

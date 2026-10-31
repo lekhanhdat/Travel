@@ -4,19 +4,22 @@ import {launchImageLibrary} from 'react-native-image-picker';
 import {ActivityIndicator, Modal, Portal} from 'react-native-paper';
 import Toast from 'react-native-toast-message';
 import {Camera} from 'react-native-vision-camera';
-import RNFetchBlob from 'rn-fetch-blob';
+// P8: uploads go through services/detect.api (rn-fetch-blob lives there).
+// import RNFetchBlob from 'rn-fetch-blob';
 import {CameraSvg, Lightning, LightningOff, SendSvg} from '../../../assets/ImageSvg';
 import colors from '../../../common/colors';
 import sizes from '../../../common/sizes';
-import {AI_RECOGNITION_TIMEOUT} from '../../../common/constants';
+// import {AI_RECOGNITION_TIMEOUT} from '../../../common/constants';
 import Page from '../../../component/Page';
-import {SERVER_URL} from '../../../utils/configs';
+import {env} from '../../../utils/env';
+import {detectImage, DetectError} from '../../../services/detect.api';
+import {requireLogin} from '../../../utils/requireLogin';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import CameraResultModal from '../../../component/CameraResultModal';
 import TextBase from '../../../common/TextBase';
 
 interface ICameraScreenProps {
-  navigation: any;
+  navigation?: any; // optional: the tab navigator passes it
 }
 
 interface ICameraScreenState {
@@ -62,13 +65,13 @@ export default class CameraScreen extends React.PureComponent<
   }
 
   async componentDidMount() {
-    this.props.navigation.addListener('blur', () => {
+    this.props.navigation?.addListener('blur', () => {
       this.setState({
         // isActive: false,
       });
     });
 
-    this.props.navigation.addListener('focus', () => {
+    this.props.navigation?.addListener('focus', () => {
       this.setState({
         isActive: true,
       });
@@ -78,9 +81,10 @@ export default class CameraScreen extends React.PureComponent<
     this.testBackendConnection();
 
     const cameraPermission = await Camera.requestCameraPermission();
-    const microphonePermission = await Camera.requestMicrophonePermission();
+    // P8: photos only, so the microphone is not requested (Play: ask only for what is used).
+    // const microphonePermission = await Camera.requestMicrophonePermission();
 
-    if (cameraPermission === 'granted' && microphonePermission === 'granted') {
+    if (cameraPermission === 'granted') {
       this.setState({hasPermission: true});
       const devices = await Camera.getAvailableCameraDevices();
       const device = devices;
@@ -90,10 +94,10 @@ export default class CameraScreen extends React.PureComponent<
 
   testBackendConnection = async () => {
     console.log('=== TESTING BACKEND CONNECTION ===');
-    console.log('Testing backend connection to:', SERVER_URL);
+    console.log('Testing backend connection to:', env.API_BASE_URL);
 
     try {
-      const response = await fetch(`${SERVER_URL}/`, {
+      const response = await fetch(`${env.API_BASE_URL}/`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -182,86 +186,118 @@ export default class CameraScreen extends React.PureComponent<
     );
   };
 
+  // P8: POST /detect on Cloud Run with the account's token (guests are asked to log in first).
   uploadImage = async (filePath: string) => {
-    const url = `${SERVER_URL}/detect`;
-    console.log('=== UPLOAD IMAGE START ===');
-    console.log('Uploading image to:', url);
-    console.log('File path:', filePath);
-
+    if (!(await requireLogin())) {return;}
     this.setState({ isDetecting: true });
-
     try {
-      const response = await RNFetchBlob.config({
-        timeout: AI_RECOGNITION_TIMEOUT,
-      }).fetch(
-        'POST',
-        url,
-        {
-          'Content-Type': 'multipart/form-data',
-        },
-        [
-          {
-            name: 'image_file',
-            filename: 'image.jpg',
-            data: RNFetchBlob.wrap(filePath),
-          },
-        ],
-      );
-
-      console.log('Response status:', response.info().status);
-      console.log('Response data:', response?.data);
-      console.log('Response info:', response.info());
-
-      if (response.info().status === 200) {
-        try {
-          const content = JSON.parse(response?.data);
-          console.log('Parsed content:', content);
-
-          this.setState({
-            visible: true,
-            resultName: content.name || 'Không xác định',
-            resultDescription: content.description || 'Không có mô tả',
-            resultPhotoPath: filePath,
-            showPreviewModal: false, // Hide preview modal when showing result
-          });
-
-          Toast.show({
-            type: 'success',
-            text1: 'Nhận diện thành công',
-            text2: 'Đã xử lý ảnh thành công',
-          });
-        } catch (parseError) {
-          console.log('Parse error:', parseError);
-          console.log('Raw response data:', response?.data);
-          Toast.show({
-            type: 'error',
-            text1: 'Lỗi xử lý dữ liệu',
-            text2: 'Không thể xử lý kết quả từ server',
-          });
-        }
-      } else {
-        console.log('Server error status:', response.info().status);
-        Toast.show({
-          type: 'error',
-          text1: 'Lỗi server',
-          text2: `Server trả về lỗi: ${response.info().status}`,
-        });
-      }
+      const content = await detectImage(filePath);
+      this.setState({
+        visible: true,
+        resultName: content.name || 'Không xác định',
+        resultDescription: content.description || 'Không có mô tả',
+        resultPhotoPath: filePath,
+        showPreviewModal: false, // Hide preview modal when showing result
+      });
+      Toast.show({
+        type: 'success',
+        text1: 'Nhận diện thành công',
+        text2: 'Đã xử lý ảnh thành công',
+      });
     } catch (error) {
-      console.log('Upload error:', error);
-      console.error('Error Details:', JSON.stringify(error, null, 2));
       Toast.show({
         type: 'error',
-        text1: 'Lỗi kết nối',
-        text2: 'Không thể kết nối đến server. Vui lòng thử lại.',
+        text1: error instanceof DetectError ? 'Không nhận diện được' : 'Lỗi kết nối',
+        text2: error instanceof DetectError ? error.message : 'Không thể kết nối đến server. Vui lòng thử lại.',
       });
     } finally {
       this.setState({
         isDetecting: false,
       });
-      console.log('=== UPLOAD IMAGE END ===');
     }
   };
+
+  // P8: DigitalOcean/SERVER_URL version retained for recovery history (removed at P12).
+  // uploadImage = async (filePath: string) => {
+  //   const url = `${SERVER_URL}/detect`;
+  //   console.log('=== UPLOAD IMAGE START ===');
+  //   console.log('Uploading image to:', url);
+  //   console.log('File path:', filePath);
+  //
+  //   this.setState({ isDetecting: true });
+  //
+  //   try {
+  //     const response = await RNFetchBlob.config({
+  //       timeout: AI_RECOGNITION_TIMEOUT,
+  //     }).fetch(
+  //       'POST',
+  //       url,
+  //       {
+  //         'Content-Type': 'multipart/form-data',
+  //       },
+  //       [
+  //         {
+  //           name: 'image_file',
+  //           filename: 'image.jpg',
+  //           data: RNFetchBlob.wrap(filePath),
+  //         },
+  //       ],
+  //     );
+  //
+  //     console.log('Response status:', response.info().status);
+  //     console.log('Response data:', response?.data);
+  //     console.log('Response info:', response.info());
+  //
+  //     if (response.info().status === 200) {
+  //       try {
+  //         const content = JSON.parse(response?.data);
+  //         console.log('Parsed content:', content);
+  //
+  //         this.setState({
+  //           visible: true,
+  //           resultName: content.name || 'Không xác định',
+  //           resultDescription: content.description || 'Không có mô tả',
+  //           resultPhotoPath: filePath,
+  //           showPreviewModal: false, // Hide preview modal when showing result
+  //         });
+  //
+  //         Toast.show({
+  //           type: 'success',
+  //           text1: 'Nhận diện thành công',
+  //           text2: 'Đã xử lý ảnh thành công',
+  //         });
+  //       } catch (parseError) {
+  //         console.log('Parse error:', parseError);
+  //         console.log('Raw response data:', response?.data);
+  //         Toast.show({
+  //           type: 'error',
+  //           text1: 'Lỗi xử lý dữ liệu',
+  //           text2: 'Không thể xử lý kết quả từ server',
+  //         });
+  //       }
+  //     } else {
+  //       console.log('Server error status:', response.info().status);
+  //       Toast.show({
+  //         type: 'error',
+  //         text1: 'Lỗi server',
+  //         text2: `Server trả về lỗi: ${response.info().status}`,
+  //       });
+  //     }
+  //   } catch (error) {
+  //     console.log('Upload error:', error);
+  //     console.error('Error Details:', JSON.stringify(error, null, 2));
+  //     Toast.show({
+  //       type: 'error',
+  //       text1: 'Lỗi kết nối',
+  //       text2: 'Không thể kết nối đến server. Vui lòng thử lại.',
+  //     });
+  //   } finally {
+  //     this.setState({
+  //       isDetecting: false,
+  //     });
+  //     console.log('=== UPLOAD IMAGE END ===');
+  //   }
+  // };
 
   pickImage = async () => {
     await launchImageLibrary(
@@ -269,6 +305,9 @@ export default class CameraScreen extends React.PureComponent<
         mediaType: 'photo',
         quality: 0.8,
         includeBase64: false,
+        // P8: BE accepts photos up to 8 MB; resizing keeps gallery images well below it.
+        maxWidth: 2048,
+        maxHeight: 2048,
       },
       response => {
         if (response.didCancel) {

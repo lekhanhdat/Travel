@@ -174,7 +174,10 @@ describe('Phase 1 Guest Mode', () => {
     tree.unmount();
   });
 
-  it('filters accented keywords locally and submits fresh data without semantic HTTP', async () => {
+  // P9: AI on — guests search semantically through the BE; no result or an error falls back to keywords.
+  it('semantic search falls back to accent-insensitive keywords; keyword mode makes no semantic call', async () => {
+    const semantic = require('../src/services/semantic.api');
+    const searchSemantic = jest.spyOn(semantic, 'searchSemantic').mockResolvedValue({success: false, results: []});
     const onSubmitSearch = jest.fn();
     let tree;
     await act(async () => {tree = renderer.create(React.createElement(Search, {
@@ -182,11 +185,23 @@ describe('Phase 1 Guest Mode', () => {
       entityType: 'location', onSearch: jest.fn(), onSubmitSearch,
     }));});
     const search = tree.getInstance();
-    await act(async () => {search.handleSearchChange('da nang');});
+    expect(search.state.useSemanticSearch).toBe(true);
+    await act(async () => {search.setState({searchValue: 'da nang'});});
     await act(async () => {await search.handleSubmitSearch();});
-    expect(onSubmitSearch).toHaveBeenCalledWith([{id: 1, name: 'Đà Nẵng'}], 'da nang', false);
+    expect(searchSemantic).toHaveBeenCalledWith(expect.objectContaining({query: 'da nang', entity_types: ['location']}));
+    expect(onSubmitSearch).toHaveBeenLastCalledWith([{id: 1, name: 'Đà Nẵng'}], 'da nang', true);
+    // Semantic hits are matched to the local catalog by Neon id.
+    searchSemantic.mockResolvedValueOnce({success: true, results: [{id: 2, entity_type: 'location', score: 0.8}]});
+    await act(async () => {search.setState({searchValue: 'pho co'});});
+    await act(async () => {await search.handleSubmitSearch();});
+    expect(onSubmitSearch).toHaveBeenLastCalledWith([{id: 2, name: 'Hội An'}], 'pho co', true);
     await act(async () => {search.toggleSearchMode();});
     expect(search.state.useSemanticSearch).toBe(false);
+    searchSemantic.mockClear();
+    await act(async () => {search.handleSearchChange('da nang');});
+    await act(async () => {await search.handleSubmitSearch();});
+    expect(onSubmitSearch).toHaveBeenLastCalledWith([{id: 1, name: 'Đà Nẵng'}], 'da nang', false);
+    expect(searchSemantic).not.toHaveBeenCalled();
     tree.unmount();
   });
 
@@ -209,20 +224,21 @@ describe('Phase 1 Guest Mode', () => {
   it.each([
     ['Location', () => require('../src/container/screens/Home/ViewAllLocation').default, 'locations'],
     ['Festival', () => require('../src/container/screens/Festival/ViewAllFestivals').default, 'festivals'],
-  ])('keeps %s results in keyword mode despite legacy semantic route params', async (_, load, field) => {
+  ])('%s results: semantic order from the search bar, keyword mode filters locally', async (_, load, field) => {
     const Screen = load();
+    const rows = [{id: 1, name: 'Hội An'}, {id: 2, name: 'Đà Nẵng'}];
     let tree;
     await act(async () => {
       tree = renderer.create(React.createElement(Screen, {
-        ...props(), route: {params: {isSemanticSearch: true, [field]: [], valueSearch: 'danang'}},
+        ...props(), route: {params: {isSemanticSearch: true, [field]: rows, valueSearch: 'da nang'}},
       }));
     });
-    expect(tree.getInstance().state.searchMode).toBe('keyword');
-    expect(tree.root.findAll(node =>
-      typeof node.props.children === 'string' && node.props.children.includes('AI Search'),
-    )).toHaveLength(0);
+    // P9: AI on — semantic results arrive already ranked and are shown as they are.
+    expect(tree.getInstance().state.searchMode).toBe('semantic');
+    expect(tree.getInstance().state[field].map(row => row.id)).toEqual([1, 2]);
     await act(async () => {tree.getInstance().toggleSearchMode();});
     expect(tree.getInstance().state.searchMode).toBe('keyword');
+    expect(tree.getInstance().state[field].map(row => row.id)).toEqual([2]);
     tree.unmount();
   });
 });

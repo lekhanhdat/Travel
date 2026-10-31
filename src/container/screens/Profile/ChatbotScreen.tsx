@@ -31,6 +31,7 @@ import {
   searchImage,
   isImageSearchRequest,
   extractImageCount,
+  resetChatSession,
 } from '../../../services/chatbot.api';
 import LocalStorageCommon from '../../../utils/LocalStorageCommon';
 import {localStorageKey} from '../../../common/constants';
@@ -40,7 +41,7 @@ import Markdown from 'react-native-markdown-display';
 const {width: SCREEN_WIDTH, height: SCREEN_HEIGHT} = Dimensions.get('window');
 
 interface ChatbotScreenProps {
-  navigation: any;
+  navigation?: any; // optional: the stack passes it
 }
 
 interface ChatbotScreenState {
@@ -76,7 +77,7 @@ export default class ChatbotScreen extends React.PureComponent<
     this.loadChatHistory();
 
     // Listen for focus event to reload chat history
-    this.props.navigation.addListener('focus', () => {
+    this.props.navigation?.addListener('focus', () => {
       this.loadChatHistory();
     });
   }
@@ -338,6 +339,8 @@ export default class ChatbotScreen extends React.PureComponent<
               messages: [welcomeMessage],
             });
             await this.saveChatHistory([welcomeMessage]);
+            // P9: the BE session (history used as context) starts over too.
+            await resetChatSession();
           },
         },
       ],

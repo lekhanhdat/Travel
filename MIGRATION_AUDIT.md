@@ -289,6 +289,7 @@ Suite test hỏng từ trước **không xóa**: sửa trong phase tính năng �
 | CB10 | `TECHNICAL_REPORT.md`, `DEPLOYMENT_PROGRESS.md`, `DEPLOYMENT_TASKLIST.md` | mô tả NocoDB/DO/Firebase, số liệu cũ | P12 | lỗi thời (viết lại ngắn theo kiến trúc mới hoặc xóa) |
 | CB12 | 11 biến `NOCODB_*` trong `.env` BE local (Firebase/DO/biến không dùng đã xóa 30/10) | không code nào đọc sau P10 | P10 | sạch cấu hình |
 | CB13 | Migration 013 bỏ cột `reviews`/`rating` của catalog (mục 5.2) | FE đọc `GET /reviews` từ P7 | P7 xong | một nguồn rating |
+| CB14 | **NocoDB/AI cũ còn trong code sau P9**: `services/memory_service.py` `NocoDBMemoryService`; `utils/startup_indexer.py` `check_and_rebuild_indexes_on_startup`/`rebuild_indexes_async` (NocoDB); `scripts/index_data.py`, `setup_nocodb_tables.py`, `get_table_ids.py`; trường `nocodb_*` trong `utils/config.py`; `faiss_indexes/` cũ trong git (247 vector theo id NocoDB — image dùng bản build từ Neon); `get_image_embedding` (CLIP, không có trong image); comment bản OpenAI/SerpAPI trực tiếp trong `chatbot.api.ts`, `SERVER_URL` trong `utils/configs.ts` | P9 chuyển sang Neon/Cloud Run | P12 | sạch NocoDB/DO |
 
 ---
 
@@ -340,3 +341,4 @@ Giả định: 1 USD ≈ 26.000 VND; demo ~100 người dùng/tháng. Guard 26.0
 | 30/10 | P6 | FE: `api.client.ts`, `auth.api.ts` gọi BE (giữ tên hàm, chỉ lưu token + hồ sơ); `IAccount.id`; mở Login/SignUp/Personal + tab Profile; xóa tài khoản; `requireLogin`; Chatbot/Ủng hộ báo "sắp có"; đăng xuất về Home. User nghiệm thu emulator: pass |
 | 30/10 | P7 | D8 đổi sang GCS `travel2026-511805-uploads` (imgbb 103 cả từ Cloud Run). BE module `uploads` + `reviews`, schema 008 + quyền 003 (bảng rỗng), catalog `rating` = AVG review + `review_count`; FE Feed/Detail/Báo cáo/avatar qua BE. Deploy `travel-api-00006-rx4`. User nghiệm thu emulator: pass |
 | 31/10 | P8 | D10: `objects` (009 + quyền 004, 11 dòng từ export) là dữ liệu admin cho `/detect` + RAG, không có UI Items (User). Module `detect`: pipeline `service.py` gọi OpenAI/SerpAPI qua urllib, ảnh tạm GCS `tmp/`, quota SerpAPI; key ở `travel-app-config:2`. Camera qua BE. Deploy `travel-api-00007-68l`. User nghiệm thu emulator: pass |
+| 31/10 | P9 | D11: FAISS build từ Neon ở bước Cloud Build (không lúc startup), 183 vector; module `ai` (OpenAI REST, không SDK); `user_memories`/`conversations` trên Neon (010 + quyền 005), xóa tài khoản xóa luôn; chatbot không tìm ảnh qua SerpAPI (dành quota cho detect). Deploy `travel-api-00008-fxl`. User nghiệm thu emulator: pass |

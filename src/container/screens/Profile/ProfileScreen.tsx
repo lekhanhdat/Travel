@@ -80,6 +80,12 @@ class ProfileScreen extends React.PureComponent<
   };
 
   // P6: guests are sent to Login; Chatbot (P9) and Donation (debt N2) are not routed yet.
+  openChatbot = async () => {
+    if (await requireLogin()) {
+      NavigationService.navigate(ScreenName.CHATBOT);
+    }
+  };
+
   showComingSoon = () => {
     Toast.show({type: 'info', text1: this.props.t('profile.comingSoon')});
   };
@@ -158,8 +164,8 @@ class ProfileScreen extends React.PureComponent<
                 alignItems: 'center',
                 justifyContent: 'center',
               }}
-              // P9: restore NavigationService.navigate(ScreenName.CHATBOT) with the chatbot route.
-              onPress={this.showComingSoon}>
+              // P9: chatbot route restored; guests are asked to log in first.
+              onPress={this.openChatbot}>
               <ChatBotSvg
                 width={sizes._20sdp}
                 height={sizes._20sdp}

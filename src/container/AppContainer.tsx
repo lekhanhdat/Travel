@@ -46,7 +46,7 @@ import ViewAllFestivals from './screens/Festival/ViewAllFestivals';
 import SignUpScreen from './screens/Login/SignUpScreen';
 // import ForgotPasswordScreen from './screens/Login/ForgotPasswordScreen';
 // import Donation from './screens/Profile/Donation';
-// import ChatBotScreen from './screens/Profile/ChatbotScreen';
+import ChatBotScreen from './screens/Profile/ChatbotScreen';
 
 export enum ScreenName {
   SPLASH_SCREEN = 'SplashScreen',
@@ -371,9 +371,8 @@ function AppContainer() {
       {/* P1: Temporarily disabled; retain for restoration.
       <Stack.Screen name="Donation" component={Donation} />
       */}
-      {/* P1: Temporarily disabled; retain for restoration.
+      {/* P9: restored (RAG chat on the BE; needs an account). */}
       <Stack.Screen name="ChatBotScreen" component={ChatBotScreen} />
-      */}
     </Stack.Navigator>
   );
 }

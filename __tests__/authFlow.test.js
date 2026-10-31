@@ -102,11 +102,22 @@ describe('Profile', () => {
     expect(NavigationService.reset).toHaveBeenCalledWith('HomeStack');
   });
 
-  it('Chatbot and Donation are not routed yet and say so instead of navigating', () => {
+  it('Donation is not routed yet and says so instead of navigating', () => {
     const profile = instance(ProfileScreen, props());
     profile.showComingSoon();
     expect(Toast.show).toHaveBeenCalledWith({type: 'info', text1: 'profile.comingSoon'});
     expect(NavigationService.navigate).not.toHaveBeenCalled();
+  });
+
+  // P9: Chatbot is routed; guests are sent to Login first.
+  it('Chatbot opens for a signed-in user and asks a guest to log in', async () => {
+    const profile = instance(ProfileScreen, props());
+    authApi.isLoggedIn.mockResolvedValue(false);
+    await profile.openChatbot();
+    expect(NavigationService.navigate).toHaveBeenLastCalledWith('LoginScreen');
+    authApi.isLoggedIn.mockResolvedValue(true);
+    await profile.openChatbot();
+    expect(NavigationService.navigate).toHaveBeenLastCalledWith('ChatBotScreen');
   });
 });
 

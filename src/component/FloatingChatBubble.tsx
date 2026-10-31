@@ -13,6 +13,7 @@ import colors from '../common/colors';
 import {ChatBotSvg} from '../assets/ImageSvg';
 import NavigationService from '../container/screens/NavigationService';
 import {ScreenName} from '../container/AppContainer';
+import {requireLogin} from '../utils/requireLogin';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SCREEN_HEIGHT = Dimensions.get('window').height;
@@ -104,9 +105,11 @@ export default class FloatingChatBubble extends React.PureComponent<
     });
   }
 
-  handlePress = () => {
-    // Navigate to ChatBot screen
-    NavigationService.navigate(ScreenName.CHATBOT);
+  handlePress = async () => {
+    // Navigate to ChatBot screen (P9: needs an account, like the RAG chat on the BE)
+    if (await requireLogin()) {
+      NavigationService.navigate(ScreenName.CHATBOT);
+    }
   };
 
   render() {

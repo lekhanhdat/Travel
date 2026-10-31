@@ -3,7 +3,7 @@ export const FEATURE_FLAGS = {
   RECOVERY_MODE: true,
   ENABLE_AUTH: true,
   ENABLE_NOCODB: false,
-  ENABLE_AI: false,
+  ENABLE_AI: true,
   ENABLE_MAP: true,
   ENABLE_PAYMENT: false,
   ENABLE_UPLOAD: true,

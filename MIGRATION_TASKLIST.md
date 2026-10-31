@@ -2,7 +2,7 @@
 
 Theo [MIGRATION_AUDIT.md](MIGRATION_AUDIT.md): quyết định (mục 2), kiểm kê F01–F38 (mục 3), kiến trúc đích (mục 5), danh sách Clean CF/CB (mục 6), chi phí + key (mục 7). Mỗi phase chỉ bắt đầu khi User duyệt; xong thì tick và ghi một dòng nhật ký.
 
-**Thứ tự:** P0–P8 ✅ → P9 AI → P10 payment sang Neon/Cloud Run (giữ tắt) → P11 i18n + dịch nội dung + Hotels → P12 CLEAN → P13 nghiệm thu Android → P14 phát hành. Sau đó: Nợ N1–N4. Refactor/tối ưu: Backlog.
+**Thứ tự:** P0–P9 ✅ → P10 payment sang Neon/Cloud Run (giữ tắt) → P11 i18n + dịch nội dung + Hotels → P12 CLEAN → P13 nghiệm thu Android → P14 phát hành. Sau đó: Nợ N1–N4. Refactor/tối ưu: Backlog.
 
 **Quy tắc:** dùng lại / mở comment code có sẵn, không viết lại tính năng tương tự. Không xóa code/tài liệu có sẵn trước P12. Không dữ liệu fix cứng, không secret trong repo. Dịch vụ bên thứ ba chỉ gọi qua BE, key ở Secret Manager `travel-app-config`. NocoDB → Neon, DigitalOcean → Cloud Run, sau migration không còn dính dáng (P12.9). Không copy dữ liệu export vào repo.
 
@@ -79,16 +79,18 @@ Phụ thuộc: P7. Ước lượng: BE M + FE S.
 
 **Deploy P8 (31/10):** migration 009 + quyền 004, import 11 objects; `travel-app-config:2` (+ `OPENAI_API_KEY`, `SERPAPI_KEY`); image `sha256:c13a57a3…` → revision `travel-api-00007-68l` (100%); rollback về `travel-api-00006-rx4`.
 
-## P9 — AI: semantic search, tương tự, gợi ý, chatbot RAG, bộ nhớ (F21–F26)
+## P9 — AI: semantic search, tương tự, gợi ý, chatbot RAG, bộ nhớ (F21–F26) ✅
 Phụ thuộc: P6, P8. Ước lượng: BE L + FE M.
-- [ ] **P9.1 Index FAISS từ Neon:** `scripts/index_data.py` + `utils/startup_indexer.py` đọc locations/festivals/objects từ Neon, `entity_id` = id Neon; build lúc build image, không build khi startup; bỏ comment `faiss-cpu`, `numpy`, `openai`; Dockerfile COPY `routers/`, `services/`, `models/`, `utils/`, index. Nghiệm thu: 123 + 49 + 11 vector, `entity_id 1` = "An Phú Farm". Test: `tests/check_indexer.py`.
-- [ ] **P9.2 Migration `010_ai_memory.sql`** + `services/memory_service.py` đọc/ghi Neon (giữ chữ ký hàm); bảng bắt đầu rỗng.
-- [ ] **P9.3 Bật router** `search`, `chat`, `memory`, `recommendations` (`app.py:23,61-64`); user lấy từ JWT; quota chat/user/ngày; `/health` báo index; RAG lấy ngữ cảnh từ `objects` + catalog. Test: `tests/check_ai_routes.py`.
-- [ ] **P9.4 FE semantic:** `semantic.api.ts:275-276` → `API_BASE_URL` + token; `ENABLE_AI`; dùng lại `SemanticSearchBarComponent`, `ViewAll*` (`isSemanticSearch`), `SimilarItemsComponent`, `RecommendationsWidget`; lỗi → tự về keyword.
-- [ ] **P9.5 Chatbot qua BE:** `chatbot.api.sendChatMessage` → `chatWithRAG` (`semantic.api.ts:380`); ảnh lấy từ `sources` của RAG, SerpAPI chỉ qua BE khi catalog không có ảnh; mở route `ChatBotScreen` và `FloatingChatBubble` (`App.tsx:53`). Dùng lại UI `ChatbotScreen`, system prompt chuyển vào `rag_service`. Test: `__tests__/chatbot.test.js`.
-- [ ] **P9.6 Sửa suite hỏng từ trước:** cài `@testing-library/react-native`; sửa `semantic.api.test.ts`, `RecommendationsWidget.test.tsx`, `SimilarItemsComponent.test.tsx`; thêm vào CI.
+- [x] **P9.1 Index FAISS từ Neon lúc build image:** `scripts/build_faiss_index.py` + `utils/startup_indexer.build_indexes_from_database` (locations/festivals/objects, `entity_id` = id Neon, metadata có `content` + `image_url`); bước Cloud Build trước `docker build` (secret DB + `travel-app-config:2`), không build khi startup; `faiss-cpu`, `numpy` (OpenAI gọi REST qua `core_api/openai_http.py`, không SDK); Dockerfile COPY `routers/`, `services/`, `models/`, `utils/`, `faiss_indexes/`; smoke kiểm 123 + 49 + 11 vector, `location 1` = "An Phú Farm". Test: `tests/check_indexer.py`.
+- [x] **P9.2 Migration `010_ai_memory.sql`** + `services/memory_service.py` đọc/ghi Neon (giữ chữ ký hàm); bảng bắt đầu rỗng.
+- [x] **P9.3 Bật router** `search`, `chat`, `memory`, `recommendations` (module `ai`); search/similar công khai (rate limit/client), chat/memory/gợi ý cần JWT (user lấy từ token, user khác → 403); quota chat 30 câu/user/ngày; `/health` báo index; RAG lấy ngữ cảnh từ `objects` + catalog (ngưỡng 0.3); `objects` không bao giờ trả cho app (chỉ làm ngữ cảnh). Xóa tài khoản xóa luôn memory + hội thoại. Test: `tests/check_ai_routes.py`.
+- [x] **P9.4 FE semantic:** `semantic.api.ts:275-276` → `API_BASE_URL` + token; `ENABLE_AI`; dùng lại `SemanticSearchBarComponent`, `ViewAll*` (`isSemanticSearch`), `SimilarItemsComponent`, `RecommendationsWidget`; lỗi → tự về keyword.
+- [x] **P9.5 Chatbot qua BE:** `chatbot.api.sendChatMessage` → `chatWithRAG` (giữ chữ ký, session lưu máy, BE giữ lịch sử); ảnh đính kèm = URL `/uploads` của chính user; "xem ảnh" lấy ảnh catalog từ `sources` (bỏ tìm ảnh SerpAPI: 250 lượt/tháng dành cho detect); mở route `ChatBotScreen`, Profile + `FloatingChatBubble` (guest → Login); system prompt chuyển vào `rag_service`. Test: `__tests__/chatbot.test.js`.
+- [x] **P9.6 Sửa suite hỏng từ trước:** `@testing-library/react-native@12.9.0` (devDependency); `semantic.api.test.ts` (mock `axios.create`, reset cache), `RecommendationsWidget.test.tsx`, `SimilarItemsComponent.test.tsx` (mock `iphone-x-helper`, `AppContainer`); cả 3 vào CI.
 
-**Nghiệm thu P9:** search "biển đẹp" ra bãi biển; Detail có "tương tự"; Home có gợi ý khi đăng nhập; chatbot trả lời kèm nguồn; ghi chi phí OpenAI đợt thử.
+**Nghiệm thu P9:** search "biển đẹp" ra bãi biển; Detail có "tương tự"; Home có gợi ý khi đăng nhập; chatbot trả lời kèm nguồn; ghi chi phí OpenAI đợt thử. — User thử emulator 31/10: pass.
+
+**Deploy P9 (31/10):** migration 010 + quyền 005; index build lúc build image (183 vector: 123 + 49 + 11); image `sha256:23aafe4d…` → revision `travel-api-00008-fxl` (100%); rollback về `travel-api-00007-68l`. Smoke: module `ai` operational, ready, "biển đẹp" → An Bàng, Thanh Bình, Bắc Mỹ An.
 
 ## P10 — Payment: bỏ NocoDB/DO, chuyển sang Neon/Cloud Run, giữ tắt (F27, F28)
 Phụ thuộc: P5. Ước lượng: BE S–M + FE S.
@@ -178,3 +180,4 @@ Mỗi mục một commit riêng. Không refactor, không tối ưu.
 | 30/10/2026 | P6 | `api.client` + `auth.api` qua BE; Login/SignUp/Personal/Profile mở lại; xóa tài khoản; `requireLogin`; đăng xuất về Home. Jest CI 13 suite 142 pass, tsc 62. User nghiệm thu emulator: pass |
 | 30/10/2026 | P7 | imgbb 103 cả từ Cloud Run → GCS; `/uploads`, `/reviews` (+report, ẩn sau 3 báo cáo), rating/`review_count` từ bảng reviews; migration 008 + quyền 003; Feed/Detail/avatar. Deploy `travel-api-00006-rx4` (`66e11a46…`). Jest CI 14 suite 154 pass, tsc 62; BE 6 test PASS. User nghiệm thu emulator: pass |
 | 31/10/2026 | P8 | Bảng `objects` (11, admin/RAG, không hiện trong app); `/detect` port pipeline cũ (Lens → OpenAI → khớp `objects`), ảnh tạm GCS `tmp/`, quota 5/user + 8/ngày; Camera + PreviewImage qua BE (JWT). Deploy `travel-api-00007-68l` (`c13a57a3…`). Jest CI 15 suite 161 pass, tsc 62; BE 7 test PASS. User nghiệm thu emulator: pass |
+| 31/10/2026 | P9 | FAISS build từ Neon lúc build image (183 vector); router search/chat/memory/recommendations (JWT, quota chat 30/ngày, objects chỉ làm ngữ cảnh RAG); memory + hội thoại trên Neon (010 + quyền 005); OpenAI qua REST; FE semantic + chatbot qua BE. Deploy `travel-api-00008-fxl` (`23aafe4d…`). Jest CI 19 suite 201 pass, tsc 62; BE 9 test PASS. User nghiệm thu emulator: pass |

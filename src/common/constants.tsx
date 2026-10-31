@@ -16,6 +16,7 @@ export const localStorageKey = {
   AVT: 'AVT',
 
   CHAT_HISTORY: 'CHAT_HISTORY',
+  CHAT_SESSION_ID: 'CHAT_SESSION_ID', // P9: BE RAG chat session (history + quota)
 };
 
 export const CONTENT_SPACING = 15;

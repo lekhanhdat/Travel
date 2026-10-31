@@ -6,7 +6,9 @@
  */
 
 import axios from 'axios';
-import {SERVER_URL} from '../utils/configs';
+// P9: AI routes live on the Cloud Run API (module `ai`); was SERVER_URL (DigitalOcean).
+import {env} from '../utils/env';
+import {tokenStore} from './api.client';
 import {apiUsageTracker} from '../utils/apiUsageTracker';
 
 // ============ Cache Configuration ============
@@ -178,8 +180,11 @@ export interface SemanticSearchResponse {
 export interface RAGChatRequest {
   message: string;  // Backend expects 'message', not 'query'
   session_id?: string;
-  user_id?: number;
+  user_id?: number;  // ignored by the BE (P9: the account comes from the token)
   include_sources?: boolean;
+  max_context_items?: number;
+  image_base64?: string;  // P9: photo for vision (≤ ~3 MB)
+  image_url?: string;  // P9: or the user's own POST /uploads image
 }
 
 export interface RAGSource {
@@ -187,6 +192,8 @@ export interface RAGSource {
   entity_id: number;
   title: string;
   relevance_score: number;
+  snippet?: string;
+  image_url?: string | null;  // P9: first catalog image of the source
 }
 
 /**
@@ -200,7 +207,8 @@ export interface SuggestedAction {
 
 export interface RAGChatResponse {
   success: boolean;
-  response: string;
+  message?: string;  // BE field (RAGChatResponse.message)
+  response?: string;  // old name, kept for callers/tests written against it
   sources: RAGSource[];
   session_id: string;
   suggested_actions?: SuggestedAction[];  // Changed from string[] to SuggestedAction[]
@@ -273,11 +281,20 @@ export interface UserMemoriesResponse {
 const API_TIMEOUT = 30000; // 30 seconds
 
 const apiClient = axios.create({
-  baseURL: SERVER_URL,
+  baseURL: env.API_BASE_URL,
   timeout: API_TIMEOUT,
   headers: {
     'Content-Type': 'application/json',
   },
+});
+
+// Chat, memory and recommendations need the account (JWT); search/similar are public and ignore it.
+apiClient.interceptors.request.use(async config => {
+  const token = await tokenStore.get();
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
 });
 
 // ============ Helper Functions ============
@@ -394,6 +411,7 @@ export const chatWithRAG = async (
     apiUsageTracker.trackCall('/api/v1/chat/rag', false, Date.now() - startTime, false);
     return {
       success: false,
+      message: '',
       response: '',
       sources: [],
       session_id: request.session_id || '',

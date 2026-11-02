@@ -1,4 +1,5 @@
 import React from 'react';
+import i18n from '../../../i18n';
 import {
   View,
   StyleSheet,
@@ -62,19 +63,19 @@ export default class SignUpScreen extends React.PureComponent<
 
     // Validation
     if (!userName || !password || !confirmPassword || !fullName || !email) {
-      Toast.show({type: 'error', text1: 'Vui lòng nhập đầy đủ thông tin'});
+      Toast.show({type: 'error', text1: i18n.t('common:ui.common.fillAll')});
       return;
     }
 
     if (password !== confirmPassword) {
-      Toast.show({type: 'error', text1: 'Mật khẩu nhập lại không khớp'});
+      Toast.show({type: 'error', text1: i18n.t('common:ui.signup.passwordMismatch')});
       return;
     }
 
     if (password.length < 6) {
       Toast.show({
         type: 'error',
-        text1: 'Mật khẩu phải có ít nhất 6 ký tự',
+        text1: i18n.t('common:ui.signup.passwordShort'),
       });
       return;
     }
@@ -82,7 +83,7 @@ export default class SignUpScreen extends React.PureComponent<
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      Toast.show({type: 'error', text1: 'Email không hợp lệ'});
+      Toast.show({type: 'error', text1: i18n.t('common:ui.common.invalidEmail')});
       return;
     }
 
@@ -93,8 +94,8 @@ export default class SignUpScreen extends React.PureComponent<
 
       Toast.show({
         type: 'success',
-        text1: 'Đăng ký thành công!',
-        text2: 'Vui lòng đăng nhập',
+        text1: i18n.t('common:ui.signup.success'),
+        text2: i18n.t('common:ui.signup.pleaseLogin'),
       });
 
       this.setState({loading: false});
@@ -105,8 +106,8 @@ export default class SignUpScreen extends React.PureComponent<
 
       Toast.show({
         type: 'error',
-        text1: 'Đăng ký thất bại',
-        text2: error.message || 'Vui lòng thử lại sau',
+        text1: i18n.t('common:ui.signup.failed'),
+        text2: error.message || i18n.t('common:ui.signup.tryLater'),
       });
     }
   };
@@ -164,8 +165,8 @@ export default class SignUpScreen extends React.PureComponent<
 
           {/* Title */}
           <View style={styles.titleContainer}>
-            <Text style={styles.title}>Đăng ký</Text>
-            <Text style={styles.subtitle}>Tạo tài khoản mới</Text>
+            <Text style={styles.title}>{i18n.t('common:ui.common.signup')}</Text>
+            <Text style={styles.subtitle}>{i18n.t('common:ui.signup.createAccount')}</Text>
           </View>
 
           {/* Form */}
@@ -173,8 +174,8 @@ export default class SignUpScreen extends React.PureComponent<
             {/* Full Name */}
             <TextInput
               mode="outlined"
-              label="Họ và tên"
-              placeholder="Nhập họ và tên đầy đủ"
+              label={i18n.t('common:ui.signup.fullName')}
+              placeholder={i18n.t('common:ui.signup.fullNamePlaceholder')}
               style={styles.input}
               outlineStyle={styles.inputOutline}
               textColor={colors.primary_950}
@@ -186,7 +187,7 @@ export default class SignUpScreen extends React.PureComponent<
             {/* Birthday */}
             <TextInput
               mode="outlined"
-              label="Ngày sinh"
+              label={i18n.t('common:ui.signup.birthday')}
               placeholder="VD: 01/01/1990"
               style={styles.input}
               outlineStyle={styles.inputOutline}
@@ -198,7 +199,7 @@ export default class SignUpScreen extends React.PureComponent<
 
             {/* Gender */}
             <View style={styles.genderSection}>
-              <Text style={styles.genderLabel}>Giới tính</Text>
+              <Text style={styles.genderLabel}>{i18n.t('common:ui.signup.gender')}</Text>
               <View style={styles.genderContainer}>
                 {(['Male', 'Female', 'Other'] as const).map((g) => (
                   <TouchableOpacity
@@ -213,7 +214,7 @@ export default class SignUpScreen extends React.PureComponent<
                         styles.genderText,
                         gender === g && styles.genderTextSelected,
                       ]}>
-                      {g === 'Male' ? 'Nam' : g === 'Female' ? 'Nữ' : 'Khác'}
+                      {g === 'Male' ? 'Nam' : g === 'Female' ? 'Nữ' : i18n.t('common:ui.common.other')}
                     </Text>
                   </TouchableOpacity>
                 ))}
@@ -223,8 +224,8 @@ export default class SignUpScreen extends React.PureComponent<
             {/* Address */}
             <TextInput
               mode="outlined"
-              label="Địa chỉ"
-              placeholder="Nhập địa chỉ"
+              label={i18n.t('common:ui.signup.address')}
+              placeholder={i18n.t('common:ui.common.addressPlaceholder')}
               style={styles.input}
               outlineStyle={styles.inputOutline}
               textColor={colors.primary_950}
@@ -236,8 +237,8 @@ export default class SignUpScreen extends React.PureComponent<
             {/* Phone */}
             <TextInput
               mode="outlined"
-              label="Số điện thoại"
-              placeholder="Nhập số điện thoại"
+              label={i18n.t('common:ui.signup.phone')}
+              placeholder={i18n.t('common:ui.common.phonePlaceholder')}
               style={styles.input}
               outlineStyle={styles.inputOutline}
               textColor={colors.primary_950}
@@ -265,8 +266,8 @@ export default class SignUpScreen extends React.PureComponent<
             {/* Username */}
             <TextInput
               mode="outlined"
-              label="Tên đăng nhập"
-              placeholder="Nhập tên đăng nhập"
+              label={i18n.t('common:ui.common.userName')}
+              placeholder={i18n.t('common:ui.common.userNamePlaceholder')}
               style={styles.input}
               outlineStyle={styles.inputOutline}
               textColor={colors.primary_950}
@@ -279,7 +280,7 @@ export default class SignUpScreen extends React.PureComponent<
             <TextInput
               mode="outlined"
               label="Mật khẩu"
-              placeholder="Nhập mật khẩu (tối thiểu 6 ký tự)"
+              placeholder={i18n.t('common:ui.signup.passwordPlaceholder')}
               style={styles.input}
               outlineStyle={styles.inputOutline}
               textColor={colors.primary_950}
@@ -298,8 +299,8 @@ export default class SignUpScreen extends React.PureComponent<
             {/* Confirm Password */}
             <TextInput
               mode="outlined"
-              label="Xác nhận mật khẩu"
-              placeholder="Nhập lại mật khẩu"
+              label={i18n.t('common:ui.signup.confirmPassword')}
+              placeholder={i18n.t('common:ui.signup.confirmPlaceholder')}
               style={styles.input}
               outlineStyle={styles.inputOutline}
               textColor={colors.primary_950}
@@ -338,18 +339,18 @@ export default class SignUpScreen extends React.PureComponent<
                     },
                   ]}
                 >
-                  Đăng ký
+                  {i18n.t('common:ui.common.signup')}
                 </Text>
               )}
             </TouchableOpacity>
 
             {/* Login Link */}
             <View style={styles.loginContainer}>
-              <Text style={styles.loginText}>Đã có tài khoản? </Text>
+              <Text style={styles.loginText}>{i18n.t('common:ui.signup.haveAccount')}</Text>
               <TouchableOpacity
                 onPress={() => NavigationService.reset(ScreenName.LOGIN_SCREEN)}
               >
-                <Text style={styles.loginLink}>Đăng nhập</Text>
+                <Text style={styles.loginLink}>{i18n.t('common:ui.common.login')}</Text>
               </TouchableOpacity>
             </View>
           </View>

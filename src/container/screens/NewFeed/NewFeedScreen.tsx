@@ -1,4 +1,5 @@
 import React from 'react';
+import i18n from '../../../i18n';
 import {FlatList, TouchableOpacity, View, Image, ScrollView, Alert, ActivityIndicator} from 'react-native';
 import Page from '../../../component/Page';
 import HeaderBase from '../../../component/HeaderBase';
@@ -181,7 +182,7 @@ export default class NewFeedScreen extends React.PureComponent<
           if (__DEV__) {console.log('User cancelled image picker');}
         } else if (response.errorCode) {
           if (__DEV__) {console.log('ImagePicker Error: ', response.errorMessage);}
-          Alert.alert('Lỗi', 'Không thể chọn ảnh. Vui lòng thử lại.');
+          Alert.alert('Lỗi', i18n.t('common:ui.common.pickImageFailed'));
         } else if (response.assets) {
           this.setState({
             selectedImages: response.assets,
@@ -240,7 +241,7 @@ export default class NewFeedScreen extends React.PureComponent<
             selectedImages: [],
             uploading: false,
           });
-          Alert.alert('Thành công', 'Đánh giá của bạn đã được gửi!');
+          Alert.alert(i18n.t('common:ui.common.ok'), i18n.t('common:ui.feed.reviewSent'));
         },
       );
 
@@ -248,7 +249,7 @@ export default class NewFeedScreen extends React.PureComponent<
     } catch (error: any) {
       if (__DEV__) {console.error('❌ Error submitting review:', error);}
       this.setState({uploading: false});
-      Alert.alert('Lỗi', error?.message || 'Không thể gửi đánh giá. Vui lòng thử lại.');
+      Alert.alert('Lỗi', error?.message || i18n.t('common:ui.feed.reviewFailed'));
     }
   };
 
@@ -317,7 +318,7 @@ export default class NewFeedScreen extends React.PureComponent<
             }}>
             <TextInput
               mode="outlined"
-              placeholder="Lọc theo địa điểm..."
+              placeholder={i18n.t('common:ui.feed.filterPlaceholder')}
               value={this.state.filterLocationQuery}
               onFocus={() => this.setState({showFilterSuggestions: true})}
               onChangeText={(text) => {
@@ -386,7 +387,7 @@ export default class NewFeedScreen extends React.PureComponent<
                       return (
                         <View style={{padding: sizes._16sdp, alignItems: 'center'}}>
                           <TextBase style={{color: colors.primary_400}}>
-                            Không tìm thấy địa điểm
+                            {i18n.t('common:ui.feed.noPlace')}
                           </TextBase>
                         </View>
                       );
@@ -446,8 +447,8 @@ export default class NewFeedScreen extends React.PureComponent<
                   <View style={{padding: sizes._32sdp, alignItems: 'center'}}>
                     <TextBase style={[AppStyle.txt_16_regular, {color: colors.primary_400}]}>
                       {this.state.filterLocationId
-                        ? 'Chưa có đánh giá nào tại địa điểm này'
-                        : 'Chưa có đánh giá nào'}
+                        ? i18n.t('common:ui.feed.emptyHere')
+                        : i18n.t('common:ui.feed.empty')}
                     </TextBase>
                   </View>
                 )}
@@ -486,7 +487,7 @@ export default class NewFeedScreen extends React.PureComponent<
                 paddingVertical: sizes._16sdp,
                 alignItems: 'center',
               }}>
-              <TextBase style={AppStyle.txt_20_bold}>Thêm Bình Luận</TextBase>
+              <TextBase style={AppStyle.txt_20_bold}>{i18n.t('common:ui.feed.addReview')}</TextBase>
             </View>
 
             <ScrollView
@@ -524,7 +525,7 @@ export default class NewFeedScreen extends React.PureComponent<
                   marginBottom: sizes._8sdp,
                 },
               ]}>
-              Đánh giá
+              {i18n.t('common:ui.feed.review')}
             </TextBase>
             <View
               style={{
@@ -577,8 +578,8 @@ export default class NewFeedScreen extends React.PureComponent<
             <View style={{width: '100%'}}>
               <TextInput
                 mode="outlined"
-                label="Đánh giá"
-                placeholder="Nhập nội dung đánh giá của bạn..."
+                label={i18n.t('common:ui.feed.review')}
+                placeholder={i18n.t('common:ui.feed.reviewPlaceholder')}
                 style={{
                   width: '100%',
                   minHeight: sizes._100sdp,
@@ -609,7 +610,7 @@ export default class NewFeedScreen extends React.PureComponent<
                   marginBottom: sizes._8sdp,
                 },
               ]}>
-              Địa điểm
+              {i18n.t('common:ui.feed.place')}
             </TextBase>
 
             {this.state.location && (
@@ -640,7 +641,7 @@ export default class NewFeedScreen extends React.PureComponent<
                 color: colors.white,
               }}
             >
-              {this.state.location ? 'Chọn lại địa điểm' : 'Chọn địa điểm'}
+              {this.state.location ? i18n.t('common:ui.feed.changePlace') : i18n.t('common:ui.feed.choosePlace')}
             </Button>
 
             {/* Upload Images Section */}
@@ -652,7 +653,7 @@ export default class NewFeedScreen extends React.PureComponent<
                   marginBottom: sizes._8sdp,
                 },
               ]}>
-              Hình ảnh (Tùy chọn)
+              {i18n.t('common:ui.feed.images')}
             </TextBase>
 
             <Button
@@ -666,7 +667,7 @@ export default class NewFeedScreen extends React.PureComponent<
               }}
               labelStyle={{color: colors.primary}}
             >
-              Chọn ảnh
+              {i18n.t('common:ui.feed.pickImages')}
             </Button>
 
             {/* Display selected images */}
@@ -743,7 +744,7 @@ export default class NewFeedScreen extends React.PureComponent<
                       color: colors.primary_400,
                     },
                   ]}>
-                  Đăng
+                  {i18n.t('common:ui.feed.post')}
                 </TextBase>
               )}
             </TouchableOpacity>
@@ -763,14 +764,14 @@ export default class NewFeedScreen extends React.PureComponent<
               paddingVertical: sizes._16sdp,
               alignItems: 'center',
             }}>
-            <TextBase style={AppStyle.txt_20_bold}>Chọn địa điểm</TextBase>
+            <TextBase style={AppStyle.txt_20_bold}>{i18n.t('common:ui.feed.choosePlace')}</TextBase>
           </View>
 
           {/* Search Box */}
           <View style={{paddingHorizontal: sizes._16sdp, paddingTop: sizes._12sdp}}>
             <TextInput
               mode="outlined"
-              placeholder="Tìm kiếm địa điểm..."
+              placeholder={i18n.t('common:ui.feed.searchPlace')}
               value={this.state.locationSearchQuery}
               onChangeText={(text) => this.setState({locationSearchQuery: text})}
               left={<TextInput.Icon icon="magnify" />}
@@ -830,7 +831,7 @@ export default class NewFeedScreen extends React.PureComponent<
                   alignItems: 'center',
                 }}>
                   <TextBase style={[AppStyle.txt_16_regular, {color: colors.primary_400}]}>
-                    Không tìm thấy địa điểm nào
+                    {i18n.t('common:ui.feed.noPlaces')}
                   </TextBase>
                 </View>
               )}

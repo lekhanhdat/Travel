@@ -1,4 +1,5 @@
 import React from 'react';
+import i18n from '../../../i18n';
 import {
   Image,
   NativeModules,
@@ -207,7 +208,7 @@ export default class ProfileScreen extends React.PureComponent<
           Toast.show({
             type: 'error',
             text1: 'Lỗi',
-            text2: 'Không thể chọn ảnh. Vui lòng thử lại.',
+            text2: i18n.t('common:ui.common.pickImageFailed'),
           });
         } else if (response.assets && response.assets.length > 0) {
           const asset = response.assets[0];
@@ -263,15 +264,15 @@ export default class ProfileScreen extends React.PureComponent<
 
       Toast.show({
         type: 'success',
-        text1: 'Thành công',
-        text2: 'Đã cập nhật ảnh đại diện',
+        text1: i18n.t('common:ui.common.ok'),
+        text2: i18n.t('common:ui.personal.avatarUpdated'),
       });
     } catch (error) {
       console.error('Error uploading avatar:', error);
       Toast.show({
         type: 'error',
         text1: 'Lỗi',
-        text2: 'Không thể tải ảnh lên. Vui lòng thử lại.',
+        text2: i18n.t('common:ui.personal.uploadFailed'),
       });
       this.setState({uploadingAvatar: false, previewAvatarUri: undefined});
     }
@@ -308,15 +309,15 @@ export default class ProfileScreen extends React.PureComponent<
 
       Toast.show({
         type: 'success',
-        text1: 'Thành công',
-        text2: 'Đã xóa ảnh đại diện',
+        text1: i18n.t('common:ui.common.ok'),
+        text2: i18n.t('common:ui.personal.avatarDeleted'),
       });
     } catch (error) {
       console.error('Error deleting avatar:', error);
       Toast.show({
         type: 'error',
         text1: 'Lỗi',
-        text2: 'Không thể xóa ảnh đại diện. Vui lòng thử lại.',
+        text2: i18n.t('common:ui.personal.avatarDeleteFailed'),
       });
       this.setState({uploadingAvatar: false});
     }
@@ -338,7 +339,7 @@ export default class ProfileScreen extends React.PureComponent<
       Toast.show({
         type: 'error',
         text1: 'Lỗi',
-        text2: 'Không tìm thấy thông tin tài khoản',
+        text2: i18n.t('common:ui.personal.noAccount'),
       });
       return;
     }
@@ -348,7 +349,7 @@ export default class ProfileScreen extends React.PureComponent<
       Toast.show({
         type: 'error',
         text1: 'Lỗi',
-        text2: 'Vui lòng nhập họ và tên',
+        text2: i18n.t('common:ui.personal.nameRequired'),
       });
       return;
     }
@@ -357,7 +358,7 @@ export default class ProfileScreen extends React.PureComponent<
       Toast.show({
         type: 'error',
         text1: 'Lỗi',
-        text2: 'Vui lòng nhập email',
+        text2: i18n.t('common:ui.personal.emailRequired'),
       });
       return;
     }
@@ -366,7 +367,7 @@ export default class ProfileScreen extends React.PureComponent<
       Toast.show({
         type: 'error',
         text1: 'Lỗi',
-        text2: 'Email không hợp lệ',
+        text2: i18n.t('common:ui.common.invalidEmail'),
       });
       return;
     }
@@ -407,15 +408,15 @@ export default class ProfileScreen extends React.PureComponent<
 
       Toast.show({
         type: 'success',
-        text1: 'Thành công',
-        text2: 'Đã cập nhật thông tin cá nhân',
+        text1: i18n.t('common:ui.common.ok'),
+        text2: i18n.t('common:ui.personal.updated'),
       });
     } catch (error: any) {
       console.error('Error updating profile:', error);
       Toast.show({
         type: 'error',
         text1: 'Lỗi',
-        text2: error.message || 'Không thể cập nhật thông tin',
+        text2: error.message || i18n.t('common:ui.personal.updateFailed'),
       });
       this.setState({savingProfile: false});
     }
@@ -424,18 +425,18 @@ export default class ProfileScreen extends React.PureComponent<
   handleDeleteAccount = async () => {
     const {deletePassword} = this.state;
     if (!deletePassword) {
-      Toast.show({type: 'error', text1: 'Lỗi', text2: 'Vui lòng nhập mật khẩu để xác nhận'});
+      Toast.show({type: 'error', text1: 'Lỗi', text2: i18n.t('common:ui.personal.passwordToConfirm')});
       return;
     }
     this.setState({deletingAccount: true});
     try {
       await authApi.deleteAccount(deletePassword);
       this.setState({showDeleteModal: false, deletePassword: '', deletingAccount: false});
-      Toast.show({type: 'success', text1: 'Đã xóa tài khoản'});
+      Toast.show({type: 'success', text1: i18n.t('common:ui.personal.accountDeleted')});
       NavigationService.reset(ScreenName.HOME_STACK_SCREEN);
     } catch (error: any) {
       this.setState({deletingAccount: false});
-      Toast.show({type: 'error', text1: 'Lỗi', text2: error.message || 'Không thể xóa tài khoản'});
+      Toast.show({type: 'error', text1: 'Lỗi', text2: error.message || i18n.t('common:ui.personal.accountDeleteFailed')});
     }
   };
 
@@ -446,7 +447,7 @@ export default class ProfileScreen extends React.PureComponent<
       Toast.show({
         type: 'error',
         text1: 'Lỗi',
-        text2: 'Không tìm thấy thông tin tài khoản',
+        text2: i18n.t('common:ui.personal.noAccount'),
       });
       return;
     }
@@ -456,7 +457,7 @@ export default class ProfileScreen extends React.PureComponent<
       Toast.show({
         type: 'error',
         text1: 'Lỗi',
-        text2: 'Vui lòng nhập mật khẩu hiện tại',
+        text2: i18n.t('common:ui.personal.currentRequired'),
       });
       return;
     }
@@ -465,7 +466,7 @@ export default class ProfileScreen extends React.PureComponent<
       Toast.show({
         type: 'error',
         text1: 'Lỗi',
-        text2: 'Vui lòng nhập mật khẩu mới',
+        text2: i18n.t('common:ui.personal.newRequired'),
       });
       return;
     }
@@ -474,7 +475,7 @@ export default class ProfileScreen extends React.PureComponent<
       Toast.show({
         type: 'error',
         text1: 'Lỗi',
-        text2: 'Mật khẩu mới phải có ít nhất 6 ký tự',
+        text2: i18n.t('common:ui.personal.newShort'),
       });
       return;
     }
@@ -483,7 +484,7 @@ export default class ProfileScreen extends React.PureComponent<
       Toast.show({
         type: 'error',
         text1: 'Lỗi',
-        text2: 'Mật khẩu xác nhận không khớp',
+        text2: i18n.t('common:ui.personal.confirmMismatch'),
       });
       return;
     }
@@ -502,15 +503,15 @@ export default class ProfileScreen extends React.PureComponent<
 
       Toast.show({
         type: 'success',
-        text1: 'Thành công',
-        text2: 'Đã đổi mật khẩu thành công',
+        text1: i18n.t('common:ui.common.ok'),
+        text2: i18n.t('common:ui.personal.passwordChanged'),
       });
     } catch (error: any) {
       console.error('Error changing password:', error);
       Toast.show({
         type: 'error',
         text1: 'Lỗi',
-        text2: error.message || 'Không thể đổi mật khẩu',
+        text2: error.message || i18n.t('common:ui.personal.passwordChangeFailed'),
       });
       this.setState({changingPassword: false});
     }
@@ -524,16 +525,16 @@ export default class ProfileScreen extends React.PureComponent<
       case 'Female':
         return 'Nữ';
       case 'Other':
-        return 'Khác';
+        return i18n.t('common:ui.common.other');
       default:
-        return 'Chưa cập nhật';
+        return i18n.t('common:ui.personal.notSet');
     }
   };
 
   // Helper function to format birthday to DD/MM/YYYY
   formatBirthday = (birthday?: string): string => {
     if (!birthday) {
-      return 'Chưa cập nhật';
+      return i18n.t('common:ui.personal.notSet');
     }
 
     // If already in DD/MM/YYYY format, return as-is
@@ -592,7 +593,7 @@ export default class ProfileScreen extends React.PureComponent<
     return (
       <Page>
         <HeaderBase
-          title={'Thông tin cá nhân'}
+          title={i18n.t('common:ui.personal.title')}
           leftIconSvg={
             <BackSvg
               width={sizes._24sdp}
@@ -628,11 +629,11 @@ export default class ProfileScreen extends React.PureComponent<
                 AppStyle.txt_14_medium,
                 {color: colors.primary_400, marginBottom: sizes._4sdp},
               ]}>
-              Tên đăng nhập
+              {i18n.t('common:ui.common.userName')}
             </TextBase>
             <TextBase
               style={[AppStyle.txt_16_medium, {color: colors.primary_950}]}>
-              {account?.userName || 'Chưa cập nhật'}
+              {account?.userName || i18n.t('common:ui.personal.notSet')}
             </TextBase>
           </View>
 
@@ -643,11 +644,11 @@ export default class ProfileScreen extends React.PureComponent<
                 AppStyle.txt_14_medium,
                 {color: colors.primary_400, marginBottom: sizes._4sdp},
               ]}>
-              Họ và tên
+              {i18n.t('common:ui.signup.fullName')}
             </TextBase>
             <TextBase
               style={[AppStyle.txt_16_medium, {color: colors.primary_950}]}>
-              {account?.fullName || 'Chưa cập nhật'}
+              {account?.fullName || i18n.t('common:ui.personal.notSet')}
             </TextBase>
           </View>
 
@@ -662,7 +663,7 @@ export default class ProfileScreen extends React.PureComponent<
             </TextBase>
             <TextBase
               style={[AppStyle.txt_16_medium, {color: colors.primary_950}]}>
-              {account?.email || 'Chưa cập nhật'}
+              {account?.email || i18n.t('common:ui.personal.notSet')}
             </TextBase>
           </View>
 
@@ -673,11 +674,11 @@ export default class ProfileScreen extends React.PureComponent<
                 AppStyle.txt_14_medium,
                 {color: colors.primary_400, marginBottom: sizes._4sdp},
               ]}>
-              Số điện thoại
+              {i18n.t('common:ui.signup.phone')}
             </TextBase>
             <TextBase
               style={[AppStyle.txt_16_medium, {color: colors.primary_950}]}>
-              {account?.phone || 'Chưa cập nhật'}
+              {account?.phone || i18n.t('common:ui.personal.notSet')}
             </TextBase>
           </View>
 
@@ -688,7 +689,7 @@ export default class ProfileScreen extends React.PureComponent<
                 AppStyle.txt_14_medium,
                 {color: colors.primary_400, marginBottom: sizes._4sdp},
               ]}>
-              Giới tính
+              {i18n.t('common:ui.signup.gender')}
             </TextBase>
             <TextBase
               style={[AppStyle.txt_16_medium, {color: colors.primary_950}]}>
@@ -703,7 +704,7 @@ export default class ProfileScreen extends React.PureComponent<
                 AppStyle.txt_14_medium,
                 {color: colors.primary_400, marginBottom: sizes._4sdp},
               ]}>
-              Ngày sinh
+              {i18n.t('common:ui.signup.birthday')}
             </TextBase>
             <TextBase
               style={[AppStyle.txt_16_medium, {color: colors.primary_950}]}>
@@ -718,11 +719,11 @@ export default class ProfileScreen extends React.PureComponent<
                 AppStyle.txt_14_medium,
                 {color: colors.primary_400, marginBottom: sizes._4sdp},
               ]}>
-              Địa chỉ
+              {i18n.t('common:ui.signup.address')}
             </TextBase>
             <TextBase
               style={[AppStyle.txt_16_medium, {color: colors.primary_950}]}>
-              {account?.address || 'Chưa cập nhật'}
+              {account?.address || i18n.t('common:ui.personal.notSet')}
             </TextBase>
           </View>
 
@@ -732,7 +733,7 @@ export default class ProfileScreen extends React.PureComponent<
               style={styles.actionButton}
               onPress={this.handleOpenEditModal}>
               <TextBase style={[AppStyle.txt_16_bold, {color: colors.white}]}>
-                Chỉnh sửa thông tin
+                {i18n.t('common:ui.personal.edit')}
               </TextBase>
             </TouchableOpacity>
 
@@ -740,7 +741,7 @@ export default class ProfileScreen extends React.PureComponent<
               style={[styles.actionButton, styles.secondaryButton]}
               onPress={this.handleOpenPasswordModal}>
               <TextBase style={[AppStyle.txt_16_bold, {color: colors.primary}]}>
-                Đổi mật khẩu
+                {i18n.t('common:ui.personal.changePassword')}
               </TextBase>
             </TouchableOpacity>
 
@@ -748,7 +749,7 @@ export default class ProfileScreen extends React.PureComponent<
               style={[styles.actionButton, styles.secondaryButton, styles.dangerButton]}
               onPress={() => this.setState({showDeleteModal: true, deletePassword: ''})}>
               <TextBase style={[AppStyle.txt_16_bold, {color: '#B22222'}]}>
-                Xóa tài khoản
+                {i18n.t('common:ui.personal.deleteAccount')}
               </TextBase>
             </TouchableOpacity>
           </View>
@@ -769,7 +770,7 @@ export default class ProfileScreen extends React.PureComponent<
                   AppStyle.txt_18_bold,
                   {marginBottom: sizes._20sdp, textAlign: 'center'},
                 ]}>
-                Chỉnh sửa thông tin
+                {i18n.t('common:ui.personal.edit')}
               </TextBase>
 
               <ScrollView>
@@ -802,7 +803,7 @@ export default class ProfileScreen extends React.PureComponent<
                       AppStyle.txt_12_regular,
                       {color: colors.primary_400, marginTop: sizes._8sdp},
                     ]}>
-                    Nhấn để thay đổi ảnh đại diện
+                    {i18n.t('common:ui.personal.tapToChange')}
                   </TextBase>}
 
                   {/* Delete Avatar Button */}
@@ -813,7 +814,7 @@ export default class ProfileScreen extends React.PureComponent<
                       style={{marginTop: sizes._8sdp}}>
                       <TextBase
                         style={[AppStyle.txt_12_medium, {color: '#FF0000'}]}>
-                        🗑️ Xóa ảnh đại diện
+                        {i18n.t('common:ui.personal.removeAvatar')}
                       </TextBase>
                     </TouchableOpacity>
                   )}
@@ -826,13 +827,13 @@ export default class ProfileScreen extends React.PureComponent<
                       AppStyle.txt_14_medium,
                       {color: colors.primary_400, marginBottom: sizes._8sdp},
                     ]}>
-                    Họ và tên
+                    {i18n.t('common:ui.signup.fullName')}
                   </TextBase>
                   <TextInput
                     mode="outlined"
                     value={editFullName}
                     onChangeText={text => this.setState({editFullName: text})}
-                    placeholder="Nhập họ và tên"
+                    placeholder={i18n.t('common:ui.common.fullNamePlaceholder')}
                     style={styles.textInput}
                     outlineColor={colors.primary_200}
                     activeOutlineColor={colors.primary}
@@ -868,13 +869,13 @@ export default class ProfileScreen extends React.PureComponent<
                       AppStyle.txt_14_medium,
                       {color: colors.primary_400, marginBottom: sizes._8sdp},
                     ]}>
-                    Số điện thoại
+                    {i18n.t('common:ui.signup.phone')}
                   </TextBase>
                   <TextInput
                     mode="outlined"
                     value={editPhone}
                     onChangeText={text => this.setState({editPhone: text})}
-                    placeholder="Nhập số điện thoại"
+                    placeholder={i18n.t('common:ui.common.phonePlaceholder')}
                     keyboardType="phone-pad"
                     style={styles.textInput}
                     outlineColor={colors.primary_200}
@@ -889,7 +890,7 @@ export default class ProfileScreen extends React.PureComponent<
                       AppStyle.txt_14_medium,
                       {color: colors.primary_400, marginBottom: sizes._8sdp},
                     ]}>
-                    Giới tính
+                    {i18n.t('common:ui.signup.gender')}
                   </TextBase>
                   <View style={styles.genderContainer}>
                     {(['Male', 'Female', 'Other'] as const).map(gender => (
@@ -914,7 +915,7 @@ export default class ProfileScreen extends React.PureComponent<
                             ? 'Nam'
                             : gender === 'Female'
                             ? 'Nữ'
-                            : 'Khác'}
+                            : i18n.t('common:ui.common.other')}
                         </TextBase>
                       </TouchableOpacity>
                     ))}
@@ -928,7 +929,7 @@ export default class ProfileScreen extends React.PureComponent<
                       AppStyle.txt_14_medium,
                       {color: colors.primary_400, marginBottom: sizes._8sdp},
                     ]}>
-                    Ngày sinh (DD/MM/YYYY)
+                    {i18n.t('common:ui.personal.birthday')}
                   </TextBase>
                   <TextInput
                     mode="outlined"
@@ -948,13 +949,13 @@ export default class ProfileScreen extends React.PureComponent<
                       AppStyle.txt_14_medium,
                       {color: colors.primary_400, marginBottom: sizes._8sdp},
                     ]}>
-                    Địa chỉ
+                    {i18n.t('common:ui.signup.address')}
                   </TextBase>
                   <TextInput
                     mode="outlined"
                     value={editAddress}
                     onChangeText={text => this.setState({editAddress: text})}
-                    placeholder="Nhập địa chỉ"
+                    placeholder={i18n.t('common:ui.common.addressPlaceholder')}
                     multiline
                     numberOfLines={2}
                     style={[styles.textInput, {minHeight: sizes._60sdp}]}
@@ -972,7 +973,7 @@ export default class ProfileScreen extends React.PureComponent<
                   disabled={savingProfile}>
                   <TextBase
                     style={[AppStyle.txt_14_medium, {color: colors.primary}]}>
-                    Hủy
+                    {i18n.t('common:ui.common.cancel')}
                   </TextBase>
                 </TouchableOpacity>
 
@@ -985,7 +986,7 @@ export default class ProfileScreen extends React.PureComponent<
                   ) : (
                     <TextBase
                       style={[AppStyle.txt_14_medium, {color: colors.white}]}>
-                      Lưu
+                      {i18n.t('common:ui.personal.save')}
                     </TextBase>
                   )}
                 </TouchableOpacity>
@@ -1007,7 +1008,7 @@ export default class ProfileScreen extends React.PureComponent<
                   AppStyle.txt_18_bold,
                   {marginBottom: sizes._20sdp, textAlign: 'center'},
                 ]}>
-                Đổi mật khẩu
+                {i18n.t('common:ui.personal.changePassword')}
               </TextBase>
 
               <ScrollView>
@@ -1018,7 +1019,7 @@ export default class ProfileScreen extends React.PureComponent<
                       AppStyle.txt_14_medium,
                       {color: colors.primary_400, marginBottom: sizes._8sdp},
                     ]}>
-                    Mật khẩu hiện tại
+                    {i18n.t('common:ui.personal.currentPassword')}
                   </TextBase>
                   <TextInput
                     mode="outlined"
@@ -1026,7 +1027,7 @@ export default class ProfileScreen extends React.PureComponent<
                     onChangeText={text =>
                       this.setState({currentPassword: text})
                     }
-                    placeholder="Nhập mật khẩu hiện tại"
+                    placeholder={i18n.t('common:ui.personal.currentPlaceholder')}
                     secureTextEntry={!showCurrentPassword}
                     right={
                       <TextInput.Icon
@@ -1057,7 +1058,7 @@ export default class ProfileScreen extends React.PureComponent<
                     mode="outlined"
                     value={newPassword}
                     onChangeText={text => this.setState({newPassword: text})}
-                    placeholder="Nhập mật khẩu mới (tối thiểu 6 ký tự)"
+                    placeholder={i18n.t('common:ui.personal.newPlaceholder')}
                     secureTextEntry={!showNewPassword}
                     right={
                       <TextInput.Icon
@@ -1080,7 +1081,7 @@ export default class ProfileScreen extends React.PureComponent<
                       AppStyle.txt_14_medium,
                       {color: colors.primary_400, marginBottom: sizes._8sdp},
                     ]}>
-                    Xác nhận mật khẩu mới
+                    {i18n.t('common:ui.personal.confirmNew')}
                   </TextBase>
                   <TextInput
                     mode="outlined"
@@ -1088,7 +1089,7 @@ export default class ProfileScreen extends React.PureComponent<
                     onChangeText={text =>
                       this.setState({confirmPassword: text})
                     }
-                    placeholder="Nhập lại mật khẩu mới"
+                    placeholder={i18n.t('common:ui.personal.confirmPlaceholder')}
                     secureTextEntry={!showConfirmPassword}
                     right={
                       <TextInput.Icon
@@ -1115,7 +1116,7 @@ export default class ProfileScreen extends React.PureComponent<
                   disabled={changingPassword}>
                   <TextBase
                     style={[AppStyle.txt_14_medium, {color: colors.primary}]}>
-                    Hủy
+                    {i18n.t('common:ui.common.cancel')}
                   </TextBase>
                 </TouchableOpacity>
 
@@ -1128,7 +1129,7 @@ export default class ProfileScreen extends React.PureComponent<
                   ) : (
                     <TextBase
                       style={[AppStyle.txt_14_medium, {color: colors.white}]}>
-                      Đổi mật khẩu
+                      {i18n.t('common:ui.personal.changePassword')}
                     </TextBase>
                   )}
                 </TouchableOpacity>
@@ -1150,15 +1151,14 @@ export default class ProfileScreen extends React.PureComponent<
                   AppStyle.txt_18_bold,
                   {marginBottom: sizes._12sdp, textAlign: 'center'},
                 ]}>
-                Xóa tài khoản
+                {i18n.t('common:ui.personal.deleteAccount')}
               </TextBase>
               <TextBase
                 style={[
                   AppStyle.txt_14_medium,
                   {color: colors.primary_400, marginBottom: sizes._16sdp},
                 ]}>
-                Thông tin cá nhân (họ tên, email, số điện thoại, ngày sinh, địa chỉ, ảnh đại diện) sẽ bị xóa và
-                không thể khôi phục. Nhập mật khẩu để xác nhận.
+                {i18n.t('common:ui.personal.deleteWarning')}
               </TextBase>
               <TextInput
                 mode="outlined"
@@ -1177,7 +1177,7 @@ export default class ProfileScreen extends React.PureComponent<
                   disabled={deletingAccount}>
                   <TextBase
                     style={[AppStyle.txt_14_medium, {color: colors.primary}]}>
-                    Hủy
+                    {i18n.t('common:ui.common.cancel')}
                   </TextBase>
                 </TouchableOpacity>
                 <TouchableOpacity
@@ -1189,7 +1189,7 @@ export default class ProfileScreen extends React.PureComponent<
                   ) : (
                     <TextBase
                       style={[AppStyle.txt_14_medium, {color: colors.white}]}>
-                      Xóa vĩnh viễn
+                      {i18n.t('common:ui.personal.deleteForever')}
                     </TextBase>
                   )}
                 </TouchableOpacity>
@@ -1216,7 +1216,7 @@ export default class ProfileScreen extends React.PureComponent<
                   AppStyle.txt_18_bold,
                   {marginBottom: sizes._16sdp, textAlign: 'center'},
                 ]}>
-                Xem trước ảnh đại diện
+                {i18n.t('common:ui.personal.previewAvatar')}
               </TextBase>
 
               {previewAvatarUri && (
@@ -1237,7 +1237,7 @@ export default class ProfileScreen extends React.PureComponent<
                   }>
                   <TextBase
                     style={[AppStyle.txt_14_medium, {color: colors.primary}]}>
-                    Hủy
+                    {i18n.t('common:ui.common.cancel')}
                   </TextBase>
                 </TouchableOpacity>
 
@@ -1246,7 +1246,7 @@ export default class ProfileScreen extends React.PureComponent<
                   onPress={this.handleConfirmAvatar}>
                   <TextBase
                     style={[AppStyle.txt_14_medium, {color: colors.white}]}>
-                    Xác nhận
+                    {i18n.t('common:ui.personal.confirm')}
                   </TextBase>
                 </TouchableOpacity>
               </View>

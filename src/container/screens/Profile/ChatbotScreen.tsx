@@ -1,4 +1,5 @@
 import React from 'react';
+import i18n from '../../../i18n';
 import {
   View,
   StyleSheet,
@@ -95,7 +96,7 @@ export default class ChatbotScreen extends React.PureComponent<
         const welcomeMessage: ChatMessage = {
           role: 'assistant',
           content:
-            'Xin chào! Tôi là trợ lý AI của ứng dụng du lịch Đà Nẵng. Tôi có thể giúp gì cho bạn? 😊',
+            i18n.t('common:ui.chatbot.welcome'),
         };
         this.setState({messages: [welcomeMessage]});
         await LocalStorageCommon.setItem(localStorageKey.CHAT_HISTORY, [
@@ -108,7 +109,7 @@ export default class ChatbotScreen extends React.PureComponent<
       const welcomeMessage: ChatMessage = {
         role: 'assistant',
         content:
-          'Xin chào! Tôi là trợ lý AI của ứng dụng du lịch Đà Nẵng. Tôi có thể giúp gì cho bạn? 😊',
+          i18n.t('common:ui.chatbot.welcome'),
       };
       this.setState({messages: [welcomeMessage]});
     }
@@ -134,7 +135,7 @@ export default class ChatbotScreen extends React.PureComponent<
           console.log('User cancelled image picker');
         } else if (response.errorCode) {
           console.log('ImagePicker Error: ', response.errorMessage);
-          Alert.alert('Lỗi', 'Không thể chọn ảnh. Vui lòng thử lại.');
+          Alert.alert('Lỗi', i18n.t('common:ui.common.pickImageFailed'));
         } else if (response.assets && response.assets.length > 0) {
           const asset = response.assets[0];
           this.setState({uploadingImage: true});
@@ -156,7 +157,7 @@ export default class ChatbotScreen extends React.PureComponent<
             });
           } catch (error) {
             console.error('Error uploading image:', error);
-            Alert.alert('Lỗi', 'Không thể upload ảnh. Vui lòng thử lại.');
+            Alert.alert('Lỗi', i18n.t('common:ui.chatbot.uploadFailed'));
             this.setState({uploadingImage: false});
           }
         }
@@ -195,7 +196,7 @@ export default class ChatbotScreen extends React.PureComponent<
       } else {
         messageContent.unshift({
           type: 'text' as const,
-          text: 'Đây là địa điểm gì? Hãy mô tả chi tiết.',
+          text: i18n.t('common:ui.chatbot.describePlace'),
         });
       }
     } else {
@@ -275,7 +276,7 @@ export default class ChatbotScreen extends React.PureComponent<
         if (imageResponse.error) {
           const imageErrorMessage: ChatMessage = {
             role: 'assistant',
-            content: `❌ Lỗi tìm ảnh: ${imageResponse.error}`,
+            content: i18n.t('common:ui.chatbot.imageError', {message: imageResponse.error}),
           };
           finalMessages = [...finalMessages, imageErrorMessage];
           this.setState({
@@ -319,21 +320,21 @@ export default class ChatbotScreen extends React.PureComponent<
 
   handleNewConversation = () => {
     Alert.alert(
-      'Tạo cuộc trò chuyện mới',
-      'Bạn có chắc muốn xóa lịch sử chat và bắt đầu cuộc trò chuyện mới?',
+      i18n.t('common:ui.chatbot.newTitle'),
+      i18n.t('common:ui.chatbot.newQuestion'),
       [
         {
-          text: 'Hủy',
+          text: i18n.t('common:ui.common.cancel'),
           style: 'cancel',
         },
         {
-          text: 'Xóa',
+          text: i18n.t('common:ui.common.delete'),
           style: 'destructive',
           onPress: async () => {
             const welcomeMessage: ChatMessage = {
               role: 'assistant',
               content:
-                'Xin chào! Tôi là trợ lý AI của ứng dụng du lịch Đà Nẵng. Tôi có thể giúp gì cho bạn? 😊',
+                i18n.t('common:ui.chatbot.welcome'),
             };
             this.setState({
               messages: [welcomeMessage],
@@ -472,7 +473,7 @@ export default class ChatbotScreen extends React.PureComponent<
 
     return (
       <View style={styles.quickRepliesContainer}>
-        <TextBase style={styles.quickRepliesTitle}>Gợi ý câu hỏi:</TextBase>
+        <TextBase style={styles.quickRepliesTitle}>{i18n.t('common:ui.chatbot.suggestions')}</TextBase>
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -496,7 +497,7 @@ export default class ChatbotScreen extends React.PureComponent<
     return (
       <Page>
         <HeaderBase
-          title="Trợ lý AI"
+          title={i18n.t('common:ui.chatbot.title')}
           leftIconSvg={
             <BackSvg
               width={sizes._24sdp}
@@ -541,7 +542,7 @@ export default class ChatbotScreen extends React.PureComponent<
           <TouchableOpacity
             onPress={this.handleNewConversation}
             style={styles.newChatButton}>
-            <TextBase style={styles.newChatButtonText}>🔄 Tạo mới</TextBase>
+            <TextBase style={styles.newChatButtonText}>{i18n.t('common:ui.chatbot.new')}</TextBase>
           </TouchableOpacity>
         </View>
 
@@ -563,7 +564,7 @@ export default class ChatbotScreen extends React.PureComponent<
               isLoading ? (
                 <View style={styles.loadingContainer}>
                   <ActivityIndicator size="small" color={colors.primary} />
-                  <TextBase style={styles.loadingText}>Đang trả lời...</TextBase>
+                  <TextBase style={styles.loadingText}>{i18n.t('common:ui.chatbot.answering')}</TextBase>
                 </View>
               ) : null
             }
@@ -609,7 +610,7 @@ export default class ChatbotScreen extends React.PureComponent<
 
               <TextInput
                 style={styles.input}
-                placeholder="Nhập câu hỏi của bạn..."
+                placeholder={i18n.t('common:ui.chatbot.inputPlaceholder')}
                 placeholderTextColor={colors.primary_300}
                 value={inputText}
                 onChangeText={text => this.setState({inputText: text})}

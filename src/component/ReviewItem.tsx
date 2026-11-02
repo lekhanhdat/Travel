@@ -1,4 +1,5 @@
 import React from 'react';
+import i18n from '../i18n';
 import {Image, View, ScrollView, TouchableOpacity, Modal, Dimensions, Alert} from 'react-native';
 import Toast from 'react-native-toast-message';
 import {IReview} from '../common/types';
@@ -52,29 +53,29 @@ export default class ReviewItem extends React.PureComponent<
   // P7 (Play UGC policy): any signed-in user can report a review; several reports hide it on the BE.
   handleReport = async () => {
     if (!(await requireLogin())) {return;}
-    Alert.alert('Báo cáo đánh giá', 'Đánh giá này có nội dung không phù hợp?', [
-      {text: 'Hủy', style: 'cancel'},
-      {text: 'Báo cáo', style: 'destructive', onPress: async () => {
+    Alert.alert(i18n.t('common:ui.review.reportTitle'), i18n.t('common:ui.review.reportQuestion'), [
+      {text: i18n.t('common:ui.common.cancel'), style: 'cancel'},
+      {text: i18n.t('common:ui.review.report'), style: 'destructive', onPress: async () => {
         try {
           const message = await reviewsApi.report(this.props.review.id);
           Toast.show({type: 'success', text1: message});
         } catch (error: any) {
-          Toast.show({type: 'error', text1: error?.message || 'Không thể gửi báo cáo'});
+          Toast.show({type: 'error', text1: error?.message || i18n.t('common:ui.review.reportFailed')});
         }
       }},
     ]);
   };
 
   handleDelete = () => {
-    Alert.alert('Xóa đánh giá', 'Bạn chắc chắn muốn xóa đánh giá này?', [
-      {text: 'Hủy', style: 'cancel'},
-      {text: 'Xóa', style: 'destructive', onPress: async () => {
+    Alert.alert(i18n.t('common:ui.review.deleteTitle'), i18n.t('common:ui.review.deleteQuestion'), [
+      {text: i18n.t('common:ui.common.cancel'), style: 'cancel'},
+      {text: i18n.t('common:ui.common.delete'), style: 'destructive', onPress: async () => {
         try {
           await reviewsApi.remove(this.props.review.id);
           this.props.onDeleted?.(this.props.review.id);
-          Toast.show({type: 'success', text1: 'Đã xóa đánh giá'});
+          Toast.show({type: 'success', text1: i18n.t('common:ui.review.deleted')});
         } catch (error: any) {
-          Toast.show({type: 'error', text1: error?.message || 'Không thể xóa đánh giá'});
+          Toast.show({type: 'error', text1: error?.message || i18n.t('common:ui.review.deleteFailed')});
         }
       }},
     ]);
@@ -168,14 +169,14 @@ export default class ReviewItem extends React.PureComponent<
             style={[
               AppStyle.txt_16_regular,
               {marginTop: sizes._12sdp},
-            ]}>{review.location ? `Địa điểm: ${review.location.name}` : `Lễ hội: ${review.festival?.name}`}</TextBase>
+            ]}>{review.location ? i18n.t('common:ui.review.place', {name: review.location.name}) : i18n.t('common:ui.review.festival', {name: review.festival?.name})}</TextBase>
         )}
 
         <TouchableOpacity
           onPress={isOwn ? this.handleDelete : this.handleReport}
           style={{alignSelf: 'flex-end', marginTop: sizes._8sdp}}>
           <TextBase style={[AppStyle.txt_14_regular, {color: colors.primary_400}]}>
-            {isOwn ? 'Xóa' : 'Báo cáo'}
+            {isOwn ? i18n.t('common:ui.common.delete') : i18n.t('common:ui.review.report')}
           </TextBase>
         </TouchableOpacity>
 

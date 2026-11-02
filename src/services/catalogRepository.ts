@@ -1,5 +1,5 @@
 import {createCatalogCache, fetchCatalog} from './catalog.client';
-import {adaptFestival, adaptLocation, FestivalDTO, LocationDTO} from './catalog.adapter';
+import {adaptFestival, adaptHotel, adaptLocation, FestivalDTO, HotelDTO, LocationDTO} from './catalog.adapter';
 import {isMapLocationVisible} from '../utils/catalogVisibility';
 
 /** Festival with the venue name resolved from location_id ('' when it has no linked location). */
@@ -48,10 +48,17 @@ const cache = createCatalogCache(async () => {
   return buildCatalogSnapshot(locations, festivals);
 });
 
+// P11.4: hotels are loaded lazily, only when a search needs them (~44 KB gzip), with the same cache rules.
+const hotelsCache = createCatalogCache<HotelDTO[]>(() => fetchCatalog('/hotels', adaptHotel));
+
 const catalogRepository = {
   get: (forceRefresh = false) => cache.get(forceRefresh),
   refresh: () => cache.get(true),
-  clear: cache.clear,
+  getHotels: (forceRefresh = false) => hotelsCache.get(forceRefresh),
+  clear: () => {
+    cache.clear();
+    hotelsCache.clear();
+  },
 };
 
 export default catalogRepository;

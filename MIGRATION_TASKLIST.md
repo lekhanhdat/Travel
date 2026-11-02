@@ -2,7 +2,7 @@
 
 Theo [MIGRATION_AUDIT.md](MIGRATION_AUDIT.md): quyết định (mục 2), kiểm kê F01–F38 (mục 3), kiến trúc đích (mục 5), danh sách Clean CF/CB (mục 6), chi phí + key (mục 7). Mỗi phase chỉ bắt đầu khi User duyệt; xong thì tick và ghi một dòng nhật ký.
 
-**Thứ tự:** P0–P9 ✅ → P10 payment sang Neon/Cloud Run (giữ tắt) → P11 i18n + dịch nội dung + Hotels → P12 CLEAN → P13 nghiệm thu Android → P14 phát hành. Sau đó: Nợ N1–N4. Refactor/tối ưu: Backlog.
+**Thứ tự:** P0–P11 ✅ (N2 PayOS bật cùng P10) → P12 CLEAN → P13 nghiệm thu Android → P14 phát hành. Sau đó: Nợ N1–N4. Refactor/tối ưu: Backlog.
 
 **Quy tắc:** dùng lại / mở comment code có sẵn, không viết lại tính năng tương tự. Không xóa code/tài liệu có sẵn trước P12. Không dữ liệu fix cứng, không secret trong repo. Dịch vụ bên thứ ba chỉ gọi qua BE, key ở Secret Manager `travel-app-config`. NocoDB → Neon, DigitalOcean → Cloud Run, sau migration không còn dính dáng (P12.9). Không copy dữ liệu export vào repo.
 
@@ -92,25 +92,29 @@ Phụ thuộc: P6, P8. Ước lượng: BE L + FE M.
 
 **Deploy P9 (31/10):** migration 010 + quyền 005; index build lúc build image (183 vector: 123 + 49 + 11); image `sha256:23aafe4d…` → revision `travel-api-00008-fxl` (100%); rollback về `travel-api-00007-68l`. Smoke: module `ai` operational, ready, "biển đẹp" → An Bàng, Thanh Bình, Bắc Mỹ An.
 
-## P10 — Payment: bỏ NocoDB/DO, chuyển sang Neon/Cloud Run, giữ tắt (F27, F28)
+## P10 — Payment: bỏ NocoDB/DO, chuyển sang Neon/Cloud Run, giữ tắt (F27, F28) ✅
 Phụ thuộc: P5. Ước lượng: BE S–M + FE S.
-- [ ] **P10.1** Quyền `db/permissions/006_payments.sql` (SELECT/INSERT/UPDATE trạng thái `transactions`, UPDATE `accounts.balance`; không đổi schema — thay cho tên `011_payments` dự kiến), test, **chưa áp dụng**.
-- [ ] **P10.2** `core_api/payments.py` `PaymentsRepository` (Neon) thay `create_transaction`, `get_user_by_id`, `update_user_balance` của `nocodb_service.py` (giữ chữ ký) + `mark_paid` (một transaction, khóa dòng).
-- [ ] **P10.3** Module `payments` (3 key PayOS, cần `auth`; **không bật** trong `service.yaml`): `/payments/create` (user từ JWT, ghi PENDING trước khi tạo link), `/payments/status/{order_code}` (chỉ chủ giao dịch), `/webhook/payos` (bắt buộc chữ ký HMAC-SHA256, idempotent theo `order_code`, sai số tiền không cộng), `/payment/return|cancel`; URL trả về = Cloud Run; SDK `payos` chỉ import khi bật. Test: `tests/check_payments.py`.
-- [ ] **P10.4** FE `payment.api.ts` → `apiCall` (`API_BASE_URL` + token, không gửi `userId`); `Donation` giữ comment; "Ủng hộ" vẫn báo "sắp có". Test: `__tests__/services/payment.api.test.js`.
+- [x] **P10.1** Quyền `db/permissions/006_payments.sql` (SELECT/INSERT/UPDATE trạng thái `transactions`, UPDATE `accounts.balance`; không đổi schema — thay cho tên `011_payments` dự kiến), test, **chưa áp dụng**.
+- [x] **P10.2** `core_api/payments.py` `PaymentsRepository` (Neon) thay `create_transaction`, `get_user_by_id`, `update_user_balance` của `nocodb_service.py` (giữ chữ ký) + `mark_paid` (một transaction, khóa dòng).
+- [x] **P10.3** Module `payments` (3 key PayOS, cần `auth`; **không bật** trong `service.yaml`): `/payments/create` (user từ JWT, ghi PENDING trước khi tạo link), `/payments/status/{order_code}` (chỉ chủ giao dịch), `/webhook/payos` (bắt buộc chữ ký HMAC-SHA256, idempotent theo `order_code`, sai số tiền không cộng), `/payment/return|cancel`; URL trả về = Cloud Run; SDK `payos` chỉ import khi bật. Test: `tests/check_payments.py`.
+- [x] **P10.4** FE `payment.api.ts` → `apiCall` (`API_BASE_URL` + token, không gửi `userId`); `Donation` giữ comment; "Ủng hộ" vẫn báo "sắp có". Test: `__tests__/services/payment.api.test.js`.
 
-**Nghiệm thu P10:** code payment không còn NocoDB/DO; test PASS; không endpoint payment public.
+**Nghiệm thu P10:** code payment không còn NocoDB/DO; test PASS; không endpoint payment public. — User thử emulator 31/10: tạo mã để PENDING, tạo mã mới và quét → PAID, số dư cộng đúng: pass.
 
-## P11 — i18n UI, nội dung tiếng Anh, Hotels trong search (F31–F33)
+**Bật N2 cùng P10 (31/10, theo User):** PayOS qua REST (không SDK), chữ ký kiểm thật (tạo link 2.000 đ rồi hủy); `travel-app-config:3` (+3 key PayOS), quyền 006; image `sha256:4899a943…` → revision `travel-api-00009-2ml` (100%), rollback về `travel-api-00008-fxl`; webhook `…/webhook/payos` đăng ký qua `confirm-webhook` (PayOS gửi thử → 200). FE mở `Donation` + mục "Ủng hộ". Còn: giao dịch thật trên emulator.
+
+## P11 — i18n UI, nội dung tiếng Anh, Hotels trong search (F31–F33) ✅
 Phụ thuộc: P9. Ước lượng: BE S + FE M + dữ liệu S.
-- [ ] **P11.1 Cột `*_en` ở Neon** (`012_i18n_content.sql`; locations/festivals/hotels/objects); API trả thêm `*_en`; `translationHelpers.ts:6-26` chọn `*_en` khi en và có dữ liệu. Chữ UI vẫn ở `src/i18n/locales/{vi,en}/common.json`. Test: `translationHelpers.test.ts`, `check_contract.py`.
-- [ ] **P11.2 Script dịch một lần** (OpenAI gpt-4o-mini, ~0,3 USD): đọc Neon → dịch theo lô → file duyệt cho User → ghi ô trống; xóa script + file duyệt sau khi ghi.
-- [ ] **P11.3 i18n UI:** `common.json` vi/en đủ key cho mọi màn mở ở P6–P10.
-- [ ] **P11.4 Hotels trong search:** `catalogRepository` nạp `/hotels` lười khi search (~44 KB gzip); adapter dùng lại `catalog.adapter`; kết quả mở `DetailLocation`. Test: `catalogSearch.test.js`, `catalog.api.test.js`.
-- [ ] **P11.5 Nhãn tiếng Việt cho `types`** trong i18n `common` theo slug; search khớp slug + nhãn.
-- [ ] **P11.6** Sửa `__tests__/i18n/languageSwitching.test.tsx`; thêm vào CI.
+- [x] **P11.1 Tiếng Anh ở Neon:** `012_i18n_content.sql` — một cột `content_en JSONB` (theo trường) cho locations/festivals/hotels/objects, thay vì nhiều cột `*_en`; API trả `content_en`; `translationHelpers` nhận bản ghi, chọn `content_en[field]` khi en, thiếu thì tiếng Việt. Test: `translationHelpers.test.ts`, `check_contract.py`.
+- [x] **P11.2 Script dịch một lần** `scripts/translate_content.py` (gpt-4o-mini): `draft` (đọc Neon → file duyệt ngoài repo) → User duyệt → `apply` (chỉ ghi trường còn trống); xóa script + file duyệt sau khi ghi.
+- [x] **P11.3 i18n UI:** ~140 chuỗi cứng của Feed, ReviewItem, Donation, Camera/Preview, Chatbot, Login, SignUp, Personal → `common:ui.*` (vi/en).
+- [x] **P11.4 Hotels trong search:** `catalogRepository.getHotels()` nạp lười ở lần gõ đầu (Home); `adaptHotel` gắn `kind: 'hotel'`; semantic search không ghép id hotel (trùng id location), hotel thêm theo từ khóa; Detail của hotel không gọi review/lễ hội/tương tự. Test: `catalog.api.test.js`, `guestMode.test.js`.
+- [x] **P11.5 Nhãn `types`:** 94 slug → `common:types.*` vi/en; search khớp slug + nhãn hai ngôn ngữ ("bảo tàng" → `museum`). Test: `catalogSearch.test.js`.
+- [x] **P11.6** `languageSwitching.test.tsx` chạy được (thư viện test từ P9) + kiểm `ui.*` đủ vi/en; thêm vào CI.
 
 **Nghiệm thu P11:** en → UI tiếng Anh, record có `*_en` hiện tiếng Anh; search ra hotels; "bảo tàng" khớp `museum`.
+
+**Deploy P11:** migration 012; image `sha256:13d7999b…` → revision `travel-api-00010-bqm` (100%), rollback về `travel-api-00009-2ml`. Dịch xong 02/11: 123 locations, 49 festivals, 82 hotels, 11 objects (script + file duyệt đã xóa).
 
 ## P12 — CLEAN (sau P5–P11; User duyệt từng mục CF/CB ở audit mục 6)
 Mỗi mục một commit riêng. Không refactor, không tối ưu.
@@ -149,7 +153,7 @@ Mỗi mục một commit riêng. Không refactor, không tối ưu.
 
 ## Nợ (sau migration)
 - [ ] **N1 Quên mật khẩu qua email:** chọn nhà cung cấp (key SendGrid còn hiệu lực nhưng chưa thử gửi), thêm key vào `travel-app-config`, bật module `email` (code có ở P5.6), mở `ForgotPasswordScreen` + route, test email thật.
-- [ ] **N2 PayOS / Donation:** 3 key PayOS vào secret, áp dụng `db/permissions/006_payments.sql`, cài `payos` (SDK, bỏ comment `requirements.txt`), thử chữ ký webhook với giao dịch sandbox, bật module `payments`, webhook `https://travel-api-u2xcse44ca-as.a.run.app/webhook/payos` trên my.payos.vn, mở `Donation`, giao dịch thật → số dư tăng đúng 1 lần.
+- [x] **N2 PayOS / Donation:** 3 key PayOS vào secret, áp dụng `db/permissions/006_payments.sql`, PayOS gọi REST (không cần SDK), chữ ký kiểm bằng link thật 2.000 đ, bật module `payments`, webhook `https://travel-api-u2xcse44ca-as.a.run.app/webhook/payos` trên my.payos.vn, mở `Donation`, giao dịch thật → số dư tăng đúng 1 lần. — **Xong 31/10 cùng P10.**
 - [ ] **N3 i18n nâng cao / dịch tự động** nếu cần thêm ngôn ngữ hoặc dịch nội dung người dùng.
 - [ ] **N4 Seeding:** sau P7 tạo tài khoản mẫu + review như reviewer, qua API (không fix cứng, không SQL tay).
 
@@ -181,3 +185,5 @@ Mỗi mục một commit riêng. Không refactor, không tối ưu.
 | 30/10/2026 | P7 | imgbb 103 cả từ Cloud Run → GCS; `/uploads`, `/reviews` (+report, ẩn sau 3 báo cáo), rating/`review_count` từ bảng reviews; migration 008 + quyền 003; Feed/Detail/avatar. Deploy `travel-api-00006-rx4` (`66e11a46…`). Jest CI 14 suite 154 pass, tsc 62; BE 6 test PASS. User nghiệm thu emulator: pass |
 | 31/10/2026 | P8 | Bảng `objects` (11, admin/RAG, không hiện trong app); `/detect` port pipeline cũ (Lens → OpenAI → khớp `objects`), ảnh tạm GCS `tmp/`, quota 5/user + 8/ngày; Camera + PreviewImage qua BE (JWT). Deploy `travel-api-00007-68l` (`c13a57a3…`). Jest CI 15 suite 161 pass, tsc 62; BE 7 test PASS. User nghiệm thu emulator: pass |
 | 31/10/2026 | P9 | FAISS build từ Neon lúc build image (183 vector); router search/chat/memory/recommendations (JWT, quota chat 30/ngày, objects chỉ làm ngữ cảnh RAG); memory + hội thoại trên Neon (010 + quyền 005); OpenAI qua REST; FE semantic + chatbot qua BE. Deploy `travel-api-00008-fxl` (`23aafe4d…`). Jest CI 19 suite 201 pass, tsc 62; BE 9 test PASS. User nghiệm thu emulator: pass |
+| 31/10/2026 | P10 + N2 | Payment trên Neon/Cloud Run (`core_api/payments.py`): user từ JWT, webhook bắt buộc chữ ký + idempotent theo `order_code`, PayOS qua REST (không SDK); quyền 006; `travel-app-config:3`; FE `payment.api` + `Donation` mở lại. Deploy `travel-api-00009-2ml` (`4899a943…`), webhook đăng ký. Jest CI 20 suite 202 pass, tsc 62; BE 10 test PASS. User thử giao dịch thật: pass |
+| 02/11/2026 | P11 | `content_en` ở Neon (012) + dịch một lần (gpt-4o-mini); helper chọn tiếng Anh theo bản ghi; ~140 chuỗi UI → `common:ui.*` vi/en; hotels nạp lười trong search (không ghép id semantic, Detail không gọi review/lễ hội); nhãn 94 `types` vi/en trong search; `languageSwitching` vào CI. Deploy `travel-api-00010-bqm`. Jest CI 21 suite 212 pass, tsc 62; BE 10 test PASS. User duyệt: done |

@@ -8,7 +8,7 @@ const festivals = require('../../src/services/festivals.api').default;
 const {request: legacyRequest} = require('../../src/services/axios');
 
 const common = id => ({id, record_id: `source-${id}`, name: `Catalog ${id}`, types: ['culture'],
-  description: '', long_description: '', rating: null, review_count: 0, reviews: [], images: [], videos: [],
+  description: '', long_description: '', rating: null, review_count: 0, content_en: {}, reviews: [], images: [], videos: [],
   advise: ['Advice'], website: '', phone: '', ticket_info: '', publishable: false});
 const location = id => ({...common(id), address: '', lat: null, long: null, opening_hours: '', avatar: ''});
 const festival = id => ({...common(id), event_time: '', location_id: null});
@@ -170,6 +170,23 @@ describe('Cloud Run catalog contract', () => {
     const empty = catalogRepository.get().catch(error => error);
     await jest.runAllTimersAsync();
     expect(await empty).toMatchObject({kind: 'network'});
+  });
+
+  // P11.4: hotels load lazily (search only), keep their own ids and are tagged kind 'hotel'.
+  it('loads hotels only on demand, tagged as hotels, and rejects a malformed category', async () => {
+    const hotel = id => ({...location(id), category: 'resort', content_en: {name: `Hotel ${id}`}});
+    const adapter = serve({'/locations': [location(1)], '/festivals': [], '/hotels': [hotel(1), hotel(2)]});
+    catalogRequest.defaults.adapter = adapter;
+    await catalogRepository.get();
+    expect(adapter.mock.calls.map(([config]) => config.url)).not.toContain('/hotels');
+    const hotels = await catalogRepository.getHotels();
+    expect(hotels.map(row => [row.id, row.kind, row.category])).toEqual([[1, 'hotel', 'resort'], [2, 'hotel', 'resort']]);
+    expect(hotels[0].content_en).toEqual({name: 'Hotel 1'});
+    await catalogRepository.getHotels();
+    expect(adapter.mock.calls.filter(([config]) => config.url === '/hotels')).toHaveLength(1);
+    const {adaptHotel} = require('../../src/services/catalog.adapter');
+    expect(() => adaptHotel({...hotel(3), category: 5})).toThrow(CatalogError);
+    expect(() => adaptHotel({...hotel(3), content_en: {name: 7}})).toThrow(CatalogError);
   });
 
   // P7: reviews come from GET /reviews (BE table), no longer from the catalog's legacy `reviews` column.

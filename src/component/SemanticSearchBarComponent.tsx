@@ -64,7 +64,12 @@ interface SemanticSearchBarComponentProps<T> {
   containerStyle?: any;
   entityType: EntityType; // 'location' | 'festival' | 'item'
   idField?: keyof T; // Field to match entity_id from semantic search
+  onQueryChange?: (text: string) => void; // P11.4: e.g. Home loads hotels on the first keystroke
 }
+
+// P11.4: hotels have their own ids (they collide with location ids) and are not in the semantic index,
+// so they never match semantic results by id; they are added by keyword instead.
+const isHotel = (item: unknown) => (item as {kind?: string} | null)?.kind === 'hotel';
 
 interface SemanticSearchBarComponentState<T> {
   searchValue: string;
@@ -187,6 +192,7 @@ export default class SemanticSearchBarComponent<T> extends React.PureComponent<
         // Match local data with API results and attach scores
         const matchedWithScores: Array<{item: T; score: number}> = [];
         data.forEach(item => {
+          if (isHotel(item)) {return;}
           const itemId = item[idField];
           const matchesNumber = resultIdSet.has(Number(itemId));
           const matchesString = resultIdSet.has(String(itemId));
@@ -232,6 +238,10 @@ export default class SemanticSearchBarComponent<T> extends React.PureComponent<
           });
         }
 
+        // Hotels matching the words (keyword search) follow the semantic results.
+        const hotels = searchCatalog(data.filter(isHotel), query, this.props.searchFields);
+        finalResults = [...finalResults, ...hotels];
+
         this.setState({lastFilteredData: finalResults, isSearching: false});
         return finalResults;
       } else {
@@ -252,6 +262,7 @@ export default class SemanticSearchBarComponent<T> extends React.PureComponent<
 
   handleSearchChange = (text: string) => {
     const {data} = this.props;
+    this.props.onQueryChange?.(text);
     const {useSemanticSearch} = this.state;
     this.setState({searchValue: text});
 

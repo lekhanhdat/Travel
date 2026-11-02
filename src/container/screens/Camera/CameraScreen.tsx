@@ -1,4 +1,5 @@
 import React from 'react';
+import i18n from '../../../i18n';
 import {Platform, TouchableOpacity, View, Image} from 'react-native';
 import {launchImageLibrary} from 'react-native-image-picker';
 import {ActivityIndicator, Modal, Portal} from 'react-native-paper';
@@ -112,15 +113,15 @@ export default class CameraScreen extends React.PureComponent<
         console.log('Backend connection successful:', data);
         Toast.show({
           type: 'success',
-          text1: '✅ Kết nối thành công',
-          text2: 'Backend API đang hoạt động bình thường',
+          text1: i18n.t('common:ui.camera.connected'),
+          text2: i18n.t('common:ui.camera.backendOk'),
         });
       } else {
         console.log('Backend connection failed with status:', response.status);
         Toast.show({
           type: 'error',
           text1: '❌ Lỗi kết nối',
-          text2: `Server trả về lỗi: ${response.status}`,
+          text2: i18n.t('common:ui.camera.serverStatus', {status: response.status}),
         });
       }
     } catch (error) {
@@ -129,7 +130,7 @@ export default class CameraScreen extends React.PureComponent<
       Toast.show({
         type: 'error',
         text1: '❌ Lỗi kết nối',
-        text2: `Không thể kết nối đến server: ${errorMessage}`,
+        text2: i18n.t('common:ui.camera.cannotConnect', {message: errorMessage}),
       });
     }
     console.log('=== TESTING BACKEND CONNECTION END ===');
@@ -156,8 +157,8 @@ export default class CameraScreen extends React.PureComponent<
               });
               Toast.show({
                 type: 'error',
-                text1: 'Lỗi chụp ảnh',
-                text2: 'Không thể lưu ảnh',
+                text1: i18n.t('common:ui.camera.captureError'),
+                text2: i18n.t('common:ui.camera.saveFailed'),
               });
               return;
             }
@@ -178,7 +179,7 @@ export default class CameraScreen extends React.PureComponent<
             Toast.show({
               type: 'error',
               text1: 'Lỗi camera',
-              text2: 'Không thể chụp ảnh',
+              text2: i18n.t('common:ui.camera.captureFailed'),
             });
           }
         }
@@ -194,21 +195,21 @@ export default class CameraScreen extends React.PureComponent<
       const content = await detectImage(filePath);
       this.setState({
         visible: true,
-        resultName: content.name || 'Không xác định',
-        resultDescription: content.description || 'Không có mô tả',
+        resultName: content.name || i18n.t('common:ui.common.unknown'),
+        resultDescription: content.description || i18n.t('common:ui.common.noDescription'),
         resultPhotoPath: filePath,
         showPreviewModal: false, // Hide preview modal when showing result
       });
       Toast.show({
         type: 'success',
-        text1: 'Nhận diện thành công',
-        text2: 'Đã xử lý ảnh thành công',
+        text1: i18n.t('common:ui.camera.recognized'),
+        text2: i18n.t('common:ui.camera.processed'),
       });
     } catch (error) {
       Toast.show({
         type: 'error',
-        text1: error instanceof DetectError ? 'Không nhận diện được' : 'Lỗi kết nối',
-        text2: error instanceof DetectError ? error.message : 'Không thể kết nối đến server. Vui lòng thử lại.',
+        text1: error instanceof DetectError ? i18n.t('common:ui.camera.notRecognized') : 'Lỗi kết nối',
+        text2: error instanceof DetectError ? error.message : i18n.t('common:ui.common.serverError'),
       });
     } finally {
       this.setState({
@@ -316,8 +317,8 @@ export default class CameraScreen extends React.PureComponent<
           console.log('ImagePicker Error: ', response.errorCode);
           Toast.show({
             type: 'error',
-            text1: 'Lỗi chọn ảnh',
-            text2: 'Không thể chọn ảnh từ thư viện',
+            text1: i18n.t('common:ui.camera.pickError'),
+            text2: i18n.t('common:ui.camera.pickFailed'),
           });
         } else {
           console.log('Image picker response:', response);
@@ -674,7 +675,7 @@ export default class CameraScreen extends React.PureComponent<
                         fontWeight: 'bold',
                         textAlign: 'center',
                       }}>
-                        Đang nhận diện địa điểm...
+                        {i18n.t('common:ui.camera.recognizing')}
                       </TextBase>
                       <TextBase style={{
                         marginTop: sizes._8sdp,
@@ -682,7 +683,7 @@ export default class CameraScreen extends React.PureComponent<
                         color: colors.gray,
                         textAlign: 'center',
                       }}>
-                        Vui lòng đợi trong giây lát
+                        {i18n.t('common:ui.camera.wait')}
                       </TextBase>
                     </View>
                   </View>

@@ -221,6 +221,39 @@ describe('Phase 1 Guest Mode', () => {
     expect(fetch).not.toHaveBeenCalled();
   });
 
+  it('a hotel Detail never loads reviews or festivals by its (colliding) id', async () => {
+    const DetailLocation = require('../src/container/screens/Home/DetailLocation').default;
+    const snapshot = buildCatalogSnapshot([{id: 7, name: 'Venue'}], [{id: 2, location_id: 7}]);
+    jest.spyOn(catalogRepository, 'get').mockResolvedValue(snapshot);
+    const reviews = jest.spyOn(locationApi, 'getReviews');
+    const detail = new DetailLocation({...props(), route: {params: {location: {id: 7, kind: 'hotel'}}}});
+    detail.setState = state => {detail.state = {...detail.state, ...state};};
+    await detail.loadCatalog();
+    await detail.loadReviews();
+    expect(detail.state.festivals).toEqual([]);
+    expect(detail.state.reviews).toEqual([]);
+    expect(reviews).not.toHaveBeenCalled();
+  });
+
+  // P11.4: hotels share the Home search; their ids collide with location ids, so they never match semantic
+  // results by id and are appended by keyword instead.
+  it('hotels join search results by keyword, never by a colliding semantic id', async () => {
+    const semantic = require('../src/services/semantic.api');
+    jest.spyOn(semantic, 'searchSemantic').mockResolvedValue({success: true, results: [{id: 1, entity_type: 'location', score: 0.9}]});
+    const onSubmitSearch = jest.fn();
+    let tree;
+    await act(async () => {tree = renderer.create(React.createElement(Search, {
+      data: [{id: 1, name: 'Bãi biển Mỹ Khê', types: ['beach']}, {id: 1, kind: 'hotel', name: 'Khách sạn biển', types: ['hotel']},
+        {id: 2, kind: 'hotel', name: 'Resort núi', types: ['resort']}],
+      searchFields: ['name', 'types'], entityType: 'location', onSearch: jest.fn(), onSubmitSearch,
+    }));});
+    const search = tree.getInstance();
+    await act(async () => {search.setState({searchValue: 'bien'});});
+    await act(async () => {await search.handleSubmitSearch();});
+    expect(onSubmitSearch.mock.calls[0][0].map(row => [row.id, row.kind ?? 'location'])).toEqual([[1, 'location'], [1, 'hotel']]);
+    tree.unmount();
+  });
+
   it.each([
     ['Location', () => require('../src/container/screens/Home/ViewAllLocation').default, 'locations'],
     ['Festival', () => require('../src/container/screens/Festival/ViewAllFestivals').default, 'festivals'],

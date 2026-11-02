@@ -66,6 +66,11 @@ class DetailLocationScreen extends React.PureComponent<
 
   loadReviews = async () => {
     const location: ILocation = this.props.route.params?.location;
+    // P11.4: reviews are keyed by location id; hotels have none yet.
+    if (location.kind === 'hotel') {
+      this.setState({reviews: []});
+      return;
+    }
     try {
       this.setState({reviews: await locationApi.getReviews(false, location.id)});
     } catch {
@@ -88,7 +93,8 @@ class DetailLocationScreen extends React.PureComponent<
     try {
       const catalog = await catalogRepository.get(forceRefresh);
       const location: ILocation = this.props.route.params?.location;
-      const festivals = catalog.festivalsByLocationId.get(location.id) ?? [];
+      // P11.4: a hotel id is not a location id (no linked festivals).
+      const festivals = location.kind === 'hotel' ? [] : catalog.festivalsByLocationId.get(location.id) ?? [];
       this.setState({allLocations: catalog.locations, festivals});
     } catch {
       this.setState({catalogError: true});
@@ -192,13 +198,13 @@ class DetailLocationScreen extends React.PureComponent<
     const hasGps = typeof location.lat === 'number' && typeof location.long === 'number' &&
       Number.isFinite(location.lat) && Number.isFinite(location.long);
     const translatedName = locationId 
-      ? translateLocationField(t, locationId, 'name', location.name)
+      ? translateLocationField(t, location, 'name', location.name)
       : location.name;
     const translatedDescription = locationId
-      ? translateLocationField(t, locationId, 'description', location.description)
+      ? translateLocationField(t, location, 'description', location.description)
       : location.description;
     const translatedAddress = locationId && location.address
-      ? translateLocationField(t, locationId, 'address', location.address)
+      ? translateLocationField(t, location, 'address', location.address)
       : location.address;
 
     return (
@@ -478,7 +484,7 @@ class DetailLocationScreen extends React.PureComponent<
                     : location.advise.split('\n')
                   ).map((advice, index) => {
                     const translatedAdvice = locationId
-                      ? translateLocationField(t, locationId, 'advise', advice.trim(), index)
+                      ? translateLocationField(t, location, 'advise', advice.trim(), index)
                       : advice.trim();
                     return (
                       <TextBase
@@ -529,8 +535,8 @@ class DetailLocationScreen extends React.PureComponent<
               </View>
               )}
 
-              {/* Semantic Similar Items from Backend */}
-              {FEATURE_FLAGS.ENABLE_AI && (
+              {/* Semantic Similar Items from Backend (P11.4: hotels are not in the location index) */}
+              {FEATURE_FLAGS.ENABLE_AI && location.kind !== 'hotel' && (
                 <SimilarItemsComponent
                   entityType="location"
                   entityId={location.id}

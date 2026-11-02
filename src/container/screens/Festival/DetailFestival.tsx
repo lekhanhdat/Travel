@@ -148,19 +148,19 @@ class DetailFestivalScreen extends React.PureComponent<
 
     const festivalId = festival.id;
     const translatedName = festivalId
-      ? translateFestivalField(t, festivalId, 'name', festival.name)
+      ? translateFestivalField(t, festival, 'name', festival.name)
       : festival.name;
     const translatedDescription = festivalId
-      ? translateFestivalField(t, festivalId, 'description', festival.description)
+      ? translateFestivalField(t, festival, 'description', festival.description)
       : festival.description;
     const translatedLocation = festivalId
-      ? translateFestivalField(t, festivalId, 'location', festival.location)
+      ? translateFestivalField(t, festival, 'location', festival.location)
       : festival.location;
     const translatedEventTime = festivalId
-      ? translateFestivalField(t, festivalId, 'event_time', festival.event_time)
+      ? translateFestivalField(t, festival, 'event_time', festival.event_time)
       : festival.event_time;
     const translatedTicketInfo = festivalId && festival.ticket_info
-      ? translateFestivalField(t, festivalId, 'ticket_info', festival.ticket_info)
+      ? translateFestivalField(t, festival, 'ticket_info', festival.ticket_info)
       : festival.ticket_info;
 
 
@@ -309,7 +309,7 @@ class DetailFestivalScreen extends React.PureComponent<
                   </View>
                   {festival.advise.map((advice, index) => {
                     const translatedAdvice = festivalId
-                      ? translateFestivalField(t, festivalId, 'advise', advice, index)
+                      ? translateFestivalField(t, festival, 'advise', advice, index)
                       : advice;
                     return (
                       <TextBase

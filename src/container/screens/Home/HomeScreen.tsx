@@ -56,6 +56,7 @@ interface IHomeScreenState {
   currentLat: number;
   currentLong: number;
   locationPermission: boolean;
+  hotels: ILocation[]; // P11.4: loaded on the first search only
 }
 
 class HomeScreen extends React.PureComponent<
@@ -69,6 +70,7 @@ class HomeScreen extends React.PureComponent<
     super(props);
     this.searchBarRef = React.createRef();
     this.state = {
+      hotels: [],
       loading: true,
       refreshing: false,
       error: false,
@@ -308,12 +310,23 @@ class HomeScreen extends React.PureComponent<
     });
   };
 
+  // P11.4: hotels join the search data the first time the user types (one lazy /hotels load).
+  hotelsRequested = false;
+  ensureHotels = () => {
+    if (this.hotelsRequested) {return;}
+    this.hotelsRequested = true;
+    catalogRepository.getHotels()
+      .then(hotels => this.setState({hotels}))
+      .catch(() => {this.hotelsRequested = false;}); // search keeps working with locations only
+  };
+
   // Called while typing - just update local state, don't navigate
   handleSearchCallback = (
     filteredData: ILocation[],
     searchValue: string,
     isSemanticSearch?: boolean,
   ) => {
+    this.ensureHotels();
     this.setState({valueSearch: searchValue});
   };
 
@@ -422,13 +435,14 @@ class HomeScreen extends React.PureComponent<
 
         <SemanticSearchBarComponent<ILocation>
           ref={this.searchBarRef}
-          data={this.state.locations}
+          data={this.state.hotels.length ? [...this.state.locations, ...this.state.hotels] : this.state.locations}
           searchFields={[...LOCATION_SEARCH_FIELDS]}
           onSearch={this.handleSearchCallback}
           onSubmitSearch={this.handleSearchSubmit}
           placeholder={this.props.t('home.searchPlaceholder')}
           entityType="location"
           idField="id"
+          onQueryChange={this.ensureHotels}
         />
         <CatalogStatus loading={this.state.loading} error={this.state.error}
           onRetry={() => this.fetchLocations(true)} />

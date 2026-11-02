@@ -1,4 +1,5 @@
 import React from 'react';
+import i18n from '../../../i18n';
 import { TouchableOpacity, View, Platform, ActivityIndicator } from 'react-native';
 import Page from '../../../component/Page';
 import HeaderBase from '../../../component/HeaderBase';
@@ -50,20 +51,20 @@ export default class PreviewImage extends React.PureComponent<IPreviewImageProps
       const content = await detectImage(filePath);
       this.setState({
         visible: true,
-        resultName: content.name || 'Không xác định',
-        resultDescription: content.description || 'Không có mô tả',
+        resultName: content.name || i18n.t('common:ui.common.unknown'),
+        resultDescription: content.description || i18n.t('common:ui.common.noDescription'),
         resultPhotoPath: filePath,
       });
       Toast.show({
         type: 'success',
-        text1: 'Nhận diện thành công',
-        text2: 'Đã xử lý ảnh thành công',
+        text1: i18n.t('common:ui.camera.recognized'),
+        text2: i18n.t('common:ui.camera.processed'),
       });
     } catch (error) {
       Toast.show({
         type: 'error',
-        text1: error instanceof DetectError ? 'Không nhận diện được' : 'Lỗi kết nối',
-        text2: error instanceof DetectError ? error.message : 'Không thể kết nối đến server. Vui lòng thử lại.',
+        text1: error instanceof DetectError ? i18n.t('common:ui.camera.notRecognized') : 'Lỗi kết nối',
+        text2: error instanceof DetectError ? error.message : i18n.t('common:ui.common.serverError'),
       });
     } finally {
       this.setState({
@@ -158,7 +159,7 @@ export default class PreviewImage extends React.PureComponent<IPreviewImageProps
       Toast.show({
         type: 'error',
         text1: 'Lỗi',
-        text2: 'Không tìm thấy đường dẫn ảnh',
+        text2: i18n.t('common:ui.camera.noImagePath'),
       });
     }
   };
@@ -228,7 +229,7 @@ export default class PreviewImage extends React.PureComponent<IPreviewImageProps
               }}>
                 <ActivityIndicator size="large" color={colors.primary} />
                 <TextBase style={{ marginTop: sizes._12sdp, fontSize: sizes._16sdp }}>
-                  Đang nhận diện địa điểm...
+                  {i18n.t('common:ui.camera.recognizing')}
                 </TextBase>
               </View>
             </View>

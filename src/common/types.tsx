@@ -23,6 +23,9 @@ export interface ILocation {
   record_id?: string;
   rating?: number | null;
   review_count?: number; // P7: number of visible reviews (BE); rating is their average
+  content_en?: Record<string, string | string[]>; // P11: English values by field (translationHelpers)
+  kind?: 'hotel'; // P11.4: hotel record (own ids): no reviews/festivals/similar in Detail
+  category?: string | null; // hotels only
   lat: number | null;
   long: number | null;
   types?: string[]; // Array of location types (e.g., ["museum", "attraction", "historical"])

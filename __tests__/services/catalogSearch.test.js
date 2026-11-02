@@ -38,6 +38,25 @@ describe('local catalog search', () => {
   });
 });
 
+// P11.5: `types` slugs also match their Vietnamese and English labels (common.json `types`).
+describe('type labels', () => {
+  beforeAll(() => {require('../../src/i18n');});
+
+  it('"bảo tàng" finds museum, "bai bien" / "beach" find beach, labels exist in both languages', () => {
+    const {typeLabels} = require('../../src/utils/catalogSearch');
+    expect(typeLabels(['museum'])).toEqual(['Bảo tàng', 'Museum']);
+    expect(typeLabels(['unknown-slug'])).toEqual([]);
+    expect(searchCatalog(locations, 'bảo tàng', [...LOCATION_SEARCH_FIELDS]).map(row => row.id)).toEqual([2]);
+    expect(searchCatalog(locations, 'bai bien', ['types']).map(row => row.id)).toEqual([1]);
+    expect(searchCatalog(locations, 'water park', ['types']).map(row => row.id)).toEqual([3]);
+    expect(searchCatalog(festivals, 'phao hoa', ['types']).map(row => row.id)).toEqual([1]);
+    const vi = require('../../src/i18n/locales/vi/common.json').types;
+    const en = require('../../src/i18n/locales/en/common.json').types;
+    expect(Object.keys(vi).sort()).toEqual(Object.keys(en).sort());
+    expect(Object.keys(vi)).toHaveLength(94);
+  });
+});
+
 describe('nearby', () => {
   const origin = {latitude: 16.0544, longitude: 108.2022};
   it('sorts by haversine distance, skips missing/invalid GPS and limits the list', () => {

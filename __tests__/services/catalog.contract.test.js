@@ -1,9 +1,9 @@
 const {CatalogError} = require('../../src/services/catalog.client');
 const {adaptLocation, adaptFestival, REMOVED_FIELDS} = require('../../src/services/catalog.adapter');
 
-// Same field sets as Travel_BE/tests/check_contract.py (locations 21, festivals 18).
+// Same field sets as Travel_BE/tests/check_contract.py (locations 22, festivals 19).
 const COMMON = {id: 1, record_id: 'source-1', name: 'Tên từ API', types: ['culture'], description: '',
-  long_description: '', rating: null, review_count: 0, reviews: [], images: [], videos: [], advise: [], website: '',
+  long_description: '', rating: null, review_count: 0, content_en: {}, reviews: [], images: [], videos: [], advise: [], website: '',
   phone: '', ticket_info: '', publishable: true};
 const LOCATION = {...COMMON, address: '', lat: 16.05, long: 108.2, opening_hours: '', avatar: ''};
 const FESTIVAL = {...COMMON, event_time: '', location_id: 7};
@@ -11,8 +11,8 @@ const without = (row, key) => Object.fromEntries(Object.entries(row).filter(([k]
 
 describe('catalog adapter contract', () => {
   it('accepts exactly the BE field sets', () => {
-    expect(Object.keys(LOCATION)).toHaveLength(21);
-    expect(Object.keys(FESTIVAL)).toHaveLength(18);
+    expect(Object.keys(LOCATION)).toHaveLength(22);
+    expect(Object.keys(FESTIVAL)).toHaveLength(19);
     expect(adaptLocation(LOCATION)).toEqual(LOCATION);
     expect(adaptFestival(FESTIVAL)).toEqual(FESTIVAL);
     expect(adaptFestival({...FESTIVAL, location_id: null}).location_id).toBeNull();
@@ -37,11 +37,11 @@ describe('catalog adapter contract', () => {
     }
   });
 
-  it.each(Object.keys(LOCATION).filter(key => key !== 'review_count'))('rejects a location without %s', key => {
+  it.each(Object.keys(LOCATION).filter(key => !['review_count', 'content_en'].includes(key)))('rejects a location without %s', key => {
     expect(() => adaptLocation(without(LOCATION, key))).toThrow(CatalogError);
   });
 
-  it.each(Object.keys(FESTIVAL).filter(key => key !== 'review_count'))('rejects a festival without %s', key => {
+  it.each(Object.keys(FESTIVAL).filter(key => !['review_count', 'content_en'].includes(key)))('rejects a festival without %s', key => {
     expect(() => adaptFestival(without(FESTIVAL, key))).toThrow(CatalogError);
   });
 

@@ -24,7 +24,7 @@ export class CatalogError extends Error {
   }
 }
 
-async function getPage(path: '/locations' | '/festivals', offset: number, deadline: number) {
+async function getPage(path: '/locations' | '/festivals' | '/hotels', offset: number, deadline: number) {
   for (let attempt = 0; ; attempt++) {
     const remaining = deadline - Date.now();
     if (remaining <= 0) {throw new CatalogError('timeout');}
@@ -49,7 +49,7 @@ async function getPage(path: '/locations' | '/festivals', offset: number, deadli
 }
 
 export async function fetchCatalog<T extends {id: number}>(
-  path: '/locations' | '/festivals', adapt: (record: unknown) => T,
+  path: '/locations' | '/festivals' | '/hotels', adapt: (record: unknown) => T,
 ): Promise<T[]> {
   const result: T[] = [];
   const ids = new Set<number>();

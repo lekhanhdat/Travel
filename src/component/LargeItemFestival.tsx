@@ -23,13 +23,13 @@ const LargeItemFestival: React.FC<ILargeItemFestivalProps> = ({festival, onPress
 
   const festivalId = festival.id;
   const translatedName = festivalId
-    ? translateFestivalField(t, festivalId, 'name', festival.name)
+    ? translateFestivalField(t, festival, 'name', festival.name)
     : festival.name;
   const translatedLocation = festivalId
-    ? translateFestivalField(t, festivalId, 'location', festival.location)
+    ? translateFestivalField(t, festival, 'location', festival.location)
     : festival.location;
   const translatedEventTime = festivalId
-    ? translateFestivalField(t, festivalId, 'event_time', festival.event_time)
+    ? translateFestivalField(t, festival, 'event_time', festival.event_time)
     : festival.event_time;
 
 

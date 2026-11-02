@@ -985,7 +985,7 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
               // Get translated location name
               const locationId = location.id;
               const translatedName = locationId
-                ? translateLocationField(t, locationId, 'name', location.name)
+                ? translateLocationField(t, location, 'name', location.name)
                 : location.name;
 
               return (
@@ -1731,21 +1731,21 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
                       marginBottom: 10,
                     },
                   ]}>
-                  {translateLocationField(t, selectedLocation.id, 'name', selectedLocation.name)}
+                  {translateLocationField(t, selectedLocation, 'name', selectedLocation.name)}
                 </TextBase>
                 <TextBase
                   style={[
                     AppStyle.txt_16_medium,
                     {marginBottom: 10, textAlign: 'justify'},
                   ]}>
-                  {translateLocationField(t, selectedLocation.id, 'description', selectedLocation.description)}
+                  {translateLocationField(t, selectedLocation, 'description', selectedLocation.description)}
                 </TextBase>
                 <TextBase
                   style={[
                     AppStyle.txt_16_medium,
                     {marginBottom: 10, textAlign: 'justify'},
                   ]}>
-                  {t('common:detail.address')}: {translateLocationField(t, selectedLocation.id, 'address', selectedLocation.address)}
+                  {t('common:detail.address')}: {translateLocationField(t, selectedLocation, 'address', selectedLocation.address)}
                 </TextBase>
                 <CachedImage
                   uri={catalogImage(selectedLocation)} // avatar -> images[0] -> placeholder

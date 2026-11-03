@@ -12,7 +12,7 @@ Kiến trúc đã đạt mục 5: app chỉ gọi Cloud Run + Mapbox; không cò
 |---|---|
 | Dữ liệu Neon | locations **123**, festivals **49**, hotels **82**, objects **11** (đủ `content_en`); accounts/transactions/reviews/memory do người dùng tạo |
 | Schema | `001`–`010`, `012`, `013` (P12: bỏ cột `reviews`/`rating` catalog); quyền `001`–`006` |
-| Backend | Cloud Run `travel-api`, module `auth,uploads,reviews,detect,ai,payments`; revision `travel-api-00011-5lb` (`sha256:fb219e59…`, rollback `travel-api-00010-bqm`); FAISS build từ Neon ở Cloud Build |
+| Backend | Cloud Run `travel-api`, module `auth,uploads,reviews,detect,ai,payments`; revision `travel-api-00012-nc7` (`sha256:690141cc…`, rollback `travel-api-00011-5lb`), Swagger/OpenAPI chỉ bật local; FAISS build từ Neon ở Cloud Build |
 | Secret Manager | `travel-database-url:1`, `travel-app-config:3` |
 | Frontend | nhánh `migration/p0-p1`: đủ tính năng mục 5 (Forgot password = Nợ N1); `.env` chỉ đọc 3 biến public |
 | Test / CI | FE jest 21 suite (209 pass / 1 skip), `tsc` 55, eslint 6 lỗi cũ (exhaustive-deps); BE 10 `check_*.py` |

@@ -52,15 +52,15 @@
                         │ HTTPS/REST API            Mapbox (bản đồ, chỉ đường)
                         ▼                           ◄── app gọi trực tiếp, token pk.
 ┌──────────────────────────────────────────────────────────────┐
-│  FASTAPI BACKEND — Google Cloud Run `travel-api`             │
+│  FASTAPI BACKEND — Google Cloud Run                          │
 │                                                              │
 │  Modules (bật bằng APP_FEATURES):                            │
-│  • catalog  : /locations /festivals /hotels /objects         │
-│  • auth     : /auth/* · /me                                  │
-│  • reviews  : /reviews · uploads : /uploads                  │
-│  • detect   : /detect                                        │
-│  • ai       : /api/v1/search|similar|recommendations|chat    │
-│  • payments : /payments/* · /webhook/payos                   │
+│  • catalog  : địa điểm, lễ hội, khách sạn, hiện vật          │
+│  • auth     : đăng ký, đăng nhập, hồ sơ                      │
+│  • reviews  : đánh giá · uploads : ảnh                       │
+│  • detect   : nhận diện ảnh                                  │
+│  • ai       : tìm kiếm, tương tự, gợi ý, chatbot             │
+│  • payments : PayOS + webhook                                │
 │                                                              │
 │  AI: FAISS index (dựng từ Neon khi build) · Embeddings · RAG │
 └───┬──────────────┬──────────────┬──────────────┬─────────────┘
@@ -69,19 +69,19 @@
 │   Neon   │ │ Cloud      │ │  OpenAI  │ │ SerpAPI · PayOS  │
 │PostgreSQL│ │ Storage    │ │   API    │ │ (Lens · Payment) │
 └──────────┘ └────────────┘ └──────────┘ └──────────────────┘
-   Key trả phí nằm ở Secret Manager `travel-app-config`, không nằm trong app
+   Key trả phí nằm ở Secret Manager, không nằm trong app
 ```
 
 ### Luồng hoạt động chính
 
-1. **Catalog Flow**: App tải một lần `/locations` + `/festivals` (khách sạn nạp khi tìm kiếm) → cache trong `catalogRepository` → mọi màn hình dùng chung
-2. **Authentication Flow**: Mobile App → `POST /auth/login` → Backend kiểm mật khẩu (scrypt) → JWT lưu AsyncStorage
-3. **Camera AI Flow**: Chụp/chọn ảnh → `POST /detect` → Google Lens (SerpAPI) → OpenAI chọn tên → đối chiếu bảng `objects` → tên + mô tả
-4. **Review Flow**: Chọn ảnh → `POST /uploads` (Cloud Storage) → `POST /reviews` → Bảng tin/Chi tiết đọc `GET /reviews`
-5. **Payment Flow**: `POST /payments/create` → PayOS → QR Code → Webhook có chữ ký → cộng số dư
+1. **Catalog Flow**: App tải một lần danh sách địa điểm + lễ hội (khách sạn nạp khi tìm kiếm) → cache trong `catalogRepository` → mọi màn hình dùng chung
+2. **Authentication Flow**: Mobile App → API đăng nhập → Backend kiểm mật khẩu (scrypt) → JWT lưu AsyncStorage
+3. **Camera AI Flow**: Chụp/chọn ảnh → API nhận diện → Google Lens (SerpAPI) → OpenAI chọn tên → đối chiếu bảng `objects` → tên + mô tả
+4. **Review Flow**: Chọn ảnh → upload (Cloud Storage) → tạo đánh giá → Bảng tin/Chi tiết đọc danh sách đánh giá
+5. **Payment Flow**: Tạo giao dịch → PayOS → QR Code → Webhook có chữ ký → cộng số dư
 6. **Maps Flow**: Vị trí GPS → Mapbox Directions → vẽ lộ trình + danh sách bước
-7. **Chatbot Flow**: Tin nhắn → `POST /api/v1/chat/rag` → tìm ngữ cảnh (FAISS) → OpenAI → trả lời kèm nguồn
-8. **Semantic Search Flow**: Query → `POST /api/v1/search/semantic` → OpenAI Embeddings → FAISS → kết quả xếp hạng
+7. **Chatbot Flow**: Tin nhắn → API chat RAG → tìm ngữ cảnh (FAISS) → OpenAI → trả lời kèm nguồn
+8. **Semantic Search Flow**: Query → API tìm kiếm ngữ nghĩa → OpenAI Embeddings → FAISS → kết quả xếp hạng
 
 ---
 
@@ -381,7 +381,7 @@ Dự án Travel App được chia thành **2 repositories riêng biệt**:
 📁 https://github.com/lekhanhdat/Travel_BE
 ├── app.py                      # FastAPI app, bật module theo APP_FEATURES, health
 ├── 📁 core_api/                # catalog, auth, security, email, uploads, reviews, detect, payments, openai_http
-├── 📁 routers/                 # search, chat, memory, recommendations (/api/v1)
+├── 📁 routers/                 # search, chat, memory, recommendations
 ├── 📁 services/                # embedding, faiss, rag, memory (Neon)
 ├── 📁 models/                  # Pydantic models của AI
 ├── 📁 utils/                   # startup_indexer (dựng FAISS từ Neon)
@@ -454,11 +454,11 @@ DATABASE_URL=postgresql://travel_runtime:<password>@<host>-pooler.<region>.aws.n
 DATABASE_URL_UNPOOLED=postgresql://<owner>:<password>@<host>.<region>.aws.neon.tech/neondb?sslmode=require   # chỉ dùng chạy migration
 
 # ============================================
-# Modules + secrets (giống Secret Manager travel-app-config)
+# Modules + secrets (giống secret cấu hình trên Secret Manager)
 # ============================================
 APP_FEATURES=auth,uploads,reviews,detect,ai,payments   # bỏ trống = chỉ catalog
 APP_CONFIG_JSON={"JWT_SECRET":"...","LEGACY_PASSWORD_SALT":"...","OPENAI_API_KEY":"sk-...","SERPAPI_KEY":"...","PAYOS_CLIENT_ID":"...","PAYOS_API_KEY":"...","PAYOS_CHECKSUM_KEY":"..."}
-UPLOAD_BUCKET=travel2026-511805-uploads              # khi bật uploads/detect
+UPLOAD_BUCKET=<ten-bucket-anh>                       # khi bật uploads/detect
 ```
 
 Mỗi module cần các key liệt kê trong `FEATURE_SECRETS` (`core_api/config.py`); thiếu key thì backend báo lỗi ngay khi khởi động.
@@ -508,8 +508,8 @@ npm ci
 Tạo file `.env` ở thư mục gốc (không commit). App **chỉ** đọc 3 biến public này (allowlist trong `babel.config.js`, giá trị được đóng gói vào app):
 
 ```bash
-CATALOG_API_URL=https://travel-api-u2xcse44ca-as.a.run.app
-API_BASE_URL=https://travel-api-u2xcse44ca-as.a.run.app
+CATALOG_API_URL=https://<url-backend-cloud-run>
+API_BASE_URL=https://<url-backend-cloud-run>
 # Hoặc backend local trên emulator Android: http://10.0.2.2:8080
 MAPBOX_ACCESS_TOKEN=pk.your-mapbox-token
 ```
@@ -579,27 +579,27 @@ Chi tiết: `Travel_BE/db/README.md`.
 
 1. Đăng ký tại https://platform.openai.com/
 2. Tạo API Key, nạp credits (tối thiểu $5)
-3. Đưa key vào `travel-app-config` (Secret Manager) hoặc `APP_CONFIG_JSON` khi chạy local — **không** đưa vào app
+3. Đưa key vào secret cấu hình (Secret Manager) hoặc `APP_CONFIG_JSON` khi chạy local — **không** đưa vào app
 
 #### 4. SerpAPI Setup
 
 1. Đăng ký tại https://serpapi.com/ (gói miễn phí 250 lượt/tháng)
-2. Đưa `SERPAPI_KEY` vào `travel-app-config`
+2. Đưa `SERPAPI_KEY` vào secret cấu hình
 
 #### 5. PayOS Setup
 
 1. Đăng ký tại https://my.payos.vn/
 2. Tạo payment channel
-3. Lấy credentials: Client ID, API Key, Checksum Key → `travel-app-config`
+3. Lấy credentials: Client ID, API Key, Checksum Key → secret cấu hình
 4. Cấu hình Webhook URL:
-   - URL: `https://travel-api-u2xcse44ca-as.a.run.app/webhook/payos`
+   - URL: URL backend + đường dẫn webhook PayOS (xem Swagger `/docs`)
    - Method: POST
 
 #### 6. Google Cloud Setup
 
-1. Project `travel2026-511805`, region `asia-southeast1`
-2. Cloud Storage bucket ảnh `travel2026-511805-uploads` (public-read, lifecycle xóa `tmp/` sau 1 ngày)
-3. Secret Manager: `travel-database-url`, `travel-app-config`
+1. Một GCP project (region Singapore `asia-southeast1`)
+2. Cloud Storage bucket ảnh (public-read, lifecycle xóa `tmp/` sau 1 ngày)
+3. Secret Manager: một secret URL database + một secret JSON cấu hình (key các dịch vụ)
 4. Billing guard ngắt billing khi chi phí GCP vượt 26.000 VND/tháng
 
 Chi tiết: `Travel_BE/deploy/README.md`.
@@ -607,7 +607,7 @@ Chi tiết: `Travel_BE/deploy/README.md`.
 #### 7. SendGrid Setup (cho OTP email — khi bật Nợ N1)
 
 1. Đăng ký tại https://sendgrid.com/, verify sender email
-2. Đưa `SENDGRID_API_KEY` + `EMAIL_FROM` vào `travel-app-config`, bật module `email`
+2. Đưa `SENDGRID_API_KEY` + `EMAIL_FROM` vào secret cấu hình, bật module `email`
 
 ---
 
@@ -627,7 +627,7 @@ uvicorn app:app --reload --host 127.0.0.1 --port 8080
 **Kiểm tra backend hoạt động:**
 ```bash
 curl http://localhost:8080/health
-curl "http://localhost:8080/locations?limit=2"
+# Danh sách API: http://localhost:8080/docs
 ```
 
 ---
@@ -741,314 +741,29 @@ python scripts/build_faiss_index.py --out faiss_indexes
 
 ## 🌐 API Documentation
 
-### Backend API Endpoints
-
-**Base URL**: `https://travel-api-u2xcse44ca-as.a.run.app` · Swagger: `/docs`
-
-**Authentication**: endpoint cần đăng nhập nhận header `Authorization: Bearer <JWT>` (lấy từ `/auth/login`). Danh tính luôn lấy từ token, không lấy từ URL/body.
-
-#### 1. Health Check
-
-```http
-GET /health
-GET /health/ready
-```
-
-**Response `/health`:**
-```json
-{
-  "status": "healthy",
-  "version": "2.0.0",
-  "profile": "core",
-  "index_stats": {"text_vectors": 183, "image_vectors": 0, "indexing_completed": true},
-  "services": {"core": "operational", "auth": "operational", "email": "disabled", "...": "..."}
-}
-```
-
-`/health/ready` trả `{"status": "ready"}` hoặc 503 khi database lỗi.
-
----
-
-#### 2. Catalog
-
-```http
-GET /locations?limit=20&offset=0
-GET /festivals?limit=20&offset=0
-GET /hotels?limit=20&offset=0
-```
-
-**Response:**
-```json
-{
-  "items": [
-    {
-      "id": 1, "record_id": "...", "name": "An Phú Farm", "types": ["farm"],
-      "description": "...", "long_description": "...",
-      "rating": 4.5, "review_count": 2,
-      "images": ["https://..."], "videos": ["youtubeId"], "advise": ["..."],
-      "website": "", "phone": "", "ticket_info": "", "publishable": true,
-      "address": "...", "lat": 16.0, "long": 108.2, "opening_hours": "", "avatar": "https://...",
-      "content_en": {"name": "...", "description": "..."}
-    }
-  ],
-  "limit": 20, "offset": 0, "has_more": true
-}
-```
-
-- `limit` 1–100; gzip + ETag (trả 304 khi không đổi), cache 5 phút
-- `rating` = trung bình đánh giá đang hiện (null nếu chưa có), `review_count` = số đánh giá
-- `publishable` chỉ quyết định marker trên bản đồ; mọi bản ghi đều hiện trong app
-- Festival có thêm `event_time`, `location_id`; hotel có thêm `category`
-
----
-
-#### 3. Authentication
-
-```http
-POST /auth/signup          {"user_name": "...", "password": "...", "full_name": "...", "email": "...", "phone": null}
-POST /auth/login           {"user_name": "...", "password": "..."}
-GET  /me                   (JWT)
-PATCH /me                  (JWT) cập nhật hồ sơ
-POST /me/change-password   (JWT) {"current_password": "...", "new_password": "..."} → token mới
-DELETE /me                 (JWT) {"password": "..."} → xóa tài khoản
-```
-
-**Response login/signup:**
-```json
-{"access_token": "<JWT>", "token_type": "bearer", "expires_in": 2592000,
- "account": {"id": 1, "user_name": "...", "full_name": "...", "email": "...", "avatar": null, "balance": 0, "...": "..."}}
-```
-
----
-
-#### 4. Upload ảnh & Reviews
-
-```http
-POST /uploads                                   (JWT, multipart: file) → {"url": "https://storage.googleapis.com/..."}
-GET  /reviews?location_id=1&limit=20&offset=0   (công khai; hoặc festival_id=)
-POST /reviews                                   (JWT) {"location_id": 1, "rating": 5, "content": "...", "images": ["<url từ /uploads>"]}
-DELETE /reviews/{id}                            (JWT, chủ đánh giá)
-POST /reviews/{id}/report                       (JWT) {"reason": "..."}
-```
-
----
-
-#### 5. Camera AI Detection
-
-```http
-POST /detect
-Authorization: Bearer <JWT>
-Content-Type: multipart/form-data
-```
-
-**Request:**
-```
-image_file: File (JPEG, PNG, WebP; ≤ 8 MB)
-```
-
-**Response:**
-```json
-{
-  "name": "Đài thờ Trà Kiệu",
-  "description": "# Đài thờ Trà Kiệu\n\nĐài thờ Trà Kiệu là một di tích lịch sử...",
-  "object_id": 3
-}
-```
-
-`object_id` là id trong bảng `objects` khi khớp, `null` khi mô tả do OpenAI viết. Quá giới hạn trong ngày → 429.
-
----
-
-#### 6. Create Payment Link
-
-```http
-POST /payments/create
-Authorization: Bearer <JWT>
-Content-Type: application/json
-```
-
-**Request Body:**
-```json
-{
-  "amount": 50000,
-  "description": "Ung ho"
-}
-```
-
-**Response:**
-```json
-{
-  "orderCode": 1730000000000,
-  "paymentLinkId": "abc123xyz",
-  "qrCode": "000201010212...",
-  "checkoutUrl": "https://pay.payos.vn/web/abc123xyz"
-}
-```
-
-**Validation:**
-- `amount`: 1.000 – 50.000.000 VND
-- `description`: tùy chọn, tối đa 9 ký tự
-- Người ủng hộ lấy từ JWT (`userId` trong body bị bỏ qua)
-
----
-
-#### 7. Get Payment Status
-
-```http
-GET /payments/status/{order_code}
-Authorization: Bearer <JWT>
-```
-
-**Response:**
-```json
-{
-  "status": "PAID",
-  "amountPaid": 50000,
-  "orderCode": 1730000000000,
-  "paymentLinkId": "abc123xyz"
-}
-```
-
-**Status Values:** `PENDING` · `PAID` · `CANCELLED` · `EXPIRED`. Chỉ chủ giao dịch xem được.
-
----
-
-#### 8. PayOS Webhook
-
-```http
-POST /webhook/payos
-Content-Type: application/json
-```
-
-**Request Body (từ PayOS):**
-```json
-{
-  "code": "00",
-  "desc": "success",
-  "data": {"orderCode": 1730000000000, "amount": 50000, "paymentLinkId": "abc123xyz", "...": "..."},
-  "signature": "<HMAC-SHA256>"
-}
-```
-
-- Sai chữ ký → từ chối; mỗi `orderCode` chỉ cộng số dư một lần; sai số tiền thì không cộng
-- `GET /payment/return`, `GET /payment/cancel`: trang PayOS chuyển về sau khi thanh toán/hủy
-
----
-
-### Semantic Search API Endpoints (FastAPI Backend)
-
-**Base URL**: `https://travel-api-u2xcse44ca-as.a.run.app`
-
-#### 1. Semantic Search
-
-```http
-POST /api/v1/search/semantic
-Content-Type: application/json
-```
-
-**Request Body:**
-```json
-{
-  "query": "bãi biển đẹp ở Đà Nẵng",
-  "entity_types": ["location", "festival"],
-  "top_k": 15,
-  "min_score": 0.3
-}
-```
-
-**Response:**
-```json
-{
-  "success": true,
-  "query": "bãi biển đẹp ở Đà Nẵng",
-  "results": [
-    {
-      "id": 5,
-      "entity_type": "location",
-      "title": "Bãi biển Mỹ Khê",
-      "description": "Bãi biển đẹp nhất Đà Nẵng...",
-      "score": 0.78,
-      "image_url": "https://..."
-    }
-  ],
-  "total_count": 8,
-  "search_time_ms": 145.5,
-  "search_type": "text"
-}
-```
-
-Công khai, giới hạn tần suất theo client. `GET /api/v1/search/suggestions?query=...` trả gợi ý từ khóa.
-
-**Score Interpretation:**
-| Score | Meaning |
-|-------|---------|
-| 0.8 - 1.0 | Excellent match |
-| 0.6 - 0.8 | Good match |
-| 0.5 - 0.6 | Fair match |
-| < 0.5 | Chỉ hiện khi thiếu kết quả (fallback) |
-
----
-
-#### 2. Similar Items
-
-```http
-GET /api/v1/similar/{entity_type}/{entity_id}?limit=5
-```
-
-**Example:** `GET /api/v1/similar/location/5?limit=5`
-
----
-
-#### 3. RAG Chat
-
-```http
-POST /api/v1/chat/rag
-Authorization: Bearer <JWT>
-
-{"message": "Gợi ý địa điểm ngắm hoàng hôn", "session_id": "...", "image_url": "<url từ /uploads, tùy chọn>"}
-```
-
-Trả `message` (câu trả lời), `sources` (địa điểm/lễ hội/hiện vật dùng làm ngữ cảnh, kèm ảnh), `session_id`. `POST /api/v1/chat/clear-session` bắt đầu phiên mới. 30 câu/người/ngày.
-
----
-
-#### 4. Personalized Recommendations
-
-```http
-GET /api/v1/recommendations/{user_id}?limit=10
-Authorization: Bearer <JWT>
-```
-
-`user_id` phải trùng tài khoản trong JWT (khác → 403).
-
----
-
-#### 5. User Memory
-
-```http
-POST /api/v1/memory/store                     (JWT) {"user_id": 1, "memory_type": "preference", "content": "Thích biển"}
-GET  /api/v1/memory/user/{user_id}            (JWT)
-GET  /api/v1/memory/conversation/{session_id} (JWT)
-DELETE /api/v1/memory/conversation/{session_id} (JWT)
-```
-
----
-
-### Mapbox API
-
-**Base URL**: `https://api.mapbox.com`
-
-**Authentication**: Query param `access_token=YOUR_MAPBOX_TOKEN`
-
-#### Directions API
-
-```http
-GET /directions/v5/mapbox/driving/{coordinates}
-```
-
-Tham số app dùng: `geometries=geojson`, `steps=true`, `alternatives=true`, `banner_instructions`, `voice_instructions` (`src/services/mapbox.api.ts`).
-
-App chỉ gọi Directions khi đã có GPS thật, mỗi lần chọn địa điểm một request.
+Danh sách endpoint, request/response đầy đủ xem bằng **Swagger** khi chạy backend local: `http://localhost:8080/docs` (xem [Hướng dẫn cài đặt](#-hướng-dẫn-cài-đặt)). README không liệt kê đường dẫn API và URL production.
+
+**Nguyên tắc chung**
+- Mọi API trả JSON; danh sách có phân trang (`limit` ≤ 100, `offset`), catalog có gzip + ETag.
+- API cần đăng nhập nhận header `Authorization: Bearer <JWT>`; danh tính luôn lấy từ token, không lấy `user_id` trên URL/body.
+- Lỗi trả mã HTTP chuẩn (401 chưa đăng nhập, 403 không có quyền, 413/415 ảnh sai, 429 hết lượt trong ngày, 502 dịch vụ ngoài lỗi, 503 database lỗi) kèm thông báo tiếng Việt.
+- Module nào tắt (`APP_FEATURES`) thì API của module đó không tồn tại.
+
+**Theo module**
+
+| Module | Chức năng | Cần đăng nhập | Giới hạn |
+|---|---|---|---|
+| catalog | Danh sách địa điểm, lễ hội, khách sạn (kèm `rating`, `review_count`, `content_en`) | Không | Cache 5 phút |
+| health | Trạng thái process, module, index FAISS; kiểm tra database | Không | — |
+| auth | Đăng ký, đăng nhập, xem/sửa hồ sơ, đổi mật khẩu, xóa tài khoản | Trừ đăng ký/đăng nhập | Giới hạn đăng nhập sai |
+| uploads | Upload ảnh JPEG/PNG/WebP ≤ 2 MB → Cloud Storage, trả URL | Có | 20 ảnh/người/ngày |
+| reviews | Xem đánh giá theo địa điểm/lễ hội; viết, xóa, báo cáo đánh giá | Viết/xóa/báo cáo | ≤ 5 ảnh, ≤ 2000 ký tự |
+| detect | Nhận diện hiện vật từ ảnh (≤ 8 MB) → tên + mô tả Markdown | Có | 5/người/ngày, 8/ngày toàn hệ thống |
+| ai | Tìm kiếm ngữ nghĩa, gợi ý từ khóa, địa điểm tương tự, gợi ý cá nhân, chatbot RAG, bộ nhớ người dùng | Chatbot, gợi ý cá nhân, bộ nhớ | Chatbot 30 câu/người/ngày |
+| payments | Tạo link + QR PayOS, xem trạng thái giao dịch của mình, webhook PayOS (bắt buộc chữ ký) | Có (trừ webhook) | 1.000–50.000.000 VND |
+| email | Quên mật khẩu qua OTP (Nợ N1, đang tắt) | — | — |
+
+**Dịch vụ ngoài mà app gọi trực tiếp:** chỉ Mapbox (bản đồ; Directions với `steps`, `alternatives`, `geojson` — `src/services/mapbox.api.ts`) bằng token public `pk.`. App chỉ gọi Directions khi đã có GPS thật, mỗi lần chọn địa điểm một request.
 
 ---
 
@@ -1070,7 +785,7 @@ App chỉ gọi Directions khi đã có GPS thật, mỗi lần chọn địa đ
 │ - auth.api.login()              │
 └──────┬──────────────────────────┘
        │
-       │ HTTPS POST /auth/login
+       │ HTTPS (đăng nhập)
        ▼
 ┌─────────────────────────────────┐
 │ Backend (core_api/auth.py)      │
@@ -1104,7 +819,7 @@ App chỉ gọi Directions khi đã có GPS thật, mỗi lần chọn địa đ
 │ - detect.api.detectImage()      │
 └──────┬──────────────────────────┘
        │
-       │ HTTPS POST /detect (JWT)
+       │ HTTPS (nhận diện, JWT)
        │ multipart/form-data
        ▼
 ┌─────────────────────────────────┐
@@ -1148,7 +863,7 @@ App chỉ gọi Directions khi đã có GPS thật, mỗi lần chọn địa đ
 │ - payment.api.createDonation()  │
 └──────┬──────────────────────────┘
        │
-       │ POST /payments/create (JWT)
+       │ Tạo giao dịch (JWT)
        ▼
 ┌─────────────────────────────────┐
 │ Backend (core_api/payments.py)  │
@@ -1175,7 +890,7 @@ App chỉ gọi Directions khi đã có GPS thật, mỗi lần chọn địa đ
        ▼
 ┌─────────────────────────────────┐
 │ PayOS Webhook                   │
-│ POST /webhook/payos             │
+│ (gọi về backend, có chữ ký)     │
 └──────┬──────────────────────────┘
        │
        ▼
@@ -1262,7 +977,7 @@ Lưu trữ thông tin tài khoản người dùng.
 | location_id / festival_id | BIGINT | Đúng một trong hai | FK |
 | rating | SMALLINT | Số sao | 1–5 |
 | content | TEXT | Nội dung | 1–2000 ký tự |
-| images | JSONB | URL ảnh từ `/uploads` | ≤ 5 ảnh |
+| images | JSONB | URL ảnh do chính người viết upload | ≤ 5 ảnh |
 | status | TEXT | `visible` / `hidden` | Ẩn khi đủ 3 báo cáo |
 | created_at | TIMESTAMPTZ | | Auto |
 
@@ -1322,13 +1037,9 @@ Build service account chỉ được cấp quyền đọc secret trong lúc buil
 
 #### Bước 4: Kiểm tra
 
-```bash
-curl https://travel-api-u2xcse44ca-as.a.run.app/health
-curl https://travel-api-u2xcse44ca-as.a.run.app/health/ready
-curl "https://travel-api-u2xcse44ca-as.a.run.app/locations?limit=2"
-```
+Kiểm tra health, readiness và catalog trên URL Cloud Run mới (lệnh trong `Travel_BE/deploy/README.md`).
 
-**Cấu hình Cloud Run** (`deploy/service.yaml`): min 0 / max 1 instance, 1 vCPU / 1 GiB, concurrency 4, timeout 60 s, `APP_FEATURES=auth,uploads,reviews,detect,ai,payments`, secret `travel-database-url` + `travel-app-config`.
+**Cấu hình Cloud Run** (`deploy/service.yaml`): min 0 / max 1 instance, 1 vCPU / 1 GiB, concurrency 4, timeout 60 s, `APP_FEATURES=auth,uploads,reviews,detect,ai,payments`, secret URL database + secret JSON cấu hình.
 
 ---
 
@@ -1418,10 +1129,10 @@ Deploy backend làm thủ công theo `deploy/README.md` (Cloud Build + `gcloud r
 | # | Chức năng | Hiện trạng | Hướng làm |
 |---|---|---|---|
 | R1 | Gợi ý cá nhân hóa thật | Chưa có luồng ghi `user_memories` → luôn hiện mục phổ biến | Ghi sở thích khi xem chi tiết, đánh giá ≥ 4 sao, chủ đề hỏi chatbot |
-| R2 | Gợi ý từ khóa khi gõ (autocomplete) | API `/api/v1/search/suggestions` + `debouncedGetSuggestions` có sẵn | Gắn vào `SemanticSearchBarComponent` |
-| R3 | Tìm kiếm bằng ảnh | Nhánh `search_type=image` luôn lỗi (không có CLIP) | Dùng lại `/detect` hoặc thêm embeddings ảnh |
+| R2 | Gợi ý từ khóa khi gõ (autocomplete) | API gợi ý từ khóa + `debouncedGetSuggestions` có sẵn | Gắn vào `SemanticSearchBarComponent` |
+| R3 | Tìm kiếm bằng ảnh | Nhánh `search_type=image` luôn lỗi (không có CLIP) | Dùng lại pipeline nhận diện hoặc thêm embeddings ảnh |
 | R4 | Cài đặt hoạt động thật | Công tắc chỉ được lưu | Xóa bộ nhớ đệm thật, mở cài đặt quyền vị trí, thông báo đẩy (FCM), chế độ tối |
-| R5 | Lịch sử giao dịch | Chỉ có kiểu `ITransaction` | `GET /payments/history` + màn hình trong Hồ sơ |
+| R5 | Lịch sử giao dịch | Chỉ có kiểu `ITransaction` | API lịch sử giao dịch (chỉ của user trong JWT) + màn hình trong Hồ sơ |
 | R6 | SOS và màn Giới thiệu | Số điện thoại cố định, URL mẫu | Số khẩn cấp (112/113/114/115) hoặc cấu hình; URL thật |
 | R7 | Đăng ký lại webhook PayOS | Thao tác tay qua API PayOS | Script `confirm-webhook` khi đổi URL backend |
 | N1 | Quên mật khẩu qua email | Code có, module `email` tắt | Thêm key SendGrid, bật module, mở màn hình |

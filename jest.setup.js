@@ -1,3 +1,4 @@
+/* eslint-env jest */
 /**
  * Jest Setup File
  * Configures global mocks and test utilities

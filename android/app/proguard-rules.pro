@@ -52,15 +52,6 @@
 -keep class com.mrousavy.camera.** { *; }
 -dontwarn com.mrousavy.camera.**
 
-# ==================== React Native Video ====================
--keep class com.brentvatne.react.** { *; }
--keep class com.brentvatne.exoplayer.** { *; }
--dontwarn com.brentvatne.**
-
-# ExoPlayer (used by react-native-video)
--keep class com.google.android.exoplayer2.** { *; }
--dontwarn com.google.android.exoplayer2.**
-
 # ==================== React Native WebView ====================
 -keep class com.reactnativecommunity.webview.** { *; }
 -dontwarn com.reactnativecommunity.webview.**
@@ -73,17 +64,9 @@
 -keep class com.imagepicker.** { *; }
 -dontwarn com.imagepicker.**
 
-# ==================== React Native Permissions ====================
--keep class com.zoontek.rnpermissions.** { *; }
--dontwarn com.zoontek.rnpermissions.**
-
 # ==================== React Native Safe Area Context ====================
 -keep class com.th3rdwave.safeareacontext.** { *; }
 -dontwarn com.th3rdwave.safeareacontext.**
-
-# ==================== React Native Pager View ====================
--keep class com.reactnativepagerview.** { *; }
--dontwarn com.reactnativepagerview.**
 
 # ==================== React Native TTS ====================
 -keep class net.no_mad.tts.** { *; }
@@ -96,10 +79,6 @@
 # ==================== React Native Vector Icons ====================
 -keep class com.oblador.vectoricons.** { *; }
 -dontwarn com.oblador.vectoricons.**
-
-# ==================== React Native FS ====================
--keep class com.rnfs.** { *; }
--dontwarn com.rnfs.**
 
 # ==================== RN Fetch Blob ====================
 -keep class com.RNFetchBlob.** { *; }

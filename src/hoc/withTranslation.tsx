@@ -2,7 +2,7 @@ import React from 'react';
 import {useTranslation} from '../hooks/useTranslation';
 import {Language} from '../context/TranslationContext';
 
-export interface WithAzureTranslationProps {
+export interface WithTranslationProps {
   t: (text: string) => string;
   translate: (text: string) => Promise<string>;
   language: Language;
@@ -12,13 +12,13 @@ export interface WithAzureTranslationProps {
 
 /**
  * HOC to inject translation functions into class components
- * Replaces the old withTranslation HOC
+ * (class screens cannot call the useTranslation hook)
  */
-export function withAzureTranslation<P extends WithAzureTranslationProps>(
+export function withTranslation<P extends WithTranslationProps>(
   WrappedComponent: React.ComponentType<P>,
 ) {
-  const WithAzureTranslationComponent = (
-    props: Omit<P, keyof WithAzureTranslationProps>,
+  const WithTranslationComponent = (
+    props: Omit<P, keyof WithTranslationProps>,
   ) => {
     const {t, translate, language, setLanguage, isLoading} = useTranslation();
 
@@ -34,12 +34,12 @@ export function withAzureTranslation<P extends WithAzureTranslationProps>(
     );
   };
 
-  WithAzureTranslationComponent.displayName = `withAzureTranslation(${
+  WithTranslationComponent.displayName = `withTranslation(${
     WrappedComponent.displayName || WrappedComponent.name
   })`;
 
-  return WithAzureTranslationComponent;
+  return WithTranslationComponent;
 }
 
-export default withAzureTranslation;
+export default withTranslation;
 

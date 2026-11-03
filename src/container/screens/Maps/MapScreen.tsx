@@ -332,7 +332,7 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
       // KHÔNG fetch route ở đây vì currentLat/currentLong chưa có
       // Sẽ fetch trong useEffect riêng khi đã có vị trí
     } else {
-      // Nếu không, fetch từ NocoDB
+      // Nếu không, lấy marker từ catalog
       catalogRepository.get().then(catalog => {
         setLocations(catalog.mapMarkers);
       }).catch(error => console.warn('Catalog unavailable for map:', error));
@@ -585,7 +585,8 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
 
         // Vẽ đường thẳng đơn giản
         const straightLineRoute: RouteInfo = {
-          distance: calculateDistance(currentLat, currentLong, location.lat, location.long),
+          distance: haversineDistance({latitude: currentLat, longitude: currentLong},
+            {latitude: location.lat, longitude: location.long}),
           duration: 0, // Không tính được thời gian khi offline
           coordinates: [
             { latitude: currentLat, longitude: currentLong },
@@ -605,28 +606,11 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
     }
   };
 
-  // Hàm tính khoảng cách Haversine (đơn giản)
-  const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
-    const R = 6371e3; // Bán kính trái đất (mét)
-    const φ1 = lat1 * Math.PI / 180;
-    const φ2 = lat2 * Math.PI / 180;
-    const Δφ = (lat2 - lat1) * Math.PI / 180;
-    const Δλ = (lon2 - lon1) * Math.PI / 180;
-
-    const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
-              Math.cos(φ1) * Math.cos(φ2) *
-              Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-    return R * c; // Khoảng cách tính bằng mét
-  };
-
   const onMarkerPress = (location: ILocation) => {
     setSelectedLocation(location);
     // setVisibleSecondModal(true);
   };
 
-  const onRegionChange = () => {};
 
   const onPressView = () => {
     if (selectedLocation) {
@@ -942,8 +926,6 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
           ref={mapRef}
           style={{flex: 1}}
           styleURL={MAP_STYLES.find(s => s.id === currentMapStyle)?.url || MapboxGL.StyleURL.Satellite}
-          // Deprecated in @rnmapbox/maps v10 (dev warning) and a no-op here; onCameraChanged below is used.
-          // onRegionDidChange={onRegionChange}
           onCameraChanged={onRegionDidChange}
           onDidFinishLoadingMap={onMapStyleLoaded}
           onPress={() => {
@@ -1472,9 +1454,7 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
               // Fetch route và hiển thị
               setFocusLocation(selectedLocation);
               setShouldShowRoute(true);
-              // P4: the route effect fetches once focusLocation/shouldShowRoute change; a direct call here
-              // made two paid Directions requests per tap.
-              // fetchRouteToLocation(selectedLocation);
+              // The route effect fetches once focusLocation/shouldShowRoute change (one Directions request).
             }}
             style={{
               backgroundColor: colors.white,

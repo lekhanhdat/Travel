@@ -3,8 +3,7 @@ import {TFunction} from 'i18next';
 // The shared i18next instance (configured by src/i18n); importing the config here would pull react-i18next.
 import i18n from 'i18next';
 
-// Catalog content comes only from the API. The old per-ID translation files keyed records by
-// legacy NocoDB IDs and overwrote API names (e.g. id 1), so these helpers never look up i18n keys.
+// Catalog content comes only from the API; these helpers never look up i18n keys by record id.
 // P11 (D1): in English, a record's `content_en` (Neon, translated once by script) replaces the
 // Vietnamese value field by field; untranslated fields (or ids passed by older callers) keep `fallback`.
 type EnglishContent = Record<string, string | string[]>;

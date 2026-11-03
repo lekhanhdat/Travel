@@ -1,4 +1,3 @@
-import FEATURE_FLAGS from '../../../config/featureFlags';
 import CatalogStatus from '../../../component/CatalogStatus';
 import React from 'react';
 import {
@@ -11,7 +10,6 @@ import {
 } from 'react-native';
 import Page from '../../../component/Page';
 import HeaderBase from '../../../component/HeaderBase';
-import {IItem} from '../../../common/types';
 import {IFestival} from '../../../services/festivals.api';
 import sizes from '../../../common/sizes';
 import BottomSheet from '../../../component/BottomSheet';
@@ -20,20 +18,18 @@ import TextBase from '../../../common/TextBase';
 import {AppStyle} from '../../../common/AppStyle';
 import NavigationService from '../NavigationService';
 import {ScreenName} from '../../AppContainer';
-import HistoricalArtifact from '../../../component/HistoricalArtifact';
 import catalogRepository from '../../../services/catalogRepository';
-import locationApi from '../../../services/locations.api';
 import SemanticSearchBarComponent from '../../../component/SemanticSearchBarComponent';
 import LargeItemFestival from '../../../component/LargeItemFestival';
 import {FESTIVAL_SEARCH_FIELDS} from '../../../utils/catalogSearch';
 import {
-  withAzureTranslation,
-  WithAzureTranslationProps,
-} from '../../../hoc/withAzureTranslation';
+  withTranslation,
+  WithTranslationProps,
+} from '../../../hoc/withTranslation';
 
 // TRANG FESTIVALS - Tìm kiếm và hiển thị lễ hội
 
-interface IFestivalsScreenProps extends WithAzureTranslationProps {
+interface IFestivalsScreenProps extends WithTranslationProps {
   navigation: any;
 }
 
@@ -42,9 +38,6 @@ interface IFestivalsScreenState {
   refreshing: boolean;
   error: boolean;
   valueSearch: string;
-  items: IItem[];
-  ITEMS_POPULAR: IItem[];
-  ITEMS_NEARLY: IItem[];
   festivals: IFestival[];
   FESTIVALS_POPULAR: IFestival[];
 }
@@ -65,9 +58,6 @@ class FestivalsScreen extends React.PureComponent<
       refreshing: false,
       error: false,
       valueSearch: '',
-      items: [],
-      ITEMS_POPULAR: [],
-      ITEMS_NEARLY: [],
       festivals: [],
       FESTIVALS_POPULAR: [],
     };
@@ -82,20 +72,7 @@ class FestivalsScreen extends React.PureComponent<
       this.searchBarRef.current?.resetSearch();
     });
 
-    if (FEATURE_FLAGS.ENABLE_ITEMS) {this.fetchItems();}
     this.fetchFestivals();
-  }
-
-  async fetchItems() {
-    const data = await locationApi.getItems();
-    if (__DEV__) {
-      console.log('📦 Items loaded:', data.length);
-    }
-    this.setState({
-      items: data,
-      ITEMS_POPULAR: data.slice(10, 40),
-      ITEMS_NEARLY: data.slice(0, 15),
-    });
   }
 
   async fetchFestivals(forceRefresh = false, pullToRefresh = false) {
@@ -111,26 +88,12 @@ class FestivalsScreen extends React.PureComponent<
     }
   }
 
-  /* P1: Items renderer retained while Items is temporarily disabled.
-  renderItemHorizontal = ({item}: {item: IItem}) => {
-    return <HistoricalArtifact key={`item-${item.id}`} item={item} />;
-  };
-  */
-
   renderFestivalItem = ({item}: {item: IFestival}) => {
     return <LargeItemFestival festival={item} />;
   };
 
   // Stable keyExtractor function to prevent re-creation
   keyExtractorById = (item: IFestival) => item.id.toString();
-
-  handleSearch = (isViewAll: boolean, items: IItem[]) => {
-    NavigationService.navigate(ScreenName.VIEW_ALL_ITEM, {
-      title: isViewAll ? this.props.t('home.viewAll') : this.props.t('festivals.title'),
-      items,
-      valueSearch: this.state.valueSearch,
-    });
-  };
 
   // Called while typing - just update local state, don't navigate
   handleFestivalSearch = (
@@ -235,7 +198,7 @@ class FestivalsScreen extends React.PureComponent<
   }
 }
 
-export default withAzureTranslation(FestivalsScreen);
+export default withTranslation(FestivalsScreen);
 
 const styles = StyleSheet.create({
   container: {

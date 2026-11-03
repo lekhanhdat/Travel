@@ -20,15 +20,15 @@ import {Button} from 'react-native-paper';
 import {IFestival} from '../../../services/festivals.api';
 import SimilarItemsComponent from '../../../component/SimilarItemsComponent';
 import {
-  withAzureTranslation,
-  WithAzureTranslationProps,
-} from '../../../hoc/withAzureTranslation';
+  withTranslation,
+  WithTranslationProps,
+} from '../../../hoc/withTranslation';
 import { translateLocationField } from '../../../utils/translationHelpers';
 import catalogRepository from '../../../services/catalogRepository';
 import { catalogImage } from '../../../utils/catalogDisplay';
 import CachedImage from '../../../component/CachedImage';
 
-interface IDetailLocationScreenProps extends WithAzureTranslationProps {
+interface IDetailLocationScreenProps extends WithTranslationProps {
   navigation: any;
   route: any;
 }
@@ -59,7 +59,6 @@ class DetailLocationScreen extends React.PureComponent<
   }
 
   componentDidMount() {
-    // P1: if (FEATURE_FLAGS.RECOVERY_MODE) {return;}
     this.loadCatalog();
     this.loadReviews();
   }
@@ -671,4 +670,4 @@ class DetailLocationScreen extends React.PureComponent<
   }
 }
 
-export default withAzureTranslation(DetailLocationScreen);
+export default withTranslation(DetailLocationScreen);

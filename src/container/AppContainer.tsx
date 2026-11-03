@@ -6,7 +6,6 @@ import {useRoute} from '@react-navigation/native';
 import {StyleSheet, View, Image, TouchableOpacity} from 'react-native';
 import {TranslationProvider} from '../context/TranslationContext';
 import {useTranslation} from '../hooks/useTranslation';
-import {offlineFallback} from '../services/translation';
 import images from '../res/images';
 import sizes from '../common/sizes';
 import TextBase from '../common/TextBase';
@@ -24,7 +23,7 @@ import {
 import LoginScreen from './screens/Login/LoginScreen';
 import HomeScreen from './screens/Home/HomeScreen';
 import NewFeedScreen from './screens/NewFeed/NewFeedScreen';
-import MapsScreen from './screens/Maps/MapScreenV2';
+import MapsScreen from './screens/Maps/MapScreen';
 import CameraScreen from './screens/Camera/CameraScreen';
 import ProfileScreen from './screens/Profile/ProfileScreen';
 import ViewAllLocation from './screens/Home/ViewAllLocation';
@@ -38,8 +37,6 @@ import FAQ from './screens/Profile/FAQ';
 import Policy from './screens/Profile/Policy';
 import About from './screens/Profile/About';
 import Advise from './screens/Maps/Advise';
-// import DetailItem from './screens/NewFeed/DetailItem';
-// import AllItemScreen from './screens/NewFeed/AllItemsScreen';
 import FestivalsScreen from './screens/Festival/FestivalsScreen';
 import DetailFestivalScreen from './screens/Festival/DetailFestival';
 import ViewAllFestivals from './screens/Festival/ViewAllFestivals';
@@ -64,8 +61,6 @@ export enum ScreenName {
   POLICY = 'Policy',
   ABOUT = 'About',
   ADVISE = 'Advise',
-  DETAIL_ITEM = 'DetailItem',
-  VIEW_ALL_ITEM = 'ViewAllItem',
   SEARCH_sCREEN = 'SearchScreen',
   DETAIL_FESTIVAL_SCREEN = 'DetailFestivalScreen',
   VIEW_ALL_FESTIVALS = 'ViewAllFestivals',
@@ -348,12 +343,6 @@ function AppContainer() {
       <Stack.Screen name="About" component={About} />
       {/* P4: restored with Map (popup button). */}
       <Stack.Screen name="Advise" component={Advise} />
-      {/* P8: Items stay off (User 31/10): table `objects` is admin data for /detect + RAG only.
-      <Stack.Screen name="DetailItem" component={DetailItem} />
-      */}
-      {/* P1: Temporarily disabled; retain for restoration.
-      <Stack.Screen name="ViewAllItem" component={AllItemScreen} />
-      */}
       <Stack.Screen name="SearchScreen" component={FestivalsScreen} />
       <Stack.Screen
         name="DetailFestivalScreen"
@@ -423,13 +412,6 @@ const styles = StyleSheet.create({
 });
 // Wrap AppContainer with TranslationProvider (replaces LanguageProvider)
 const AppWithTranslation = () => {
-  useEffect(() => {
-    // Initialize offline fallback translations
-    if (FEATURE_FLAGS.ENABLE_OFFLINE_CACHE) {
-      offlineFallback.initialize('vi');
-    }
-  }, []);
-
   return (
     <TranslationProvider>
       <AppContainer />

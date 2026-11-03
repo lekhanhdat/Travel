@@ -22,14 +22,14 @@ import {localStorageKey} from '../../../common/constants';
 import {Avatar, getDisplayName} from '../../../utils/avatarUtils';
 import {UserSvg} from '../../../assets/assets/ImageSvg';
 import {Button} from 'react-native-paper';
-import {withAzureTranslation, WithAzureTranslationProps} from '../../../hoc/withAzureTranslation';
+import {withTranslation, WithTranslationProps} from '../../../hoc/withTranslation';
 import Toast from 'react-native-toast-message';
 import authApi from '../../../services/auth.api';
 import {requireLogin} from '../../../utils/requireLogin';
 
 const {StatusBarManager} = NativeModules;
 
-interface IProfileScreenProps extends WithAzureTranslationProps {
+interface IProfileScreenProps extends WithTranslationProps {
   navigation?: any;
 }
 
@@ -445,4 +445,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default withAzureTranslation(ProfileScreen);
+export default withTranslation(ProfileScreen);

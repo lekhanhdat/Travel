@@ -6,7 +6,7 @@
  */
 
 import axios from 'axios';
-// P9: AI routes live on the Cloud Run API (module `ai`); was SERVER_URL (DigitalOcean).
+// P9: AI routes live on the Cloud Run API (module `ai`).
 import {env} from '../utils/env';
 import {tokenStore} from './api.client';
 import {apiUsageTracker} from '../utils/apiUsageTracker';

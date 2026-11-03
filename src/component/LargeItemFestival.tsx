@@ -2,7 +2,6 @@ import React from 'react';
 import {StyleSheet, TouchableOpacity, View} from 'react-native';
 import {useTranslation} from 'react-i18next';
 import {IFestival} from '../services/festivals.api';
-import festivalsApi from '../services/festivals.api';
 import sizes from '../common/sizes';
 import colors from '../common/colors';
 import {AppStyle} from '../common/AppStyle';
@@ -32,9 +31,6 @@ const LargeItemFestival: React.FC<ILargeItemFestivalProps> = ({festival, onPress
     ? translateFestivalField(t, festival, 'event_time', festival.event_time)
     : festival.event_time;
 
-
-  // Calculate rating from reviews instead of using static rating field
-  const avgRating = festivalsApi.calculateAverageRating(festival.reviews);
 
   return (
     <TouchableOpacity
@@ -90,10 +86,11 @@ const LargeItemFestival: React.FC<ILargeItemFestivalProps> = ({festival, onPress
             </TextBase>
           ) : null}
 
-          {festival.reviews?.length > 0 ? (
+          {/* rating = average of visible reviews (BE table `reviews`), null without reviews. */}
+          {festival.review_count > 0 && festival.rating != null ? (
             <View style={{flexDirection: 'row', marginTop: sizes._4sdp}}>
               <TextBase style={[AppStyle.txt_14_bold]}>
-                ⭐ {avgRating.toFixed(1)}
+                ⭐ {festival.rating.toFixed(1)}
               </TextBase>
             </View>
           ) : null}

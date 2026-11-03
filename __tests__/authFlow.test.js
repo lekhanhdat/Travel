@@ -8,7 +8,7 @@ jest.mock('../src/container/AppContainer', () => ({ScreenName: {
   CHATBOT: 'ChatBotScreen', DONATION: 'Donation', SETTINGS: 'Settings', FAQ: 'FAQ', POLICY: 'Policy', ABOUT: 'About',
 }}));
 jest.mock('../src/container/screens/NavigationService', () => ({navigate: jest.fn(), reset: jest.fn(), pop: jest.fn(), push: jest.fn()}));
-jest.mock('../src/hoc/withAzureTranslation', () => ({withAzureTranslation: component => component}));
+jest.mock('../src/hoc/withTranslation', () => ({withTranslation: component => component}));
 jest.mock('../src/services/auth.api', () => ({__esModule: true, default: {
   login: jest.fn(), logout: jest.fn(), isLoggedIn: jest.fn(), deleteAccount: jest.fn(),
   updateProfile: jest.fn(), changePassword: jest.fn(),

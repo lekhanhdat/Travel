@@ -11,7 +11,6 @@ import InputBase from '../../../component/InputBase';
 import {Button} from 'react-native-paper';
 import {AppStyle} from '../../../common/AppStyle';
 import paymentApi from '../../../services/payment.api';
-// import {env} from '../../../utils/env'; // N2: PAYOS_BACKEND_URL no longer used
 import LocalStorageCommon from '../../../utils/LocalStorageCommon';
 import {localStorageKey} from '../../../common/constants';
 import {IAccount} from '../../../common/types';
@@ -34,13 +33,12 @@ const Donation = () => {
   const pollRef = useRef<number | null>(null);
 
   useEffect(() => {
-    // Load current user id from local storage and fetch latest data from NocoDB
+    // Load current user id from local storage and fetch the latest profile (balance) from the API
     (async () => {
       try {
         const acc: IAccount = await LocalStorageCommon.getItem(localStorageKey.AVT);
         if (acc?.id) {
           setUserId(acc.id);
-          // Fetch latest user data from NocoDB to get updated balance
           const latestUserData = await authApi.getUserById(acc.id);
           if (latestUserData) {
             setUserAccount(latestUserData);
@@ -62,11 +60,6 @@ const Donation = () => {
 
   const onCreate = async () => {
     try {
-      // N2: payments go to the Cloud Run API (payment.api, JWT); no PAYOS_BACKEND_URL any more.
-      // if (!env.PAYOS_BACKEND_URL) {
-      //   alert('Chưa cấu hình PAYOS_BACKEND_URL trong env.local.json');
-      //   return;
-      // }
       const amt = parseInt(amount || '0', 10);
       if (!amt || amt < 1000 || amt > 50000000) {
         alert(i18n.t('common:ui.donation.invalidAmount'));

@@ -55,7 +55,6 @@ describe('detect.api', () => {
     expect(await detectImage('/data/photo.jpg')).toEqual({name: 'Cầu Rồng', description: 'Mô tả', object_id: 1});
     const [method, url, headers, parts] = fetchMock().mock.calls[0];
     expect([method, url]).toEqual(['POST', `${env.API_BASE_URL}/detect`]);
-    expect(url).not.toContain('ondigitalocean');
     expect(headers).toEqual({'Content-Type': 'multipart/form-data', Authorization: 'Bearer jwt-7'});
     expect(parts).toEqual([{name: 'image_file', filename: 'image.jpg', type: 'image/jpeg',
       data: 'RNFetchBlob-file:///data/photo.jpg'}]);

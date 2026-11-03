@@ -5,10 +5,6 @@ const fs = require('fs');
 const path = require('path');
 
 const PUBLIC_ENV = ['CATALOG_API_URL', 'API_BASE_URL', 'MAPBOX_ACCESS_TOKEN'];
-const SECRET_FIELDS = [
-  'NOCODB_TOKEN', 'SENDGRID_API_KEY', 'OPENAI_API_KEY', 'UNSPLASH_ACCESS_KEY',
-  'SERPAPI_KEY', 'AZURE_TRANSLATOR_KEY', 'PAYOS_BACKEND_URL',
-];
 
 function sourceFiles(dir) {
   return fs.readdirSync(dir, {withFileTypes: true}).flatMap(entry => {
@@ -43,9 +39,7 @@ describe('environment allowlist', () => {
 
   it('paid-service keys are never read into the app', () => {
     const {env} = require('../src/utils/env');
-    for (const field of SECRET_FIELDS) {
-      expect(env[field]).toBe('');
-    }
+    expect(Object.keys(env).sort()).toEqual(['API_BASE_URL', 'MAPBOX_ACCESS_TOKEN']);
     // babel inlines the local .env (if any) before jest's moduleNameMapper, so only check shape.
     expect(env.MAPBOX_ACCESS_TOKEN === '' || env.MAPBOX_ACCESS_TOKEN.startsWith('pk.')).toBe(true);
     expect(env.API_BASE_URL).toMatch(/^https:\/\/[^/]+[^/]$/);

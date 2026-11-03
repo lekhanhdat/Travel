@@ -2,13 +2,13 @@
 
 Theo [MIGRATION_AUDIT.md](MIGRATION_AUDIT.md): quyết định (mục 2), kiểm kê F01–F38 (mục 3), kiến trúc đích (mục 5), danh sách Clean CF/CB (mục 6), chi phí + key (mục 7). Mỗi phase chỉ bắt đầu khi User duyệt; xong thì tick và ghi một dòng nhật ký.
 
-**Thứ tự:** P0–P11 ✅ (N2 PayOS bật cùng P10) → P12 CLEAN → P13 nghiệm thu Android → P14 phát hành. Sau đó: Nợ N1–N4. Refactor/tối ưu: Backlog.
+**Thứ tự:** P0–P12 ✅ (N2 PayOS bật cùng P10) → P13 nghiệm thu Android → P14 phát hành. Sau đó: Nợ N1–N4. Refactor/tối ưu: Backlog.
 
 **Quy tắc:** dùng lại / mở comment code có sẵn, không viết lại tính năng tương tự. Không xóa code/tài liệu có sẵn trước P12. Không dữ liệu fix cứng, không secret trong repo. Dịch vụ bên thứ ba chỉ gọi qua BE, key ở Secret Manager `travel-app-config`. NocoDB → Neon, DigitalOcean → Cloud Run, sau migration không còn dính dáng (P12.9). Không copy dữ liệu export vào repo.
 
 **Gate mỗi phase:**
-- FE: jest nhóm CI (`.github/workflows/ci.yml`, thêm test mới vào danh sách) pass; `tsc` ≤ 62; eslint không lỗi mới.
-- BE: `tests/check_core_api.py`, `check_contract.py`, `check_auth.py` + test mới (fake DB/provider) pass.
+- FE: jest nhóm CI (`.github/workflows/ci.yml`, thêm test mới vào danh sách) pass; `tsc` ≤ 55 (từ P12); eslint không lỗi mới.
+- BE: toàn bộ `tests/check_*.py` (fake DB/provider) pass.
 - CI xanh 2 repo; diff không secret, không URL NocoDB/DO mới; app không gọi thẳng OpenAI/SerpAPI/SendGrid/PayOS.
 - Neon chỉ đổi qua migration mới trong `Travel_BE/db/schema/` (User chạy); deploy theo `Travel_BE/deploy/README.md` (User chạy).
 - File tạm của phase (script một lần, bundle/index thử, file duyệt) xóa trước khi đóng phase.
@@ -116,19 +116,17 @@ Phụ thuộc: P9. Ước lượng: BE S + FE M + dữ liệu S.
 
 **Deploy P11:** migration 012; image `sha256:13d7999b…` → revision `travel-api-00010-bqm` (100%), rollback về `travel-api-00009-2ml`. Dịch xong 02/11: 123 locations, 49 festivals, 82 hotels, 11 objects (script + file duyệt đã xóa).
 
-## P12 — CLEAN (sau P5–P11; User duyệt từng mục CF/CB ở audit mục 6)
-Mỗi mục một commit riêng. Không refactor, không tối ưu.
-- [ ] P12.1 Rà lại bằng chứng từng mục ngay trước khi xóa; mục còn tham chiếu thì giữ.
-- [ ] P12.2 FE code chết/trùng: CF1–CF5, CF7, CF8, CF10–CF13.
-- [ ] P12.3 FE bỏ NocoDB/DO/gọi thẳng bên thứ ba: CF6, CF9, CF14.
-- [ ] P12.4 FE bỏ Azure: CF21 (giữ i18n, `TranslationContext`, HOC).
-- [ ] P12.5 FE dependency + script: CF15, CF16 — gỡ package native xong phải `npm ci` + build debug pass.
-- [ ] P12.6 FE asset + file build: CF17, CF22 (+ `.gitignore`).
-- [ ] P12.7 Tài liệu: CF18, CF19, CB10; viết lại `README.md` FE/BE theo kiến trúc đích.
-- [ ] P12.8 BE: CB1–CB9, CB12, CB13 (CB13 = migration 013 bỏ cột `reviews`/`rating` + bỏ mảng `reviews` khỏi contract).
-- [ ] P12.9 **Xác nhận sạch:** `git grep -il "nocodb\|ondigitalocean\|digital.ocean\|digitalocean"` 2 repo = 0 (trừ 2 file migration); `src` FE không còn `firebase|azure|microsofttranslator|unsplash|api.openai.com|serpapi.com|sendgrid.com`; `.env` không còn biến NocoDB/DO/Firebase/Azure/Unsplash; không còn file tạm.
-- [ ] P12.10 Lint/tsc: sửa lỗi rõ ràng; hạ baseline tsc trong CI.
-- **Không xóa:** khối `BackgroundGeolocation` (Backlog); `ForgotPasswordScreen`, `Donation`, code email/payment ở BE (Nợ); test của tính năng.
+## P12 — CLEAN ✅ (User duyệt bảng rà soát 03/11; một commit mỗi repo theo User)
+- [x] P12.1 Rà lại bằng chứng từng mục trước khi xóa. Giữ: `get_image_embedding` (search kiểu IMAGE vẫn gọi), CF20 (để P14), `BackgroundGeolocation`, `ForgotPasswordScreen`, email/payment.
+- [x] P12.2 FE code chết/trùng + Items: CF1–CF5, CF7, CF8, CF10–CF13, CF23 (`RECOVERY_MODE`, `ENABLE_NOCODB`, `ENABLE_ITEMS` bỏ). Theo User 03/11: giữ SVG/ảnh hay dùng; xóa `ChatBubble`, `SearchBarComponent` (bản đang dùng: `FloatingChatBubble`, `SemanticSearchBarComponent`); bỏ Haversine trùng (`HomeScreen`, `MapScreen` dùng `utils/haversineDistance`); `MapScreenV2` → `MapScreen` (Map v1 Google Maps đã xóa từ `1570328`). Test mới `__tests__/floatingChatBubble.test.js` (CI).
+- [x] P12.3 FE bỏ NocoDB/DO/gọi thẳng bên thứ ba: CF6, CF9 (`axios.ts`, `utils/configs.ts`; `env.ts` chỉ còn `API_BASE_URL`, `MAPBOX_ACCESS_TOKEN`), CF14.
+- [x] P12.4 FE bỏ Azure: CF21 — xóa `services/translation/` + 2 test; `TranslationContext` chỉ đọc i18n; HOC đổi tên `withTranslation` (giữ logic: cấp `t`/`language` cho 8 class screen).
+- [x] P12.5 FE dependency + script: CF15, CF16 (19 package, rule proguard tương ứng). **Còn: User chạy `npm ci` + `npm run android:fresh`.**
+- [x] P12.6 FE asset + file build: CF17 (11 ảnh, 64 SVG, 22 font NotoSansJP/Roboto ~35 MB), CF22 (APK 89 MB, bundle, baselineProfiles khỏi cây + `.gitignore`).
+- [x] P12.7 Tài liệu: CF18, CF19, CB10 xóa; `README.md` FE/BE cập nhật tại chỗ từ bản cũ (tính năng có trạng thái, kiến trúc, cài đặt, API, schema, deploy, mục "Chức năng có thể mở rộng"; bỏ code mẫu, tham khảo, đóng góp, lời cảm ơn); `deploy/README.md`, `db/README.md` viết lại ngắn.
+- [x] P12.8 BE: CB1–CB9, CB14 (NocoDB/Firebase/DO/`main.py`/`Procfile`/`.do`/route chết trong `app.py`/`faiss_indexes/` khỏi git); CB13 = `013_drop_legacy_catalog_columns.sql` + bỏ `reviews` khỏi model/contract (FE vẫn nhận `reviews: []` của API cũ; thẻ lễ hội hiện `rating`/`review_count`). Migration 013 đã chạy (không còn cột cũ); deploy `:phase12`. Còn: CB12 + U20 sửa `.env`.
+- [x] P12.9 Xác nhận sạch: `git grep` NocoDB/DO 2 repo = 0 (trừ MIGRATION_*, comment 2 migration đã chạy 009/010); `src` FE không còn `firebase|azure|microsofttranslator|unsplash|api.openai.com|serpapi.com|sendgrid.com`.
+- [x] P12.10 Lint/tsc: `jest.setup.js` khai báo môi trường jest (`eslint .` 22 → 6 lỗi, còn exhaustive-deps cũ); tsc 62 → 55, baseline CI = 55.
 
 ## P13 — Nghiệm thu Android toàn app
 - [ ] P13.1 Build debug từ `.env` tối giản (`CATALOG_API_URL`, `API_BASE_URL`, Mapbox `pk.`); nếu Gradle lỗi tải SDK Mapbox: download token `sk.` (`DOWNLOADS:READ`) trong `~/.gradle/gradle.properties`
@@ -136,7 +134,7 @@ Mỗi mục một commit riêng. Không refactor, không tối ưu.
 - [ ] P13.3 Mất mạng → thông báo ≤ 30 s; có mạng lại thì Thử lại thành công
 - [ ] P13.4 Network chỉ tới Cloud Run, host ảnh, Mapbox
 - [ ] P13.5 Tài khoản: đăng ký → đăng nhập (cả seed) → hồ sơ/avatar → đổi mật khẩu → đăng xuất → xóa tài khoản
-- [ ] P13.6 Nội dung: review có ảnh → Feed/Detail/rating → báo cáo; Items → DetailItem; Camera nhận diện
+- [ ] P13.6 Nội dung: review có ảnh → Feed/Detail/rating → báo cáo; Camera nhận diện
 - [ ] P13.7 AI: semantic search, tương tự, gợi ý, chatbot (văn bản + ảnh)
 - [ ] P13.8 Ngôn ngữ vi/en; Hotels trong search; từ chối mọi quyền không crash
 - [ ] P13.9 Sửa `__tests__/App.test.tsx` và đưa vào CI; full jest không còn suite hỏng
@@ -157,17 +155,27 @@ Mỗi mục một commit riêng. Không refactor, không tối ưu.
 - [ ] **N3 i18n nâng cao / dịch tự động** nếu cần thêm ngôn ngữ hoặc dịch nội dung người dùng.
 - [ ] **N4 Seeding:** sau P7 tạo tài khoản mẫu + review như reviewer, qua API (không fix cứng, không SQL tay).
 
+## Hoàn thiện tính năng (rà README cũ 03/11 — chờ User duyệt thứ tự)
+Tính năng có giao diện/API nhưng chưa chạy thật (🧩 trong `README.md`). Không phải do P12 xóa.
+- [ ] **R1 Gợi ý cá nhân hóa:** ghi sở thích vào `user_memories` (vd. xem chi tiết, đánh giá ≥ 4 sao, chủ đề hỏi chatbot) để `/api/v1/recommendations` không chỉ trả mục phổ biến. BE S + FE S.
+- [ ] **R2 Gợi ý từ khóa khi gõ:** gắn `debouncedGetSuggestions` (`/api/v1/search/suggestions`) vào `SemanticSearchBarComponent`. FE S.
+- [ ] **R3 Tìm bằng ảnh:** `search_type=image` luôn lỗi (image không có CLIP) — bỏ nhánh hoặc chuyển sang `/detect`. BE S.
+- [ ] **R4 Cài đặt:** Xóa bộ nhớ đệm làm thật (`catalogRepository.clear` + cache ảnh); Dịch vụ vị trí → mở cài đặt quyền hệ thống; Thông báo đẩy (cần FCM), Tự động đồng bộ, Chế độ tối → làm hoặc ẩn. FE S–L.
+- [ ] **R5 Lịch sử giao dịch:** `GET /payments/history` (chỉ của user trong JWT) + màn hình trong Hồ sơ. BE S + FE S.
+- [ ] **R6 Giới thiệu / SOS:** URL thật (website, mạng xã hội, Play Store), nút SOS gọi số khẩn cấp thay số cá nhân cố định trong `ProfileScreen.tsx`. FE S (cùng P14).
+- [ ] **R7 PayOS confirm-webhook:** `confirm_webhook` + `/payment/webhook-info` (xóa ở P12 cùng `payment_service.py`, đã dùng một lần ở N2) — viết lại thành script khi cần đổi URL webhook. BE S.
+- [ ] **R8 Ý tưởng chưa có code:** lọc lễ hội theo tháng (`getFestivalsByMonth` có ở `git show 7e17613:src/services/festivals.api.ts`), lưu yêu thích, chia sẻ, nhắc lịch lễ hội, gom cụm marker, bản đồ offline.
+
 ## Cần User (còn mở)
 - [ ] **U5** Đổi/vô hiệu các tài khoản từng có mật khẩu dạng chữ trong `authConstants.tsx` (lịch sử git) — cùng P14.1.
 - [ ] **U7** Dữ liệu: 21 festival chưa có `location_id`; bổ sung dần trên Neon khi muốn.
 - [ ] **U16** Emulator Pixel_8_API_34 kẹt "offline": chạy `emulator -avd Pixel_8_API_34 -no-snapshot-load -gpu swiftshader_indirect`, rồi `npx react-native run-android`; GPS giả `adb emu geo fix 108.2270 16.0611`.
-- [ ] **U20** Sau P5 có thể xóa `OPENAI_API_KEY`, `SERPAPI_KEY`, `PASSWORD_SALT` khỏi `.env` FE (app không còn đọc). Giữ `SENDGRID_API_KEY` tới N1 (hoặc chuyển sang `.env` BE). Xóa `NOCODB_*`/`DB_URL` sau P8. `.env` FE cuối cùng chỉ còn `CATALOG_API_URL`, `API_BASE_URL`, `MAPBOX_ACCESS_TOKEN`.
-- [ ] **U30** Bundle/APK cũ đang được track trong git: khuyến nghị xóa khỏi cây ở P12 (CF22) + rotate key ở P14.1, không viết lại lịch sử. Xác nhận khi tới P12.
+- [ ] **U20** `.env` FE chỉ còn `CATALOG_API_URL`, `API_BASE_URL`, `MAPBOX_ACCESS_TOKEN` (hiện còn `DB_URL`, `NOCODB_TOKEN`, `SENDGRID_API_KEY`, `PASSWORD_SALT`, `OPENAI_API_KEY`, `SERPAPI_KEY` và thiếu 2 URL — code có mặc định Cloud Run). Chuyển `SENDGRID_API_KEY` sang `.env` BE nếu cần cho N1. `.env` BE: xóa `NOCODB_*` (CB12), `IMGBB_API_KEY`, `FAISS_INDEX_DIR`.
 - **Mỗi phase có DB/deploy:** User chạy migration (owner `DATABASE_URL_UNPOOLED` trong `.env` BE) và deploy theo `Travel_BE/deploy/README.md`; agent soạn lệnh cụ thể khi tới phase.
 
 ## Backlog
-- [ ] Cảnh báo giọng nói khi tới gần địa điểm (khối `BackgroundGeolocation` comment trong `MapScreenV2.tsx`)
-- [ ] Refactor (class component → hook, gộp 2 `ImageSvg`, tách `MapScreenV2`), tối ưu hiệu năng
+- [ ] Cảnh báo giọng nói khi tới gần địa điểm (khối `BackgroundGeolocation` comment trong `MapScreen.tsx`)
+- [ ] Refactor (class component → hook, gộp 2 `ImageSvg`, tách `MapScreen`), tối ưu hiệu năng
 - [ ] Endpoint detail / bỏ `long_description` khỏi list
 - [ ] pgvector thay FAISS nếu FAISS-trong-image không đủ
 
@@ -187,3 +195,4 @@ Mỗi mục một commit riêng. Không refactor, không tối ưu.
 | 31/10/2026 | P9 | FAISS build từ Neon lúc build image (183 vector); router search/chat/memory/recommendations (JWT, quota chat 30/ngày, objects chỉ làm ngữ cảnh RAG); memory + hội thoại trên Neon (010 + quyền 005); OpenAI qua REST; FE semantic + chatbot qua BE. Deploy `travel-api-00008-fxl` (`23aafe4d…`). Jest CI 19 suite 201 pass, tsc 62; BE 9 test PASS. User nghiệm thu emulator: pass |
 | 31/10/2026 | P10 + N2 | Payment trên Neon/Cloud Run (`core_api/payments.py`): user từ JWT, webhook bắt buộc chữ ký + idempotent theo `order_code`, PayOS qua REST (không SDK); quyền 006; `travel-app-config:3`; FE `payment.api` + `Donation` mở lại. Deploy `travel-api-00009-2ml` (`4899a943…`), webhook đăng ký. Jest CI 20 suite 202 pass, tsc 62; BE 10 test PASS. User thử giao dịch thật: pass |
 | 02/11/2026 | P11 | `content_en` ở Neon (012) + dịch một lần (gpt-4o-mini); helper chọn tiếng Anh theo bản ghi; ~140 chuỗi UI → `common:ui.*` vi/en; hotels nạp lười trong search (không ghép id semantic, Detail không gọi review/lễ hội); nhãn 94 `types` vi/en trong search; `languageSwitching` vào CI. Deploy `travel-api-00010-bqm`. Jest CI 21 suite 212 pass, tsc 62; BE 10 test PASS. User duyệt: done |
+| 03/11/2026 | P12 | Clean CF1–CF19, CF21–CF23, CB1–CB10, CB13, CB14 (một commit mỗi repo); 19 package, APK/bundle, font/ảnh/SVG thừa, NocoDB/DO/Firebase/Azure khỏi code; migration 013. Deploy `travel-api-00011-5lb` (`fb219e59…`). Jest CI 22 suite 212 pass, tsc 55, eslint 6 lỗi cũ; BE 10 test PASS |

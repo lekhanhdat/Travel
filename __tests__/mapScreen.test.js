@@ -47,12 +47,12 @@ const Toast = require('react-native-toast-message');
 const mapboxApi = require('../src/services/mapbox.api');
 const catalogRepository = require('../src/services/catalogRepository').default;
 const {buildCatalogSnapshot} = require('../src/services/catalogRepository');
-const MapScreenV2 = require('../src/container/screens/Maps/MapScreenV2').default;
+const MapScreen = require('../src/container/screens/Maps/MapScreen').default;
 // Module-level configuration, captured before afterEach clears mock calls.
 const geoConfigCalls = [...Geolocation.setRNConfiguration.mock.calls];
 
 const place = (id, extra) => ({id, name: `Place ${id}`, description: '', address: '', avatar: '', images: [],
-  reviews: [], lat: 16.05 + id / 100, long: 108.2, publishable: true, ...extra});
+  lat:16.05 + id / 100, long: 108.2, publishable: true, ...extra});
 const snapshot = buildCatalogSnapshot([
   place(1, {lat: 16.06}), place(2, {publishable: false}), place(3, {lat: null, long: null}), place(4, {lat: 16.09}),
 ], []);
@@ -70,7 +70,7 @@ describe('Map (P4)', () => {
   it('shows only publishable markers with GPS; a denied permission blocks directions and "you are here"', async () => {
     jest.spyOn(PermissionsAndroid, 'request').mockResolvedValue(PermissionsAndroid.RESULTS.DENIED);
     let tree;
-    await act(async () => {tree = renderer.create(React.createElement(MapScreenV2, props()));});
+    await act(async () => {tree = renderer.create(React.createElement(MapScreen, props()));});
     expect(markerIds(tree)).toEqual(['marker-0', 'marker-1']);
     const markers = tree.root.findAll(node => node.type === 'MarkerView');
     expect(markers.map(node => node.props.coordinate)).toEqual([[108.2, 16.06], [108.2, 16.09]]);
@@ -89,7 +89,7 @@ describe('Map (P4)', () => {
     mapboxApi.getDirections.mockResolvedValue({routes: [{distance: 1200, duration: 300, legs: [{steps: []}],
       geometry: {coordinates: [[108.1, 16.0], [108.2, 16.06]]}}]});
     let tree;
-    await act(async () => {tree = renderer.create(React.createElement(MapScreenV2, props()));});
+    await act(async () => {tree = renderer.create(React.createElement(MapScreen, props()));});
     expect(markerIds(tree)).toContain('myLocation');
     const markers = tree.root.findAll(node => node.type === 'MarkerView' && node.props.id === 'marker-0');
     await act(async () => {markers[0].findByType(require('react-native').TouchableOpacity).props.onPress();});
@@ -111,7 +111,7 @@ describe('Map (P4)', () => {
     let onWatch;
     Geolocation.watchPosition.mockImplementation(success => {onWatch = success; return 1;});
     let tree;
-    await act(async () => {tree = renderer.create(React.createElement(MapScreenV2, props()));});
+    await act(async () => {tree = renderer.create(React.createElement(MapScreen, props()));});
     expect(markerIds(tree)).toContain('myLocation');
     expect(cameraCenter(tree)).toEqual([108.2, 16.075]);
     await act(async () => {onWatch({coords: {latitude: 16.07, longitude: 108.21}});});
@@ -128,7 +128,7 @@ describe('Map (P4)', () => {
       .mockImplementationOnce((success, failure) => failure({code: 3, message: 'timeout'}))
       .mockImplementationOnce(success => success({coords: {latitude: 16.0, longitude: 108.1}}));
     let tree;
-    await act(async () => {tree = renderer.create(React.createElement(MapScreenV2, props()));});
+    await act(async () => {tree = renderer.create(React.createElement(MapScreen, props()));});
     expect(Geolocation.getCurrentPosition.mock.calls.map(call => call[2].enableHighAccuracy)).toEqual([true, false]);
     expect(markerIds(tree)).toContain('myLocation');
     tree.unmount();
@@ -138,11 +138,11 @@ describe('Map (P4)', () => {
     jest.spyOn(PermissionsAndroid, 'request').mockResolvedValue(PermissionsAndroid.RESULTS.GRANTED);
     Geolocation.getCurrentPosition.mockImplementation(success => success({coords: {latitude: 16.0, longitude: 108.1}}));
     let tree;
-    await act(async () => {tree = renderer.create(React.createElement(MapScreenV2, props()));});
+    await act(async () => {tree = renderer.create(React.createElement(MapScreen, props()));});
     expect(cameraCenter(tree)).toEqual([108.1, 16.0]);
     tree.unmount();
     const hidden = snapshot.locationById.get(2);
-    await act(async () => {tree = renderer.create(React.createElement(MapScreenV2,
+    await act(async () => {tree = renderer.create(React.createElement(MapScreen,
       {...props(), route: {params: {locations: [hidden], showRoute: false}}}));});
     expect(markerIds(tree)).toEqual(['marker-0', 'myLocation']);
     expect(cameraCenter(tree)).toEqual([108.2, hidden.lat]);

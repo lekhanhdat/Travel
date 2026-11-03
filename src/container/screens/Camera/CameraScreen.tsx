@@ -5,12 +5,9 @@ import {launchImageLibrary} from 'react-native-image-picker';
 import {ActivityIndicator, Modal, Portal} from 'react-native-paper';
 import Toast from 'react-native-toast-message';
 import {Camera} from 'react-native-vision-camera';
-// P8: uploads go through services/detect.api (rn-fetch-blob lives there).
-// import RNFetchBlob from 'rn-fetch-blob';
 import {CameraSvg, Lightning, LightningOff, SendSvg} from '../../../assets/ImageSvg';
 import colors from '../../../common/colors';
 import sizes from '../../../common/sizes';
-// import {AI_RECOGNITION_TIMEOUT} from '../../../common/constants';
 import Page from '../../../component/Page';
 import {env} from '../../../utils/env';
 import {detectImage, DetectError} from '../../../services/detect.api';
@@ -217,88 +214,6 @@ export default class CameraScreen extends React.PureComponent<
       });
     }
   };
-
-  // P8: DigitalOcean/SERVER_URL version retained for recovery history (removed at P12).
-  // uploadImage = async (filePath: string) => {
-  //   const url = `${SERVER_URL}/detect`;
-  //   console.log('=== UPLOAD IMAGE START ===');
-  //   console.log('Uploading image to:', url);
-  //   console.log('File path:', filePath);
-  //
-  //   this.setState({ isDetecting: true });
-  //
-  //   try {
-  //     const response = await RNFetchBlob.config({
-  //       timeout: AI_RECOGNITION_TIMEOUT,
-  //     }).fetch(
-  //       'POST',
-  //       url,
-  //       {
-  //         'Content-Type': 'multipart/form-data',
-  //       },
-  //       [
-  //         {
-  //           name: 'image_file',
-  //           filename: 'image.jpg',
-  //           data: RNFetchBlob.wrap(filePath),
-  //         },
-  //       ],
-  //     );
-  //
-  //     console.log('Response status:', response.info().status);
-  //     console.log('Response data:', response?.data);
-  //     console.log('Response info:', response.info());
-  //
-  //     if (response.info().status === 200) {
-  //       try {
-  //         const content = JSON.parse(response?.data);
-  //         console.log('Parsed content:', content);
-  //
-  //         this.setState({
-  //           visible: true,
-  //           resultName: content.name || 'Không xác định',
-  //           resultDescription: content.description || 'Không có mô tả',
-  //           resultPhotoPath: filePath,
-  //           showPreviewModal: false, // Hide preview modal when showing result
-  //         });
-  //
-  //         Toast.show({
-  //           type: 'success',
-  //           text1: 'Nhận diện thành công',
-  //           text2: 'Đã xử lý ảnh thành công',
-  //         });
-  //       } catch (parseError) {
-  //         console.log('Parse error:', parseError);
-  //         console.log('Raw response data:', response?.data);
-  //         Toast.show({
-  //           type: 'error',
-  //           text1: 'Lỗi xử lý dữ liệu',
-  //           text2: 'Không thể xử lý kết quả từ server',
-  //         });
-  //       }
-  //     } else {
-  //       console.log('Server error status:', response.info().status);
-  //       Toast.show({
-  //         type: 'error',
-  //         text1: 'Lỗi server',
-  //         text2: `Server trả về lỗi: ${response.info().status}`,
-  //       });
-  //     }
-  //   } catch (error) {
-  //     console.log('Upload error:', error);
-  //     console.error('Error Details:', JSON.stringify(error, null, 2));
-  //     Toast.show({
-  //       type: 'error',
-  //       text1: 'Lỗi kết nối',
-  //       text2: 'Không thể kết nối đến server. Vui lòng thử lại.',
-  //     });
-  //   } finally {
-  //     this.setState({
-  //       isDetecting: false,
-  //     });
-  //     console.log('=== UPLOAD IMAGE END ===');
-  //   }
-  // };
 
   pickImage = async () => {
     await launchImageLibrary(

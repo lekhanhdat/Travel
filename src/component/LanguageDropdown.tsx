@@ -10,7 +10,6 @@ import {
 } from 'react-native';
 import {useTranslation} from '../hooks/useTranslation';
 import {Language} from '../context/TranslationContext';
-import {offlineFallback} from '../services/translation';
 import colors from '../common/colors';
 import sizes from '../common/sizes';
 import fonts from '../common/fonts';
@@ -59,8 +58,6 @@ const LanguageDropdown: React.FC<LanguageDropdownProps> = ({
 
   const handleLanguageSelect = async (selectedLanguage: Language) => {
     setLanguage(selectedLanguage);
-    // Preload offline translations for the new language
-    await offlineFallback.preloadForLanguage(selectedLanguage);
     setIsVisible(false);
   };
 

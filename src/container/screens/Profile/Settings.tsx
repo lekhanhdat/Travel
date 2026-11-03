@@ -8,9 +8,9 @@ import {
   NativeModules,
 } from 'react-native';
 import {
-  withAzureTranslation,
-  WithAzureTranslationProps,
-} from '../../../hoc/withAzureTranslation';
+  withTranslation,
+  WithTranslationProps,
+} from '../../../hoc/withTranslation';
 import LanguageDropdown from '../../../component/LanguageDropdown';
 import Page from '../../../component/Page';
 import HeaderBase from '../../../component/HeaderBase';
@@ -25,7 +25,7 @@ import {localStorageKey} from '../../../common/constants';
 
 const {StatusBarManager} = NativeModules;
 
-interface ISettingsProps extends WithAzureTranslationProps {}
+interface ISettingsProps extends WithTranslationProps {}
 
 interface ISettingsState {
   notifications: boolean;
@@ -252,7 +252,7 @@ class Settings extends React.PureComponent<ISettingsProps, ISettingsState> {
   }
 }
 
-export default withAzureTranslation(Settings);
+export default withTranslation(Settings);
 
 const styles = StyleSheet.create({
   container: {

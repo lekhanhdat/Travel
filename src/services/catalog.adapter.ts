@@ -10,7 +10,6 @@ export interface CatalogDTO {
   rating: number | null;
   /** P7: visible reviews in the BE table; `rating` is their average. 0 when an older API omits it. */
   review_count: number;
-  reviews: any[];
   images: string[];
   videos: string[];
   advise: string[];
@@ -62,7 +61,6 @@ function validate(raw: unknown, festival: boolean): void {
   if (!Number.isSafeInteger(row.id) || typeof row.publishable !== 'boolean' ||
       strings.some(key => typeof row[key] !== 'string') ||
       numbers.some(key => row[key] !== null && (typeof row[key] !== 'number' || !Number.isFinite(row[key]))) ||
-      !Array.isArray(row.reviews) ||
       (row.review_count !== undefined && (!Number.isSafeInteger(row.review_count) || (row.review_count as number) < 0)) ||
       (row.content_en !== undefined && !isEnglishContent(row.content_en)) ||
       ['types', 'images', 'videos', 'advise'].some(key =>

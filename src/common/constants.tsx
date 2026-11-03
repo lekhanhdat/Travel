@@ -4,7 +4,7 @@ import {AppState, AppStateStatus, Dimensions, Platform} from 'react-native';
 
 export const API_TIME_OUT = 10000;
 // AI Camera Recognition timeout: 2 minutes (120 seconds)
-// This accounts for: image upload + OpenAI Vision API + NocoDB check + OpenAI description generation
+// This accounts for: image upload + Google Lens + OpenAI + objects lookup (BE /detect)
 export const AI_RECOGNITION_TIMEOUT = 120000;
 export const localStorageKey = {
   AUTH_TOKEN: 'AUTH_TOKEN',

@@ -13,14 +13,14 @@ import { LOCATION_SEARCH_FIELDS, searchCatalog } from '../../../utils/catalogSea
 import TextBase from '../../../common/TextBase';
 import { AppStyle } from '../../../common/AppStyle';
 import {
-  withAzureTranslation,
-  WithAzureTranslationProps,
-} from '../../../hoc/withAzureTranslation';
+  withTranslation,
+  WithTranslationProps,
+} from '../../../hoc/withTranslation';
 
 type SearchFilterType = 'all' | 'name' | 'address' | 'description';
 type SearchModeType = 'semantic' | 'keyword';
 
-interface IViewAllLocationProps extends WithAzureTranslationProps {
+interface IViewAllLocationProps extends WithTranslationProps {
   navigation: any;
   route: any; // React Navigation v5+ route prop
 }
@@ -255,7 +255,7 @@ class ViewAllLocation extends React.PureComponent<
   }
 }
 
-export default withAzureTranslation(ViewAllLocation);
+export default withTranslation(ViewAllLocation);
 
 const styles = StyleSheet.create({
   filterButton: {

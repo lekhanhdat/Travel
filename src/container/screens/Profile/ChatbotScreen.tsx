@@ -141,7 +141,7 @@ export default class ChatbotScreen extends React.PureComponent<
           this.setState({uploadingImage: true});
 
           try {
-            // Upload to NocoDB
+            // Upload via POST /uploads
             const uploadResult = await locationApi.uploadImage({
               uri: asset.uri,
               type: asset.type || 'image/jpeg',

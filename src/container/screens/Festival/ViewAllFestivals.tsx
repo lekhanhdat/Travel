@@ -13,14 +13,14 @@ import {FESTIVAL_SEARCH_FIELDS, searchCatalog} from '../../../utils/catalogSearc
 import TextBase from '../../../common/TextBase';
 import {AppStyle} from '../../../common/AppStyle';
 import {
-  withAzureTranslation,
-  WithAzureTranslationProps,
-} from '../../../hoc/withAzureTranslation';
+  withTranslation,
+  WithTranslationProps,
+} from '../../../hoc/withTranslation';
 
 type SearchFilterType = 'all' | 'name' | 'location' | 'description';
 type SearchModeType = 'semantic' | 'keyword';
 
-interface IViewAllFestivalsProps extends WithAzureTranslationProps {
+interface IViewAllFestivalsProps extends WithTranslationProps {
   navigation: any;
   route: any; // React Navigation v5+ route prop
 }
@@ -251,7 +251,7 @@ class ViewAllFestivals extends React.PureComponent<
   }
 }
 
-export default withAzureTranslation(ViewAllFestivals);
+export default withTranslation(ViewAllFestivals);
 
 const styles = StyleSheet.create({
   filterButton: {

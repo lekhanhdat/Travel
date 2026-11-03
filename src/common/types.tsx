@@ -14,7 +14,7 @@ export interface IAccount {
 }
 
 export interface ILocation {
-  id: number; // API primary key (single key; legacy NocoDB 'Id' removed)
+  id: number; // API primary key
   name: string;
   avatar: string;
   address: string;
@@ -30,8 +30,6 @@ export interface ILocation {
   long: number | null;
   types?: string[]; // Array of location types (e.g., ["museum", "attraction", "historical"])
   haveVoice?: boolean; // DƯ THỪA - chỉ cần check voiceName
-  reviews: IReview[];
-  // item?: IItem[];
   recommendation?: string; // KHÔNG ĐƯỢC SỬ DỤNG - nên là optional
   icon?: any;
   voiceName?: string;
@@ -57,15 +55,6 @@ export interface IReview {
   location?: ILocation;
   festival?: {id: number; name: string}; // P7: set for festival reviews (Feed shows its name)
   images?: string[]; // Array of image URLs uploaded by user
-}
-
-export interface IItem {
-  Id: number;
-  name: string;
-  description: string;
-  video?: string;
-  images?: any[];
-  location?: Pick<ILocation, 'id' | 'name'>;
 }
 
 export interface ITransaction {

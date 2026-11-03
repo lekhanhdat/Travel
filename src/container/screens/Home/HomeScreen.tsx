@@ -25,9 +25,9 @@ import catalogRepository from '../../../services/catalogRepository';
 import LocalStorageCommon from '../../../utils/LocalStorageCommon';
 import {localStorageKey} from '../../../common/constants';
 import {
-  withAzureTranslation,
-  WithAzureTranslationProps,
-} from '../../../hoc/withAzureTranslation';
+  withTranslation,
+  WithTranslationProps,
+} from '../../../hoc/withTranslation';
 import LanguageDropdown from '../../../component/LanguageDropdown';
 import Geolocation from '@react-native-community/geolocation';
 import SemanticSearchBarComponent from '../../../component/SemanticSearchBarComponent';
@@ -36,7 +36,7 @@ import {Button} from 'react-native-paper';
 import {sortByDistance} from '../../../utils/nearby';
 import {LOCATION_SEARCH_FIELDS} from '../../../utils/catalogSearch';
 
-interface IHomeScreenProps extends WithAzureTranslationProps {
+interface IHomeScreenProps extends WithTranslationProps {
   navigation: any;
 }
 
@@ -167,74 +167,6 @@ class HomeScreen extends React.PureComponent<
       nearbyStatus: 'ready',
     });
   };
-
-  // Calculate distance between two coordinates using Haversine formula
-  calculateDistance = (
-    lat1: number,
-    lon1: number,
-    lat2: number,
-    lon2: number,
-  ): number => {
-    const R = 6371; // Radius of the Earth in km
-    const dLat = this.deg2rad(lat2 - lat1);
-    const dLon = this.deg2rad(lon2 - lon1);
-    const a =
-      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos(this.deg2rad(lat1)) *
-        Math.cos(this.deg2rad(lat2)) *
-        Math.sin(dLon / 2) *
-        Math.sin(dLon / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    const distance = R * c; // Distance in km
-    return distance;
-  };
-
-  deg2rad = (deg: number): number => {
-    return deg * (Math.PI / 180);
-  };
-
-  /* P1: Legacy GPS/nearby loader retained while Guest Mode uses the loader below.
-  async fetchLocations() {
-    const data = await locationApi.getLocations();
-
-    // Calculate distance for each location
-    const locationsWithDistance = data.map(location => ({
-      ...location,
-      distance: this.calculateDistance(
-        this.state.currentLat,
-        this.state.currentLong,
-        location.lat,
-        location.long,
-      ),
-    }));
-
-    // Sort by distance (nearest first)
-    const sortedByDistance = [...locationsWithDistance].sort(
-      (a, b) => a.distance - b.distance,
-    );
-
-    // Get top 10 nearest locations
-    const nearestLocations = sortedByDistance.slice(0, 20);
-
-    // Get popular locations (first 10 from original data)
-    const popularLocations = data.slice(0, 20);
-
-    this.setState({
-      locations: data,
-      locationsNearly: nearestLocations,
-      locationsPopular: popularLocations,
-    });
-
-    if (__DEV__) {
-      console.log(
-        '🎯 Nearest location:',
-        nearestLocations[0]?.name,
-        nearestLocations[0]?.distance?.toFixed(2),
-        'km',
-      );
-    }
-  }
-  */
 
   async fetchLocations(forceRefresh = false, pullToRefresh = false) {
     this.setState({loading: !pullToRefresh, refreshing: pullToRefresh, error: false});
@@ -556,7 +488,7 @@ class HomeScreen extends React.PureComponent<
   }
 }
 
-export default withAzureTranslation(HomeScreen);
+export default withTranslation(HomeScreen);
 
 const styles = StyleSheet.create({
   container: {

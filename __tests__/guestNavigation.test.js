@@ -7,7 +7,6 @@ jest.mock('@react-navigation/stack', () => ({createStackNavigator: () => ({Navig
 jest.mock('@react-navigation/bottom-tabs', () => ({createBottomTabNavigator: () => ({Navigator: 'Tabs', Screen: 'Tab'})}));
 jest.mock('../src/context/TranslationContext', () => ({TranslationProvider: ({children}) => children}));
 jest.mock('../src/hooks/useTranslation', () => ({useTranslation: () => ({t: key => key})}));
-jest.mock('../src/services/translation', () => ({offlineFallback: {initialize: jest.fn()}}));
 jest.mock('../src/container/screens/Home/HomeScreen', () => 'Home');
 jest.mock('../src/container/screens/Home/ViewAllLocation', () => 'Locations');
 jest.mock('../src/container/screens/Home/DetailLocation', () => 'DetailLocation');
@@ -32,7 +31,7 @@ jest.mock('../src/container/screens/Profile/Personal', () => 'Personal');
 jest.mock('../src/container/screens/Login/LoginScreen', () => 'Login');
 jest.mock('../src/container/screens/Login/SignUpScreen', () => 'SignUp');
 // P4: Map tab/route are enabled; the screens are mocked here so Mapbox stays uninitialized in this test.
-jest.mock('../src/container/screens/Maps/MapScreenV2', () => 'Map');
+jest.mock('../src/container/screens/Maps/MapScreen', () => 'Map');
 jest.mock('../src/container/screens/Maps/Advise', () => 'Advise');
 jest.mock('@rnmapbox/maps', () => {throw new Error('Guest must not initialize Mapbox');});
 jest.mock('../src/services/auth.api', () => {throw new Error('Guest must not initialize Auth');});
@@ -45,7 +44,6 @@ jest.mock('../src/services/payment.api', () => {throw new Error('Guest must not 
 
 it('registers guest + account routes and Home/Festival/Feed/Map/Camera/Profile tabs without initializing deferred modules', () => {
   const AppContainer = require('../src/container/AppContainer').default;
-  const {offlineFallback} = require('../src/services/translation');
   let tree;
   renderer.act(() => {tree = renderer.create(React.createElement(AppContainer));});
   const routes = tree.root.findAllByType('Route').map(route => route.props.name);
@@ -59,7 +57,6 @@ it('registers guest + account routes and Home/Festival/Feed/Map/Camera/Profile t
   let tabs;
   renderer.act(() => {tabs = renderer.create(React.createElement(HomeStack));});
   expect(tabs.root.findAllByType('Tab').map(tab => tab.props.name)).toEqual(['TabHome', 'TabFestival', 'TabFeed', 'TabMap', 'TabCamera', 'TabProfile']);
-  expect(offlineFallback.initialize).not.toHaveBeenCalled();
   tree.unmount();
   tabs.unmount();
 });

@@ -24,6 +24,5 @@ it('creates a donation and reads its status through the BE; the donor comes from
   expect(create).toMatchObject({method: 'post', url: '/payments/create', data: {amount: 10000}});
   expect(create.data).not.toHaveProperty('userId');
   expect(create.headers.Authorization).toBe('Bearer jwt-1');
-  expect(create.baseURL ?? apiRequest.defaults.baseURL).not.toContain('ondigitalocean');
   expect(status).toMatchObject({method: 'get', url: '/payments/status/5'});
 });

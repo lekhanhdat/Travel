@@ -19,7 +19,7 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci --ignore-scripts
-      # Recovery + catalog suites; AzureTranslatorService/semantic.api fail since before migration and are not gated.
+      # App.test.tsx is fixed at P13; every other suite is gated here.
       - name: Jest (recovery + catalog)
         run: >
           node node_modules/jest/bin/jest.js --runInBand
@@ -32,8 +32,9 @@ jobs:
           __tests__/camera.test.js __tests__/chatbot.test.js __tests__/services/semantic.api.test.ts
           __tests__/components/RecommendationsWidget.test.tsx __tests__/components/SimilarItemsComponent.test.tsx
           __tests__/services/payment.api.test.js __tests__/i18n/languageSwitching.test.tsx
-      - name: tsc (baseline 62 errors, must not grow)
+          __tests__/floatingChatBubble.test.js
+      - name: tsc (baseline 55 errors, must not grow)
         run: |
           count=$(node node_modules/typescript/bin/tsc --noEmit | grep -c "error TS" || true)
-          echo "tsc errors: $count (baseline 62)"
-          test "$count" -le 62
+          echo "tsc errors: $count (baseline 55)"
+          test "$count" -le 55

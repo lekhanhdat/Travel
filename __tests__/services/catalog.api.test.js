@@ -5,10 +5,9 @@ const {adaptLocation, adaptFestival} = require('../../src/services/catalog.adapt
 const catalogRepository = require('../../src/services/catalogRepository').default;
 const locations = require('../../src/services/locations.api').default;
 const festivals = require('../../src/services/festivals.api').default;
-const {request: legacyRequest} = require('../../src/services/axios');
 
 const common = id => ({id, record_id: `source-${id}`, name: `Catalog ${id}`, types: ['culture'],
-  description: '', long_description: '', rating: null, review_count: 0, content_en: {}, reviews: [], images: [], videos: [],
+  description: '', long_description: '', rating: null, review_count: 0, content_en: {}, images: [], videos: [],
   advise: ['Advice'], website: '', phone: '', ticket_info: '', publishable: false});
 const location = id => ({...common(id), address: '', lat: null, long: null, opening_hours: '', avatar: ''});
 const festival = id => ({...common(id), event_time: '', location_id: null});
@@ -26,7 +25,7 @@ describe('Cloud Run catalog contract', () => {
   afterEach(() => {catalogRequest.defaults.adapter = originalAdapter; jest.restoreAllMocks(); jest.useRealTimers();});
 
   it('preserves IDs, nulls, nested JSON and arrays without filtering publishable=false', () => {
-    const raw = {...location(27), reviews: [{arbitrary: {value: null}}], images: ['https://example.com/image']};
+    const raw = {...location(27), images: ['https://example.com/image']};
     expect(adaptLocation(raw)).toEqual(raw);
     expect(adaptLocation(raw)).not.toHaveProperty('Id');
     expect(adaptLocation(raw).images).toBe(raw.images);
@@ -50,7 +49,6 @@ describe('Cloud Run catalog contract', () => {
       const count = offset === 0 ? 100 : 24;
       return response(config, page(Array.from({length: count}, (_, i) => make(offset + i + 1)), offset, offset === 0));
     };
-    const legacy = jest.spyOn(legacyRequest, 'get');
     const snapshot = await catalogRepository.get();
     expect(snapshot.locations).toHaveLength(124);
     expect(snapshot.festivals).toHaveLength(124);
@@ -66,7 +64,6 @@ describe('Cloud Run catalog contract', () => {
       expect(config.headers.has('Authorization')).toBe(false);
       expect(config.headers.has('Cookie')).toBe(false);
     }
-    expect(legacy).not.toHaveBeenCalled();
   });
 
   it('accepts empty final page and a genuinely empty list', async () => {
@@ -189,18 +186,17 @@ describe('Cloud Run catalog contract', () => {
     expect(() => adaptHotel({...hotel(3), content_en: {name: 7}})).toThrow(CatalogError);
   });
 
-  // P7: reviews come from GET /reviews (BE table), no longer from the catalog's legacy `reviews` column.
-  it('reads reviews from the BE, ignores the legacy catalog column, and still lists them without a catalog', async () => {
+  // P7: reviews come from GET /reviews (BE table); the catalog has no `reviews` field since P12 (schema 013).
+  it('reads reviews from the BE and still lists them without a catalog', async () => {
     const {apiRequest} = require('../../src/services/api.client');
     const dto = {id: 9, location_id: 1, festival_id: null, rating: 4, content: 'Đẹp', images: [],
       created_at: '2026-10-30T02:05:00Z', author: {id: 3, user_name: 'u3', full_name: null, avatar: null}};
     const request = jest.spyOn(apiRequest, 'request').mockResolvedValue({data: page([dto])});
-    catalogRequest.defaults.adapter = serve({'/locations': [{...location(1), reviews: [{id: 99}]}]});
+    catalogRequest.defaults.adapter = serve({'/locations': [location(1)]});
     const [review] = await locations.getReviews(false, 1);
     expect(request.mock.calls[0][0]).toMatchObject({method: 'get', url: '/reviews', params: {location_id: 1, limit: 100}});
     expect(request.mock.calls[0][0].headers.Authorization).toBeUndefined();
     expect(review).toMatchObject({id: 9, accountId: 3, start: 4, name_user_review: 'u3', location: {id: 1}});
-    expect((await catalogRepository.get()).locations[0].reviews).toEqual([{id: 99}]);
     catalogRepository.clear();
     catalogRequest.defaults.adapter = serve({'/locations': () => ({list: []})});
     expect((await locations.getReviews())[0]).toMatchObject({id: 9, location: undefined});

@@ -5,7 +5,6 @@ import {ApiError, apiCall, setUnauthorizedHandler, tokenStore} from './api.clien
 
 // Accounts live in the backend (Travel_BE core_api/auth.py): hashing, validation and sessions
 // happen there; the app keeps only the JWT (AUTH_TOKEN) and the profile (AVT), never a password.
-// Previous NocoDB/SendGrid client: `git show 39fc44a:src/services/auth.api.ts`.
 
 type Gender = 'Male' | 'Female' | 'Other';
 

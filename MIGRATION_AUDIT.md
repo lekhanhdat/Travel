@@ -1,27 +1,22 @@
 # Migration Audit — Travel App
 
-Cập nhật **30/10/2026** (sau P6). Tasklist: [MIGRATION_TASKLIST.md](MIGRATION_TASKLIST.md).
+Cập nhật **03/11/2026** (sau P12). Tasklist: [MIGRATION_TASKLIST.md](MIGRATION_TASKLIST.md).
 
 ---
 
-## 1. Hiện trạng (sau P6)
+## 1. Hiện trạng (sau P12)
 
-```
-RN app (Android) ── catalog.client / (P6) api.client ──HTTPS──► Cloud Run travel-api (FastAPI)
-  guest: Home · Lễ hội · Bản đồ · Search                          ├─ catalog GET (gzip, ETag)
-  key trả phí không còn trong bundle                              ├─ module auth (APP_FEATURES)
-                                                                  └─ Neon PostgreSQL
-```
+Kiến trúc đã đạt mục 5: app chỉ gọi Cloud Run + Mapbox; không còn NocoDB, DigitalOcean, Firebase, Azure trong code.
 
 | Hạng mục | Trạng thái |
 |---|---|
-| Dữ liệu Neon | locations **123** (29 `publishable`), festivals **49** (28 có `location_id`), hotels **82**; accounts **3**, transactions **7** (seed của User). `rating`/`reviews` của catalog đang trống |
-| Schema | `001`–`007` (007: `token_version`, `deleted_at`, CHECK định dạng hash); quyền runtime `001_runtime`, `002_auth` |
-| Backend | Cloud Run `travel-api`, image `sha256:d06a0c3c…`; module bật: `auth`. Endpoint: `GET /locations`, `/festivals`, `/hotels`; `POST /auth/signup`, `/auth/login`; `GET/PATCH/DELETE /me`; `POST /me/change-password`; `/health`, `/health/ready` |
-| Secret Manager | `travel-database-url:1`, `travel-app-config:1` (`JWT_SECRET`, `LEGACY_PASSWORD_SALT`) |
-| Frontend | nhánh `migration/p0-p1` (P6): guest catalog + Map; đăng nhập/đăng ký/hồ sơ/đổi mật khẩu/xóa tài khoản qua BE; `.env` chỉ được đọc 3 biến public; các tính năng khác còn tắt (mục 3) |
-| Test / CI | FE jest nhóm CI 13 suite, 142 pass / 1 skip, `tsc` 62; BE `check_core_api`, `check_contract`, `check_auth` |
-| Nguồn cũ | Dữ liệu NocoDB đã export (ngoài repo); app DigitalOcean đã bị xóa; code NocoDB/DO còn trong repo, dọn ở P12 |
+| Dữ liệu Neon | locations **123**, festivals **49**, hotels **82**, objects **11** (đủ `content_en`); accounts/transactions/reviews/memory do người dùng tạo |
+| Schema | `001`–`010`, `012`, `013` (P12: bỏ cột `reviews`/`rating` catalog); quyền `001`–`006` |
+| Backend | Cloud Run `travel-api`, module `auth,uploads,reviews,detect,ai,payments`; revision `travel-api-00011-5lb` (`sha256:fb219e59…`, rollback `travel-api-00010-bqm`); FAISS build từ Neon ở Cloud Build |
+| Secret Manager | `travel-database-url:1`, `travel-app-config:3` |
+| Frontend | nhánh `migration/p0-p1`: đủ tính năng mục 5 (Forgot password = Nợ N1); `.env` chỉ đọc 3 biến public |
+| Test / CI | FE jest 21 suite (209 pass / 1 skip), `tsc` 55, eslint 6 lỗi cũ (exhaustive-deps); BE 10 `check_*.py` |
+| Còn lại | P13 nghiệm thu Android, P14 phát hành (CF20 quyền manifest, rotate key); `.env` 2 repo (U20, CB12) |
 
 ---
 
@@ -243,6 +238,8 @@ Không còn: NocoDB, DigitalOcean, Firebase, Azure Translator, SendGrid gọi t�
 
 ## 6. Đầu vào phase Clean (P12)
 
+**Kết quả P12 (03/11):** đã xử lý CF1–CF19, CF21–CF23, CB1–CB10, CB13, CB14; còn CF20 (P14), CB12 (User sửa `.env`); giữ `get_image_embedding` (còn được search kiểu IMAGE gọi). Bảng dưới giữ làm lịch sử.
+
 Mỗi mục cần User duyệt. "Bằng chứng" = kết quả grep import/tham chiếu trên `src`, `App.tsx`, `index.js`, `__tests__` (FE) hoặc `app.py` + Dockerfile (BE) ngày 30/10. Mục có điều kiện chỉ xóa khi phase ghi bên cạnh đã xong. File tạm do chính các phase P5–P11 tạo ra không nằm ở đây: dọn ngay trong phase đó (mục 5.1).
 
 ### 6.1 FE — file/code
@@ -344,3 +341,4 @@ Giả định: 1 USD ≈ 26.000 VND; demo ~100 người dùng/tháng. Guard 26.0
 | 31/10 | P9 | D11: FAISS build từ Neon ở bước Cloud Build (không lúc startup), 183 vector; module `ai` (OpenAI REST, không SDK); `user_memories`/`conversations` trên Neon (010 + quyền 005), xóa tài khoản xóa luôn; chatbot không tìm ảnh qua SerpAPI (dành quota cho detect). Deploy `travel-api-00008-fxl`. User nghiệm thu emulator: pass |
 | 31/10 | P10 + N2 | Payment bỏ NocoDB/DO: Neon + Cloud Run, sửa G6 (webhook bắt buộc chữ ký HMAC, user từ JWT, cộng số dư đúng 1 lần, khóa dòng); PayOS qua REST (chữ ký kiểm thật); bật luôn N2 theo User (secret v3, quyền 006, webhook đăng ký). Deploy `travel-api-00009-2ml`. Giao dịch thật: pass |
 | 02/11 | P11 | D1: tiếng Anh ở Neon bằng một cột `content_en JSONB` mỗi bảng (thay nhiều cột `*_en`), dịch một lần 123/49/82/11 bản ghi; UI vi/en đủ khóa; Hotels trong search (id riêng, `kind: 'hotel'`); nhãn `types` vi/en. Deploy `travel-api-00010-bqm` |
+| 03/11 | P12 | Clean theo mục 6 (User duyệt, một commit mỗi repo): bỏ NocoDB/DO/Firebase/Azure/Items và code chết, 19 package, APK/bundle/font/asset thừa; HOC đổi tên `withTranslation`; D9 hoàn tất bằng migration 013 (contract bỏ `reviews`) |

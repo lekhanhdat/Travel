@@ -3,14 +3,14 @@
 <div align="center">
 
 ![React Native](https://img.shields.io/badge/React_Native-0.74.2-61DAFB?style=for-the-badge&logo=react&logoColor=white)
-![TypeScript](https://img.shields.io/badge/TypeScript-4.8.4-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
 ![Android](https://img.shields.io/badge/Android-3DDC84?style=for-the-badge&logo=android&logoColor=white)
-![iOS](https://img.shields.io/badge/iOS-000000?style=for-the-badge&logo=apple&logoColor=white)
+![Google Cloud Run](https://img.shields.io/badge/Cloud_Run-Backend-4285F4?style=for-the-badge&logo=googlecloud&logoColor=white)
 ![i18n](https://img.shields.io/badge/i18n-Vietnamese%20%7C%20English-blue?style=for-the-badge)
 
-**Ứng dụng di động du lịch Đà Nẵng** với tính năng AI nhận diện địa điểm, tìm kiếm ngữ nghĩa thông minh, bản đồ tương tác Mapbox, chatbot AI, và hệ thống thanh toán PayOS.
+**Ứng dụng di động du lịch Đà Nẵng** với tính năng AI nhận diện hiện vật, tìm kiếm ngữ nghĩa thông minh, bản đồ tương tác Mapbox, chatbot AI, bảng tin đánh giá và ủng hộ qua PayOS.
 
-[Tính năng](#-tính-năng-chính) • [Cài đặt](#-hướng-dẫn-cài-đặt) • [Cấu trúc](#-cấu-trúc-dự-án) • [Scripts](#-scripts-có-sẵn) • [Cấu hình](#️-cấu-hình)
+[Tính năng](#-tính-năng-chính) • [Kiến trúc](#️-kiến-trúc-hệ-thống) • [Cài đặt](#-hướng-dẫn-cài-đặt) • [Cấu trúc](#-cấu-trúc-repository) • [API](#-api-documentation) • [Mở rộng](#-chức-năng-có-thể-mở-rộng)
 
 </div>
 
@@ -18,18 +18,19 @@
 
 ## 📱 Giới thiệu
 
-**Travel App** là hệ thống ứng dụng du lịch hoàn chỉnh bao gồm **Mobile App (React Native)** và **Backend API (FastAPI)**, cung cấp trải nghiệm du lịch thông minh với các tính năng:
+**Travel App** là hệ thống ứng dụng du lịch gồm **Mobile App (React Native)** và **Backend API (FastAPI trên Google Cloud Run)**, dữ liệu lưu ở **Neon PostgreSQL**, cung cấp trải nghiệm du lịch thông minh với các tính năng:
 
-- 🔐 **Xác thực người dùng** - Đăng ký, đăng nhập, quên mật khẩu với OTP qua email
-- 🗺️ **Bản đồ tương tác** - Tích hợp Mapbox với chỉ đường thông minh, nhiều lộ trình
-- 📸 **Camera AI** - Nhận diện địa điểm du lịch bằng AI (OpenAI Vision)
-- 🏛️ **Khám phá địa điểm** - Danh sách địa điểm phổ biến và gần bạn với GPS
-- ⭐ **Đánh giá & Review** - Hệ thống đánh giá và bình luận địa điểm
-- 🎉 **Lễ hội & Sự kiện** - Khám phá các lễ hội và sự kiện du lịch
-- 💰 **Thanh toán/Donate** - Tích hợp PayOS payment gateway
-- 🤖 **AI Chatbot** - Trợ lý du lịch thông minh với OpenAI
-- 🌐 **Đa ngôn ngữ** - Hỗ trợ tiếng Việt và tiếng Anh
-- 👤 **Quản lý Profile** - Cài đặt cá nhân, FAQ, chính sách
+- 🔐 **Xác thực người dùng** - Đăng ký, đăng nhập, đổi mật khẩu, xóa tài khoản (quên mật khẩu qua OTP email: đang tắt, xem [Nợ N1](MIGRATION_TASKLIST.md))
+- 🗺️ **Bản đồ tương tác** - Mapbox, chỉ đường từng bước, nhiều lộ trình, lớp giao thông, đọc thuyết minh bằng giọng nói
+- 📸 **Camera AI** - Nhận diện hiện vật/địa danh qua ảnh (Google Lens + OpenAI, đối chiếu dữ liệu hiện vật)
+- 🏛️ **Khám phá địa điểm** - Địa điểm phổ biến và gần bạn theo GPS, chi tiết đầy đủ ảnh/video
+- ⭐ **Đánh giá & Review** - Viết đánh giá có sao và ảnh, bảng tin, báo cáo đánh giá xấu
+- 🎉 **Lễ hội & Sự kiện** - Danh sách, chi tiết, liên kết địa điểm tổ chức
+- 🔍 **Tìm kiếm thông minh** - Tìm theo từ khóa (không dấu) hoặc theo ý nghĩa (AI), gồm cả khách sạn/nhà hàng
+- 💰 **Thanh toán/Donate** - Ủng hộ qua mã QR PayOS
+- 🤖 **AI Chatbot** - Trợ lý du lịch dựa trên dữ liệu của app (RAG), bong bóng chat nổi
+- 🌐 **Đa ngôn ngữ** - Tiếng Việt và tiếng Anh (cả giao diện lẫn nội dung)
+- 👤 **Quản lý Profile** - Hồ sơ, ảnh đại diện, cài đặt, FAQ, chính sách
 
 ---
 
@@ -46,147 +47,150 @@
 │  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐     │
 │  │ NewsFeed │  │ Festival │  │  Chatbot │  │ Donation │     │
 │  └──────────┘  └──────────┘  └──────────┘  └──────────┘     │
+│  catalog.client (GET, cache)   api.client (Bearer JWT)      │
 └───────────────────────┬─────────────────────────────────────┘
-                        │
-                        │ HTTPS/REST API
-                        │
-        ┌───────────────┴───────────────┐
-        │                               │
-        ▼                               ▼
-┌──────────────────┐          ┌───────────────────────────┐
-│  FASTAPI BACKEND │          │  NOCODB DATABASE          │
-│   (Python 3.8+)  │◄────────►│   (Cloud/Self)            │
-│                  │          │                           │
-│  Endpoints:      │          │  Tables:                  │
-│  • /detect       │          │  • Accounts + Objects     │
-│  • /payments/*   │          │  • Locations + Festivals  │
-│  • /webhook/*    │          │  • Transactions           │
-│  • /api/v1/*     │          │  • Embeddings + UserMemory│
-│    (Semantic AI) │          │                           │
-│                  │          │                           │
-│  AI Services:    │          │                           │
-│  • FAISS Index   │          │                           │
-│  • Embeddings    │          │                           │
-│  • RAG Pipeline  │          │                           │
-└────────┬─────────┘          └───────────────────────────┘
-         │
-         │ External APIs
-         │
-    ┌────┴────┬──────────┬──────────┬──────────┬──────────┐
-    ▼         ▼          ▼          ▼          ▼          ▼
-┌────────┐ ┌────────┐ ┌────────┐ ┌────────┐ ┌────────┐ ┌────────┐
-│ OpenAI │ │ PayOS  │ │Mapbox  │ │Firebase│ │SerpAPI │ │SendGrid│
-│  API   │ │Payment │ │  Maps  │ │Storage │ │ Search │ │ Email  │
-└────────┘ └────────┘ └────────┘ └────────┘ └────────┘ └────────┘
+                        │ HTTPS/REST API            Mapbox (bản đồ, chỉ đường)
+                        ▼                           ◄── app gọi trực tiếp, token pk.
+┌──────────────────────────────────────────────────────────────┐
+│  FASTAPI BACKEND — Google Cloud Run `travel-api`             │
+│                                                              │
+│  Modules (bật bằng APP_FEATURES):                            │
+│  • catalog  : /locations /festivals /hotels /objects         │
+│  • auth     : /auth/* · /me                                  │
+│  • reviews  : /reviews · uploads : /uploads                  │
+│  • detect   : /detect                                        │
+│  • ai       : /api/v1/search|similar|recommendations|chat    │
+│  • payments : /payments/* · /webhook/payos                   │
+│                                                              │
+│  AI: FAISS index (dựng từ Neon khi build) · Embeddings · RAG │
+└───┬──────────────┬──────────────┬──────────────┬─────────────┘
+    ▼              ▼              ▼              ▼
+┌──────────┐ ┌────────────┐ ┌──────────┐ ┌──────────────────┐
+│   Neon   │ │ Cloud      │ │  OpenAI  │ │ SerpAPI · PayOS  │
+│PostgreSQL│ │ Storage    │ │   API    │ │ (Lens · Payment) │
+└──────────┘ └────────────┘ └──────────┘ └──────────────────┘
+   Key trả phí nằm ở Secret Manager `travel-app-config`, không nằm trong app
 ```
 
 ### Luồng hoạt động chính
 
-1. **Authentication Flow**: Mobile App → NocoDB API → Validate → Store in AsyncStorage
-2. **Camera AI Flow**: Capture Image → Upload to FastAPI → OpenAI Vision → Return Location Info
-3. **Payment Flow**: Create Payment → PayOS API → QR Code → Webhook → Update Balance
-4. **Maps Flow**: Get Location → Mapbox API → Display Route → Turn-by-turn Navigation
-5. **Chatbot Flow**: User Message → FastAPI → OpenAI Chat → AI Response
-6. **Semantic Search Flow**: Query → FastAPI → OpenAI Embeddings → FAISS Search → Ranked Results
+1. **Catalog Flow**: App tải một lần `/locations` + `/festivals` (khách sạn nạp khi tìm kiếm) → cache trong `catalogRepository` → mọi màn hình dùng chung
+2. **Authentication Flow**: Mobile App → `POST /auth/login` → Backend kiểm mật khẩu (scrypt) → JWT lưu AsyncStorage
+3. **Camera AI Flow**: Chụp/chọn ảnh → `POST /detect` → Google Lens (SerpAPI) → OpenAI chọn tên → đối chiếu bảng `objects` → tên + mô tả
+4. **Review Flow**: Chọn ảnh → `POST /uploads` (Cloud Storage) → `POST /reviews` → Bảng tin/Chi tiết đọc `GET /reviews`
+5. **Payment Flow**: `POST /payments/create` → PayOS → QR Code → Webhook có chữ ký → cộng số dư
+6. **Maps Flow**: Vị trí GPS → Mapbox Directions → vẽ lộ trình + danh sách bước
+7. **Chatbot Flow**: Tin nhắn → `POST /api/v1/chat/rag` → tìm ngữ cảnh (FAISS) → OpenAI → trả lời kèm nguồn
+8. **Semantic Search Flow**: Query → `POST /api/v1/search/semantic` → OpenAI Embeddings → FAISS → kết quả xếp hạng
 
 ---
 
 ## ✨ Tính năng chính
 
+> Ký hiệu trạng thái: ✅ đang chạy · ⏸ có code, đang tắt · 🧩 có giao diện/API nhưng chưa hoạt động thật · 💡 chưa có code (xem [Chức năng có thể mở rộng](#-chức-năng-có-thể-mở-rộng)).
+> Khách (chưa đăng nhập) xem được mọi nội dung; viết đánh giá, Camera, Chatbot, gợi ý cá nhân và ủng hộ cần đăng nhập.
+
 ### 🏠 Trang chủ (Home)
-- Hiển thị địa điểm du lịch phổ biến với hình ảnh đẹp
-- Địa điểm gần bạn dựa trên vị trí GPS real-time
-- Xem chi tiết địa điểm với hình ảnh, video, đánh giá
-- Tìm kiếm địa điểm nhanh chóng với autocomplete
-- Lọc theo danh mục: Văn hóa, Ngắm cảnh, Thiên nhiên, Ẩm thực, v.v.
+- ✅ Hiển thị địa điểm du lịch phổ biến với hình ảnh
+- ✅ Địa điểm gần bạn theo GPS (chỉ xin quyền khi bấm "Gần bạn"), sắp xếp theo khoảng cách
+- ✅ Xem chi tiết địa điểm: ảnh, video YouTube, mô tả, giờ mở cửa, vé, lời khuyên, lễ hội tại đây, đánh giá, địa điểm tương tự
+- ✅ Thanh tìm kiếm thông minh (xem [Tìm kiếm](#-tìm-kiếm-ngữ-nghĩa-semantic-search))
+- ✅ Gợi ý cho bạn (khi đã đăng nhập)
+- ✅ Kéo để làm mới, thông báo lỗi mạng + nút Thử lại
 
 ### 🗺️ Bản đồ (Maps)
-- **Mapbox Integration** - Bản đồ vệ tinh chất lượng cao
-- **Turn-by-turn Navigation** - Chỉ đường chi tiết từng bước với giọng nói
-- **Alternative Routes** - Nhiều lộ trình lựa chọn (nhanh nhất, ngắn nhất)
-- **Real-time Location** - Theo dõi vị trí thời gian thực
-- **Marker Clustering** - Hiển thị nhiều địa điểm trên bản đồ
-- **Distance & Duration** - Tính toán khoảng cách và thời gian di chuyển
-- **Offline Maps** - Hỗ trợ bản đồ offline (tính năng tương lai)
+- ✅ **Mapbox Integration** - Nhiều kiểu bản đồ (vệ tinh, đường phố…), lớp giao thông
+- ✅ **Turn-by-turn Navigation** - Danh sách chỉ đường từng bước
+- ✅ **Alternative Routes** - Nhiều lộ trình lựa chọn
+- ✅ **Real-time Location** - Vị trí hiện tại (Google Fused Location)
+- ✅ **Markers** - Marker các địa điểm được phép hiện trên bản đồ, popup + Lời khuyên
+- ✅ **Distance & Duration** - Khoảng cách và thời gian di chuyển
+- ✅ **Text-to-Speech** - Đọc thuyết minh địa điểm bằng giọng nói
+- ⏸ Cảnh báo giọng nói khi tới gần địa điểm (chạy nền, `BackgroundGeolocation` — Backlog)
+- 💡 Marker Clustering, Offline Maps
 
-### 📸 Camera AI (Nhận diện địa điểm)
-- **Chụp ảnh trực tiếp** - Sử dụng camera thiết bị với chất lượng cao
-- **Chọn từ thư viện** - Upload ảnh có sẵn từ gallery
-- **AI Detection** - Nhận diện địa điểm tự động bằng OpenAI Vision
-- **Backend Processing** - Xử lý ảnh qua FastAPI server
-- **Flash Control** - Bật/tắt đèn flash
-- **Location Info** - Hiển thị tên địa điểm và mô tả chi tiết
-- **Fallback Data** - Sử dụng dữ liệu local khi offline
+### 📸 Camera AI (Nhận diện hiện vật)
+- ✅ **Chụp ảnh trực tiếp** - `react-native-vision-camera`
+- ✅ **Chọn từ thư viện** - Upload ảnh có sẵn từ gallery
+- ✅ **AI Detection** - Google Lens (SerpAPI) + OpenAI, đối chiếu bảng hiện vật `objects`
+- ✅ **Backend Processing** - Xử lý ảnh qua Cloud Run (ảnh tạm tự xóa sau 1 ngày)
+- ✅ **Flash Control** - Bật/tắt đèn flash
+- ✅ **Kết quả** - Tên + mô tả chi tiết (Markdown)
+- Giới hạn: 5 lần/người/ngày, 8 lần/ngày toàn hệ thống (quota SerpAPI miễn phí)
 
 ### 🔐 Xác thực (Authentication)
-- **Đăng nhập** - Username/Password với validation và mã hóa
-- **Đăng ký** - Tạo tài khoản mới với email verification
-- **Quên mật khẩu** - Khôi phục qua OTP email (SendGrid)
-- **NocoDB Backend** - Lưu trữ tài khoản an toàn với encryption
-- **Local Storage** - Lưu phiên đăng nhập với AsyncStorage
-- **Password Encryption** - Mã hóa mật khẩu với CryptoJS
-- **Session Management** - Quản lý phiên đăng nhập tự động
+- ✅ **Đăng nhập** - Username/Password qua backend, nhận JWT (30 ngày)
+- ✅ **Đăng ký** - Tạo tài khoản mới
+- ⏸ **Quên mật khẩu** - OTP qua email (SendGrid) — màn hình và module backend có sẵn, đang tắt (Nợ N1)
+- ✅ **Bảo mật mật khẩu** - Hash scrypt ở backend; app **không lưu mật khẩu**, chỉ lưu token + hồ sơ
+- ✅ **Session Management** - Token bị thu hồi (đổi mật khẩu, xóa tài khoản) → tự đăng xuất
+- ✅ **Giới hạn đăng nhập sai** - Chống dò mật khẩu
 
 ### 📰 Bảng tin (NewsFeed)
-- Danh sách bài viết du lịch từ NocoDB
-- Tìm kiếm bài viết theo tiêu đề và nội dung
-- Xem chi tiết bài viết với markdown rendering
-- Lọc theo danh mục và tags
-- Chia sẻ bài viết lên mạng xã hội
+- ✅ Danh sách đánh giá mới nhất của mọi người (địa điểm và lễ hội)
+- ✅ Lọc theo địa điểm
+- ✅ Viết đánh giá: chấm sao, nội dung, tối đa 5 ảnh (≤ 2 MB/ảnh)
+- ✅ Xóa đánh giá của mình, báo cáo đánh giá xấu (3 báo cáo → tự ẩn)
+- 💡 Chia sẻ bài viết lên mạng xã hội
 
 ### 🎉 Lễ hội & Sự kiện (Festivals)
-- Danh sách lễ hội và sự kiện du lịch
-- Xem chi tiết lễ hội với hình ảnh và video
-- Lọc theo thời gian và địa điểm
-- Thông báo nhắc nhở sự kiện sắp diễn ra
-- Lưu lễ hội yêu thích
+- ✅ Danh sách lễ hội và sự kiện du lịch, xem tất cả
+- ✅ Xem chi tiết lễ hội với hình ảnh, video, thời gian, vé, đánh giá
+- ✅ Liên kết tới địa điểm tổ chức (mở bản đồ chỉ đường)
+- ✅ Tìm kiếm lễ hội (từ khóa / AI)
+- 💡 Lọc theo tháng, nhắc lịch sự kiện sắp diễn ra, lưu lễ hội yêu thích
 
 ### 💰 Thanh toán/Donate (Payment)
-- **PayOS Integration** - Cổng thanh toán PayOS
-- **QR Code Payment** - Thanh toán qua mã QR
-- **Payment Link** - Tạo link thanh toán tự động
-- **Webhook Handler** - Xử lý callback từ PayOS
-- **Transaction History** - Lịch sử giao dịch
-- **Balance Management** - Quản lý số dư tài khoản
-- **Secure Payment** - Thanh toán an toàn với signature verification
+- ✅ **PayOS Integration** - Cổng thanh toán PayOS (gọi REST từ backend)
+- ✅ **QR Code Payment** - Thanh toán qua mã QR
+- ✅ **Payment Link** - Link thanh toán PayOS
+- ✅ **Webhook Handler** - Bắt buộc chữ ký HMAC-SHA256, xử lý mỗi đơn đúng một lần
+- ✅ **Balance Management** - Cộng số dư tài khoản khi thanh toán xong
+- 💡 **Transaction History** - Màn hình lịch sử giao dịch
 
 ### 🤖 AI Chatbot (Trợ lý du lịch)
-- **OpenAI Integration** - Chatbot thông minh với GPT
-- **Travel Assistant** - Tư vấn địa điểm du lịch
-- **Natural Language** - Giao tiếp tự nhiên bằng tiếng Việt/Anh
-- **Context Aware** - Hiểu ngữ cảnh cuộc hội thoại
-- **Floating Bubble** - Chatbot nổi trên mọi màn hình
-- **Quick Suggestions** - Gợi ý câu hỏi nhanh
+- ✅ **RAG Chatbot** - GPT-4o-mini trả lời dựa trên dữ liệu địa điểm, lễ hội, hiện vật của app, kèm nguồn
+- ✅ **Travel Assistant** - Tư vấn địa điểm du lịch, xem ảnh địa điểm trong dữ liệu
+- ✅ **Gửi kèm ảnh** - Hỏi về ảnh vừa chụp/chọn
+- ✅ **Context Aware** - Lưu lịch sử hội thoại theo phiên (backend), bắt đầu phiên mới
+- ✅ **Floating Bubble** - Bong bóng chat nổi, kéo thả được trên mọi màn hình (`FloatingChatBubble`)
+- ✅ **Quick Suggestions** - Câu hỏi gợi ý nhanh
+- Giới hạn: 30 câu/người/ngày
 
 ### 🔍 Tìm kiếm ngữ nghĩa (Semantic Search)
-- **AI-Powered Search** - Tìm kiếm thông minh với OpenAI embeddings và FAISS
-- **Multi-Entity Search** - Tìm kiếm đồng thời địa điểm, lễ hội, và bài viết
-- **Similarity Score Filtering** - Lọc kết quả theo độ tương đồng ngữ nghĩa
-  - PRIMARY RULE: Hiển thị tất cả kết quả có score > 0.5
-  - FALLBACK RULE: Hiển thị top 10 kết quả nếu ít hơn 10 kết quả đạt ngưỡng
-- **Vietnamese/English Support** - Hỗ trợ tìm kiếm bằng tiếng Việt và tiếng Anh
-- **Intelligent Ranking** - Sắp xếp kết quả theo độ liên quan
-- **Keyword Fallback** - Tự động chuyển sang tìm kiếm từ khóa khi cần
+Thanh tìm kiếm `SemanticSearchBarComponent` (Trang chủ, Lễ hội) có:
+- ✅ **2 chế độ, đổi bằng nút** - Tìm theo ý nghĩa (AI, mặc định) và tìm theo từ khóa
+- ✅ **AI-Powered Search** - OpenAI embeddings + FAISS trên địa điểm và lễ hội
+- ✅ **Similarity Score Filtering**
+  - PRIMARY RULE: hiển thị tất cả kết quả có score > ngưỡng
+  - FALLBACK RULE: hiển thị top kết quả nếu ít kết quả đạt ngưỡng
+- ✅ **Tìm khi đang gõ** (debounce) và **tìm khi nhấn Enter** (chuyển sang màn Xem tất cả)
+- ✅ **Từ khóa không dấu, nhiều trường** - Tên, địa chỉ, mô tả, loại; khớp nhãn loại cả tiếng Việt và tiếng Anh ("bảo tàng" → `museum`)
+- ✅ **Khách sạn/nhà hàng** - Nạp khi gõ lần đầu, thêm vào kết quả theo từ khóa
+- ✅ **Keyword Fallback** - Tự chuyển sang từ khóa khi AI lỗi hoặc không có kết quả
+- ✅ **Nút xóa nhanh**, tự reset khi quay lại màn hình
+- ✅ **Bộ lọc ở màn Xem tất cả** - Tất cả / Tên / Địa chỉ / Mô tả
+- 🧩 **Autocomplete** - API gợi ý từ khóa có sẵn, chưa gắn vào thanh tìm kiếm
 
 ### 📊 Gợi ý & Đề xuất (Recommendations)
-- **RecommendationsWidget** - Gợi ý địa điểm cá nhân hóa trên trang chủ
-- **SimilarItemsComponent** - Hiển thị địa điểm/lễ hội tương tự dựa trên AI
-- **User Memory** - Lưu trữ sở thích người dùng để cá nhân hóa
-- **Similarity Percentage** - Hiển thị phần trăm độ tương đồng
+- ✅ **SimilarItemsComponent** - Địa điểm/lễ hội tương tự dựa trên AI, hiển thị phần trăm tương đồng
+- ✅ **RecommendationsWidget** - Gợi ý địa điểm trên trang chủ (khi đăng nhập)
+- 🧩 **User Memory** - Bảng `user_memories` và API có sẵn nhưng chưa có luồng ghi sở thích, nên gợi ý hiện là các mục phổ biến
 
 ### 👤 Hồ sơ (Profile)
-- Thông tin cá nhân với avatar tùy chỉnh
-- Cài đặt ứng dụng (ngôn ngữ, thông báo)
-- FAQ - Câu hỏi thường gặp
-- Chính sách & Điều khoản sử dụng
-- Giới thiệu ứng dụng và phiên bản
-- Đăng xuất và xóa tài khoản
+- ✅ Thông tin cá nhân, đổi ảnh đại diện, đổi mật khẩu
+- ✅ Đăng xuất và xóa tài khoản (có xác nhận mật khẩu)
+- ✅ FAQ, Chính sách & Điều khoản, Giới thiệu ứng dụng
+- ✅ Lối vào Chatbot, Ủng hộ
+- 🧩 Gọi khẩn cấp (SOS): đang gọi một số cố định trong code
+- 🧩 Cài đặt: thông báo đẩy, dịch vụ vị trí, tự động đồng bộ, chế độ tối, xóa bộ nhớ đệm mới là giao diện (chỉ lưu công tắc)
+- 🧩 Màn Giới thiệu: link website/mạng xã hội/Play Store là URL mẫu
 
 ### 🌐 Đa ngôn ngữ (i18n)
-- Hỗ trợ tiếng Việt và tiếng Anh
-- Chuyển đổi ngôn ngữ real-time
-- Dịch tự động nội dung địa điểm
-- Lưu ngôn ngữ ưa thích
+- ✅ Hỗ trợ tiếng Việt và tiếng Anh
+- ✅ Chuyển đổi ngôn ngữ real-time, lưu ngôn ngữ ưa thích
+- ✅ Nội dung địa điểm/lễ hội/khách sạn có bản tiếng Anh (`content_en`, dịch sẵn và lưu ở database); trường chưa dịch hiển thị tiếng Việt
+- ✅ Nhãn loại địa điểm (94 loại) có tên vi/en
 
 ---
 
@@ -195,105 +199,97 @@
 ### 📱 Frontend (Mobile App)
 
 #### Core Technologies
-- **React Native** `0.74.2` - Framework chính cho cross-platform
-- **TypeScript** `4.8.4` - Type safety và developer experience
-- **React Navigation** `6.x` - Điều hướng và navigation stack
+- **React Native** `0.74.2` - Framework chính
+- **TypeScript** `5.0` - Type safety
+- **React Navigation** `6.x` - Stack + bottom tabs
 - **React Native Paper** `5.12.5` - Material Design UI Components
 
 #### Maps & Location
-- **@rnmapbox/maps** `10.1.31` - Mapbox integration chính
-- **react-native-maps** `1.18.0` - Google Maps fallback
-- **@react-native-community/geolocation** `3.4.0` - GPS tracking
+- **@rnmapbox/maps** `10.1.31` - Mapbox integration
+- **@react-native-community/geolocation** `3.4.0` - GPS
+- **react-native-tts** `4.1.1` - Đọc thuyết minh
 
 #### Camera & Media
-- **react-native-vision-camera** `4.5.2` - Modern Camera API
-- **react-native-image-picker** `7.1.2` - Image selection từ gallery
-- **react-native-image-viewing** `0.2.2` - Image viewer với zoom
-- **react-native-video** `6.7.0` - Video player
+- **react-native-vision-camera** `4.5.2` - Camera API
+- **react-native-image-picker** `7.1.2` - Chọn ảnh từ gallery
+- **react-native-image-viewing** `0.2.2` - Xem ảnh với zoom
+- **react-native-youtube-iframe** `2.3.0` - Phát video YouTube (cần `react-native-webview`)
+- **react-native-qrcode-svg** `6.3.15` - Mã QR thanh toán
 
 #### Storage & Network
-- **@react-native-async-storage/async-storage** `1.23.1` - Local storage
-- **axios** `1.5.0` - HTTP client cho API calls
-- **rn-fetch-blob** `0.12.0` - File upload/download
+- **@react-native-async-storage/async-storage** `1.23.1` - Local storage (token, hồ sơ, ngôn ngữ, phiên chat)
+- **axios** `1.5.0` - HTTP client (timeout 12 s, retry GET)
+- **rn-fetch-blob** `0.12.0` - Upload ảnh nhận diện
 
 #### UI & Animation
-- **react-native-reanimated** `3.12.1` - Smooth animations
+- **react-native-reanimated** `3.12.1` - Animations
 - **react-native-gesture-handler** `2.17.1` - Gesture handling
-- **react-native-svg** `15.3.0` - SVG support
+- **react-native-svg** `15.3.0` + **react-native-svg-transformer** - SVG
 - **react-native-vector-icons** `10.2.0` - Icon library
+- **react-native-markdown-display** `7.0.2` - Hiển thị Markdown (Camera, Chatbot)
 
 #### Utilities
-- **moment** `2.30.1` - Date/time handling
-- **crypto-js** `4.2.0` - Password encryption
-- **@faker-js/faker** `9.2.0` - Mock data generation
-- **lodash** `4.17.5` - Utility functions
+- **i18next** + **react-i18next** - Đa ngôn ngữ
+- **moment** `2.30.1` - Date/time
 - **react-native-toast-message** `2.2.1` - Toast notifications
+- **Jest** + **@testing-library/react-native** - Kiểm thử
 
 ### 🖥️ Backend (API Server)
 
 #### Core Technologies
-- **FastAPI** `0.108.0+` - Modern Python web framework
-- **Python** `3.8+` - Programming language
-- **Uvicorn** `0.25.0+` - ASGI server
-- **Gunicorn** `20.1.0+` - Production WSGI server
-- **Pydantic** `2.0.0+` - Data validation
+- **FastAPI** - Python web framework
+- **Python** `3.12`
+- **Uvicorn** - ASGI server (1 worker trên Cloud Run)
+- **Pydantic** `2` - Data validation
+- **psycopg 3** + **psycopg-pool** - PostgreSQL
 
 #### AI & Machine Learning
-- **OpenAI** `1.51.0+` - GPT models cho chatbot và image recognition
-- **FAISS** `1.7.4+` - Vector similarity search cho semantic search
-- **sentence-transformers** `2.2.2+` - Text embeddings cho semantic search
-- **SerpAPI** `0.1.5+` - Search API cho location data
+- **OpenAI** (REST) - `gpt-4o-mini` cho chatbot/nhận diện, `text-embedding-3-small` cho tìm kiếm
+- **FAISS** (`faiss-cpu`) - Vector similarity search (cosine similarity)
+- **SerpAPI** - Google Lens cho nhận diện ảnh
 
 #### Payment & Services
-- **PayOS** `1.0.0+` - Payment gateway integration
-- **Firebase Admin** `6.5.0+` - Firebase/Firestore integration
-- **python-dotenv** - Environment variables management
-
-#### HTTP & Utilities
-- **requests** `2.32.3+` - HTTP library
-- **python-multipart** - File upload handling
+- **PayOS** (REST, kiểm chữ ký HMAC-SHA256)
+- **Google Cloud Storage** - Lưu ảnh upload
+- **Google Secret Manager** - Lưu key
+- **SendGrid** - Email OTP (Nợ N1, đang tắt)
 
 ### 🗄️ Database & Storage
 
-- **NocoDB** - No-code database platform (Cloud/Self-hosted)
-  - Tables: Accounts, Locations, Items, Transactions
-  - REST API với authentication
-- **Firebase Storage** - File storage cho images/videos
+- **Neon PostgreSQL** (Singapore) - Toàn bộ dữ liệu: địa điểm, lễ hội, khách sạn, hiện vật, tài khoản, giao dịch, đánh giá, bộ nhớ AI
+- **Google Cloud Storage** - Ảnh đánh giá/ảnh đại diện (public), ảnh nhận diện tạm (`tmp/`, xóa sau 1 ngày)
+- **FAISS index** - Dựng từ Neon mỗi lần build image backend
 - **AsyncStorage** - Local storage trên mobile
 
 ### 🌐 External Services
 
-- **Mapbox API** - Maps, directions, geocoding
-- **OpenAI API** - AI chatbot và image recognition
+- **Mapbox API** - Bản đồ, chỉ đường (app gọi trực tiếp bằng token public `pk.`)
+- **OpenAI API** - Chatbot, nhận diện, embeddings (chỉ backend gọi)
+- **SerpAPI** - Google Lens (chỉ backend gọi; gói miễn phí 250 lượt/tháng)
 - **PayOS** - Payment gateway (VN)
-- **SendGrid** - Email service cho OTP
-- **SerpAPI** - Search và location data
-- **Unsplash API** - High-quality images
-- **NocoDB Cloud** - Database hosting
+- **Google Cloud** - Cloud Run, Cloud Build, Artifact Registry, Cloud Storage, Secret Manager
+- **Neon** - PostgreSQL serverless
+- **SendGrid** - Email OTP (khi bật N1)
 
 ---
 
 ## 📋 Yêu cầu hệ thống
 
 ### Frontend (Mobile App)
-- **Node.js** >= 18.x
-- **npm** >= 9.x hoặc **yarn** >= 1.22.x
-- **React Native CLI** (cài đặt global)
-- **Android Studio** (cho Android development)
-  - Android SDK Platform 33+
-  - Android SDK Build-Tools
+- **Node.js** 22 (CI dùng 22) và **npm**
+- **React Native CLI** (dùng qua `npx react-native`)
+- **Android Studio**
+  - Android SDK Platform 34 (minSdk 23)
+  - Android SDK Build-Tools, Platform-Tools
   - Android Emulator hoặc thiết bị thật
-- **Xcode** >= 14 (cho iOS - chỉ macOS)
-  - iOS Simulator hoặc thiết bị thật
-  - CocoaPods
-- **JDK** 17 trở lên (OpenJDK hoặc Oracle JDK)
-- **Watchman** (khuyến nghị cho macOS/Linux)
+- **JDK** 17
+- **Xcode** >= 14 + CocoaPods (iOS — có thư mục `ios/` nhưng hiện chỉ kiểm thử trên Android)
 
 ### Backend (API Server)
-- **Python** >= 3.8
-- **pip** >= 21.x hoặc **poetry**
-- **Virtual Environment** (venv, virtualenv, hoặc conda)
-- **Git** (để clone repository)
+- **Python** 3.12
+- **pip** + **venv**
+- **Git**
+- **Google Cloud SDK** (`gcloud`) - khi build/deploy
 
 ### Development Tools (Khuyến nghị)
 - **VS Code** với extensions:
@@ -302,17 +298,17 @@
   - ESLint
   - Prettier
 - **Reactotron** - Debugging tool cho React Native
-- **Postman** hoặc **Insomnia** - API testing
-- **Android Device** hoặc **iOS Device** - Testing trên thiết bị thật
+- **Postman** hoặc Swagger `/docs` của backend - API testing
+- **Android Device** - Testing trên thiết bị thật
 
 ### External Services (Cần đăng ký)
-- **NocoDB Account** - Database hosting
-- **Mapbox Account** - Maps API key
+- **Mapbox Account** - Access token `pk.` + download token `sk.`
+- **Neon Account** - PostgreSQL database
+- **Google Cloud Project** - Cloud Run, Storage, Secret Manager (có billing guard)
 - **OpenAI Account** - API key cho AI features
+- **SerpAPI Account** - Google Lens
 - **PayOS Account** - Payment gateway credentials
-- **SendGrid Account** - Email service API key
-- **Firebase Project** - Storage và services
-- **Digital Ocean Account** - Backend deployment (optional)
+- **SendGrid Account** - Email OTP (khi bật quên mật khẩu)
 
 ---
 
@@ -324,94 +320,79 @@ Dự án Travel App được chia thành **2 repositories riêng biệt**:
 ```
 📁 https://github.com/lekhanhdat/Travel
 ├── 📁 src/
-│   ├── 📁 assets/              # Hình ảnh, SVG, fonts
-│   │   ├── images/
-│   │   └── svg/
-│   ├── 📁 common/              # Constants, colors, styles, types
-│   │   ├── colors.ts
-│   │   ├── fonts.ts
-│   │   ├── sizes.ts
-│   │   ├── types.ts
-│   │   └── constants.ts
+│   ├── 📁 assets/              # Hình ảnh, SVG, fonts (GoogleSans)
+│   ├── 📁 common/              # colors, fonts, sizes, types, constants, AppStyle, TextBase
 │   ├── 📁 component/           # Reusable UI components
-│   │   ├── HeaderBase.tsx
-│   │   ├── BigItemLocation.tsx
-│   │   ├── FloatingChatBubble.tsx
-│   │   ├── SemanticSearchBarComponent.tsx  # AI-powered semantic search
-│   │   ├── RecommendationsWidget.tsx       # Personalized recommendations
-│   │   ├── SimilarItemsComponent.tsx       # Similar items display
-│   │   └── ...
+│   │   ├── HeaderBase.tsx, Page.tsx, BottomSheet.tsx, InputBase.tsx
+│   │   ├── BigItemLocation.tsx, LargeItemLocation.tsx, LargeItemFestival.tsx
+│   │   ├── FloatingChatBubble.tsx          # Bong bóng chat nổi, kéo thả
+│   │   ├── SemanticSearchBarComponent.tsx  # Thanh tìm kiếm AI + từ khóa
+│   │   ├── RecommendationsWidget.tsx       # Gợi ý cho bạn
+│   │   ├── SimilarItemsComponent.tsx       # Địa điểm tương tự
+│   │   ├── ReviewItem.tsx, CameraResultModal.tsx, CatalogStatus.tsx, CachedImage.tsx
+│   │   └── LanguageDropdown.tsx
+│   ├── 📁 config/
+│   │   └── featureFlags.ts     # Công tắc tính năng ENABLE_*
 │   ├── 📁 container/           # Screens & navigation
-│   │   ├── AppContainer.tsx
+│   │   ├── AppContainer.tsx    # Stack + 6 tab
 │   │   └── screens/
-│   │       ├── Home/           # Trang chủ
-│   │       ├── Maps/           # Bản đồ
-│   │       ├── Camera/         # Camera AI
-│   │       ├── Login/          # Đăng nhập/Đăng ký
-│   │       ├── Profile/        # Hồ sơ
+│   │       ├── Home/           # Trang chủ, Chi tiết, Xem tất cả, Ảnh, Video
+│   │       ├── Maps/           # Bản đồ (MapScreen, Mapbox), Lời khuyên
+│   │       ├── Camera/         # Camera AI, Xem trước ảnh
+│   │       ├── Login/          # Đăng nhập, Đăng ký, Quên mật khẩu (tắt)
+│   │       ├── Profile/        # Hồ sơ, Cá nhân, Cài đặt, FAQ, Chính sách, Giới thiệu, Chatbot, Ủng hộ
 │   │       ├── NewFeed/        # Bảng tin
-│   │       ├── Festival/       # Lễ hội
-│   │       └── Donation/       # Thanh toán
-│   ├── 📁 i18n/                # Đa ngôn ngữ (i18n)
-│   │   ├── en.json
-│   │   └── vi.json
-│   ├── 📁 res/                 # Resources
-│   │   ├── images.tsx
-│   │   └── strings.ts
+│   │       └── Festival/       # Lễ hội
+│   ├── 📁 context/ 📁 hoc/ 📁 hooks/  # TranslationContext, withTranslation, useTranslation
+│   ├── 📁 i18n/                # Đa ngôn ngữ
+│   │   └── locales/{vi,en}/common.json
+│   ├── 📁 res/                 # images.tsx, strings.tsx
 │   ├── 📁 services/            # API services
-│   │   ├── axios.ts            # Axios config
+│   │   ├── catalog.client.ts, catalog.adapter.ts, catalogRepository.ts  # Catalog + cache
+│   │   ├── api.client.ts       # Axios + JWT, lỗi tiếng Việt
 │   │   ├── auth.api.ts         # Authentication API
-│   │   ├── locations.api.ts    # Locations API
-│   │   ├── festivals.api.ts    # Festivals API
-│   │   ├── semantic.api.ts     # Semantic search API (AI-powered)
+│   │   ├── locations.api.ts, festivals.api.ts, reviews.api.ts
+│   │   ├── detect.api.ts       # Camera AI
+│   │   ├── semantic.api.ts     # Semantic search, similar, recommendations, RAG
+│   │   ├── chatbot.api.ts      # Chatbot
 │   │   ├── payment.api.ts      # Payment API
-│   │   ├── chatbot.api.ts      # Chatbot API
 │   │   └── mapbox.api.ts       # Mapbox API
-│   ├── 📁 types/               # TypeScript type definitions
-│   │   └── env.mock.ts         # Environment mocks for testing
+│   ├── 📁 types/               # env.d.ts, declarations
 │   └── 📁 utils/               # Utility functions
-│       ├── configs.ts          # App configuration
-│       ├── env.ts              # Environment variables
-│       ├── apiUsageTracker.ts  # API usage monitoring & thresholds
+│       ├── env.ts              # Biến môi trường public
+│       ├── nearby.ts, haversineDistance.ts  # Gần bạn: khoảng cách Haversine
+│       ├── catalogSearch.ts    # Tìm kiếm không dấu
+│       ├── translationHelpers.ts, catalogDisplay.ts, requireLogin.ts
+│       ├── apiUsageTracker.ts  # API usage monitoring
 │       └── LocalStorageCommon.tsx
 ├── 📁 android/                 # Android native code
-│   ├── app/
-│   └── build.gradle
 ├── 📁 ios/                     # iOS native code
-│   ├── Travel/
-│   ├── Podfile
-│   └── Travel.xcworkspace
-├── 📁 __tests__/               # Unit tests (Jest)
-│   ├── App.test.tsx
-│   ├── 📁 components/
-│   │   ├── RecommendationsWidget.test.tsx
-│   │   └── SimilarItemsComponent.test.tsx
-│   └── 📁 services/
-│       └── semantic.api.test.ts
-├── 📁 docs/                    # Technical documentation
-│   └── SEMANTIC_SEARCH_SPECIFICATION.md
-├── App.tsx                     # Root component
-├── jest.setup.js               # Jest test configuration
-├── package.json                # Dependencies
-├── tsconfig.json               # TypeScript config
+├── 📁 __tests__/               # Unit tests (Jest) — services, components, i18n, màn hình
+├── 📁 scripts/android-fresh.js # Khởi động lạnh emulator + chạy app
+├── 📁 .github/workflows/ci.yml # CI: Jest + tsc
+├── App.tsx                     # Root component (+ FloatingChatBubble)
+├── babel.config.js             # Allowlist biến .env public
+├── MIGRATION_TASKLIST.md, MIGRATION_AUDIT.md  # Kế hoạch + lịch sử migration
 └── README.md                   # Documentation (file này)
 ```
 
 ### 2️⃣ Backend Repository (API Server)
 ```
 📁 https://github.com/lekhanhdat/Travel_BE
-├── app.py                      # Main FastAPI application
-├── service.py                  # AI detection service
-├── nocodb_service.py           # NocoDB integration
-├── payment_service.py          # PayOS payment service
-├── data.py                     # Fallback data
-├── firestore.py                # Firebase integration
-├── requirements.txt            # Python dependencies
-├── Procfile                    # Digital Ocean deployment config
-├── .env                        # Environment variables (không commit)
-├── .gitignore
-├── privateKey.json             # Firebase credentials (không commit)
-└── README.md                   # Backend documentation
+├── app.py                      # FastAPI app, bật module theo APP_FEATURES, health
+├── 📁 core_api/                # catalog, auth, security, email, uploads, reviews, detect, payments, openai_http
+├── 📁 routers/                 # search, chat, memory, recommendations (/api/v1)
+├── 📁 services/                # embedding, faiss, rag, memory (Neon)
+├── 📁 models/                  # Pydantic models của AI
+├── 📁 utils/                   # startup_indexer (dựng FAISS từ Neon)
+├── 📁 scripts/                 # build_faiss_index.py, configure_cost_guard.py
+├── 📁 db/                      # schema/NNN_*.sql (migration), permissions/ (quyền runtime)
+├── 📁 deploy/                  # cloudbuild.yaml, service.yaml, container_smoke.py, billing_guard/
+├── 📁 tests/                   # check_*.py (fake DB/provider, chạy trong CI)
+├── Dockerfile
+├── requirements.txt
+├── .env                        # Biến môi trường local (không commit)
+└── README.md
 ```
 
 ---
@@ -420,124 +401,88 @@ Dự án Travel App được chia thành **2 repositories riêng biệt**:
 
 ### 📋 Tổng quan quy trình cài đặt
 
-1. **Setup Backend** → Cài đặt và chạy API server trước
-2. **Setup Frontend** → Cài đặt mobile app và kết nối với backend
+1. **Setup Frontend** → Mặc định app dùng backend production trên Cloud Run, không cần chạy backend local
+2. **Setup Backend (tùy chọn)** → Khi cần sửa/chạy API local
 3. **Configure Services** → Cấu hình các dịch vụ bên ngoài
 4. **Test & Run** → Kiểm tra và chạy ứng dụng
 
 ---
 
-### 🖥️ PHẦN 1: Cài đặt Backend (API Server)
+### 🖥️ PHẦN 1: Cài đặt Backend (API Server — tùy chọn)
 
 #### Bước 1: Clone Backend Repository
 
 ```bash
-# Mở terminal/command prompt
-cd C:\Users\lekha\Desktop
-
-# Clone repository (nếu chưa có)
-git clone <backend-repo-url> freelance-travel-app-server
-cd freelance-travel-app-server
+git clone https://github.com/lekhanhdat/Travel_BE.git
+cd Travel_BE
 ```
 
 #### Bước 2: Tạo Virtual Environment
 
 ```bash
 # Windows
-python -m venv venv
-venv\Scripts\activate
+python -m venv .venv
+.venv\Scripts\activate
 
 # macOS/Linux
-python3 -m venv venv
-source venv/bin/activate
+python3 -m venv .venv
+source .venv/bin/activate
 ```
 
 #### Bước 3: Cài đặt Dependencies
 
 ```bash
-# Upgrade pip
-pip install --upgrade pip
-
-# Cài đặt packages
-pip install -r requirements.txt
+pip install -r requirements.txt -r tests/requirements.txt
 ```
 
 **Dependencies chính:**
-- `fastapi>=0.108.0` - Web framework
-- `uvicorn>=0.25.0` - ASGI server
-- `openai>=1.51.0` - OpenAI API
-- `payos>=1.0.0` - PayOS payment
-- `firebase-admin>=6.5.0` - Firebase
-- `requests>=2.32.3` - HTTP client
+- `fastapi`, `uvicorn`, `pydantic` - Web framework
+- `psycopg[binary]`, `psycopg-pool` - PostgreSQL (Neon)
+- `faiss-cpu`, `numpy` - Vector search
+- `python-multipart` - Upload file
+- OpenAI, SerpAPI, PayOS, Cloud Storage gọi qua HTTP chuẩn (không cần SDK)
 
 #### Bước 4: Cấu hình Environment Variables
 
-Tạo file `.env` trong thư mục backend:
+Tạo file `.env` trong thư mục backend (không commit):
 
 ```bash
-# .env file
 # ============================================
-# OpenAI Configuration
+# Database (Neon)
 # ============================================
-OPENAI_API_KEY=sk-your-openai-api-key-here
+DATABASE_URL=postgresql://travel_runtime:<password>@<host>-pooler.<region>.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+DATABASE_URL_UNPOOLED=postgresql://<owner>:<password>@<host>.<region>.aws.neon.tech/neondb?sslmode=require   # chỉ dùng chạy migration
 
 # ============================================
-# NocoDB Configuration
+# Modules + secrets (giống Secret Manager travel-app-config)
 # ============================================
-NOCODB_BASE_URL=https://app.nocodb.com
-NOCODB_API_TOKEN=your-nocodb-api-token
-NOCODB_TABLE_ID=mj77cy6909ll2wc
-
-# ============================================
-# PayOS Configuration
-# ============================================
-PAYOS_CLIENT_ID=your-payos-client-id
-PAYOS_API_KEY=your-payos-api-key
-PAYOS_CHECKSUM_KEY=your-payos-checksum-key
-
-# ============================================
-# Server Configuration
-# ============================================
-PUBLIC_BASE_URL=https://digital-ocean-fast-api-h9zys.ondigitalocean.app
-
-# ============================================
-# Search API
-# ============================================
-SERPAPI_KEY=your-serpapi-key
+APP_FEATURES=auth,uploads,reviews,detect,ai,payments   # bỏ trống = chỉ catalog
+APP_CONFIG_JSON={"JWT_SECRET":"...","LEGACY_PASSWORD_SALT":"...","OPENAI_API_KEY":"sk-...","SERPAPI_KEY":"...","PAYOS_CLIENT_ID":"...","PAYOS_API_KEY":"...","PAYOS_CHECKSUM_KEY":"..."}
+UPLOAD_BUCKET=travel2026-511805-uploads              # khi bật uploads/detect
 ```
 
-#### Bước 5: Cấu hình Firebase (Optional)
+Mỗi module cần các key liệt kê trong `FEATURE_SECRETS` (`core_api/config.py`); thiếu key thì backend báo lỗi ngay khi khởi động.
 
-Nếu sử dụng Firebase Storage:
+#### Bước 5: Dựng FAISS index (khi bật module `ai`)
 
-1. Tạo Firebase project tại https://console.firebase.google.com
-2. Tạo Service Account và download `privateKey.json`
-3. Đặt file `privateKey.json` vào thư mục backend
-4. **Lưu ý**: Không commit file này lên git!
+```bash
+python scripts/build_faiss_index.py --out faiss_indexes
+```
+
+Đọc địa điểm/lễ hội/hiện vật từ Neon, tạo embeddings (~0,002 USD mỗi lần).
 
 #### Bước 6: Chạy Backend Server
 
 ```bash
-# Development mode (auto-reload)
-uvicorn app:app --reload --host 0.0.0.0 --port 8080
-
-# Production mode
-gunicorn -w 2 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8080 app:app
+uvicorn app:app --reload --host 127.0.0.1 --port 8080
 ```
 
 #### Bước 7: Kiểm tra Backend
 
 Mở browser và truy cập:
-- **Health Check**: http://localhost:8080/
+- **Health Check**: http://localhost:8080/health
+- **Readiness (DB)**: http://localhost:8080/health/ready
 - **API Docs**: http://localhost:8080/docs
-- **ReDoc**: http://localhost:8080/redoc
-
-Kết quả mong đợi:
-```json
-{
-  "message": "Hello World"
-}
-```
 
 ---
 
@@ -546,10 +491,6 @@ Kết quả mong đợi:
 #### Bước 1: Clone Frontend Repository
 
 ```bash
-# Mở terminal mới
-cd C:\Users\lekha\Desktop\Travel
-
-# Clone repository (nếu chưa có)
 git clone https://github.com/lekhanhdat/Travel.git
 cd Travel
 ```
@@ -557,66 +498,34 @@ cd Travel
 #### Bước 2: Cài đặt Dependencies
 
 ```bash
-# Sử dụng npm
-npm install
-
-# Hoặc sử dụng yarn
-yarn install
+npm ci
 ```
 
 **Lưu ý**: Quá trình này có thể mất 5-10 phút tùy vào tốc độ mạng.
 
 #### Bước 3: Cấu hình Environment Variables
 
-Kiểm tra file `src/utils/env.ts` và cập nhật các giá trị:
+Tạo file `.env` ở thư mục gốc (không commit). App **chỉ** đọc 3 biến public này (allowlist trong `babel.config.js`, giá trị được đóng gói vào app):
 
-```typescript
-// src/utils/env.ts
-export const env: AppEnv = {
-  // Backend API URL
-  SERVER_URL: 'https://digital-ocean-fast-api-h9zys.ondigitalocean.app',
-  // Hoặc local: 'http://localhost:8080' (khi test local)
-
-  // NocoDB Configuration
-  DB_URL: 'https://app.nocodb.com',
-  NOCODB_TOKEN: 'your-nocodb-api-token',
-
-  // Mapbox Token
-  MAPBOX_ACCESS_TOKEN: 'pk.your-mapbox-token',
-
-  // PayOS Backend URL (same as SERVER_URL)
-  PAYOS_BACKEND_URL: 'https://digital-ocean-fast-api-h9zys.ondigitalocean.app',
-
-  // SendGrid Email API
-  SENDGRID_API_KEY: 'SG.your-sendgrid-api-key',
-
-  // Password Encryption Salt
-  PASSWORD_SALT: 'TravelApp_Secret_Salt_2025',
-
-  // OpenAI API Key (for chatbot)
-  OPENAI_API_KEY: 'sk-your-openai-api-key',
-
-  // Unsplash API (for images)
-  UNSPLASH_ACCESS_KEY: 'your-unsplash-access-key',
-
-  // SerpAPI Key (for search)
-  SERPAPI_KEY: 'your-serpapi-key',
-};
+```bash
+CATALOG_API_URL=https://travel-api-u2xcse44ca-as.a.run.app
+API_BASE_URL=https://travel-api-u2xcse44ca-as.a.run.app
+# Hoặc backend local trên emulator Android: http://10.0.2.2:8080
+MAPBOX_ACCESS_TOKEN=pk.your-mapbox-token
 ```
+
+Không đặt key trả phí (OpenAI, SerpAPI, PayOS, SendGrid…) vào `.env` của app: các key đó chỉ nằm ở backend.
 
 #### Bước 4: Cấu hình Android
 
+**Mapbox download token** (để Gradle tải SDK Mapbox) — thêm vào `~/.gradle/gradle.properties`, không đặt trong repo:
 ```bash
-# Reverse port cho Reactotron (debugging tool)
-npm run reactotron
-
-# Reverse port cho Metro bundler (khi test trên thiết bị thật)
-npm run realDevice
+MAPBOX_DOWNLOADS_TOKEN=sk.your-mapbox-download-token
 ```
 
 **Cấu hình Android SDK:**
 1. Mở Android Studio
-2. SDK Manager → Android SDK → Chọn Android 13 (API 33)
+2. SDK Manager → Android SDK → Chọn Android 14 (API 34)
 3. SDK Tools → Chọn:
    - Android SDK Build-Tools
    - Android Emulator
@@ -627,161 +536,98 @@ npm run realDevice
 ANDROID_HOME=C:\Users\<YourUsername>\AppData\Local\Android\Sdk
 ```
 
+```bash
+# Reverse port cho Reactotron (debugging tool)
+npm run reactotron
+
+# Reverse port cho Metro bundler (khi test trên thiết bị thật)
+npm run realDevice
+```
+
 #### Bước 5: Cấu hình iOS (chỉ macOS)
 
 ```bash
-# Di chuyển vào thư mục ios
 cd ios
-
-# Cài đặt CocoaPods dependencies
 pod install
-
-# Quay lại thư mục root
 cd ..
 ```
 
 **Lưu ý**:
 - Cần Xcode >= 14
-- Cần Apple Developer Account để chạy trên thiết bị thật
-- Simulator không cần account
-
-#### Bước 6: Link Native Dependencies
-
-```bash
-# Link các native modules
-npm run link
-
-# Hoặc
-npx react-native link
-```
+- iOS chưa được kiểm thử ở đợt migration (chỉ Android)
 
 ---
 
 ### ⚙️ PHẦN 3: Cấu hình External Services
 
-#### 1. NocoDB Setup
+#### 1. Neon (PostgreSQL)
 
-**Tạo tài khoản và database:**
+1. Tạo project tại https://neon.tech (region Singapore)
+2. Tạo schema bằng các file `db/schema/NNN_*.sql` của backend theo thứ tự, bằng role owner
+3. Tạo role runtime `travel_runtime` và cấp quyền bằng `db/permissions/*.sql`
+4. Backend dùng URL **pooled** của `travel_runtime`; URL owner chỉ dùng khi chạy migration
 
-1. Truy cập https://app.nocodb.com hoặc self-host
-2. Tạo workspace mới
-3. Tạo các tables sau:
-
-**Table: Accounts** (ID: `mad8fvjhd0ba1bk`)
-```
-Columns:
-- Id (Number, Auto-increment)
-- userName (Text, Unique)
-- password (Text, Encrypted)
-- fullName (Text)
-- email (Text, Unique)
-- avatar (Text, URL)
-- balance (Number, Default: 0)
-- createdAt (DateTime)
-```
-
-**Table: Base_Locations** (ID: `mfz84cb0t9a84jt`)
-```
-Columns:
-- Id (Number, Auto-increment)
-- title (Text)
-- description (LongText)
-- latitude (Number)
-- longitude (Number)
-- images (Attachment, Multiple)
-- videos (Attachment, Multiple)
-- category (SingleSelect)
-- rating (Number)
-- reviews (JSON)
-```
-
-**Table: Transactions** (cho payment)
-```
-Columns:
-- Id (Number, Auto-increment)
-- accountId (Number, Link to Accounts)
-- amount (Number)
-- orderCode (Text)
-- paymentLinkId (Text)
-- status (SingleSelect: PENDING, PAID, CANCELLED)
-- description (Text)
-- createdAt (DateTime)
-```
-
-4. Copy API Token từ Settings → API Tokens
-5. Copy Table IDs từ URL hoặc API docs
+Chi tiết: `Travel_BE/db/README.md`.
 
 #### 2. Mapbox Setup
 
 1. Đăng ký tại https://www.mapbox.com/
-2. Tạo Access Token tại https://account.mapbox.com/access-tokens/
-3. Chọn scopes: `styles:read`, `fonts:read`, `datasets:read`
-4. Copy token và paste vào `env.ts`
+2. Tạo Access Token (public, `pk.`) tại https://account.mapbox.com/access-tokens/ → `.env` của app
+3. Tạo Secret token `sk.` với scope `DOWNLOADS:READ` → `~/.gradle/gradle.properties`
 
 #### 3. OpenAI Setup
 
 1. Đăng ký tại https://platform.openai.com/
-2. Tạo API Key tại https://platform.openai.com/api-keys
-3. Nạp credits (tối thiểu $5)
-4. Copy API key và paste vào `.env` (backend) và `env.ts` (frontend)
+2. Tạo API Key, nạp credits (tối thiểu $5)
+3. Đưa key vào `travel-app-config` (Secret Manager) hoặc `APP_CONFIG_JSON` khi chạy local — **không** đưa vào app
 
-#### 4. PayOS Setup
+#### 4. SerpAPI Setup
+
+1. Đăng ký tại https://serpapi.com/ (gói miễn phí 250 lượt/tháng)
+2. Đưa `SERPAPI_KEY` vào `travel-app-config`
+
+#### 5. PayOS Setup
 
 1. Đăng ký tại https://my.payos.vn/
 2. Tạo payment channel
-3. Lấy credentials:
-   - Client ID
-   - API Key
-   - Checksum Key
+3. Lấy credentials: Client ID, API Key, Checksum Key → `travel-app-config`
 4. Cấu hình Webhook URL:
-   - URL: `https://your-backend-url.com/webhook/payos`
+   - URL: `https://travel-api-u2xcse44ca-as.a.run.app/webhook/payos`
    - Method: POST
 
-#### 5. SendGrid Setup (cho OTP email)
+#### 6. Google Cloud Setup
 
-1. Đăng ký tại https://sendgrid.com/
-2. Tạo API Key tại Settings → API Keys
-3. Verify sender email
-4. Copy API key và paste vào `env.ts`
+1. Project `travel2026-511805`, region `asia-southeast1`
+2. Cloud Storage bucket ảnh `travel2026-511805-uploads` (public-read, lifecycle xóa `tmp/` sau 1 ngày)
+3. Secret Manager: `travel-database-url`, `travel-app-config`
+4. Billing guard ngắt billing khi chi phí GCP vượt 26.000 VND/tháng
 
-#### 6. Firebase Setup (Optional)
+Chi tiết: `Travel_BE/deploy/README.md`.
 
-1. Tạo project tại https://console.firebase.google.com/
-2. Enable Storage
-3. Tạo Service Account:
-   - Project Settings → Service Accounts
-   - Generate New Private Key
-   - Download JSON file → Rename thành `privateKey.json`
-4. Đặt file vào thư mục backend
+#### 7. SendGrid Setup (cho OTP email — khi bật Nợ N1)
+
+1. Đăng ký tại https://sendgrid.com/, verify sender email
+2. Đưa `SENDGRID_API_KEY` + `EMAIL_FROM` vào `travel-app-config`, bật module `email`
 
 ---
 
 ## 🎯 Hướng dẫn sử dụng
 
-### 🚀 Chạy Backend Server
+### 🚀 Chạy Backend Server (local, tùy chọn)
 
 ```bash
-# Di chuyển vào thư mục backend
-cd C:\Users\lekha\Desktop\freelance-travel-app-server
+cd Travel_BE
+.venv\Scripts\activate  # Windows
+source .venv/bin/activate  # macOS/Linux
 
-# Activate virtual environment
-venv\Scripts\activate  # Windows
-source venv/bin/activate  # macOS/Linux
-
-# Chạy development server
-uvicorn app:app --reload --host 0.0.0.0 --port 8080
-
-# Server sẽ chạy tại: http://localhost:8080
+uvicorn app:app --reload --host 127.0.0.1 --port 8080
 # API Docs: http://localhost:8080/docs
 ```
 
 **Kiểm tra backend hoạt động:**
 ```bash
-# Test health check
-curl http://localhost:8080/
-
-# Kết quả mong đợi:
-# {"message": "Hello World"}
+curl http://localhost:8080/health
+curl "http://localhost:8080/locations?limit=2"
 ```
 
 ---
@@ -791,26 +637,21 @@ curl http://localhost:8080/
 #### Development Mode
 
 ```bash
-# Di chuyển vào thư mục frontend
-cd C:\Users\lekha\Desktop\Travel\Travel
+# Khởi động lạnh emulator + build + cài app (khuyên dùng)
+npm run android:fresh
 
-# Terminal 1: Start Metro bundler
-npm start
-
-# Terminal 2: Chạy trên Android
-npm run android
-
-# Terminal 3: Chạy trên iOS (chỉ macOS)
-npm run ios
+# Hoặc khi emulator/thiết bị đã chạy sẵn
+npm start            # Terminal 1: Metro bundler
+npm run android      # Terminal 2: Chạy trên Android
 ```
 
 **Chạy trên Android Emulator:**
 1. Mở Android Studio
-2. AVD Manager → Create Virtual Device
-3. Chọn device (ví dụ: Pixel 6)
-4. Chọn system image (Android 13)
-5. Start emulator
-6. Chạy `npm run android`
+2. Device Manager → Create Virtual Device (ví dụ: Pixel 8)
+3. Chọn system image (Android 14, API 34)
+4. Start emulator
+5. Chạy `npm run android`
+6. GPS giả: `adb emu geo fix 108.2270 16.0611`
 
 **Chạy trên Android Device (thiết bị thật):**
 1. Bật Developer Options trên điện thoại
@@ -820,14 +661,6 @@ npm run ios
 5. Chạy `npm run realDevice` để reverse port
 6. Chạy `npm run android`
 
-**Chạy trên iOS Simulator:**
-```bash
-# Chạy trên iPhone 14 Pro
-npm run ios -- --simulator="iPhone 14 Pro"
-
-# Hoặc mở Xcode và chọn simulator
-```
-
 ---
 
 ### 🔨 Build Production
@@ -836,11 +669,7 @@ npm run ios -- --simulator="iPhone 14 Pro"
 
 ```bash
 cd android
-
-# Clean build
 ./gradlew clean
-
-# Build release APK
 ./gradlew assembleRelease
 
 # APK output location:
@@ -855,6 +684,8 @@ cd android
 # AAB output:
 # android/app/build/outputs/bundle/release/app-release.aab
 ```
+
+**Lưu ý**: File APK/AAB/bundle không commit vào git (đã có trong `.gitignore`). Ký release và Play App Signing làm ở phase P14.
 
 #### Build iOS IPA (chỉ macOS)
 
@@ -874,8 +705,11 @@ cd android
 # Lint code
 npm run lint
 
-# Run tests
+# Run tests (danh sách suite CI ở .github/workflows/ci.yml)
 npm test
+
+# Kiểm tra TypeScript
+npx tsc --noEmit
 
 # Generate image resources từ assets
 npm run genimg
@@ -883,17 +717,11 @@ npm run genimg
 # Generate SVG resources
 npm run genimgsvg
 
-# Link native dependencies
-npm run link
-
-# Reset Metro cache
+# Reset Metro cache (sau khi sửa .env)
 npm start -- --reset-cache
 
 # Clean Android build
 cd android && ./gradlew clean && cd ..
-
-# Clean iOS build
-cd ios && rm -rf build && pod deintegrate && pod install && cd ..
 ```
 
 #### Backend Scripts
@@ -902,17 +730,11 @@ cd ios && rm -rf build && pod deintegrate && pod install && cd ..
 # Run development server
 uvicorn app:app --reload
 
-# Run production server
-gunicorn -w 2 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8080 app:app
+# Run tests (fake DB, không cần mạng)
+for f in tests/check_*.py; do python "$f"; done
 
-# Test API endpoint
-curl -X POST http://localhost:8080/detect -F "image_file=@test_image.jpg"
-
-# Check Python dependencies
-pip list
-
-# Update dependencies
-pip install --upgrade -r requirements.txt
+# Dựng FAISS index từ Neon
+python scripts/build_faiss_index.py --out faiss_indexes
 ```
 
 ---
@@ -921,55 +743,127 @@ pip install --upgrade -r requirements.txt
 
 ### Backend API Endpoints
 
-**Base URL**: `https://digital-ocean-fast-api-h9zys.ondigitalocean.app`
+**Base URL**: `https://travel-api-u2xcse44ca-as.a.run.app` · Swagger: `/docs`
+
+**Authentication**: endpoint cần đăng nhập nhận header `Authorization: Bearer <JWT>` (lấy từ `/auth/login`). Danh tính luôn lấy từ token, không lấy từ URL/body.
 
 #### 1. Health Check
 
 ```http
-GET /
+GET /health
+GET /health/ready
+```
+
+**Response `/health`:**
+```json
+{
+  "status": "healthy",
+  "version": "2.0.0",
+  "profile": "core",
+  "index_stats": {"text_vectors": 183, "image_vectors": 0, "indexing_completed": true},
+  "services": {"core": "operational", "auth": "operational", "email": "disabled", "...": "..."}
+}
+```
+
+`/health/ready` trả `{"status": "ready"}` hoặc 503 khi database lỗi.
+
+---
+
+#### 2. Catalog
+
+```http
+GET /locations?limit=20&offset=0
+GET /festivals?limit=20&offset=0
+GET /hotels?limit=20&offset=0
 ```
 
 **Response:**
 ```json
 {
-  "message": "Hello World"
+  "items": [
+    {
+      "id": 1, "record_id": "...", "name": "An Phú Farm", "types": ["farm"],
+      "description": "...", "long_description": "...",
+      "rating": 4.5, "review_count": 2,
+      "images": ["https://..."], "videos": ["youtubeId"], "advise": ["..."],
+      "website": "", "phone": "", "ticket_info": "", "publishable": true,
+      "address": "...", "lat": 16.0, "long": 108.2, "opening_hours": "", "avatar": "https://...",
+      "content_en": {"name": "...", "description": "..."}
+    }
+  ],
+  "limit": 20, "offset": 0, "has_more": true
 }
+```
+
+- `limit` 1–100; gzip + ETag (trả 304 khi không đổi), cache 5 phút
+- `rating` = trung bình đánh giá đang hiện (null nếu chưa có), `review_count` = số đánh giá
+- `publishable` chỉ quyết định marker trên bản đồ; mọi bản ghi đều hiện trong app
+- Festival có thêm `event_time`, `location_id`; hotel có thêm `category`
+
+---
+
+#### 3. Authentication
+
+```http
+POST /auth/signup          {"user_name": "...", "password": "...", "full_name": "...", "email": "...", "phone": null}
+POST /auth/login           {"user_name": "...", "password": "..."}
+GET  /me                   (JWT)
+PATCH /me                  (JWT) cập nhật hồ sơ
+POST /me/change-password   (JWT) {"current_password": "...", "new_password": "..."} → token mới
+DELETE /me                 (JWT) {"password": "..."} → xóa tài khoản
+```
+
+**Response login/signup:**
+```json
+{"access_token": "<JWT>", "token_type": "bearer", "expires_in": 2592000,
+ "account": {"id": 1, "user_name": "...", "full_name": "...", "email": "...", "avatar": null, "balance": 0, "...": "..."}}
 ```
 
 ---
 
-#### 2. Camera AI Detection
+#### 4. Upload ảnh & Reviews
+
+```http
+POST /uploads                                   (JWT, multipart: file) → {"url": "https://storage.googleapis.com/..."}
+GET  /reviews?location_id=1&limit=20&offset=0   (công khai; hoặc festival_id=)
+POST /reviews                                   (JWT) {"location_id": 1, "rating": 5, "content": "...", "images": ["<url từ /uploads>"]}
+DELETE /reviews/{id}                            (JWT, chủ đánh giá)
+POST /reviews/{id}/report                       (JWT) {"reason": "..."}
+```
+
+---
+
+#### 5. Camera AI Detection
 
 ```http
 POST /detect
+Authorization: Bearer <JWT>
 Content-Type: multipart/form-data
 ```
 
 **Request:**
 ```
-image_file: File (JPEG, PNG)
+image_file: File (JPEG, PNG, WebP; ≤ 8 MB)
 ```
 
 **Response:**
 ```json
 {
   "name": "Đài thờ Trà Kiệu",
-  "description": "# Đài thờ Trà Kiệu\n\nĐài thờ Trà Kiệu là một di tích lịch sử..."
+  "description": "# Đài thờ Trà Kiệu\n\nĐài thờ Trà Kiệu là một di tích lịch sử...",
+  "object_id": 3
 }
 ```
 
-**Curl Example:**
-```bash
-curl -X POST "https://digital-ocean-fast-api-h9zys.ondigitalocean.app/detect" \
-  -F "image_file=@/path/to/image.jpg"
-```
+`object_id` là id trong bảng `objects` khi khớp, `null` khi mô tả do OpenAI viết. Quá giới hạn trong ngày → 429.
 
 ---
 
-#### 3. Create Payment Link
+#### 6. Create Payment Link
 
 ```http
 POST /payments/create
+Authorization: Bearer <JWT>
 Content-Type: application/json
 ```
 
@@ -977,32 +871,32 @@ Content-Type: application/json
 ```json
 {
   "amount": 50000,
-  "userId": 123,
-  "description": "Donation from user 123"
+  "description": "Ung ho"
 }
 ```
 
 **Response:**
 ```json
 {
-  "orderCode": 1234567890,
+  "orderCode": 1730000000000,
   "paymentLinkId": "abc123xyz",
-  "qrCode": "data:image/png;base64,iVBORw0KG...",
+  "qrCode": "000201010212...",
   "checkoutUrl": "https://pay.payos.vn/web/abc123xyz"
 }
 ```
 
 **Validation:**
-- `amount`: Minimum 1,000 VND
-- `userId`: Optional, integer
-- `description`: Optional, string
+- `amount`: 1.000 – 50.000.000 VND
+- `description`: tùy chọn, tối đa 9 ký tự
+- Người ủng hộ lấy từ JWT (`userId` trong body bị bỏ qua)
 
 ---
 
-#### 4. Get Payment Status
+#### 7. Get Payment Status
 
 ```http
 GET /payments/status/{order_code}
+Authorization: Bearer <JWT>
 ```
 
 **Response:**
@@ -1010,20 +904,16 @@ GET /payments/status/{order_code}
 {
   "status": "PAID",
   "amountPaid": 50000,
-  "orderCode": 1234567890,
+  "orderCode": 1730000000000,
   "paymentLinkId": "abc123xyz"
 }
 ```
 
-**Status Values:**
-- `PENDING` - Chờ thanh toán
-- `PAID` - Đã thanh toán
-- `CANCELLED` - Đã hủy
-- `EXPIRED` - Hết hạn
+**Status Values:** `PENDING` · `PAID` · `CANCELLED` · `EXPIRED`. Chỉ chủ giao dịch xem được.
 
 ---
 
-#### 5. PayOS Webhook
+#### 8. PayOS Webhook
 
 ```http
 POST /webhook/payos
@@ -1033,70 +923,21 @@ Content-Type: application/json
 **Request Body (từ PayOS):**
 ```json
 {
-  "data": {
-    "orderCode": 1234567890,
-    "amount": 50000,
-    "description": "Donation from user 123",
-    "paymentLinkId": "abc123xyz",
-    "status": "PAID"
-  },
-  "signature": "webhook_signature_here"
+  "code": "00",
+  "desc": "success",
+  "data": {"orderCode": 1730000000000, "amount": 50000, "paymentLinkId": "abc123xyz", "...": "..."},
+  "signature": "<HMAC-SHA256>"
 }
 ```
 
-**Response:**
-```json
-{
-  "received": true,
-  "transactionId": 456,
-  "userId": 123,
-  "amount": 50000
-}
-```
-
----
-
-#### 6. Payment Return URLs
-
-```http
-GET /payment/return
-```
-Redirect URL sau khi thanh toán thành công.
-
-```http
-GET /payment/cancel
-```
-Redirect URL sau khi hủy thanh toán.
-
----
-
-#### 7. Webhook Info
-
-```http
-GET /payment/webhook-info
-```
-
-**Response:**
-```json
-{
-  "success": true,
-  "webhookUrl": "https://digital-ocean-fast-api-h9zys.ondigitalocean.app/webhook/payos",
-  "message": "Configure this webhook URL in PayOS dashboard",
-  "instructions": [
-    "1. Login to https://my.payos.vn",
-    "2. Go to your payment channel settings",
-    "3. Find 'Webhook URL' field",
-    "4. Enter: https://...",
-    "5. Save settings"
-  ]
-}
-```
+- Sai chữ ký → từ chối; mỗi `orderCode` chỉ cộng số dư một lần; sai số tiền thì không cộng
+- `GET /payment/return`, `GET /payment/cancel`: trang PayOS chuyển về sau khi thanh toán/hủy
 
 ---
 
 ### Semantic Search API Endpoints (FastAPI Backend)
 
-**Base URL**: `https://digital-ocean-fast-api-h9zys.ondigitalocean.app`
+**Base URL**: `https://travel-api-u2xcse44ca-as.a.run.app`
 
 #### 1. Semantic Search
 
@@ -1110,8 +951,8 @@ Content-Type: application/json
 {
   "query": "bãi biển đẹp ở Đà Nẵng",
   "entity_types": ["location", "festival"],
-  "limit": 15,
-  "min_score": 0.5
+  "top_k": 15,
+  "min_score": 0.3
 }
 ```
 
@@ -1127,14 +968,16 @@ Content-Type: application/json
       "title": "Bãi biển Mỹ Khê",
       "description": "Bãi biển đẹp nhất Đà Nẵng...",
       "score": 0.78,
-      "metadata": { "image_url": "...", "location": "Đà Nẵng" }
+      "image_url": "https://..."
     }
   ],
   "total_count": 8,
   "search_time_ms": 145.5,
-  "search_type": "semantic"
+  "search_type": "text"
 }
 ```
+
+Công khai, giới hạn tần suất theo client. `GET /api/v1/search/suggestions?query=...` trả gợi ý từ khóa.
 
 **Score Interpretation:**
 | Score | Meaning |
@@ -1142,7 +985,7 @@ Content-Type: application/json
 | 0.8 - 1.0 | Excellent match |
 | 0.6 - 0.8 | Good match |
 | 0.5 - 0.6 | Fair match |
-| < 0.5 | Excluded by default |
+| < 0.5 | Chỉ hiện khi thiếu kết quả (fallback) |
 
 ---
 
@@ -1154,20 +997,18 @@ GET /api/v1/similar/{entity_type}/{entity_id}?limit=5
 
 **Example:** `GET /api/v1/similar/location/5?limit=5`
 
-**Response:**
-```json
-{
-  "success": true,
-  "similar_items": [
-    {
-      "id": 12,
-      "entity_type": "location",
-      "title": "Cầu Tình Yêu",
-      "similarity_score": 0.72
-    }
-  ]
-}
+---
+
+#### 3. RAG Chat
+
+```http
+POST /api/v1/chat/rag
+Authorization: Bearer <JWT>
+
+{"message": "Gợi ý địa điểm ngắm hoàng hôn", "session_id": "...", "image_url": "<url từ /uploads, tùy chọn>"}
 ```
+
+Trả `message` (câu trả lời), `sources` (địa điểm/lễ hội/hiện vật dùng làm ngữ cảnh, kèm ảnh), `session_id`. `POST /api/v1/chat/clear-session` bắt đầu phiên mới. 30 câu/người/ngày.
 
 ---
 
@@ -1175,89 +1016,20 @@ GET /api/v1/similar/{entity_type}/{entity_id}?limit=5
 
 ```http
 GET /api/v1/recommendations/{user_id}?limit=10
+Authorization: Bearer <JWT>
 ```
 
-**Response:**
-```json
-{
-  "success": true,
-  "recommendations": [
-    {
-      "id": 8,
-      "entity_type": "location",
-      "title": "Bà Nà Hills",
-      "score": 0.85,
-      "reason": "Based on your interest in mountain destinations"
-    }
-  ]
-}
-```
+`user_id` phải trùng tài khoản trong JWT (khác → 403).
 
 ---
 
 #### 5. User Memory
 
-**Store Memory:**
 ```http
-POST /api/v1/memory/store
-Content-Type: application/json
-
-{
-  "user_id": 123,
-  "memory_type": "preference",
-  "content": "User prefers beach destinations"
-}
-```
-
-**Get User Memories:**
-```http
-GET /api/v1/memory/user/{user_id}
-```
-
----
-
-### NocoDB API Endpoints
-
-**Base URL**: `https://app.nocodb.com/api/v2`
-
-**Authentication**: Header `xc-token: YOUR_NOCODB_TOKEN`
-
-#### Get Accounts
-
-```http
-GET /tables/mad8fvjhd0ba1bk/records?offset=0&limit=100
-```
-
-#### Create Account
-
-```http
-POST /tables/mad8fvjhd0ba1bk/records
-Content-Type: application/json
-
-{
-  "userName": "user123",
-  "password": "encrypted_password",
-  "fullName": "Nguyễn Văn A",
-  "email": "user@example.com"
-}
-```
-
-#### Get Locations
-
-```http
-GET /tables/mfz84cb0t9a84jt/records?offset=0&limit=100
-```
-
-#### Update User Balance
-
-```http
-PATCH /tables/mad8fvjhd0ba1bk/records
-Content-Type: application/json
-
-{
-  "Id": 123,
-  "balance": 100000
-}
+POST /api/v1/memory/store                     (JWT) {"user_id": 1, "memory_type": "preference", "content": "Thích biển"}
+GET  /api/v1/memory/user/{user_id}            (JWT)
+GET  /api/v1/memory/conversation/{session_id} (JWT)
+DELETE /api/v1/memory/conversation/{session_id} (JWT)
 ```
 
 ---
@@ -1274,56 +1046,9 @@ Content-Type: application/json
 GET /directions/v5/mapbox/driving/{coordinates}
 ```
 
-**Example:**
-```
-https://api.mapbox.com/directions/v5/mapbox/driving/
-106.6297,10.8231;106.6917,10.7769
-?access_token=YOUR_TOKEN
-&geometries=geojson
-&steps=true
-&alternatives=true
-```
+Tham số app dùng: `geometries=geojson`, `steps=true`, `alternatives=true`, `banner_instructions`, `voice_instructions` (`src/services/mapbox.api.ts`).
 
-#### Geocoding API
-
-```http
-GET /geocoding/v5/mapbox.places/{query}.json
-```
-
-**Example:**
-```
-https://api.mapbox.com/geocoding/v5/mapbox.places/
-Da%20Nang.json?access_token=YOUR_TOKEN
-```
-
----
-
-### OpenAI API (Chatbot)
-
-**Base URL**: `https://api.openai.com/v1`
-
-**Authentication**: Header `Authorization: Bearer YOUR_OPENAI_KEY`
-
-#### Chat Completion
-
-```http
-POST /chat/completions
-Content-Type: application/json
-
-{
-  "model": "gpt-4",
-  "messages": [
-    {
-      "role": "system",
-      "content": "You are a travel assistant for Vietnam"
-    },
-    {
-      "role": "user",
-      "content": "Gợi ý địa điểm du lịch ở Đà Nẵng"
-    }
-  ]
-}
-```
+App chỉ gọi Directions khi đã có GPS thật, mỗi lần chọn địa điểm một request.
 
 ---
 
@@ -1342,45 +1067,24 @@ Content-Type: application/json
 ┌─────────────────────────────────┐
 │ Frontend (LoginScreen.tsx)      │
 │ - Validate input                │
-│ - Encrypt password (CryptoJS)   │
+│ - auth.api.login()              │
 └──────┬──────────────────────────┘
        │
-       │ HTTP POST
+       │ HTTPS POST /auth/login
        ▼
 ┌─────────────────────────────────┐
-│ NocoDB API                      │
-│ - Query Accounts table          │
-│ - Match username & password     │
+│ Backend (core_api/auth.py)      │
+│ - Tìm tài khoản trong Neon      │
+│ - Kiểm mật khẩu (scrypt)        │
+│ - Ký JWT (30 ngày)              │
 └──────┬──────────────────────────┘
        │
        ▼
 ┌─────────────────────────────────┐
 │ Frontend Response Handler       │
-│ - Save to AsyncStorage          │
-│ - Navigate to HomeScreen        │
+│ - Lưu token + hồ sơ AsyncStorage│
+│ - Quay lại màn trước / Home     │
 └─────────────────────────────────┘
-```
-
-**Code Example:**
-
-```typescript
-// Frontend: src/services/auth.api.ts
-const login = async (userName: string, password: string) => {
-  // Encrypt password
-  const encryptedPassword = CryptoJS.AES.encrypt(
-    password,
-    env.PASSWORD_SALT
-  ).toString();
-
-  // Query NocoDB
-  const response = await request.get(URL_GET_ACCOUNTS, {
-    params: {
-      where: `(userName,eq,${userName})~and(password,eq,${encryptedPassword})`
-    }
-  });
-
-  return response.data.list[0];
-};
 ```
 
 ---
@@ -1396,82 +1100,35 @@ const login = async (userName: string, password: string) => {
        ▼
 ┌─────────────────────────────────┐
 │ Frontend (CameraScreen.tsx)     │
-│ - Capture image                 │
-│ - Convert to FormData           │
+│ - Capture / pick image          │
+│ - detect.api.detectImage()      │
 └──────┬──────────────────────────┘
        │
-       │ HTTP POST /detect
+       │ HTTPS POST /detect (JWT)
        │ multipart/form-data
        ▼
 ┌─────────────────────────────────┐
-│ Backend (app.py)                │
-│ - Receive image file            │
-│ - Call service.get_object_name()│
+│ Backend (core_api/detect.py)    │
+│ - Lưu ảnh tạm Cloud Storage     │
+│ - Google Lens (SerpAPI)         │
+│ - OpenAI chọn tên hiện vật      │
 └──────┬──────────────────────────┘
        │
        ▼
 ┌─────────────────────────────────┐
-│ OpenAI Vision API               │
-│ - Analyze image                 │
-│ - Return location name          │
-└──────┬──────────────────────────┘
-       │
-       ▼
-┌─────────────────────────────────┐
-│ Backend (service.py)            │
-│ - Get full description          │
-│ - Check NocoDB first            │
-│ - Fallback to OpenAI            │
+│ Bảng objects (Neon)             │
+│ - Khớp tên/tên khác (aliases)   │
+│ - Lấy mô tả đã kiểm chứng       │
+│ - Không khớp → OpenAI viết      │
 └──────┬──────────────────────────┘
        │
        │ JSON Response
        ▼
 ┌─────────────────────────────────┐
 │ Frontend Response Handler       │
-│ - Display location name         │
-│ - Show description (Markdown)   │
-│ - Navigate to detail screen     │
+│ - Hiện tên hiện vật             │
+│ - Mô tả Markdown                │
 └─────────────────────────────────┘
-```
-
-**Code Example:**
-
-```typescript
-// Frontend: src/container/screens/Camera/PreviewImage.tsx
-const uploadImage = async (imageUri: string) => {
-  const formData = new FormData();
-  formData.append('image_file', {
-    uri: imageUri,
-    type: 'image/jpeg',
-    name: 'photo.jpg',
-  });
-
-  const response = await fetch(`${SERVER_URL}/detect`, {
-    method: 'POST',
-    body: formData,
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  });
-
-  const data = await response.json();
-  // data = { name: "...", description: "..." }
-
-  return data;
-};
-```
-
-```python
-# Backend: app.py
-@app.post("/detect")
-def detect(image_file: UploadFile):
-    name = get_object_name(image_file)
-    full_description = get_full_description(name)
-
-    return {
-        "name": name,
-        "description": full_description,
-    }
 ```
 
 ---
@@ -1488,21 +1145,20 @@ def detect(image_file: UploadFile):
 ┌─────────────────────────────────┐
 │ Frontend (Donation.tsx)         │
 │ - Input amount                  │
-│ - Call payment API              │
+│ - payment.api.createDonation()  │
 └──────┬──────────────────────────┘
        │
-       │ POST /payments/create
+       │ POST /payments/create (JWT)
        ▼
 ┌─────────────────────────────────┐
-│ Backend (payment_service.py)    │
-│ - Create PayOS payment link     │
-│ - Generate QR code              │
+│ Backend (core_api/payments.py)  │
+│ - Ghi giao dịch PENDING (Neon)  │
+│ - Tạo link PayOS (ký HMAC)      │
 └──────┬──────────────────────────┘
        │
        ▼
 ┌─────────────────────────────────┐
 │ PayOS API                       │
-│ - Create payment session        │
 │ - Return payment link & QR      │
 └──────┬──────────────────────────┘
        │
@@ -1511,7 +1167,7 @@ def detect(image_file: UploadFile):
 ┌─────────────────────────────────┐
 │ Frontend Display                │
 │ - Show QR code                  │
-│ - Show payment link             │
+│ - Hỏi trạng thái định kỳ        │
 │ - User scans & pays             │
 └─────────────────────────────────┘
        │
@@ -1524,10 +1180,9 @@ def detect(image_file: UploadFile):
        │
        ▼
 ┌─────────────────────────────────┐
-│ Backend (app.py)                │
-│ - Verify signature              │
-│ - Create transaction record     │
-│ - Update user balance           │
+│ Backend (core_api/payments.py)  │
+│ - Verify signature (bắt buộc)   │
+│ - PAID + cộng số dư (1 lần)     │
 └─────────────────────────────────┘
 ```
 
@@ -1535,201 +1190,145 @@ def detect(image_file: UploadFile):
 
 ## 📊 Database Schema
 
-### NocoDB Tables
+### Neon PostgreSQL Tables
 
-#### Table: Accounts (ID: `mad8fvjhd0ba1bk`)
+Schema quản lý bằng migration trong `Travel_BE/db/schema/` (`001`–`013`); backend chỉ dùng role `travel_runtime` với quyền tối thiểu (`db/permissions/`).
+
+#### Table: accounts
 
 Lưu trữ thông tin tài khoản người dùng.
 
 | Column | Type | Description | Constraints |
 |--------|------|-------------|-------------|
-| Id | Number | ID tự động tăng | Primary Key, Auto-increment |
-| userName | Text | Tên đăng nhập | Unique, Required |
-| password | Text | Mật khẩu đã mã hóa | Required, Encrypted (CryptoJS) |
-| fullName | Text | Họ và tên | Required |
-| email | Text | Email | Unique, Required |
-| avatar | Text | URL avatar | Optional |
-| balance | Number | Số dư tài khoản (VND) | Default: 0 |
-| createdAt | DateTime | Ngày tạo | Auto-generated |
-
-**Indexes:**
-- `userName` (Unique)
-- `email` (Unique)
+| id | BIGINT | ID tự động tăng | Primary Key |
+| user_name | TEXT | Tên đăng nhập | Unique, Required |
+| password_hash | TEXT | `scrypt$…` (hash cũ `sha256salt$…` tự nâng cấp khi đăng nhập) | Required |
+| full_name, email, phone, gender, birthday, address | TEXT | Hồ sơ | Email unique (không phân biệt hoa thường) |
+| avatar | TEXT | URL ảnh đại diện | Optional |
+| balance | BIGINT | Số dư (VND) | Default: 0 |
+| token_version | INTEGER | Thu hồi JWT khi đổi mật khẩu/xóa tài khoản | Default: 0 |
+| deleted_at | TIMESTAMPTZ | Thời điểm xóa (dữ liệu cá nhân bị xóa trắng) | Optional |
+| created_at, updated_at | TIMESTAMPTZ | | Auto |
 
 ---
 
-#### Table: Base_Locations (ID: `mfz84cb0t9a84jt`)
+#### Table: locations / hotels
 
-Lưu trữ thông tin địa điểm du lịch.
+Địa điểm du lịch (123) và khách sạn/nhà hàng/quán (82).
 
-| Column | Type | Description | Constraints |
-|--------|------|-------------|-------------|
-| Id | Number | ID tự động tăng | Primary Key, Auto-increment |
-| title | Text | Tên địa điểm | Required |
-| description | LongText | Mô tả chi tiết (Markdown) | Optional |
-| latitude | Number | Vĩ độ | Required |
-| longitude | Number | Kinh độ | Required |
-| images | Attachment | Hình ảnh địa điểm | Multiple files |
-| videos | Attachment | Video địa điểm | Multiple files |
-| category | SingleSelect | Danh mục | Values: Văn hóa, Thiên nhiên, Ẩm thực, etc. |
-| rating | Number | Đánh giá trung bình | 0-5 stars |
-| reviews | JSON | Danh sách đánh giá | Array of review objects |
-| address | Text | Địa chỉ | Optional |
-| openingHours | Text | Giờ mở cửa | Optional |
-| ticketPrice | Number | Giá vé (VND) | Optional |
+| Column | Type | Description |
+|--------|------|-------------|
+| id, record_id | BIGINT, TEXT | Khóa PostgreSQL và khóa nguồn ổn định |
+| name, description, long_description | TEXT | Tên, mô tả ngắn, mô tả dài |
+| types | JSONB (array) | Loại (slug, ví dụ `museum`, `beach`) |
+| images, videos, advise | JSONB (array) | URL ảnh, id video YouTube, lời khuyên |
+| website, phone, ticket_info, opening_hours, address, avatar | TEXT | Thông tin chi tiết |
+| lat, long | DOUBLE PRECISION | Tọa độ (cùng null hoặc cùng có) |
+| publishable | BOOLEAN | Hiện marker trên bản đồ |
+| category | TEXT | Chỉ hotels |
+| content_en | JSONB (object) | Bản tiếng Anh theo tên trường |
 
-**Sample Review JSON:**
-```json
-[
-  {
-    "userId": 123,
-    "userName": "Nguyễn Văn A",
-    "rating": 5,
-    "comment": "Địa điểm rất đẹp!",
-    "images": ["url1", "url2"],
-    "createdAt": "2025-01-15T10:30:00Z"
-  }
-]
-```
+`rating` và `review_count` không lưu ở bảng này mà tính từ bảng `reviews` (migration 013 đã bỏ cột `rating`/`reviews` cũ).
 
 ---
 
-#### Table: Items (ID: `m0s4uwjesun4rl9`)
+#### Table: festivals
 
-Lưu trữ bài viết/tin tức du lịch.
-
-| Column | Type | Description | Constraints |
-|--------|------|-------------|-------------|
-| Id | Number | ID tự động tăng | Primary Key, Auto-increment |
-| title | Text | Tiêu đề bài viết | Required |
-| content | LongText | Nội dung (Markdown) | Required |
-| thumbnail | Attachment | Ảnh thumbnail | Single file |
-| category | SingleSelect | Danh mục | Values: Tin tức, Hướng dẫn, Review, etc. |
-| tags | MultiSelect | Tags | Multiple values |
-| author | Text | Tác giả | Optional |
-| publishedAt | DateTime | Ngày xuất bản | Auto-generated |
-| views | Number | Lượt xem | Default: 0 |
+49 lễ hội: cùng nhóm cột nội dung như locations, thêm `event_time` (TEXT) và `location_id` (FK nullable → locations.id).
 
 ---
 
-#### Table: Transactions (cho Payment)
+#### Table: objects
 
-Lưu trữ lịch sử giao dịch thanh toán.
+11 hiện vật dùng cho Camera AI và làm ngữ cảnh chatbot (không hiện thành màn hình riêng trong app).
 
-| Column | Type | Description | Constraints |
-|--------|------|-------------|-------------|
-| Id | Number | ID tự động tăng | Primary Key, Auto-increment |
-| accountId | Number | ID tài khoản | Link to Accounts.Id |
-| amount | Number | Số tiền (VND) | Required, >= 1000 |
-| orderCode | Text | Mã đơn hàng PayOS | Unique |
-| paymentLinkId | Text | ID link thanh toán | Optional |
-| status | SingleSelect | Trạng thái | Values: PENDING, PAID, CANCELLED, EXPIRED |
-| description | Text | Mô tả giao dịch | Optional |
-| createdAt | DateTime | Ngày tạo | Auto-generated |
-| paidAt | DateTime | Ngày thanh toán | Optional |
-
-**Indexes:**
-- `orderCode` (Unique)
-- `accountId` (Foreign Key)
+| Column | Type | Description |
+|--------|------|-------------|
+| id, record_id | BIGINT, TEXT | Khóa |
+| title, content | TEXT | Tên và mô tả đã kiểm chứng |
+| images, video | JSONB, TEXT | Ảnh, video YouTube |
+| location_id | BIGINT | FK nullable → locations.id |
+| aliases | JSONB (array) | Tên khác để khớp kết quả nhận diện |
+| content_en | JSONB | Bản tiếng Anh |
 
 ---
 
-#### Table: Festivals (cho Lễ hội)
-
-Lưu trữ thông tin lễ hội và sự kiện.
+#### Table: reviews / review_reports
 
 | Column | Type | Description | Constraints |
 |--------|------|-------------|-------------|
-| Id | Number | ID tự động tăng | Primary Key, Auto-increment |
-| name | Text | Tên lễ hội | Required |
-| description | LongText | Mô tả chi tiết | Optional |
-| startDate | DateTime | Ngày bắt đầu | Required |
-| endDate | DateTime | Ngày kết thúc | Required |
-| location | Text | Địa điểm tổ chức | Required |
-| images | Attachment | Hình ảnh lễ hội | Multiple files |
-| category | SingleSelect | Loại lễ hội | Values: Văn hóa, Âm nhạc, Ẩm thực, etc. |
-| isFeatured | Checkbox | Nổi bật | Default: false |
+| id | BIGINT | | Primary Key |
+| account_id | BIGINT | Người viết | FK → accounts.id |
+| location_id / festival_id | BIGINT | Đúng một trong hai | FK |
+| rating | SMALLINT | Số sao | 1–5 |
+| content | TEXT | Nội dung | 1–2000 ký tự |
+| images | JSONB | URL ảnh từ `/uploads` | ≤ 5 ảnh |
+| status | TEXT | `visible` / `hidden` | Ẩn khi đủ 3 báo cáo |
+| created_at | TIMESTAMPTZ | | Auto |
+
+`review_reports` (review_id, account_id, reason): mỗi người báo cáo một đánh giá một lần.
+
+---
+
+#### Table: transactions (cho Payment)
+
+| Column | Type | Description | Constraints |
+|--------|------|-------------|-------------|
+| id | BIGINT | | Primary Key |
+| account_id | BIGINT | Người ủng hộ | FK → accounts.id |
+| user_name | TEXT | Tên đăng nhập lúc giao dịch | Optional |
+| amount | BIGINT | Số tiền (VND) | > 0 |
+| order_code | BIGINT | Mã đơn PayOS | Unique |
+| payment_link_id | TEXT | ID link thanh toán | Unique |
+| status | TEXT | PENDING, PAID, CANCELLED, EXPIRED | Default PENDING |
+| description | TEXT | Mô tả | Optional |
+| created_at, updated_at | TIMESTAMPTZ | | Auto |
+
+---
+
+#### Table: user_memories / conversations (AI)
+
+- `user_memories`: account_id, memory_type (`preference`, `interest`, `visited`, `dislike`, `context`), content, confidence, metadata
+- `conversations`: session_id, account_id, role (`user`/`assistant`), content — dùng cho lịch sử chat và quota/ngày
+
+Xóa tài khoản xóa luôn hai bảng này của người dùng.
 
 ---
 
 ## 🚢 Deployment
 
-### Backend Deployment (Digital Ocean)
+### Backend Deployment (Google Cloud Run)
 
-#### Bước 1: Tạo App trên Digital Ocean
+Hướng dẫn đầy đủ (lệnh PowerShell, rollback): `Travel_BE/deploy/README.md`.
 
-1. Đăng nhập https://cloud.digitalocean.com/
-2. Create → Apps → Deploy from GitHub
-3. Chọn repository: `freelance-travel-app-server`
-4. Chọn branch: `main`
+#### Bước 1: Migration database (nếu có)
 
-#### Bước 2: Cấu hình App
+Chạy file `db/schema/NNN_*.sql` mới bằng role owner (`DATABASE_URL_UNPOOLED`) **trước** khi deploy code cần nó.
 
-**App Spec:**
-```yaml
-name: travel-backend
-region: sgp
-services:
-  - name: api
-    github:
-      repo: your-username/freelance-travel-app-server
-      branch: main
-      deploy_on_push: true
-    build_command: pip install -r requirements.txt
-    run_command: gunicorn -w 2 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8080 app:app
-    environment_slug: python
-    instance_count: 1
-    instance_size_slug: basic-xxs
-    http_port: 8080
-    routes:
-      - path: /
-    envs:
-      - key: OPENAI_API_KEY
-        value: ${OPENAI_API_KEY}
-        type: SECRET
-      - key: NOCODB_API_TOKEN
-        value: ${NOCODB_API_TOKEN}
-        type: SECRET
-      - key: PAYOS_CLIENT_ID
-        value: ${PAYOS_CLIENT_ID}
-        type: SECRET
-      - key: PAYOS_API_KEY
-        value: ${PAYOS_API_KEY}
-        type: SECRET
-      - key: PAYOS_CHECKSUM_KEY
-        value: ${PAYOS_CHECKSUM_KEY}
-        type: SECRET
+#### Bước 2: Build image bằng Cloud Build
+
+`deploy/cloudbuild.yaml` gồm 3 bước:
+1. Dựng FAISS index từ Neon (`scripts/build_faiss_index.py`)
+2. `docker build`
+3. Smoke test container (`deploy/container_smoke.py`): DB lỗi → 503, Neon thật → đủ số bản ghi
+
+Build service account chỉ được cấp quyền đọc secret trong lúc build, thu hồi ngay sau đó.
+
+#### Bước 3: Deploy
+
+1. Lấy digest image vừa build, ghi vào `deploy/service.yaml`
+2. Ghi lại revision đang chạy (để rollback)
+3. `gcloud run services replace deploy/service.yaml`
+
+#### Bước 4: Kiểm tra
+
+```bash
+curl https://travel-api-u2xcse44ca-as.a.run.app/health
+curl https://travel-api-u2xcse44ca-as.a.run.app/health/ready
+curl "https://travel-api-u2xcse44ca-as.a.run.app/locations?limit=2"
 ```
 
-#### Bước 3: Cấu hình Environment Variables
-
-Trong Digital Ocean App Settings → Environment Variables:
-
-```
-OPENAI_API_KEY=sk-your-key
-NOCODB_BASE_URL=https://app.nocodb.com
-NOCODB_API_TOKEN=your-token
-NOCODB_TABLE_ID=mj77cy6909ll2wc
-PAYOS_CLIENT_ID=your-client-id
-PAYOS_API_KEY=your-api-key
-PAYOS_CHECKSUM_KEY=your-checksum-key
-PUBLIC_BASE_URL=https://your-app.ondigitalocean.app
-SERPAPI_KEY=your-serpapi-key
-```
-
-#### Bước 4: Deploy
-
-1. Click "Create Resources"
-2. Đợi build và deploy (5-10 phút)
-3. Kiểm tra logs để đảm bảo không có lỗi
-4. Test API tại: `https://your-app.ondigitalocean.app/docs`
-
-#### Bước 5: Cấu hình Domain (Optional)
-
-1. Settings → Domains
-2. Add Domain: `api.yourdomain.com`
-3. Cấu hình DNS records tại domain provider
-4. Đợi SSL certificate tự động cấp
+**Cấu hình Cloud Run** (`deploy/service.yaml`): min 0 / max 1 instance, 1 vCPU / 1 GiB, concurrency 4, timeout 60 s, `APP_FEATURES=auth,uploads,reviews,detect,ai,payments`, secret `travel-database-url` + `travel-app-config`.
 
 ---
 
@@ -1750,7 +1349,6 @@ cd android
 3. Distribute qua:
    - Email
    - Google Drive
-   - Firebase App Distribution
    - Website download
 
 **Option 2: Google Play Store**
@@ -1768,7 +1366,8 @@ cd android
 4. Điền thông tin app:
    - App name, description
    - Screenshots (phone, tablet)
-   - Privacy policy URL
+   - Privacy policy URL, link xóa tài khoản
+   - Data safety, khai báo nội dung người dùng tạo (UGC)
    - Content rating
 
 5. Submit for review
@@ -1795,187 +1394,53 @@ cd android
 
 ---
 
-### CI/CD Setup (Optional)
-
-#### GitHub Actions cho Backend
-
-Tạo file `.github/workflows/deploy.yml`:
-
-```yaml
-name: Deploy to Digital Ocean
-
-on:
-  push:
-    branches: [main]
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Deploy to Digital Ocean
-        uses: digitalocean/app_action@v1
-        with:
-          app_name: travel-backend
-          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
-```
+### CI/CD Setup
 
 #### GitHub Actions cho Frontend
 
-Tạo file `.github/workflows/android.yml`:
+`.github/workflows/ci.yml` chạy mỗi lần push/PR:
+- `npm ci`
+- Jest các suite trong danh sách (không gọi mạng)
+- `tsc --noEmit` không vượt ngưỡng lỗi hiện có
 
-```yaml
-name: Android Build
+#### GitHub Actions cho Backend
 
-on:
-  push:
-    branches: [main]
+`Travel_BE/.github/workflows/ci.yml` chạy toàn bộ `tests/check_*.py` với DB và nhà cung cấp giả (không cần secret).
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: '18'
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Build Android APK
-        run: |
-          cd android
-          ./gradlew assembleRelease
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v2
-        with:
-          name: app-release
-          path: android/app/build/outputs/apk/release/app-release.apk
-```
+Deploy backend làm thủ công theo `deploy/README.md` (Cloud Build + `gcloud run services replace`).
 
 ---
 
-## 📚 Tài liệu tham khảo
+## 🔮 Chức năng có thể mở rộng
 
-### React Native
-- [React Native Docs](https://reactnative.dev/docs/getting-started)
-- [React Navigation](https://reactnavigation.org/docs/getting-started)
-- [React Native Paper](https://callstack.github.io/react-native-paper/)
+### Hoàn thiện các phần đang dở (đã có giao diện hoặc API)
 
-### Backend & APIs
-- [FastAPI Documentation](https://fastapi.tiangolo.com/)
-- [NocoDB Documentation](https://docs.nocodb.com/)
-- [OpenAI API Reference](https://platform.openai.com/docs/api-reference)
-- [PayOS Documentation](https://payos.vn/docs/)
-- [Mapbox API](https://docs.mapbox.com/api/)
+| # | Chức năng | Hiện trạng | Hướng làm |
+|---|---|---|---|
+| R1 | Gợi ý cá nhân hóa thật | Chưa có luồng ghi `user_memories` → luôn hiện mục phổ biến | Ghi sở thích khi xem chi tiết, đánh giá ≥ 4 sao, chủ đề hỏi chatbot |
+| R2 | Gợi ý từ khóa khi gõ (autocomplete) | API `/api/v1/search/suggestions` + `debouncedGetSuggestions` có sẵn | Gắn vào `SemanticSearchBarComponent` |
+| R3 | Tìm kiếm bằng ảnh | Nhánh `search_type=image` luôn lỗi (không có CLIP) | Dùng lại `/detect` hoặc thêm embeddings ảnh |
+| R4 | Cài đặt hoạt động thật | Công tắc chỉ được lưu | Xóa bộ nhớ đệm thật, mở cài đặt quyền vị trí, thông báo đẩy (FCM), chế độ tối |
+| R5 | Lịch sử giao dịch | Chỉ có kiểu `ITransaction` | `GET /payments/history` + màn hình trong Hồ sơ |
+| R6 | SOS và màn Giới thiệu | Số điện thoại cố định, URL mẫu | Số khẩn cấp (112/113/114/115) hoặc cấu hình; URL thật |
+| R7 | Đăng ký lại webhook PayOS | Thao tác tay qua API PayOS | Script `confirm-webhook` khi đổi URL backend |
+| N1 | Quên mật khẩu qua email | Code có, module `email` tắt | Thêm key SendGrid, bật module, mở màn hình |
 
-### Development Tools
-- [Reactotron](https://github.com/infinitered/reactotron)
-- [VS Code React Native Tools](https://marketplace.visualstudio.com/items?itemName=msjsdiag.vscode-react-native)
+### Ý tưởng mới
+
+- 🗓️ **Lễ hội theo thời gian** - Lọc theo tháng, lịch sự kiện, nhắc lịch trước ngày diễn ra
+- ❤️ **Yêu thích** - Lưu địa điểm/lễ hội, danh sách "Đã lưu" (đã có chuỗi i18n `bookmark`)
+- 🔗 **Chia sẻ** - Chia sẻ địa điểm/đánh giá qua mạng xã hội, deep link mở thẳng màn chi tiết
+- 🧭 **Lập lịch trình** - Gợi ý lịch trình nhiều điểm trong ngày, tối ưu đường đi bằng Mapbox
+- 🔔 **Cảnh báo giọng nói khi tới gần** - Bật lại khối `BackgroundGeolocation` (cần quyền vị trí nền)
+- 🗺️ **Bản đồ nâng cao** - Gom cụm marker, bản đồ offline, lọc marker theo loại
+- 📴 **Chế độ offline** - Lưu catalog và ảnh đã xem để dùng khi mất mạng
+- 🏨 **Khách sạn đầy đủ** - Đánh giá, chỉ đường, tương tự cho khách sạn/nhà hàng
+- 🧑‍💼 **Trang quản trị** - Quản lý nội dung, duyệt đánh giá bị báo cáo, hiện vật
+- 🌏 **Thêm ngôn ngữ** - Dịch nội dung bằng script (như tiếng Anh), dịch đánh giá người dùng
+- 🍎 **iOS** - Kiểm thử và phát hành bản iOS
 
 ---
-
-## 🤝 Đóng góp
-
-Mọi đóng góp đều được chào đón! Dự án này hoan nghênh sự tham gia của cộng đồng.
-
-### Quy trình đóng góp
-
-1. **Fork repository**
-   ```bash
-   # Click "Fork" button trên GitHub
-   ```
-
-2. **Clone fork của bạn**
-   ```bash
-   git clone https://github.com/your-username/Travel.git
-   cd Travel
-   ```
-
-3. **Tạo branch mới**
-   ```bash
-   git checkout -b feature/amazing-feature
-   # Hoặc
-   git checkout -b fix/bug-fix
-   ```
-
-4. **Thực hiện thay đổi**
-   - Viết code clean và có comments
-   - Follow coding conventions
-   - Test kỹ trước khi commit
-
-5. **Commit changes**
-   ```bash
-   git add .
-   git commit -m "feat: add amazing feature"
-   ```
-
-   **Commit message format**:
-   - `feat:` - Tính năng mới
-   - `fix:` - Bug fix
-   - `docs:` - Documentation changes
-   - `style:` - Code style changes (formatting)
-   - `refactor:` - Code refactoring
-   - `test:` - Adding tests
-   - `chore:` - Maintenance tasks
-
-6. **Push to GitHub**
-   ```bash
-   git push origin feature/amazing-feature
-   ```
-
-7. **Tạo Pull Request**
-   - Mở repository trên GitHub
-   - Click "New Pull Request"
-   - Chọn branch của bạn
-   - Điền mô tả chi tiết về changes
-   - Submit PR
-
-### Areas to Contribute
-
-#### 🐛 Bug Fixes
-- Fix existing bugs
-- Improve error handling
-- Performance optimizations
-
-#### ✨ New Features
-- Offline mode support
-- Social media sharing
-- Advanced search filters
-- User reviews and ratings
-- Favorite locations
-- Trip planning
-
-#### 📚 Documentation
-- Improve README
-- Add code comments
-- Create tutorials
-- Translate documentation
-
-#### 🧪 Testing
-- Write unit tests
-- Add integration tests
-- E2E testing
-- Performance testing
-
-#### 🎨 UI/UX Improvements
-- Design improvements
-- Accessibility features
-- Dark mode enhancements
-- Animations
-
-### Code Review Process
-
-1. **Automated checks**: CI/CD sẽ chạy tests và linting
-2. **Manual review**: Maintainer sẽ review code
-3. **Feedback**: Có thể yêu cầu changes
-4. **Approval**: Sau khi approve, PR sẽ được merge
-5. **Deployment**: Changes sẽ được deploy lên production
 
 ## 📄 License
 
@@ -2000,6 +1465,8 @@ Dự án này là **private repository**. Mọi quyền được bảo lưu.
 ### **Lê Khánh Đạt**
 
 [![GitHub](https://img.shields.io/badge/GitHub-lekhanhdat-181717?style=for-the-badge&logo=github)](https://github.com/lekhanhdat)
+[![Facebook](https://img.shields.io/badge/Facebook-LeKhanhDat09-1877F2?style=for-the-badge&logo=facebook&logoColor=white)](https://www.facebook.com/LeKhanhDat09/)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-lekhanhdat-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/lekhanhdat/)
 [![Email](https://img.shields.io/badge/Email-Contact-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:lekhanhdat03@gmail.com)
 
 </div>
@@ -2013,53 +1480,10 @@ Dự án này là **private repository**. Mọi quyền được bảo lưu.
 
 - **Mobile**: React Native, TypeScript, iOS, Android
 - **Backend**: Python, FastAPI, Node.js
-- **Database**: NocoDB, Firebase, PostgreSQL
-- **AI/ML**: OpenAI, Computer Vision
-- **Cloud**: Digital Ocean, AWS, Firebase
+- **Database**: PostgreSQL (Neon)
+- **AI/ML**: OpenAI, FAISS, RAG, Computer Vision
+- **Cloud**: Google Cloud (Cloud Run, Cloud Storage, Secret Manager)
 - **Tools**: Git, Docker, CI/CD
-
----
-
-## 🙏 Lời cảm ơn
-
-Dự án này được xây dựng với sự hỗ trợ của nhiều công nghệ và thư viện open-source tuyệt vời:
-
-### Frameworks & Libraries
-
-- [React Native](https://reactnative.dev/) - Framework mobile cross-platform
-- [FastAPI](https://fastapi.tiangolo.com/) - Modern Python web framework
-- [TypeScript](https://www.typescriptlang.org/) - JavaScript with types
-- [React Navigation](https://reactnavigation.org/) - Routing and navigation
-
-### Services & APIs
-
-- [Mapbox](https://www.mapbox.com/) - Maps and location services
-- [OpenAI](https://openai.com/) - AI and machine learning
-- [NocoDB](https://nocodb.com/) - Open-source Airtable alternative
-- [PayOS](https://payos.vn/) - Payment gateway for Vietnam
-- [SendGrid](https://sendgrid.com/) - Email delivery service
-- [Firebase](https://firebase.google.com/) - Backend services
-- [Digital Ocean](https://www.digitalocean.com/) - Cloud hosting
-
-### UI Components & Tools
-
-- [React Native Paper](https://callstack.github.io/react-native-paper/) - Material Design components
-- [React Native Vector Icons](https://github.com/oblador/react-native-vector-icons) - Icon library
-- [Reactotron](https://github.com/infinitered/reactotron) - Debugging tool
-- [Axios](https://axios-http.com/) - HTTP client
-
-### Community
-
-- [React Native Community](https://github.com/react-native-community) - Community-driven packages
-- [Stack Overflow](https://stackoverflow.com/) - Q&A community
-- [GitHub](https://github.com/) - Code hosting and collaboration
-
-### Special Thanks
-
-- Tất cả contributors đã đóng góp cho dự án
-- Open-source community vì những thư viện tuyệt vời
-- Beta testers đã giúp test và feedback
-- Người dùng đã tin tưởng và sử dụng ứng dụng
 
 ---
 
@@ -2090,6 +1514,8 @@ Có ý tưởng cho tính năng mới? Tạo issue với label `enhancement`:
 
 - **GitHub Issues**: [Create Issue](https://github.com/lekhanhdat/Travel/issues)
 - **Email**: lekhanhdat03@gmail.com
+- **Facebook**: https://www.facebook.com/LeKhanhDat09/
+- **LinkedIn**: https://www.linkedin.com/in/lekhanhdat/
 
 ---
 
@@ -2107,6 +1533,6 @@ Có ý tưởng cho tính năng mới? Tạo issue với label `enhancement`:
 
 ---
 
-*Last updated: 2 December 2025*
+*Last updated: 3 November 2026*
 
 </div>

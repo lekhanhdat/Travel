@@ -19,15 +19,15 @@ import {ScreenName} from '../../AppContainer';
 import {Button} from 'react-native-paper';
 import SimilarItemsComponent from '../../../component/SimilarItemsComponent';
 import {
-  withAzureTranslation,
-  WithAzureTranslationProps,
-} from '../../../hoc/withAzureTranslation';
+  withTranslation,
+  WithTranslationProps,
+} from '../../../hoc/withTranslation';
 import { translateFestivalField } from '../../../utils/translationHelpers';
 import catalogRepository from '../../../services/catalogRepository';
 import { catalogImage } from '../../../utils/catalogDisplay';
 import CachedImage from '../../../component/CachedImage';
 
-interface IDetailFestivalScreenProps extends WithAzureTranslationProps {
+interface IDetailFestivalScreenProps extends WithTranslationProps {
   navigation: any;
   route: any;
 }
@@ -59,7 +59,6 @@ class DetailFestivalScreen extends React.PureComponent<
   }
 
   componentDidMount() {
-    // P1: if (FEATURE_FLAGS.RECOVERY_MODE) {return;}
     this.loadCatalog();
     this.loadReviews();
   }
@@ -537,4 +536,4 @@ class DetailFestivalScreen extends React.PureComponent<
   }
 }
 
-export default withAzureTranslation(DetailFestivalScreen);
+export default withTranslation(DetailFestivalScreen);

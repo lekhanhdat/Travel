@@ -6,7 +6,7 @@ jest.mock('../src/assets/ImageSvg', () => new Proxy({}, {get: (_, name) => name 
 jest.mock('../src/assets/assets/ImageSvg', () => new Proxy({}, {get: (_, name) => name === '__esModule' ? false : 'Icon'}));
 jest.mock('../src/container/AppContainer', () => ({ScreenName: {VIEW_ALL_SCREEN: 'ViewAllLocation', DETAIL_LOCATION_SCREEN: 'DetailLocationScreen'}}));
 jest.mock('../src/container/screens/NavigationService', () => ({navigate: jest.fn()}));
-jest.mock('../src/hoc/withAzureTranslation', () => ({withAzureTranslation: component => component}));
+jest.mock('../src/hoc/withTranslation', () => ({withTranslation: component => component}));
 jest.mock('../src/hooks/useTranslation', () => ({useTranslation: () => ({t: key => key})}));
 jest.mock('../src/component/Page', () => 'Page');
 jest.mock('react-native-iphone-x-helper', () => ({isIphoneX: () => false}));
@@ -14,7 +14,6 @@ jest.mock('../src/component/HeaderBase', () => 'Header');
 jest.mock('../src/component/BigItemLocation', () => 'LocationCard');
 jest.mock('../src/component/LargeItemLocation', () => 'LocationCard');
 jest.mock('../src/component/LargeItemFestival', () => 'FestivalCard');
-jest.mock('../src/component/HistoricalArtifact', () => 'Item');
 jest.mock('../src/component/BottomSheet', () => 'BottomSheet');
 jest.mock('../src/component/LanguageDropdown', () => 'Language');
 jest.mock('../src/component/RecommendationsWidget', () => 'Recommendations');
@@ -29,7 +28,7 @@ const Festival = require('../src/container/screens/Festival/FestivalsScreen').de
 const Search = require('../src/component/SemanticSearchBarComponent').default;
 const CatalogStatus = require('../src/component/CatalogStatus').default;
 const storage = require('../src/utils/LocalStorageCommon').default;
-const {request} = require('../src/services/axios');
+const {apiRequest: request} = require('../src/services/api.client');
 const locationApi = require('../src/services/locations.api').default;
 const catalogRepository = require('../src/services/catalogRepository').default;
 const {buildCatalogSnapshot} = require('../src/services/catalogRepository');
@@ -158,13 +157,11 @@ describe('Phase 1 Guest Mode', () => {
     } finally {request.defaults.adapter = oldAdapter; tree?.unmount();}
   });
 
-  it('mounts Festival with an explicit error and retry, without fetching Items', async () => {
-    const items = jest.spyOn(locationApi, 'getItems');
+  it('mounts Festival with an explicit error and retry', async () => {
     jest.spyOn(catalogRepository, 'get').mockRejectedValue(new Error('Catalog network error'));
     let tree;
     await act(async () => {tree = renderer.create(React.createElement(Festival, props()));});
     expect(tree.getInstance().state).toMatchObject({loading: false, error: true, festivals: []});
-    expect(items).not.toHaveBeenCalled();
     await act(async () => {tree.root.findByType(CatalogStatus).props.onRetry();});
     expect(tree.getInstance().state.loading).toBe(false);
     const {RefreshControl} = require('react-native');
@@ -203,22 +200,6 @@ describe('Phase 1 Guest Mode', () => {
     expect(onSubmitSearch).toHaveBeenLastCalledWith([{id: 1, name: 'Đà Nẵng'}], 'da nang', false);
     expect(searchSemantic).not.toHaveBeenCalled();
     tree.unmount();
-  });
-
-  it('rejects legacy reads/writes before Axios adapter while catalog uses a separate client', async () => {
-    const adapter = jest.fn();
-    await expect(request.get('/api/v2/accounts', {adapter})).rejects.toThrow('disabled');
-    await expect(request.post('/api/v2/storage/upload', {}, {adapter})).rejects.toThrow('disabled');
-    expect(adapter).not.toHaveBeenCalled();
-    expect(require('../src/services/catalog.client').catalogRequest).not.toBe(request);
-  });
-
-  it('never calls Azure fetch when disabled, even with local credentials present', async () => {
-    const azure = require('../src/services/translation/AzureTranslatorService').default;
-    const fetch = jest.spyOn(global, 'fetch');
-    await expect(azure.translateBatch(['Travel'], 'vi')).resolves.toEqual(['Travel']);
-    await expect(azure.detectLanguage('Travel')).resolves.toBe('en');
-    expect(fetch).not.toHaveBeenCalled();
   });
 
   it('a hotel Detail never loads reviews or festivals by its (colliding) id', async () => {

@@ -132,6 +132,8 @@ export default class LoginScreen extends React.PureComponent<ILoginScreenProps, 
             outlineStyle={styles.inputOutline}
             textColor={colors.primary_950}
             placeholderTextColor={colors.black}
+            autoCapitalize="none"
+            autoCorrect={false}
             onChangeText={userName => this.setState({ userName })}
           />
 

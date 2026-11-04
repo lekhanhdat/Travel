@@ -202,7 +202,9 @@
     "routeInfo": "Route Information",
     "distance": "Distance",
     "duration": "Duration",
-    "startNavigation": "Start Navigation"
+    "startNavigation": "Start Navigation",
+    "modeLocations": "Places",
+    "modeFestivals": "Festivals"
   },
   "camera": {
     "title": "Camera",

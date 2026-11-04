@@ -29,7 +29,7 @@ import {
   WithTranslationProps,
 } from '../../../hoc/withTranslation';
 import LanguageDropdown from '../../../component/LanguageDropdown';
-import Geolocation from '@react-native-community/geolocation';
+import {getPreciseLocation} from '../../../utils/preciseLocation';
 import SemanticSearchBarComponent from '../../../component/SemanticSearchBarComponent';
 import RecommendationsWidget from '../../../component/RecommendationsWidget';
 import {Button} from 'react-native-paper';
@@ -139,23 +139,17 @@ class HomeScreen extends React.PureComponent<
     this.getCurrentLocation();
   };
 
-  // Get current GPS location (foreground only)
+  // Get current GPS location (foreground only, high accuracy — see utils/preciseLocation)
   getCurrentLocation = () => {
-    Geolocation.getCurrentPosition(
-      position => {
+    getPreciseLocation()
+      .then(position => {
         const {latitude, longitude} = position.coords;
         this.setState({currentLat: latitude, currentLong: longitude}, this.updateNearby);
-      },
-      error => {
+      })
+      .catch(error => {
         console.log('❌ Error getting location:', error);
         this.setState({nearbyStatus: 'unavailable'});
-      },
-      {
-        enableHighAccuracy: false,
-        timeout: 15000,
-        maximumAge: 60000,
-      },
-    );
+      });
   };
 
   updateNearby = () => {

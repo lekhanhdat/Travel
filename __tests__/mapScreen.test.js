@@ -59,10 +59,17 @@ const snapshot = buildCatalogSnapshot([
 const props = () => ({navigation: {addListener: jest.fn(() => jest.fn())}, route: {params: {}}});
 const markerIds = tree => tree.root.findAll(node => node.type === 'MarkerView').map(node => node.props.id);
 const directionsButton = tree => tree.root.find(node => node.type === 'Button' && node.props.icon === 'directions');
+// Fixes come from watchPosition (utils/preciseLocation for the first fix, then the live watch).
+const giveFix = coords => Geolocation.watchPosition.mockImplementation(success => {
+  success({coords: {accuracy: 5, ...coords}});
+  return 1;
+});
 
 describe('Map (P4)', () => {
   beforeEach(() => {
     jest.replaceProperty(Platform, 'OS', 'android');
+    // No fix unless a test gives one (clearAllMocks keeps implementations from earlier tests).
+    Geolocation.watchPosition.mockReset().mockImplementation(() => 1);
     jest.spyOn(catalogRepository, 'get').mockResolvedValue(snapshot);
   });
   afterEach(() => {jest.restoreAllMocks(); jest.clearAllMocks();});
@@ -85,7 +92,7 @@ describe('Map (P4)', () => {
 
   it('routes from the real position once GPS is available; only foreground location APIs are used', async () => {
     jest.spyOn(PermissionsAndroid, 'request').mockResolvedValue(PermissionsAndroid.RESULTS.GRANTED);
-    Geolocation.getCurrentPosition.mockImplementation(success => success({coords: {latitude: 16.0, longitude: 108.1}}));
+    giveFix({latitude: 16.0, longitude: 108.1});
     mapboxApi.getDirections.mockResolvedValue({routes: [{distance: 1200, duration: 300, legs: [{steps: []}],
       geometry: {coordinates: [[108.1, 16.0], [108.2, 16.06]]}}]});
     let tree;
@@ -98,6 +105,7 @@ describe('Map (P4)', () => {
     expect(mapboxApi.getDirections).toHaveBeenCalledWith(expect.objectContaining({coordinates: '108.1,16;108.2,16.06'}));
     expect(Toast.show).not.toHaveBeenCalled();
     expect(Geolocation.watchPosition).toHaveBeenCalled();
+    expect(Geolocation.getCurrentPosition).not.toHaveBeenCalled();
     tree.unmount();
     expect(Geolocation.clearWatch).toHaveBeenCalled();
   });
@@ -107,9 +115,10 @@ describe('Map (P4)', () => {
   it('opens on the catalog area for a far (stale) fix, moves to the user once on the first nearby fix, then stays', async () => {
     jest.spyOn(PermissionsAndroid, 'request').mockResolvedValue(PermissionsAndroid.RESULTS.GRANTED);
     // Emulator default position (California): "you are here" is shown there, the map opens on the markers.
-    Geolocation.getCurrentPosition.mockImplementation(success => success({coords: {latitude: 37.42, longitude: -122.08}}));
     let onWatch;
-    Geolocation.watchPosition.mockImplementation(success => {onWatch = success; return 1;});
+    Geolocation.watchPosition
+      .mockImplementationOnce(success => {success({coords: {latitude: 37.42, longitude: -122.08, accuracy: 5}}); return 1;})
+      .mockImplementation(success => {onWatch = success; return 2;});
     let tree;
     await act(async () => {tree = renderer.create(React.createElement(MapScreen, props()));});
     expect(markerIds(tree)).toContain('myLocation');
@@ -121,22 +130,26 @@ describe('Map (P4)', () => {
     tree.unmount();
   });
 
-  it('uses the fused provider and retries a failed high-accuracy fix with normal accuracy', async () => {
+  it('uses the fused provider in high accuracy only; never LOW_POWER nor the crashing getCurrentPosition', async () => {
     expect(geoConfigCalls[0]).toEqual([expect.objectContaining({locationProvider: 'playServices'})]);
     jest.spyOn(PermissionsAndroid, 'request').mockResolvedValue(PermissionsAndroid.RESULTS.GRANTED);
-    Geolocation.getCurrentPosition
-      .mockImplementationOnce((success, failure) => failure({code: 3, message: 'timeout'}))
-      .mockImplementationOnce(success => success({coords: {latitude: 16.0, longitude: 108.1}}));
+    // An "unavailable" error does not end the wait; the next fix is used.
+    Geolocation.watchPosition.mockImplementation((success, failure) => {
+      failure({code: 2, message: 'unavailable'});
+      success({coords: {latitude: 16.0, longitude: 108.1, accuracy: 8}});
+      return 1;
+    });
     let tree;
     await act(async () => {tree = renderer.create(React.createElement(MapScreen, props()));});
-    expect(Geolocation.getCurrentPosition.mock.calls.map(call => call[2].enableHighAccuracy)).toEqual([true, false]);
+    expect(Geolocation.watchPosition.mock.calls.every(call => call[2].enableHighAccuracy === true)).toBe(true);
+    expect(Geolocation.getCurrentPosition).not.toHaveBeenCalled();
     expect(markerIds(tree)).toContain('myLocation');
     tree.unmount();
   });
 
   it('opens on the user when near the catalog, and on the focused place (even if not publishable) from Detail', async () => {
     jest.spyOn(PermissionsAndroid, 'request').mockResolvedValue(PermissionsAndroid.RESULTS.GRANTED);
-    Geolocation.getCurrentPosition.mockImplementation(success => success({coords: {latitude: 16.0, longitude: 108.1}}));
+    giveFix({latitude: 16.0, longitude: 108.1});
     let tree;
     await act(async () => {tree = renderer.create(React.createElement(MapScreen, props()));});
     expect(cameraCenter(tree)).toEqual([108.1, 16.0]);
@@ -146,6 +159,39 @@ describe('Map (P4)', () => {
       {...props(), route: {params: {locations: [hidden], showRoute: false}}}));});
     expect(markerIds(tree)).toEqual(['marker-0', 'myLocation']);
     expect(cameraCenter(tree)).toEqual([108.2, hidden.lat]);
+    tree.unmount();
+  });
+
+  it('festival mode shows every festival at its venue (any location with GPS) and opens its detail', async () => {
+    jest.spyOn(PermissionsAndroid, 'request').mockResolvedValue(PermissionsAndroid.RESULTS.DENIED);
+    const festival = (id, location_id) => ({id, name: `Lễ hội ${id}`, description: '', images: [], location_id,
+      event_time: '', content_en: {}});
+    // 10 at a publishable place, 11 at a non-publishable place, 12 at a place without GPS, 13 without a place.
+    const withFestivals = buildCatalogSnapshot(snapshot.locations,
+      [festival(10, 1), festival(11, 2), festival(12, 3), festival(13, null)]);
+    catalogRepository.get.mockResolvedValue(withFestivals);
+    const NavigationService = require('../src/container/screens/NavigationService');
+    const modeButton = (tree, key) => tree.root.find(node => node.type === require('react-native').TouchableOpacity &&
+      node.findAll(child => typeof child.props.children === 'string' && child.props.children.includes(key)).length > 0);
+    let tree;
+    await act(async () => {tree = renderer.create(React.createElement(MapScreen, props()));});
+    expect(markerIds(tree)).toEqual(['marker-0', 'marker-1']);
+    await act(async () => {modeButton(tree, 'common:map.modeFestivals').props.onPress();});
+    expect(markerIds(tree)).toEqual(['festival-10', 'festival-11']);
+    const venue = withFestivals.locationById.get(2);
+    expect(tree.root.find(node => node.props.id === 'festival-11').props.coordinate).toEqual([venue.long, venue.lat]);
+    await act(async () => {
+      tree.root.find(node => node.props.id === 'festival-10').findByType(require('react-native').TouchableOpacity).props.onPress();
+    });
+    expect(NavigationService.navigate).toHaveBeenCalledWith(undefined, {festival: withFestivals.festivalById.get(10)});
+    await act(async () => {modeButton(tree, 'common:map.modeLocations').props.onPress();});
+    expect(markerIds(tree)).toEqual(['marker-0', 'marker-1']);
+    tree.unmount();
+    // Opened for one place (from Detail): no mode switch.
+    await act(async () => {tree = renderer.create(React.createElement(MapScreen,
+      {...props(), route: {params: {locations: [withFestivals.locationById.get(1)], showRoute: false}}}));});
+    expect(tree.root.findAll(node => typeof node.props.children === 'string' &&
+      node.props.children.includes('common:map.modeFestivals'))).toHaveLength(0);
     tree.unmount();
   });
 });

@@ -127,6 +127,54 @@ describe('auth.api (backend)', () => {
     expect(request).toHaveBeenCalledTimes(1);
   });
 
+  it('login keeps the refresh pair and sends the user name in lower case (passwords stay as typed)', async () => {
+    const request = jest.spyOn(apiRequest, 'request').mockResolvedValue({data: {
+      access_token: 'a-1', expires_in: 3600, refresh_token: 'r-1', refresh_expires_in: 5184000, account: ACCOUNT}});
+    await authApi.login(' Seed1 ', 'MatKhau1');
+    expect(request.mock.calls[0][0].data).toEqual({user_name: 'seed1', password: 'MatKhau1'});
+    expect(store).toMatchObject({AUTH_TOKEN: 'a-1', REFRESH_TOKEN: 'r-1'});
+    expect(Number(store.AUTH_TOKEN_EXPIRES_AT)).toBeGreaterThan(Date.now() + 3500 * 1000);
+  });
+
+  it('a rejected access token is refreshed once and the request is sent again', async () => {
+    Object.assign(store, {AUTH_TOKEN: 'a-old', REFRESH_TOKEN: 'r-1'});
+    const refresh = jest.spyOn(apiRequest, 'post').mockResolvedValue({data: {
+      access_token: 'a-new', expires_in: 3600, refresh_token: 'r-2', account: {...ACCOUNT, full_name: 'Mới'}}});
+    const request = jest.spyOn(apiRequest, 'request')
+      .mockRejectedValueOnce(httpError(401, 'Phiên đăng nhập không hợp lệ hoặc đã hết hạn', {'www-authenticate': 'Bearer'}))
+      .mockResolvedValueOnce({data: ACCOUNT});
+    await expect(authApi.getUserById()).resolves.toMatchObject({id: 7});
+    expect(refresh).toHaveBeenCalledWith('/auth/refresh', {refresh_token: 'r-1'});
+    expect(request.mock.calls.map(call => call[0].headers.Authorization)).toEqual(['Bearer a-old', 'Bearer a-new']);
+    expect(store).toMatchObject({AUTH_TOKEN: 'a-new', REFRESH_TOKEN: 'r-2'});
+  });
+
+  it('refreshes before an expiring token is used, once for parallel calls', async () => {
+    Object.assign(store, {AUTH_TOKEN: 'a-old', REFRESH_TOKEN: 'r-1', AUTH_TOKEN_EXPIRES_AT: String(Date.now() + 10 * 1000)});
+    const refresh = jest.spyOn(apiRequest, 'post').mockResolvedValue({data: {
+      access_token: 'a-new', expires_in: 3600, refresh_token: 'r-2', account: ACCOUNT}});
+    const request = jest.spyOn(apiRequest, 'request').mockResolvedValue({data: ACCOUNT});
+    await Promise.all([authApi.getUserById(), authApi.getUserById()]);
+    expect(refresh).toHaveBeenCalledTimes(1);
+    expect(request.mock.calls.map(call => call[0].headers.Authorization)).toEqual(['Bearer a-new', 'Bearer a-new']);
+  });
+
+  it('a rejected refresh token ends the session; being offline does not', async () => {
+    Object.assign(store, {AUTH_TOKEN: 'a-old', REFRESH_TOKEN: 'r-1', AVT: JSON.stringify({id: 7})});
+    const rejected = httpError(401, 'Phiên đăng nhập không hợp lệ hoặc đã hết hạn', {'www-authenticate': 'Bearer'});
+    const refresh = jest.spyOn(apiRequest, 'post')
+      .mockRejectedValueOnce(Object.assign(new Error('Network Error'), {isAxiosError: true}));
+    const request = jest.spyOn(apiRequest, 'request').mockRejectedValue(rejected);
+    await expect(authApi.getUserById()).resolves.toBeNull();
+    expect(store.AUTH_TOKEN).toBe('a-old'); // offline: still signed in
+    refresh.mockRejectedValueOnce(httpError(401, 'Phiên đăng nhập không hợp lệ hoặc đã hết hạn', {'www-authenticate': 'Bearer'}));
+    await expect(authApi.getUserById()).resolves.toBeNull();
+    expect(store.AUTH_TOKEN).toBeUndefined();
+    expect(store.REFRESH_TOKEN).toBeUndefined();
+    expect(profile()).toBeNull();
+    expect(request).toHaveBeenCalledTimes(2);
+  });
+
   it('forgot password is debt N1: a disabled backend module gives a clear message', async () => {
     jest.spyOn(apiRequest, 'request').mockRejectedValue(httpError(404, 'Not Found'));
     await expect(authApi.sendOTPEmail('a@b.vn')).resolves.toEqual({success: false, error: 'Tính năng quên mật khẩu sẽ có ở bản sau'});

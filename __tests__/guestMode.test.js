@@ -20,7 +20,8 @@ jest.mock('../src/component/RecommendationsWidget', () => 'Recommendations');
 jest.mock('../src/component/SimilarItemsComponent', () => 'SimilarItems');
 jest.mock('react-native-paper', () => ({Button: 'Button', Searchbar: 'Searchbar'}));
 jest.mock('react-native-svg', () => ({__esModule: true, default: 'Svg', Circle: 'Circle', Line: 'Line'}));
-jest.mock('@react-native-community/geolocation', () => ({getCurrentPosition: jest.fn()}));
+// Home reads one precise fix through utils/preciseLocation (watchPosition, high accuracy).
+jest.mock('@react-native-community/geolocation', () => ({getCurrentPosition: jest.fn(), watchPosition: jest.fn(), clearWatch: jest.fn()}));
 jest.mock('react-native-toast-message', () => ({show: jest.fn()}));
 
 const Home = require('../src/container/screens/Home/HomeScreen').default;
@@ -95,7 +96,7 @@ describe('Phase 1 Guest Mode', () => {
     expect(tree.getInstance().state.locationsPopular).toHaveLength(3);
     await act(async () => {await findButton(tree, 'home.useMyLocation').props.onPress();});
     expect(permission).toHaveBeenCalledTimes(1);
-    expect(geo.getCurrentPosition).not.toHaveBeenCalled();
+    expect(geo.watchPosition).not.toHaveBeenCalled();
     expect(tree.getInstance().state).toMatchObject({nearbyStatus: 'denied', locationsNearly: []});
     expect(tree.getInstance().state.locationsPopular).toHaveLength(3);
     expect(tree.root.findAll(node => node.props.children === 'home.locationDenied').length).toBeGreaterThan(0);
@@ -106,7 +107,11 @@ describe('Phase 1 Guest Mode', () => {
     jest.replaceProperty(require('react-native').Platform, 'OS', 'android');
     jest.spyOn(catalogRepository, 'get').mockResolvedValue(nearbyCatalog());
     jest.spyOn(PermissionsAndroid, 'request').mockResolvedValue(PermissionsAndroid.RESULTS.GRANTED);
-    geo.getCurrentPosition.mockImplementationOnce(success => success({coords: {latitude: 16.0544, longitude: 108.2022}}));
+    geo.watchPosition.mockImplementationOnce((success, _error, options) => {
+      expect(options.enableHighAccuracy).toBe(true); // LOW_POWER positions are city-level
+      success({coords: {latitude: 16.0544, longitude: 108.2022, accuracy: 5}});
+      return 1;
+    });
     let tree;
     await act(async () => {tree = renderer.create(React.createElement(Home, props()));});
     await act(async () => {await findButton(tree, 'home.useMyLocation').props.onPress();});
@@ -114,7 +119,9 @@ describe('Phase 1 Guest Mode', () => {
     expect(state.nearbyStatus).toBe('ready');
     expect(state.locationsNearly.map(row => row.id)).toEqual([3, 1]);
     expect(state.locationsNearly[0].distanceKm).toBeLessThan(0.1);
-    geo.getCurrentPosition.mockClear();
+    expect(geo.getCurrentPosition).not.toHaveBeenCalled(); // crashes on Play Services with a second fix
+    expect(geo.clearWatch).toHaveBeenCalledWith(1);
+    geo.watchPosition.mockClear();
     tree.unmount();
   });
 
@@ -145,7 +152,7 @@ describe('Phase 1 Guest Mode', () => {
       await act(async () => {tree = renderer.create(React.createElement(Home, props()));});
       expect(tree.getInstance().state).toMatchObject({account: null, loading: false, error: true, locations: []});
       expect(permission).not.toHaveBeenCalled();
-      expect(geo.getCurrentPosition).not.toHaveBeenCalled();
+      expect(geo.watchPosition).not.toHaveBeenCalled();
       // P6: Home reads the locally stored profile (AVT) for signed-in features; no account request.
       expect(account.mock.calls).toEqual([['AVT']]);
       await act(async () => {tree.root.findByType(CatalogStatus).props.onRetry();});

@@ -51,8 +51,9 @@ export function setSessionRefreshedHandler(handler: typeof onRefreshed) {
 export const tokenStore = {
   /** Access token for a signed-in call, refreshed first when it is about to expire; null when signed out. */
   get: async (): Promise<string | null> => {
-    const [[, token], [, expiresAt]] = await AsyncStorage.multiGet([ACCESS_KEY, EXPIRES_AT_KEY]);
+    const token = await AsyncStorage.getItem(ACCESS_KEY);
     if (!token) {return null;}
+    const expiresAt = await AsyncStorage.getItem(EXPIRES_AT_KEY);
     if (expiresAt && Date.now() > Number(expiresAt) - REFRESH_MARGIN_MS) {
       try {
         return await refreshSession();
@@ -62,13 +63,22 @@ export const tokenStore = {
     }
     return token;
   },
+  /** Access token only (no expiry known, never refreshed early): kept for callers and tests. */
+  set: (token: string) => AsyncStorage.setItem(ACCESS_KEY, token),
   save: async (pair: TokenPair) => {
-    const entries: [string, string][] = [[ACCESS_KEY, pair.access_token]];
-    if (pair.refresh_token) {entries.push([REFRESH_KEY, pair.refresh_token]);}
-    if (pair.expires_in) {entries.push([EXPIRES_AT_KEY, String(Date.now() + pair.expires_in * 1000)]);}
-    await AsyncStorage.multiSet(entries);
+    await AsyncStorage.setItem(ACCESS_KEY, pair.access_token);
+    if (pair.refresh_token) {await AsyncStorage.setItem(REFRESH_KEY, pair.refresh_token);}
+    if (pair.expires_in) {
+      await AsyncStorage.setItem(EXPIRES_AT_KEY, String(Date.now() + pair.expires_in * 1000));
+    } else {
+      await AsyncStorage.removeItem(EXPIRES_AT_KEY);
+    }
   },
-  clear: () => AsyncStorage.multiRemove([ACCESS_KEY, REFRESH_KEY, EXPIRES_AT_KEY]),
+  clear: async () => {
+    await AsyncStorage.removeItem(ACCESS_KEY);
+    await AsyncStorage.removeItem(REFRESH_KEY);
+    await AsyncStorage.removeItem(EXPIRES_AT_KEY);
+  },
 };
 
 let refreshing: Promise<string | null> | null = null;
@@ -131,7 +141,7 @@ export async function apiCall<T>(config: AxiosRequestConfig & {signedIn?: boolea
   let refreshed = false;
   for (let attempt = 0; ; attempt++) {
     try {
-      return (await apiRequest.request<T>({...request, headers})).data;
+      return (await apiRequest.request<T>({...request, headers: {...headers}})).data;
     } catch (error) {
       const apiError = toApiError(error);
       // Access token rejected (expired early, revoked): refresh once and resend the same request.

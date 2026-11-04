@@ -44,5 +44,7 @@ export function getPreciseLocation(maxWaitMs = MAX_WAIT_MS): Promise<Geolocation
       },
       {enableHighAccuracy: true, distanceFilter: 0, interval: 1000, fastestInterval: 500, maximumAge: 0},
     );
+    // A fix delivered synchronously finished before watchId existed.
+    if (done) {Geolocation.clearWatch(watchId);}
   });
 }

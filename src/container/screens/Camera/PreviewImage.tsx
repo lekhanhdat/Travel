@@ -1,4 +1,5 @@
 import React from 'react';
+import i18n from '../../../i18n';
 import { TouchableOpacity, View, Platform, ActivityIndicator } from 'react-native';
 import Page from '../../../component/Page';
 import HeaderBase from '../../../component/HeaderBase';
@@ -6,10 +7,9 @@ import ImageView from 'react-native-image-viewing';
 import NavigationService from '../NavigationService';
 import sizes from '../../../common/sizes';
 import colors from '../../../common/colors';
-import {AI_RECOGNITION_TIMEOUT} from '../../../common/constants';
 import { SendSvg } from '../../../assets/ImageSvg';
-import RNFetchBlob from 'rn-fetch-blob';
-import { SERVER_URL } from '../../../utils/configs';
+import {detectImage, DetectError} from '../../../services/detect.api';
+import {requireLogin} from '../../../utils/requireLogin';
 import Toast from 'react-native-toast-message';
 import CameraResultModal from '../../../component/CameraResultModal';
 import TextBase from '../../../common/TextBase';
@@ -39,80 +39,33 @@ export default class PreviewImage extends React.PureComponent<IPreviewImageProps
     }
   }
 
+  // P8: POST /detect on Cloud Run with the account's token (same call as CameraScreen).
   uploadImage = async (filePath: string) => {
-    const url = `${SERVER_URL}/detect`;
-    console.log('=== UPLOAD IMAGE START ===');
-    console.log('Uploading image to:', url);
-    console.log('File path:', filePath);
-
+    if (!(await requireLogin())) {return;}
     this.setState({ isDetecting: true });
-
     try {
-      const response = await RNFetchBlob.config({
-        timeout: AI_RECOGNITION_TIMEOUT,
-      }).fetch(
-        'POST',
-        url,
-        {
-          'Content-Type': 'multipart/form-data',
-        },
-        [
-          {
-            name: 'image_file',
-            filename: 'image.jpg',
-            data: RNFetchBlob.wrap(filePath),
-          },
-        ],
-      );
-
-      console.log('Response status:', response.info().status);
-      console.log('Response data:', response?.data);
-
-      if (response.info().status === 200) {
-        try {
-          const content = JSON.parse(response?.data);
-          console.log('Parsed content:', content);
-
-          this.setState({
-            visible: true,
-            resultName: content.name || 'Không xác định',
-            resultDescription: content.description || 'Không có mô tả',
-            resultPhotoPath: filePath,
-          });
-
-          Toast.show({
-            type: 'success',
-            text1: 'Nhận diện thành công',
-            text2: 'Đã xử lý ảnh thành công',
-          });
-        } catch (parseError) {
-          console.log('Parse error:', parseError);
-          Toast.show({
-            type: 'error',
-            text1: 'Lỗi xử lý dữ liệu',
-            text2: 'Không thể xử lý kết quả từ server',
-          });
-        }
-      } else {
-        console.log('Server error status:', response.info().status);
-        Toast.show({
-          type: 'error',
-          text1: 'Lỗi server',
-          text2: `Server trả về lỗi: ${response.info().status}`,
-        });
-      }
+      const content = await detectImage(filePath);
+      this.setState({
+        visible: true,
+        resultName: content.name || i18n.t('common:ui.common.unknown'),
+        resultDescription: content.description || i18n.t('common:ui.common.noDescription'),
+        resultPhotoPath: filePath,
+      });
+      Toast.show({
+        type: 'success',
+        text1: i18n.t('common:ui.camera.recognized'),
+        text2: i18n.t('common:ui.camera.processed'),
+      });
     } catch (error) {
-      console.log('Upload error:', error);
       Toast.show({
         type: 'error',
-        text1: 'Lỗi kết nối',
-        text2: 'Không thể kết nối đến server. Vui lòng thử lại.',
+        text1: error instanceof DetectError ? i18n.t('common:ui.camera.notRecognized') : 'Lỗi kết nối',
+        text2: error instanceof DetectError ? error.message : i18n.t('common:ui.common.serverError'),
       });
     } finally {
       this.setState({
         isDetecting: false,
       });
-      console.log('=== UPLOAD IMAGE END ===');
     }
   };
 
@@ -124,7 +77,7 @@ export default class PreviewImage extends React.PureComponent<IPreviewImageProps
       Toast.show({
         type: 'error',
         text1: 'Lỗi',
-        text2: 'Không tìm thấy đường dẫn ảnh',
+        text2: i18n.t('common:ui.camera.noImagePath'),
       });
     }
   };
@@ -194,7 +147,7 @@ export default class PreviewImage extends React.PureComponent<IPreviewImageProps
               }}>
                 <ActivityIndicator size="large" color={colors.primary} />
                 <TextBase style={{ marginTop: sizes._12sdp, fontSize: sizes._16sdp }}>
-                  Đang nhận diện địa điểm...
+                  {i18n.t('common:ui.camera.recognizing')}
                 </TextBase>
               </View>
             </View>

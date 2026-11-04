@@ -7,8 +7,6 @@
 import CalendarSearchSvg from './svg/CalendarSearchSvg.svg';
 import Call from './svg/Call.svg';
 import CameraSvg from './svg/CameraSvg.svg';
-import CategorySvg from './svg/CategorySvg.svg';
-import ChartsSvg from './svg/ChartsSvg.svg';
 import ChatBotSvg from './svg/ChatBotSvg.svg';
 import ClockSvg from './svg/ClockSvg.svg';
 import CloseSvg from './svg/CloseSvg.svg';
@@ -20,7 +18,6 @@ import FriendsSvg from './svg/FriendsSvg.svg';
 import GlobeSvg from './svg/GlobeSvg.svg';
 import HomeSvg from './svg/HomeSvg.svg';
 import icon_camera from './svg/icon_camera.svg';
-import LibrarySvg from './svg/LibrarySvg.svg';
 import Lightning from './svg/Lightning.svg';
 import LightningOff from './svg/LightningOff.svg';
 import MapSvg from './svg/MapSvg.svg';
@@ -32,14 +29,11 @@ import SearchSvg from './svg/SearchSvg.svg';
 import SendSvg from './svg/SendSvg.svg';
 import Setting from './svg/Setting.svg';
 import TranslateSvg from './svg/TranslateSvg.svg';
-import VipSvg from './svg/VipSvg.svg';
   export {
     Add,
 CalendarSearchSvg,
 Call,
 CameraSvg,
-CategorySvg,
-ChartsSvg,
 ChatBotSvg,
 ClockSvg,
 CloseSvg,
@@ -51,7 +45,6 @@ FriendsSvg,
 GlobeSvg,
 HomeSvg,
 icon_camera,
-LibrarySvg,
 Lightning,
 LightningOff,
 MapSvg,
@@ -63,5 +56,4 @@ SearchSvg,
 SendSvg,
 Setting,
 TranslateSvg,
-VipSvg,
     }

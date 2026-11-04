@@ -118,4 +118,19 @@ describe('Translation Integration', () => {
       expect(getByTestId('translated-text').props.children).toBe('Save');
     });
   });
+
+  // P11.3: UI strings of the screens opened in P6–P10 come from common.json `ui.*`, in both languages.
+  it('has every ui.* key in vi and en, and screens get English after switching', async () => {
+    const flat = (tree: Record<string, any>, prefix = ''): string[] => Object.entries(tree).flatMap(([key, value]) =>
+      typeof value === 'string' ? [`${prefix}${key}`] : flat(value, `${prefix}${key}.`));
+    const vi = require('../../src/i18n/locales/vi/common.json').ui;
+    const en = require('../../src/i18n/locales/en/common.json').ui;
+    expect(flat(vi).sort()).toEqual(flat(en).sort());
+    expect(flat(vi).length).toBeGreaterThan(130);
+    await i18n.changeLanguage('en');
+    expect(i18n.t('common:ui.feed.post')).toBe('Post');
+    expect(i18n.t('common:ui.donation.thanks', {name: 'An', balance: '2.000'})).toBe('Thank you An for your support (2.000 VND)');
+    await i18n.changeLanguage('vi');
+    expect(i18n.t('common:ui.feed.post')).toBe('Đăng');
+  });
 });

@@ -20,12 +20,12 @@ interface IBigItemLocationProps {
 const BigItemLocation: React.FC<IBigItemLocationProps> = ({location, onPress}) => {
   const {t} = useTranslation('common');
 
-  const locationId = location.Id || location.id;
+  const locationId = location.id;
   const translatedName = locationId
-    ? translateLocationField(t, locationId, 'name', location.name)
+    ? translateLocationField(t, location, 'name', location.name)
     : location.name;
   const translatedDescription = locationId
-    ? translateLocationField(t, locationId, 'description', location.description)
+    ? translateLocationField(t, location, 'description', location.description)
     : location.description;
 
   return (

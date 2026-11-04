@@ -6,7 +6,6 @@ import {useRoute} from '@react-navigation/native';
 import {StyleSheet, View, Image, TouchableOpacity} from 'react-native';
 import {TranslationProvider} from '../context/TranslationContext';
 import {useTranslation} from '../hooks/useTranslation';
-import {offlineFallback} from '../services/translation';
 import images from '../res/images';
 import sizes from '../common/sizes';
 import TextBase from '../common/TextBase';
@@ -21,32 +20,30 @@ import {
   ProfileSvg,
 } from '../assets/ImageSvg';
 // P1: Keep deferred imports commented to avoid native/service initialization.
-// import LoginScreen from './screens/Login/LoginScreen';
+import LoginScreen from './screens/Login/LoginScreen';
 import HomeScreen from './screens/Home/HomeScreen';
-// import NewFeedScreen from './screens/NewFeed/NewFeedScreen';
-// import MapsScreen from './screens/Maps/MapScreenV2';
-// import CameraScreen from './screens/Camera/CameraScreen';
-// import ProfileScreen from './screens/Profile/ProfileScreen';
+import NewFeedScreen from './screens/NewFeed/NewFeedScreen';
+import MapsScreen from './screens/Maps/MapScreen';
+import CameraScreen from './screens/Camera/CameraScreen';
+import ProfileScreen from './screens/Profile/ProfileScreen';
 import ViewAllLocation from './screens/Home/ViewAllLocation';
 import DetailItemScreen from './screens/Home/DetailLocation';
-// import PreviewImage from './screens/Camera/PreviewImage';
+import PreviewImage from './screens/Camera/PreviewImage';
 import LocationImage from './screens/Home/LocationImage';
 import LocationVideo from './screens/Home/LocationVideo';
-// import Personal from './screens/Profile/Personal';
+import Personal from './screens/Profile/Personal';
 import Settings from './screens/Profile/Settings';
 import FAQ from './screens/Profile/FAQ';
 import Policy from './screens/Profile/Policy';
 import About from './screens/Profile/About';
-// import Advise from './screens/Maps/Advise';
-// import DetailItem from './screens/NewFeed/DetailItem';
-// import AllItemScreen from './screens/NewFeed/AllItemsScreen';
+import Advise from './screens/Maps/Advise';
 import FestivalsScreen from './screens/Festival/FestivalsScreen';
 import DetailFestivalScreen from './screens/Festival/DetailFestival';
 import ViewAllFestivals from './screens/Festival/ViewAllFestivals';
-// import SignUpScreen from './screens/Login/SignUpScreen';
+import SignUpScreen from './screens/Login/SignUpScreen';
 // import ForgotPasswordScreen from './screens/Login/ForgotPasswordScreen';
-// import Donation from './screens/Profile/Donation';
-// import ChatBotScreen from './screens/Profile/ChatbotScreen';
+import Donation from './screens/Profile/Donation';
+import ChatBotScreen from './screens/Profile/ChatbotScreen';
 
 export enum ScreenName {
   SPLASH_SCREEN = 'SplashScreen',
@@ -64,8 +61,6 @@ export enum ScreenName {
   POLICY = 'Policy',
   ABOUT = 'About',
   ADVISE = 'Advise',
-  DETAIL_ITEM = 'DetailItem',
-  VIEW_ALL_ITEM = 'ViewAllItem',
   SEARCH_sCREEN = 'SearchScreen',
   DETAIL_FESTIVAL_SCREEN = 'DetailFestivalScreen',
   VIEW_ALL_FESTIVALS = 'ViewAllFestivals',
@@ -84,6 +79,11 @@ export const TAB_NAMES = {
   CAMERA: 'TabCamera',
   PROFILE: 'TabProfile',
 } as const;
+
+// Fixed icon order for getTabIcon, independent of which tabs are currently enabled
+const TAB_ORDER: string[] = [
+  TAB_NAMES.HOME, TAB_NAMES.FESTIVAL, TAB_NAMES.FEED, TAB_NAMES.MAP, TAB_NAMES.CAMERA, TAB_NAMES.PROFILE,
+];
 
 // Translation keys for tab labels
 const TAB_TRANSLATION_KEYS = {
@@ -170,7 +170,7 @@ function MyTabBar({
             onPress={onPress}
             onLongPress={onLongPress}
             style={[styles.containerTouch]}>
-            {getTabIcon(index, isFocused)}
+            {getTabIcon(TAB_ORDER.indexOf(item.name), isFocused)}
             <TextBase
               style={[
                 styles.title,
@@ -250,7 +250,8 @@ function HomeStack() {
             ),
           }}
         />
-        {/* P1: Temporarily disabled; retain for restoration.
+        {/* P7: Feed restored (reviews via BE; writing needs an account). */}
+        {FEATURE_FLAGS.ENABLE_FEED && (
         <Tabs.Screen
           name={TAB_NAMES.FEED}
           component={NewFeedScreen}
@@ -266,8 +267,8 @@ function HomeStack() {
             ),
           }}
         />
-        */}
-        {/* P1: Temporarily disabled; retain for restoration.
+        )}
+        {/* P4: Map restored. */}
         <Tabs.Screen
           name={TAB_NAMES.MAP}
           component={MapsScreen}
@@ -281,8 +282,8 @@ function HomeStack() {
             ),
           }}
         />
-        */}
-        {/* P1: Temporarily disabled; retain for restoration.
+        {/* P8: Camera restored (POST /detect; recognising needs an account). */}
+        {FEATURE_FLAGS.ENABLE_CAMERA && (
         <Tabs.Screen
           name={TAB_NAMES.CAMERA}
           component={CameraScreen}
@@ -296,8 +297,8 @@ function HomeStack() {
             ),
           }}
         />
-        */}
-        {/* P1: Temporarily disabled; retain for restoration.
+        )}
+        {/* P6: Profile restored (guest sees Settings/FAQ/Policy/About + Login). */}
         <Tabs.Screen
           name={TAB_NAMES.PROFILE}
           component={ProfileScreen}
@@ -311,7 +312,6 @@ function HomeStack() {
             ),
           }}
         />
-        */}
       </Tabs.Navigator>
     </View>
   );
@@ -325,56 +325,42 @@ function AppContainer() {
       initialRouteName={ScreenName.HOME_STACK_SCREEN}
       screenOptions={{headerShown: false}}>
       <Stack.Screen name="HomeStack" component={HomeStack} />
-      {/* P1: Temporarily disabled; retain for restoration.
+      {/* P6: restored. */}
       <Stack.Screen name="LoginScreen" component={LoginScreen} />
-      */}
       <Stack.Screen name="ViewAllLocation" component={ViewAllLocation} />
       <Stack.Screen name="DetailLocationScreen" component={DetailItemScreen} />
-      {/* P1: Temporarily disabled; retain for restoration.
+      {/* P8: restored with Camera. */}
       <Stack.Screen name="PreviewImage" component={PreviewImage} />
-      */}
-      {/* P1: Temporarily disabled; retain for restoration.
+      {/* P4: Map restored. */}
       <Stack.Screen name="MapsScreen" component={MapsScreen} />
-      */}
       <Stack.Screen name="LocationImage" component={LocationImage} />
       <Stack.Screen name="LocationVideo" component={LocationVideo} />
-      {/* P1: Temporarily disabled; retain for restoration.
+      {/* P6: restored. */}
       <Stack.Screen name="Personal" component={Personal} />
-      */}
       <Stack.Screen name="Settings" component={Settings} />
       <Stack.Screen name="FAQ" component={FAQ} />
       <Stack.Screen name="Policy" component={Policy} />
       <Stack.Screen name="About" component={About} />
-      {/* P1: Temporarily disabled; retain for restoration.
+      {/* P4: restored with Map (popup button). */}
       <Stack.Screen name="Advise" component={Advise} />
-      */}
-      {/* P1: Temporarily disabled; retain for restoration.
-      <Stack.Screen name="DetailItem" component={DetailItem} />
-      */}
-      {/* P1: Temporarily disabled; retain for restoration.
-      <Stack.Screen name="ViewAllItem" component={AllItemScreen} />
-      */}
       <Stack.Screen name="SearchScreen" component={FestivalsScreen} />
       <Stack.Screen
         name="DetailFestivalScreen"
         component={DetailFestivalScreen}
       />
       <Stack.Screen name="ViewAllFestivals" component={ViewAllFestivals} />
-      {/* P1: Temporarily disabled; retain for restoration.
+      {/* P6: restored. */}
       <Stack.Screen name="SignUpScreen" component={SignUpScreen} />
-      */}
-      {/* P1: Temporarily disabled; retain for restoration.
+      {/* P1: Temporarily disabled; retain for restoration. Debt N1 (email module off).
       <Stack.Screen
         name="ForgotPasswordScreen"
         component={ForgotPasswordScreen}
       />
       */}
-      {/* P1: Temporarily disabled; retain for restoration.
+      {/* N2: Donation restored (PayOS via the Cloud Run API, module payments). */}
       <Stack.Screen name="Donation" component={Donation} />
-      */}
-      {/* P1: Temporarily disabled; retain for restoration.
+      {/* P9: restored (RAG chat on the BE; needs an account). */}
       <Stack.Screen name="ChatBotScreen" component={ChatBotScreen} />
-      */}
     </Stack.Navigator>
   );
 }
@@ -426,13 +412,6 @@ const styles = StyleSheet.create({
 });
 // Wrap AppContainer with TranslationProvider (replaces LanguageProvider)
 const AppWithTranslation = () => {
-  useEffect(() => {
-    // Initialize offline fallback translations
-    if (FEATURE_FLAGS.ENABLE_OFFLINE_CACHE) {
-      offlineFallback.initialize('vi');
-    }
-  }, []);
-
   return (
     <TranslationProvider>
       <AppContainer />

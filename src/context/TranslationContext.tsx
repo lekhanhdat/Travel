@@ -1,4 +1,3 @@
-import FEATURE_FLAGS from '../config/featureFlags';
 import React, {
   createContext,
   useContext,
@@ -9,7 +8,6 @@ import React, {
 } from 'react';
 import i18n from '../i18n';
 import LocalStorageCommon from '../utils/LocalStorageCommon';
-import {translationQueue} from '../services/translation';
 
 export type Language = 'vi' | 'en';
 
@@ -33,10 +31,8 @@ export const TranslationProvider: React.FC<TranslationProviderProps> = ({
   children,
 }) => {
   const [language, setLanguageState] = useState<Language>('vi');
-  const [isLoading, setIsLoading] = useState(false);
-  const [translations, setTranslations] = useState<Map<string, string>>(
-    new Map(),
-  );
+  // UI strings come from i18n only; there is no async translation any more.
+  const isLoading = false;
 
   useEffect(() => {
     loadLanguage();
@@ -65,56 +61,10 @@ export const TranslationProvider: React.FC<TranslationProviderProps> = ({
       setLanguageState(lang);
      // Sync with i18n
      await i18n.changeLanguage(lang);
-      setTranslations(new Map()); // Clear cached translations on language change
     } catch (error) {
       console.log('Error saving language:', error);
     }
   };
-
-  const translate = useCallback(
-    async (text: string): Promise<string> => {
-      if (!text) return '';
-
-     // 1. Check if it's an i18n key (contains ':' or '.')
-     if (text.includes(':') || text.includes('.')) {
-       // It's an i18n key, use i18n directly
-       if (i18n.exists(text)) {
-         return i18n.t(text, {lng: language});
-       }
-     }
-
-     // 2. Try to find it in i18n common namespace
-     const commonKey = `common.${text}`;
-     if (i18n.exists(commonKey)) {
-       return i18n.t(commonKey, {lng: language});
-     }
-
-      // Check local state cache
-     const cached = translations.get(text);
-      if (cached) return cached;
-
-     // 3. If not in i18n and language is English, return as-is
-     if (!FEATURE_FLAGS.USE_AZURE_TRANSLATOR || language === 'en') return text;
-
-     // 4. Use Azure Translator for dynamic content not in i18n
-      try {
-        setIsLoading(true);
-        const translated = await translationQueue.translate(
-         text,
-          language,
-          'en',
-        );
-       setTranslations(prev => new Map(prev).set(text, translated));
-        return translated;
-      } catch (error) {
-        console.error('Translation error:', error);
-       return text;
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [language, translations],
-  );
 
   const translateSync = useCallback(
     (text: string): string => {
@@ -134,16 +84,15 @@ export const TranslationProvider: React.FC<TranslationProviderProps> = ({
        return i18n.t(commonKey, {lng: language});
      }
 
-      // Check dynamic translations cache
-     const cached = translations.get(text);
-      if (cached) {
-        return cached;
-      }
-
      // Return original text if not found
      return text;
     },
-    [language, translations],
+    [language],
+  );
+
+  const translate = useCallback(
+    async (text: string): Promise<string> => translateSync(text),
+    [translateSync],
   );
 
   return (

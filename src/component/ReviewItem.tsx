@@ -1,5 +1,7 @@
 import React from 'react';
-import {Image, View, ScrollView, TouchableOpacity, Modal, Dimensions} from 'react-native';
+import i18n from '../i18n';
+import {Image, View, ScrollView, TouchableOpacity, Modal, Dimensions, Alert} from 'react-native';
+import Toast from 'react-native-toast-message';
 import {IReview} from '../common/types';
 import sizes from '../common/sizes';
 import TextBase from '../common/TextBase';
@@ -8,10 +10,15 @@ import {StarActive} from '../assets/assets/ImageSvg';
 import colors from '../common/colors';
 import {Avatar, getReviewAuthorName} from '../utils/avatarUtils';
 import CachedImage from './CachedImage';
+import reviewsApi from '../services/reviews.api';
+import {requireLogin} from '../utils/requireLogin';
 
 interface IReviewItemProps {
   review: IReview;
   isShowLocation?: boolean;
+  /** Signed-in account: its own reviews show "Xóa" instead of "Báo cáo". */
+  currentAccountId?: number;
+  onDeleted?: (reviewId: number) => void;
 }
 
 interface IReviewItemState {
@@ -43,8 +50,40 @@ export default class ReviewItem extends React.PureComponent<
     }
   }
 
+  // P7 (Play UGC policy): any signed-in user can report a review; several reports hide it on the BE.
+  handleReport = async () => {
+    if (!(await requireLogin())) {return;}
+    Alert.alert(i18n.t('common:ui.review.reportTitle'), i18n.t('common:ui.review.reportQuestion'), [
+      {text: i18n.t('common:ui.common.cancel'), style: 'cancel'},
+      {text: i18n.t('common:ui.review.report'), style: 'destructive', onPress: async () => {
+        try {
+          const message = await reviewsApi.report(this.props.review.id);
+          Toast.show({type: 'success', text1: message});
+        } catch (error: any) {
+          Toast.show({type: 'error', text1: error?.message || i18n.t('common:ui.review.reportFailed')});
+        }
+      }},
+    ]);
+  };
+
+  handleDelete = () => {
+    Alert.alert(i18n.t('common:ui.review.deleteTitle'), i18n.t('common:ui.review.deleteQuestion'), [
+      {text: i18n.t('common:ui.common.cancel'), style: 'cancel'},
+      {text: i18n.t('common:ui.common.delete'), style: 'destructive', onPress: async () => {
+        try {
+          await reviewsApi.remove(this.props.review.id);
+          this.props.onDeleted?.(this.props.review.id);
+          Toast.show({type: 'success', text1: i18n.t('common:ui.review.deleted')});
+        } catch (error: any) {
+          Toast.show({type: 'error', text1: error?.message || i18n.t('common:ui.review.deleteFailed')});
+        }
+      }},
+    ]);
+  };
+
   render(): React.ReactNode {
-    const {review} = this.props;
+    const {review, currentAccountId} = this.props;
+    const isOwn = currentAccountId !== undefined && review.accountId === currentAccountId;
     return (
       <View style={{marginBottom: sizes._16sdp}}>
         <View
@@ -125,13 +164,21 @@ export default class ReviewItem extends React.PureComponent<
           </ScrollView>
         )}
 
-        {this.props.isShowLocation && (
+        {this.props.isShowLocation && (review.location || review.festival) && (
           <TextBase
             style={[
               AppStyle.txt_16_regular,
               {marginTop: sizes._12sdp},
-            ]}>{`Địa điểm: ${review.location?.name}`}</TextBase>
+            ]}>{review.location ? i18n.t('common:ui.review.place', {name: review.location.name}) : i18n.t('common:ui.review.festival', {name: review.festival?.name})}</TextBase>
         )}
+
+        <TouchableOpacity
+          onPress={isOwn ? this.handleDelete : this.handleReport}
+          style={{alignSelf: 'flex-end', marginTop: sizes._8sdp}}>
+          <TextBase style={[AppStyle.txt_14_regular, {color: colors.primary_400}]}>
+            {isOwn ? i18n.t('common:ui.common.delete') : i18n.t('common:ui.review.report')}
+          </TextBase>
+        </TouchableOpacity>
 
         <View
           style={{

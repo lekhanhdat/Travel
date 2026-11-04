@@ -8,26 +8,26 @@ import {BackSvg, Clock, CardSvg, ThunderSvg} from '../../../assets/assets/ImageS
 import sizes from '../../../common/sizes';
 import colors from '../../../common/colors';
 import NavigationService from '../NavigationService';
-import {IFestival, IFestivalReview} from '../../../services/festivals.api';
-import {IReview} from '../../../common/types';
+import festivalsApi, {IFestival, IFestivalReview} from '../../../services/festivals.api';
+import {ILocation, IReview} from '../../../common/types';
 import TextBase from '../../../common/TextBase';
 import {AppStyle} from '../../../common/AppStyle';
 import ReviewItem from '../../../component/ReviewItem';
-import festivalsApi from '../../../services/festivals.api';
 import {StarActive, StarInActive} from '../../../assets/assets/ImageSvg';
 import {MapSvg, CalendarSearchSvg} from '../../../assets/ImageSvg';
 import {ScreenName} from '../../AppContainer';
 import {Button} from 'react-native-paper';
 import SimilarItemsComponent from '../../../component/SimilarItemsComponent';
 import {
-  withAzureTranslation,
-  WithAzureTranslationProps,
-} from '../../../hoc/withAzureTranslation';
+  withTranslation,
+  WithTranslationProps,
+} from '../../../hoc/withTranslation';
 import { translateFestivalField } from '../../../utils/translationHelpers';
+import catalogRepository from '../../../services/catalogRepository';
 import { catalogImage } from '../../../utils/catalogDisplay';
 import CachedImage from '../../../component/CachedImage';
 
-interface IDetailFestivalScreenProps extends WithAzureTranslationProps {
+interface IDetailFestivalScreenProps extends WithTranslationProps {
   navigation: any;
   route: any;
 }
@@ -35,8 +35,11 @@ interface IDetailFestivalScreenProps extends WithAzureTranslationProps {
 interface IDetailFestivalScreenState {
   catalogError: boolean;
   allFestivals: IFestival[];
+  /** Linked location from location_id, resolved via the repository index. */
+  venue: ILocation | null;
   showImageModal: boolean;
   selectedImageIndex: number;
+  reviews: IFestivalReview[] | null; // P7: GET /reviews?festival_id (null until loaded)
 }
 
 class DetailFestivalScreen extends React.PureComponent<
@@ -48,21 +51,35 @@ class DetailFestivalScreen extends React.PureComponent<
     this.state = {
       catalogError: false,
       allFestivals: [],
+      venue: null,
       showImageModal: false,
       selectedImageIndex: 0,
+      reviews: null,
     };
   }
 
   componentDidMount() {
-    // P1: if (FEATURE_FLAGS.RECOVERY_MODE) {return;}
     this.loadCatalog();
+    this.loadReviews();
   }
+
+  loadReviews = async () => {
+    const festival: IFestival | undefined = this.props.route?.params?.festival;
+    if (!festival) {return;}
+    try {
+      this.setState({reviews: await festivalsApi.getReviews(festival.id)});
+    } catch {
+      this.setState({reviews: []});
+    }
+  };
 
   loadCatalog = async (forceRefresh = false) => {
     this.setState({catalogError: false});
     try {
-      const festivals = await festivalsApi.getFestivals(forceRefresh);
-      this.setState({allFestivals: festivals});
+      const {festivals, locationById} = await catalogRepository.get(forceRefresh);
+      const festival: IFestival | undefined = this.props.route?.params?.festival;
+      const venue = festival?.location_id != null ? locationById.get(festival.location_id) ?? null : null;
+      this.setState({allFestivals: festivals, venue});
     } catch {
       this.setState({catalogError: true});
     }
@@ -108,7 +125,7 @@ class DetailFestivalScreen extends React.PureComponent<
       const festTypes = fest.types || [];
 
       // Không include chính festival hiện tại
-      if (fest.Id === currentFestival.Id) {
+      if (fest.id === currentFestival.id) {
         return false;
       }
 
@@ -128,25 +145,28 @@ class DetailFestivalScreen extends React.PureComponent<
     const festival: IFestival = this.props.route.params?.festival;
     const {t} = this.props;
 
-    const festivalId = festival.Id || festival.id;
+    const festivalId = festival.id;
     const translatedName = festivalId
-      ? translateFestivalField(t, festivalId, 'name', festival.name)
+      ? translateFestivalField(t, festival, 'name', festival.name)
       : festival.name;
     const translatedDescription = festivalId
-      ? translateFestivalField(t, festivalId, 'description', festival.description)
+      ? translateFestivalField(t, festival, 'description', festival.description)
       : festival.description;
     const translatedLocation = festivalId
-      ? translateFestivalField(t, festivalId, 'location', festival.location)
+      ? translateFestivalField(t, festival, 'location', festival.location)
       : festival.location;
     const translatedEventTime = festivalId
-      ? translateFestivalField(t, festivalId, 'event_time', festival.event_time)
+      ? translateFestivalField(t, festival, 'event_time', festival.event_time)
       : festival.event_time;
     const translatedTicketInfo = festivalId && festival.ticket_info
-      ? translateFestivalField(t, festivalId, 'ticket_info', festival.ticket_info)
+      ? translateFestivalField(t, festival, 'ticket_info', festival.ticket_info)
       : festival.ticket_info;
 
 
-    const avgRating = this.calculateAverageRating(festival.reviews);
+    // P7: fresh reviews when loaded, otherwise the catalog's BE-computed rating/review_count.
+    const reviews = this.state.reviews;
+    const avgRating = reviews ? this.calculateAverageRating(reviews) : festival.rating ?? 0;
+    const reviewCount = reviews ? reviews.length : festival.review_count ?? 0;
 
     return (
       <Page>
@@ -181,7 +201,7 @@ class DetailFestivalScreen extends React.PureComponent<
               </TextBase>
 
               {/* Average Rating Display */}
-              {festival.reviews && festival.reviews.length > 0 && (
+              {reviewCount > 0 && (
                 <View style={{
                   flexDirection: 'row',
                   alignItems: 'center',
@@ -206,7 +226,7 @@ class DetailFestivalScreen extends React.PureComponent<
                     );
                   })}
                   <TextBase style={[AppStyle.txt_16_regular, {marginLeft: sizes._8sdp}]}>
-                    {avgRating.toFixed(1)} ({festival.reviews.length})
+                    {avgRating.toFixed(1)} ({reviewCount})
                   </TextBase>
                 </View>
               )}
@@ -234,7 +254,15 @@ class DetailFestivalScreen extends React.PureComponent<
 
               {/* Location: hidden when the festival has no location_id */}
               {festival.location_id !== null && translatedLocation ? (
-                <View style={{flexDirection: 'row', alignItems: 'center', marginTop: sizes._12sdp}}>
+                <TouchableOpacity
+                  disabled={!this.state.venue}
+                  accessibilityRole="link"
+                  onPress={() => {
+                    if (this.state.venue) {
+                      NavigationService.navigate(ScreenName.DETAIL_LOCATION_SCREEN, {location: this.state.venue});
+                    }
+                  }}
+                  style={{flexDirection: 'row', alignItems: 'center', marginTop: sizes._12sdp}}>
                   <MapSvg
                     width={sizes._20sdp}
                     height={sizes._20sdp}
@@ -244,7 +272,12 @@ class DetailFestivalScreen extends React.PureComponent<
                     style={[AppStyle.txt_16_medium_detail, {marginLeft: sizes._8sdp, flex: 1, textAlign: 'justify'}]}>
                     {t('detail.location')}: {translatedLocation}
                   </TextBase>
-                </View>
+                  {this.state.venue ? (
+                    <TextBase style={[AppStyle.txt_14_bold, {color: colors.primary, marginLeft: sizes._8sdp}]}>
+                      {t('detail.viewLocation')} ›
+                    </TextBase>
+                  ) : null}
+                </TouchableOpacity>
               ) : null}
 
               {/* Ticket information */}
@@ -275,7 +308,7 @@ class DetailFestivalScreen extends React.PureComponent<
                   </View>
                   {festival.advise.map((advice, index) => {
                     const translatedAdvice = festivalId
-                      ? translateFestivalField(t, festivalId, 'advise', advice, index)
+                      ? translateFestivalField(t, festival, 'advise', advice, index)
                       : advice;
                     return (
                       <TextBase
@@ -368,10 +401,10 @@ class DetailFestivalScreen extends React.PureComponent<
               </View>
 
               {/* Semantic Similar Items from Backend */}
-              {FEATURE_FLAGS.ENABLE_AI && festival.Id && (
+              {FEATURE_FLAGS.ENABLE_AI && (
                 <SimilarItemsComponent
                   entityType="festival"
-                  entityId={festival.Id}
+                  entityId={festival.id}
                   title={t('detail.similarFestivalsAI')}
                   limit={5}
                 />
@@ -393,7 +426,7 @@ class DetailFestivalScreen extends React.PureComponent<
               </TextBase>
 
               <FlatList
-                data={festival.reviews}
+                data={reviews ?? []}
                 scrollEnabled={false}
                 renderItem={this.renderReviewItem}
                 keyExtractor={(item, index) => index.toString() + item.id}
@@ -503,4 +536,4 @@ class DetailFestivalScreen extends React.PureComponent<
   }
 }
 
-export default withAzureTranslation(DetailFestivalScreen);
+export default withTranslation(DetailFestivalScreen);

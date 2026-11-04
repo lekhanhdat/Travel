@@ -8,7 +8,6 @@ import colors from '../../../common/colors';
 import NavigationService from '../NavigationService';
 import {ILocation} from '../../../common/types';
 import YoutubePlayer from 'react-native-youtube-iframe';
-import {DB_URL} from '../../../utils/configs';
 
 interface Props {
   navigation: any;
@@ -71,10 +70,8 @@ export default class LocationImage extends React.PureComponent<Props, States> {
             <Text style={styles.sectionTitle}>Hình ảnh</Text>
             {location?.images && Array.isArray(location.images) && location.images.length > 0 ? (
               location.images.map((image, index) => {
-                // Kiểm tra xem image là string (URL) hay object có path
-                const imageUri = typeof image === 'string'
-                  ? image
-                  : `${DB_URL}/${image?.path}`;
+                // Catalog images are URL strings (validated by catalog.adapter).
+                const imageUri = image;
 
                 return (
                   <Image

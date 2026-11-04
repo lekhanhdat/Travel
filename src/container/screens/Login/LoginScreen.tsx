@@ -1,4 +1,5 @@
 import React from 'react';
+import i18n from '../../../i18n';
 import { View, StyleSheet, Image, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { TextInput } from 'react-native-paper';
 import Swiper from 'react-native-swiper';
@@ -11,9 +12,11 @@ import images from '../../../res/images';
 import { AppStyle } from '../../../common/AppStyle';
 import NavigationService from '../NavigationService';
 import { ScreenName } from '../../AppContainer';
-import { localStorageKey } from '../../../common/constants';
-import LocalStorageCommon from '../../../utils/LocalStorageCommon';
 import authApi from '../../../services/auth.api';
+
+interface ILoginScreenProps {
+  navigation?: {canGoBack: () => boolean; goBack: () => void};
+}
 
 interface ILoginScreenState {
   isSecureTextEntry: boolean;
@@ -23,8 +26,8 @@ interface ILoginScreenState {
   loading: boolean;
 }
 
-export default class LoginScreen extends React.PureComponent<{}, ILoginScreenState> {
-  constructor(props: {}) {
+export default class LoginScreen extends React.PureComponent<ILoginScreenProps, ILoginScreenState> {
+  constructor(props: ILoginScreenProps) {
     super(props);
     this.state = {
       isSecureTextEntry: true,
@@ -41,7 +44,7 @@ export default class LoginScreen extends React.PureComponent<{}, ILoginScreenSta
     if (!userName || !password) {
       Toast.show({
         type: 'error',
-        text1: 'Vui lòng nhập đầy đủ thông tin',
+        text1: i18n.t('common:ui.common.fillAll'),
       });
       return;
     }
@@ -54,32 +57,33 @@ export default class LoginScreen extends React.PureComponent<{}, ILoginScreenSta
       if (!account) {
         Toast.show({
           type: 'error',
-          text1: 'Tên tài khoản hoặc mật khẩu không chính xác',
+          text1: i18n.t('common:ui.login.wrongCredentials'),
         });
         this.setState({loading: false});
         return;
       }
 
-      // Save to local storage
-      await LocalStorageCommon.setItem(localStorageKey.USERNAME, account.userName);
-      await LocalStorageCommon.setItem(localStorageKey.PASSWORD, account.password);
-      await LocalStorageCommon.setItem(localStorageKey.AVT, account);
-
+      // authApi.login stored the session (token + profile); the password is never stored.
       Toast.show({
         type: 'success',
-        text1: 'Đăng nhập thành công!',
+        text1: i18n.t('common:ui.login.success'),
       });
 
       this.setState({loading: false});
-      NavigationService.push(ScreenName.HOME_STACK_SCREEN);
+      // Opened from a screen that needs an account: go back to it; otherwise start at Home.
+      if (this.props.navigation?.canGoBack()) {
+        this.props.navigation.goBack();
+      } else {
+        NavigationService.reset(ScreenName.HOME_STACK_SCREEN);
+      }
     } catch (error: any) {
-      console.error('❌ Login error:', error);
+      console.error('❌ Login error:', error?.message);
       this.setState({loading: false});
 
       Toast.show({
         type: 'error',
         text1: 'Lỗi kết nối',
-        text2: 'Không thể kết nối đến server. Vui lòng thử lại sau.',
+        text2: error?.message || i18n.t('common:ui.common.serverErrorLater'),
       });
     }
   };
@@ -116,14 +120,14 @@ export default class LoginScreen extends React.PureComponent<{}, ILoginScreenSta
         </View>
 
         <View style={styles.titleContainer}>
-          <Text style={styles.title}>Đăng nhập</Text>
+          <Text style={styles.title}>{i18n.t('common:ui.common.login')}</Text>
         </View>
 
         <View style={styles.container}>
           <TextInput
             mode="outlined"
-            label="Tên đăng nhập"
-            placeholder="Nhập tên đăng nhập"
+            label={i18n.t('common:ui.common.userName')}
+            placeholder={i18n.t('common:ui.common.userNamePlaceholder')}
             style={styles.textInput}
             outlineStyle={styles.inputOutline}
             textColor={colors.primary_950}
@@ -150,9 +154,10 @@ export default class LoginScreen extends React.PureComponent<{}, ILoginScreenSta
           />
 
           <TouchableOpacity
-            onPress={() => NavigationService.reset(ScreenName.FORGOT_PASSWORD)}
+            // Debt N1: email OTP is off in the backend; ForgotPasswordScreen stays out of navigation.
+            onPress={() => Toast.show({type: 'info', text1: i18n.t('common:ui.login.forgotSoon')})}
           >
-            <Text style={styles.forgotPassword}>Quên mật khẩu?</Text>
+            <Text style={styles.forgotPassword}>{i18n.t('common:ui.login.forgot')}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -169,18 +174,18 @@ export default class LoginScreen extends React.PureComponent<{}, ILoginScreenSta
                   { color: isLoginDisabled ? colors.primary_400 : colors.white },
                 ]}
               >
-                Đăng nhập
+                {i18n.t('common:ui.common.login')}
               </Text>
             )}
           </TouchableOpacity>
 
           <View style={styles.signupContainer}>
             <Text style={styles.signupText}>
-              Chưa có tài khoản?{' '}
+              {i18n.t('common:ui.login.noAccount')}{' '}
               <TouchableOpacity
                 onPress={() => NavigationService.reset(ScreenName.SIGN_UP)}
               >
-                <Text style={styles.signupLink}>Đăng ký</Text>
+                <Text style={styles.signupLink}>{i18n.t('common:ui.common.signup')}</Text>
               </TouchableOpacity>
             </Text>
           </View>

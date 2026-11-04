@@ -17,17 +17,18 @@ import {StarActive, StarInActive, ThunderSvg} from '../../../assets/assets/Image
 import {MapSvg, Call, GlobeSvg, ClockSvg, DirectionsSvg} from '../../../assets/ImageSvg';
 import {ScreenName} from '../../AppContainer';
 import {Button} from 'react-native-paper';
-import festivalsApi, {IFestival} from '../../../services/festivals.api';
+import {IFestival} from '../../../services/festivals.api';
 import SimilarItemsComponent from '../../../component/SimilarItemsComponent';
 import {
-  withAzureTranslation,
-  WithAzureTranslationProps,
-} from '../../../hoc/withAzureTranslation';
+  withTranslation,
+  WithTranslationProps,
+} from '../../../hoc/withTranslation';
 import { translateLocationField } from '../../../utils/translationHelpers';
+import catalogRepository from '../../../services/catalogRepository';
 import { catalogImage } from '../../../utils/catalogDisplay';
 import CachedImage from '../../../component/CachedImage';
 
-interface IDetailLocationScreenProps extends WithAzureTranslationProps {
+interface IDetailLocationScreenProps extends WithTranslationProps {
   navigation: any;
   route: any;
 }
@@ -38,6 +39,7 @@ interface IDetailLocationScreenState {
   showImageModal: boolean;
   selectedImageIndex: number;
   festivals: IFestival[];
+  reviews: IReview[] | null; // P7: GET /reviews?location_id (null until loaded)
 }
 
 class DetailLocationScreen extends React.PureComponent<
@@ -52,23 +54,47 @@ class DetailLocationScreen extends React.PureComponent<
       showImageModal: false,
       selectedImageIndex: 0,
       festivals: [],
+      reviews: null,
     };
   }
 
   componentDidMount() {
-    // P1: if (FEATURE_FLAGS.RECOVERY_MODE) {return;}
     this.loadCatalog();
+    this.loadReviews();
   }
+
+  loadReviews = async () => {
+    const location: ILocation = this.props.route.params?.location;
+    // P11.4: reviews are keyed by location id; hotels have none yet.
+    if (location.kind === 'hotel') {
+      this.setState({reviews: []});
+      return;
+    }
+    try {
+      this.setState({reviews: await locationApi.getReviews(false, location.id)});
+    } catch {
+      // Detail still works without reviews; the list shows "no reviews".
+      this.setState({reviews: []});
+    }
+  };
+
+  /** Fresh reviews when loaded, otherwise the catalog's BE-computed rating/review_count. */
+  getRatingSummary = (location: ILocation): {rating: number; count: number} => {
+    const {reviews} = this.state;
+    if (reviews) {
+      return {rating: locationApi.calculateAverageRating(reviews), count: reviews.length};
+    }
+    return {rating: location.rating ?? 0, count: location.review_count ?? 0};
+  };
 
   loadCatalog = async (forceRefresh = false) => {
     this.setState({catalogError: false});
     try {
-      const locations = await locationApi.getLocations(forceRefresh);
+      const catalog = await catalogRepository.get(forceRefresh);
       const location: ILocation = this.props.route.params?.location;
-      const locationId = location.id ?? location.Id;
-      if (forceRefresh) {festivalsApi.clearCache();}
-      const festivals = locationId == null ? [] : await festivalsApi.getFestivalsByLocationId(locationId);
-      this.setState({allLocations: locations, festivals});
+      // P11.4: a hotel id is not a location id (no linked festivals).
+      const festivals = location.kind === 'hotel' ? [] : catalog.festivalsByLocationId.get(location.id) ?? [];
+      this.setState({allLocations: catalog.locations, festivals});
     } catch {
       this.setState({catalogError: true});
     }
@@ -105,9 +131,7 @@ class DetailLocationScreen extends React.PureComponent<
       const locTypes = loc.types || [];
 
       // Không include chính location hiện tại (so sánh bằng Id/id hoặc name)
-      const currentId = currentLocation.Id || currentLocation.id;
-      const locId = loc.Id || loc.id;
-      if (currentId && locId && currentId === locId) {
+      if (currentLocation.id === loc.id) {
         return false;
       }
       if (loc.name === currentLocation.name) {
@@ -168,15 +192,18 @@ class DetailLocationScreen extends React.PureComponent<
     const location: ILocation = this.props.route.params?.location;
     const {t} = this.props;
 
-    const locationId = location.Id || location.id;
+    const locationId = location.id;
+    // Map/directions only for a valid GPS pair.
+    const hasGps = typeof location.lat === 'number' && typeof location.long === 'number' &&
+      Number.isFinite(location.lat) && Number.isFinite(location.long);
     const translatedName = locationId 
-      ? translateLocationField(t, locationId, 'name', location.name)
+      ? translateLocationField(t, location, 'name', location.name)
       : location.name;
     const translatedDescription = locationId
-      ? translateLocationField(t, locationId, 'description', location.description)
+      ? translateLocationField(t, location, 'description', location.description)
       : location.description;
     const translatedAddress = locationId && location.address
-      ? translateLocationField(t, locationId, 'address', location.address)
+      ? translateLocationField(t, location, 'address', location.address)
       : location.address;
 
     return (
@@ -193,7 +220,7 @@ class DetailLocationScreen extends React.PureComponent<
           onLeftIconPress={() => {
             NavigationService.pop();
           }}
-          rightIconSvgOne={FEATURE_FLAGS.ENABLE_MAP &&
+          rightIconSvgOne={FEATURE_FLAGS.ENABLE_MAP && hasGps &&
             <MapSvg
               width={sizes._24sdp}
               height={sizes._24sdp}
@@ -225,7 +252,7 @@ class DetailLocationScreen extends React.PureComponent<
               </TextBase>
 
               {/* Average Rating Display */}
-              {location.reviews && location.reviews.length > 0 && (
+              {this.getRatingSummary(location).count > 0 && (
                 <View style={{
                   flexDirection: 'row',
                   alignItems: 'center',
@@ -233,7 +260,7 @@ class DetailLocationScreen extends React.PureComponent<
                   marginTop: sizes._12sdp,
                 }}>
                   {Array.from([1, 2, 3, 4, 5]).map((i) => {
-                    const avgRating = locationApi.calculateAverageRating(location.reviews);
+                    const avgRating = this.getRatingSummary(location).rating;
                     return i <= Math.round(avgRating) ? (
                       <StarActive
                         key={i}
@@ -251,7 +278,7 @@ class DetailLocationScreen extends React.PureComponent<
                     );
                   })}
                   <TextBase style={[AppStyle.txt_16_regular, {marginLeft: sizes._8sdp}]}>
-                    {locationApi.calculateAverageRating(location.reviews).toFixed(1)} ({location.reviews.length})
+                    {this.getRatingSummary(location).rating.toFixed(1)} ({this.getRatingSummary(location).count})
                   </TextBase>
                 </View>
               )}
@@ -374,7 +401,7 @@ class DetailLocationScreen extends React.PureComponent<
                   >
                     {this.state.festivals.map((festival, index) => (
                       <TouchableOpacity
-                        key={`festival-${festival.Id || index}`}
+                        key={`festival-${festival.id}`}
                         onPress={() => {
                           NavigationService.navigate(ScreenName.DETAIL_FESTIVAL_SCREEN, {
                             festival: festival,
@@ -456,7 +483,7 @@ class DetailLocationScreen extends React.PureComponent<
                     : location.advise.split('\n')
                   ).map((advice, index) => {
                     const translatedAdvice = locationId
-                      ? translateLocationField(t, locationId, 'advise', advice.trim(), index)
+                      ? translateLocationField(t, location, 'advise', advice.trim(), index)
                       : advice.trim();
                     return (
                       <TextBase
@@ -470,7 +497,7 @@ class DetailLocationScreen extends React.PureComponent<
               )}
 
               {/* Buttons: Directions */}
-              {FEATURE_FLAGS.ENABLE_MAP && (
+              {FEATURE_FLAGS.ENABLE_MAP && hasGps && (
               <View style={{
                 flexDirection: 'row',
                 gap: sizes._12sdp,
@@ -507,11 +534,11 @@ class DetailLocationScreen extends React.PureComponent<
               </View>
               )}
 
-              {/* Semantic Similar Items from Backend */}
-              {FEATURE_FLAGS.ENABLE_AI && (location.Id || location.id) && (
+              {/* Semantic Similar Items from Backend (P11.4: hotels are not in the location index) */}
+              {FEATURE_FLAGS.ENABLE_AI && location.kind !== 'hotel' && (
                 <SimilarItemsComponent
                   entityType="location"
-                  entityId={location.Id || location.id!}
+                  entityId={location.id}
                   title={t('detail.similarLocations')}
                   limit={5}
                 />
@@ -533,7 +560,7 @@ class DetailLocationScreen extends React.PureComponent<
               </TextBase>
 
               <FlatList
-                data={location.reviews}
+                data={this.state.reviews ?? []}
                 scrollEnabled={false}
                 renderItem={this.renderItem}
                 keyExtractor={(item, index) => index.toString() + item.id}
@@ -643,4 +670,4 @@ class DetailLocationScreen extends React.PureComponent<
   }
 }
 
-export default withAzureTranslation(DetailLocationScreen);
+export default withTranslation(DetailLocationScreen);

@@ -22,11 +22,14 @@ import {localStorageKey} from '../../../common/constants';
 import {Avatar, getDisplayName} from '../../../utils/avatarUtils';
 import {UserSvg} from '../../../assets/assets/ImageSvg';
 import {Button} from 'react-native-paper';
-import {withAzureTranslation, WithAzureTranslationProps} from '../../../hoc/withAzureTranslation';
+import {withTranslation, WithTranslationProps} from '../../../hoc/withTranslation';
+import Toast from 'react-native-toast-message';
+import authApi from '../../../services/auth.api';
+import {requireLogin} from '../../../utils/requireLogin';
 
 const {StatusBarManager} = NativeModules;
 
-interface IProfileScreenProps extends WithAzureTranslationProps {
+interface IProfileScreenProps extends WithTranslationProps {
   navigation?: any;
 }
 
@@ -74,6 +77,36 @@ class ProfileScreen extends React.PureComponent<
     this.setState({
       account: response,
     });
+  };
+
+  // P6: guests are sent to Login; Chatbot (P9) and Donation (debt N2) are not routed yet.
+  openDonation = async () => {
+    if (await requireLogin()) {
+      NavigationService.navigate(ScreenName.DONATION);
+    }
+  };
+
+  openChatbot = async () => {
+    if (await requireLogin()) {
+      NavigationService.navigate(ScreenName.CHATBOT);
+    }
+  };
+
+  showComingSoon = () => {
+    Toast.show({type: 'info', text1: this.props.t('profile.comingSoon')});
+  };
+
+  openAccountInfo = async () => {
+    if (await requireLogin()) {
+      NavigationService.navigate(ScreenName.PERSONAL);
+    }
+  };
+
+  handleLogout = async () => {
+    await authApi.logout();
+    this.setState({account: undefined});
+    Toast.show({type: 'success', text1: this.props.t('profile.loggedOut')});
+    NavigationService.reset(ScreenName.HOME_STACK_SCREEN);
   };
 
   render(): React.ReactNode {
@@ -137,9 +170,8 @@ class ProfileScreen extends React.PureComponent<
                 alignItems: 'center',
                 justifyContent: 'center',
               }}
-              onPress={() => {
-                NavigationService.navigate(ScreenName.CHATBOT);
-              }}>
+              // P9: chatbot route restored; guests are asked to log in first.
+              onPress={this.openChatbot}>
               <ChatBotSvg
                 width={sizes._20sdp}
                 height={sizes._20sdp}
@@ -194,15 +226,12 @@ class ProfileScreen extends React.PureComponent<
                 borderRadius: sizes._1000sdp,
                 alignItems: 'center',
                 justifyContent: 'center',
-              }}>
-
+              }}
+              onPress={this.openAccountInfo}>
               <UserSvg
                 width={sizes._20sdp}
                 height={sizes._20sdp}
                 color={colors.primary_950}
-                onPress={() => {
-                  NavigationService.navigate(ScreenName.PERSONAL);
-                }}
               />
             </TouchableOpacity>
           </View>
@@ -224,9 +253,8 @@ class ProfileScreen extends React.PureComponent<
                 alignItems: 'center',
                 justifyContent: 'center',
               }}
-              onPress={() => {
-                NavigationService.navigate(ScreenName.DONATION);
-              }}>
+              // N2: Donation routed; guests are asked to log in first.
+              onPress={this.openDonation}>
               <TextBase style={{
                 fontSize: sizes._16sdp,
                 fontWeight: 'bold',
@@ -378,9 +406,13 @@ class ProfileScreen extends React.PureComponent<
               mode="contained"
               labelStyle={{ fontSize: 16, height: sizes._30sdp, textAlignVertical: 'center', color: '#B22222' }}
               onPress={() => {
-                NavigationService.reset(ScreenName.LOGIN_SCREEN);
+                if (account) {
+                  this.handleLogout();
+                } else {
+                  NavigationService.navigate(ScreenName.LOGIN_SCREEN);
+                }
               }}>
-              {t('profile.logout')}
+              {account ? t('profile.logout') : t('auth.login')}
             </Button>
             {/* <TouchableOpacity
               style={[styles.btn]}
@@ -413,4 +445,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default withAzureTranslation(ProfileScreen);
+export default withTranslation(ProfileScreen);

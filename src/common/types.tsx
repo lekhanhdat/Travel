@@ -1,7 +1,7 @@
+// Profile as returned by the backend (services/auth.api.ts toAccount); never holds a password.
 export interface IAccount {
-  Id?: number; // NocoDB primary key
+  id: number;
   userName: string;
-  password: string;
   fullName?: string; // Họ và tên đầy đủ
   email?: string; // Email for password recovery
   avatar?: string; // Avatar URL (optional, default to ProfileSvg)
@@ -14,8 +14,7 @@ export interface IAccount {
 }
 
 export interface ILocation {
-  Id?: number; // Optional vì data có cả 'id' và 'Id'
-  id?: number; // Optional vì data có cả 'id' và 'Id'
+  id: number; // API primary key
   name: string;
   avatar: string;
   address: string;
@@ -23,12 +22,14 @@ export interface ILocation {
   long_description?: string; // Detailed description for DetailLocation screen (falls back to description if empty)
   record_id?: string;
   rating?: number | null;
+  review_count?: number; // P7: number of visible reviews (BE); rating is their average
+  content_en?: Record<string, string | string[]>; // P11: English values by field (translationHelpers)
+  kind?: 'hotel'; // P11.4: hotel record (own ids): no reviews/festivals/similar in Detail
+  category?: string | null; // hotels only
   lat: number | null;
   long: number | null;
   types?: string[]; // Array of location types (e.g., ["museum", "attraction", "historical"])
   haveVoice?: boolean; // DƯ THỪA - chỉ cần check voiceName
-  reviews: IReview[];
-  // item?: IItem[];
   recommendation?: string; // KHÔNG ĐƯỢC SỬ DỤNG - nên là optional
   icon?: any;
   voiceName?: string;
@@ -44,6 +45,7 @@ export interface ILocation {
 
 export interface IReview {
   id: number;
+  accountId?: number; // P7: author's account (BE reviews); used to show "Xóa" on own reviews
   content: string;
   name_user_review: string;
   fullName?: string; // Full name of user (preferred over name_user_review)
@@ -51,16 +53,8 @@ export interface IReview {
   start: number;
   avatar: string;
   location?: ILocation;
+  festival?: {id: number; name: string}; // P7: set for festival reviews (Feed shows its name)
   images?: string[]; // Array of image URLs uploaded by user
-}
-
-export interface IItem {
-  Id: number;
-  name: string;
-  description: string;
-  video?: string;
-  images?: any[];
-  location?: Pick<ILocation, 'Id' | 'name'>;
 }
 
 export interface ITransaction {

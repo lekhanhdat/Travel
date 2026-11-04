@@ -14,21 +14,26 @@ import {
   storeMemory,
   getUserMemories,
   generateSessionId,
+  cacheControls,
   SemanticSearchRequest,
   RAGChatRequest,
   StoreMemoryRequest,
 } from '../../src/services/semantic.api';
 
-// Mock axios
-jest.mock('axios');
-const mockedAxios = axios as jest.Mocked<typeof axios>;
-
-// Mock axios.create to return our mocked axios instance
-mockedAxios.create = jest.fn().mockReturnValue(mockedAxios);
+// Mock axios: axios.create() (called when semantic.api loads) returns one shared instance.
+// P9.6: automock left create() returning undefined, so the suite never ran.
+jest.mock('axios', () => {
+  const instance = {get: jest.fn(), post: jest.fn(), interceptors: {request: {use: jest.fn()}}};
+  return {__esModule: true, default: {...instance, create: jest.fn(() => instance)}};
+});
+const mockedAxios = (axios as any).create() as jest.Mocked<typeof axios>;
 
 describe('Semantic API Service', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    // Reset queued mockResolvedValueOnce values and the module's query cache between tests.
+    mockedAxios.get.mockReset();
+    mockedAxios.post.mockReset();
+    cacheControls.invalidateAll();
   });
 
   // ============ searchSemantic Tests ============
@@ -175,9 +180,8 @@ describe('Semantic API Service', () => {
       const result = await clearChatSession('session_123');
 
       expect(result).toBe(true);
-      expect(mockedAxios.post).toHaveBeenCalledWith('/api/v1/chat/clear-session', {
-        session_id: 'session_123',
-      });
+      // The BE reads session_id from the query string (routers/chat.py).
+      expect(mockedAxios.post).toHaveBeenCalledWith('/api/v1/chat/clear-session?session_id=session_123');
     });
 
     it('should return false on error', async () => {
@@ -281,7 +285,8 @@ describe('Semantic API Service', () => {
     });
 
     it('should handle errors', async () => {
-      mockedAxios.get.mockRejectedValueOnce(new Error('Server error'));
+      // A server error without a detail falls back to the default message (no response → network message).
+      mockedAxios.get.mockRejectedValueOnce({response: {status: 500, data: {}}});
 
       const result = await getRecommendations(1);
 
@@ -368,7 +373,8 @@ describe('Semantic API Service', () => {
     });
 
     it('should handle errors', async () => {
-      mockedAxios.get.mockRejectedValueOnce(new Error('Server error'));
+      // A server error without a detail falls back to the default message (no response → network message).
+      mockedAxios.get.mockRejectedValueOnce({response: {status: 500, data: {}}});
 
       const result = await getUserMemories(1);
 

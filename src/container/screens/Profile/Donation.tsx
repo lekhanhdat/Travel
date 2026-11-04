@@ -1,4 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
+import i18n from '../../../i18n';
 import {StyleSheet, View} from 'react-native';
 import Page from '../../../component/Page';
 import HeaderBase from '../../../component/HeaderBase';
@@ -10,7 +11,6 @@ import InputBase from '../../../component/InputBase';
 import {Button} from 'react-native-paper';
 import {AppStyle} from '../../../common/AppStyle';
 import paymentApi from '../../../services/payment.api';
-import {env} from '../../../utils/env';
 import LocalStorageCommon from '../../../utils/LocalStorageCommon';
 import {localStorageKey} from '../../../common/constants';
 import {IAccount} from '../../../common/types';
@@ -33,14 +33,13 @@ const Donation = () => {
   const pollRef = useRef<number | null>(null);
 
   useEffect(() => {
-    // Load current user id from local storage and fetch latest data from NocoDB
+    // Load current user id from local storage and fetch the latest profile (balance) from the API
     (async () => {
       try {
         const acc: IAccount = await LocalStorageCommon.getItem(localStorageKey.AVT);
-        if (acc?.Id) {
-          setUserId(acc.Id);
-          // Fetch latest user data from NocoDB to get updated balance
-          const latestUserData = await authApi.getUserById(acc.Id);
+        if (acc?.id) {
+          setUserId(acc.id);
+          const latestUserData = await authApi.getUserById(acc.id);
           if (latestUserData) {
             setUserAccount(latestUserData);
             // Update LocalStorage with latest data
@@ -61,13 +60,9 @@ const Donation = () => {
 
   const onCreate = async () => {
     try {
-      if (!env.PAYOS_BACKEND_URL) {
-        alert('Chưa cấu hình PAYOS_BACKEND_URL trong env.local.json');
-        return;
-      }
       const amt = parseInt(amount || '0', 10);
-      if (!amt || amt < 1000) {
-        alert('Số tiền không hợp lệ (>= 1.000 VND)');
+      if (!amt || amt < 1000 || amt > 50000000) {
+        alert(i18n.t('common:ui.donation.invalidAmount'));
         return;
       }
       setCreating(true);
@@ -81,10 +76,15 @@ const Donation = () => {
         pollRef.current = (setInterval(async () => {
           try {
             const status = await paymentApi.getStatus(res.orderCode);
-            if (status.status === 'PAID') {
+            if (status.status === 'CANCELLED' || status.status === 'EXPIRED') {
               if (pollRef.current != null) {clearInterval(pollRef.current as any);}
               pollRef.current = null;
-              alert('Thanh toán thành công! Số dư sẽ được cộng tự động.');
+              setQrCode(undefined);
+              alert(i18n.t('common:ui.donation.expired'));
+            } else if (status.status === 'PAID') {
+              if (pollRef.current != null) {clearInterval(pollRef.current as any);}
+              pollRef.current = null;
+              alert(i18n.t('common:ui.donation.paid'));
               // Quay về trang Profile
               // @ts-ignore
               require('../NavigationService').default.pop();
@@ -96,7 +96,7 @@ const Donation = () => {
       }
     } catch (e: any) {
       console.error(e);
-      alert(e?.message ?? 'Không thể tạo QR.');
+      alert(e?.message ?? i18n.t('common:ui.donation.qrFailed'));
     } finally {
       setCreating(false);
     }
@@ -105,7 +105,7 @@ const Donation = () => {
   return (
     <Page>
       <HeaderBase
-        title={'Donation'}
+        title={i18n.t('common:ui.donation.title')}
         leftIconSvg={<BackSvg width={sizes._24sdp} height={sizes._24sdp} color={colors.primary_950} />}
         onLeftIconPress={() => {
           // @ts-ignore
@@ -115,27 +115,29 @@ const Donation = () => {
       <View style={styles.content}>
         {userAccount && (
           <TextBase style={[AppStyle.txt_16_medium, {color: colors.primary_700, marginBottom: sizes._8sdp}]}>
-            Cảm ơn {userAccount.fullName || userAccount.userName} đã ủng hộ (
-            {userAccount.balance?.toLocaleString('vi-VN') || '0'} VND)
+            {i18n.t('common:ui.donation.thanks', {
+              name: userAccount.fullName || userAccount.userName,
+              balance: userAccount.balance?.toLocaleString('vi-VN') || '0',
+            })}
           </TextBase>
         )}
-        <TextBase style={[AppStyle.txt_18_bold]}>Enter amount (VND)</TextBase>
+        <TextBase style={[AppStyle.txt_18_bold]}>{i18n.t('common:ui.donation.amount')}</TextBase>
         <InputBase
-          placeHolder={'Example: 50000'}
+          placeHolder={i18n.t('common:ui.donation.amountExample')}
           initValue={amount}
           onChangeText={(t: string) => setAmount(t.replace(/[^0-9]/g, ''))}
         />
         <Button mode="contained" loading={creating} onPress={onCreate}>
-          Create VietQR Code
+          {i18n.t('common:ui.donation.create')}
         </Button>
 
         {qrCode && (
           <View style={{marginTop: sizes._16sdp, alignItems: 'center'}}>
-            <TextBase style={[AppStyle.txt_16_medium, {marginBottom: sizes._8sdp}]}>Scan QR to donate</TextBase>
+            <TextBase style={[AppStyle.txt_16_medium, {marginBottom: sizes._8sdp}]}>{i18n.t('common:ui.donation.scan')}</TextBase>
             <QRCode value={qrCode} size={sizes.width - sizes._64sdp} />
             {!!orderCode && (
               <TextBase style={{marginTop: sizes._8sdp, color: colors.primary_700}}>
-                Order code: {orderCode}
+                {i18n.t('common:ui.donation.orderCode', {orderCode})}
               </TextBase>
             )}
           </View>

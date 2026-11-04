@@ -12,7 +12,7 @@ import Svg, {Circle, Line} from 'react-native-svg';
 import {CloseSvg} from '../assets/ImageSvg';
 import colors from '../common/colors';
 import sizes from '../common/sizes';
-import {convertCitationVietnameseUnsigned} from '../utils/Utils';
+import {searchCatalog} from '../utils/catalogSearch';
 import {
   searchSemantic,
   EntityType,
@@ -64,7 +64,12 @@ interface SemanticSearchBarComponentProps<T> {
   containerStyle?: any;
   entityType: EntityType; // 'location' | 'festival' | 'item'
   idField?: keyof T; // Field to match entity_id from semantic search
+  onQueryChange?: (text: string) => void; // P11.4: e.g. Home loads hotels on the first keystroke
 }
+
+// P11.4: hotels have their own ids (they collide with location ids) and are not in the semantic index,
+// so they never match semantic results by id; they are added by keyword instead.
+const isHotel = (item: unknown) => (item as {kind?: string} | null)?.kind === 'hotel';
 
 interface SemanticSearchBarComponentState<T> {
   searchValue: string;
@@ -99,20 +104,7 @@ export default class SemanticSearchBarComponent<T> extends React.PureComponent<
     const {data, searchFields} = this.props;
     if (!searchValue || searchValue.trim().length === 0) {return data;}
 
-    const normalizedSearch = convertCitationVietnameseUnsigned(searchValue)
-      ?.toLowerCase()
-      .trim();
-
-    return data.filter(item => {
-      return searchFields.some(field => {
-        const fieldValue = item[field];
-        if (fieldValue === null || fieldValue === undefined) {return false;}
-        const normalizedFieldValue = convertCitationVietnameseUnsigned(
-          String(fieldValue),
-        )?.toLowerCase();
-        return normalizedFieldValue?.includes(normalizedSearch);
-      });
-    });
+    return searchCatalog(data, searchValue, searchFields);
   };
 
   /**
@@ -133,7 +125,7 @@ export default class SemanticSearchBarComponent<T> extends React.PureComponent<
   // Semantic search using AI - returns results and stores in state
   performSemanticSearch = async (query: string): Promise<T[]> => {
     if (!FEATURE_FLAGS.ENABLE_AI) {return this.filterDataKeyword(query);}
-    const {data, entityType, idField = 'Id' as keyof T} = this.props;
+    const {data, entityType, idField = 'id' as keyof T} = this.props;
 
     console.log('🔍 [SemanticSearch] Starting search...');
     console.log('  📋 Query:', query);
@@ -182,7 +174,7 @@ export default class SemanticSearchBarComponent<T> extends React.PureComponent<
 
         // Log local data IDs for comparison
         const localIds = data.slice(0, 5).map(item => {
-          const id = item[idField] || (item as any).id || (item as any).Id;
+          const id = item[idField];
           return { id, type: typeof id };
         });
         console.log('  📋 Local data IDs (first 5):', localIds);
@@ -200,7 +192,8 @@ export default class SemanticSearchBarComponent<T> extends React.PureComponent<
         // Match local data with API results and attach scores
         const matchedWithScores: Array<{item: T; score: number}> = [];
         data.forEach(item => {
-          const itemId = item[idField] || (item as any).id || (item as any).Id;
+          if (isHotel(item)) {return;}
+          const itemId = item[idField];
           const matchesNumber = resultIdSet.has(Number(itemId));
           const matchesString = resultIdSet.has(String(itemId));
           if (matchesNumber || matchesString) {
@@ -238,12 +231,16 @@ export default class SemanticSearchBarComponent<T> extends React.PureComponent<
         if (finalResults.length > 0) {
           console.log('  📊 Final results sorted by relevance:');
           finalResults.slice(0, 5).forEach((item, i) => {
-            const id = Number((item[idField] || (item as any).id || (item as any).Id));
+            const id = Number((item[idField]));
             const name = (item as any).name || (item as any).Name || 'Unknown';
             const score = scoreMap.get(id) || 0;
             console.log(`    ${i + 1}. "${name}" (score: ${score.toFixed(2)})`);
           });
         }
+
+        // Hotels matching the words (keyword search) follow the semantic results.
+        const hotels = searchCatalog(data.filter(isHotel), query, this.props.searchFields);
+        finalResults = [...finalResults, ...hotels];
 
         this.setState({lastFilteredData: finalResults, isSearching: false});
         return finalResults;
@@ -265,6 +262,7 @@ export default class SemanticSearchBarComponent<T> extends React.PureComponent<
 
   handleSearchChange = (text: string) => {
     const {data} = this.props;
+    this.props.onQueryChange?.(text);
     const {useSemanticSearch} = this.state;
     this.setState({searchValue: text});
 

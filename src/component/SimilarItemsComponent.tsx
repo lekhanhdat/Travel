@@ -23,8 +23,7 @@ import {
   SimilarItem,
   EntityType,
 } from '../services/semantic.api';
-import locationApi from '../services/locations.api';
-import festivalsApi from '../services/festivals.api';
+import catalogRepository from '../services/catalogRepository';
 
 interface SimilarItemsComponentProps {
   entityType: EntityType;
@@ -80,24 +79,19 @@ const SimilarItemsComponent: React.FC<SimilarItemsComponentProps> = ({
     similarItems: SimilarItem[],
   ): Promise<EnrichedSimilarItem[]> => {
     // Fetch full data for navigation
-    const [locations, festivals] = await Promise.all([
-      locationApi.getLocations(),
-      festivalsApi.getFestivals(),
-    ]);
+    const {locationById, festivalById} = await catalogRepository.get();
 
     return similarItems.map(item => {
       let fullData = null;
       let avatar = item.image_url || '';
 
       if (item.entity_type === 'location') {
-        fullData = locations.find(
-          loc => loc.Id === item.entity_id || loc.id === item.entity_id,
-        );
+        fullData = locationById.get(item.entity_id) ?? null;
         if (fullData) {
           avatar = fullData.avatar || (fullData.images?.[0]) || avatar;
         }
       } else if (item.entity_type === 'festival') {
-        fullData = festivals.find(fest => fest.Id === item.entity_id);
+        fullData = festivalById.get(item.entity_id) ?? null;
         if (fullData) {
           // Cloud Run festivals expose images, without an avatar field.
           // Legacy: avatar = fullData.avatar || (fullData.images?.[0]) || avatar;

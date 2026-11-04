@@ -8,6 +8,24 @@ import {render, waitFor, fireEvent} from '@testing-library/react-native';
 import RecommendationsWidget from '../../src/component/RecommendationsWidget';
 import * as semanticApi from '../../src/services/semantic.api';
 
+// P9.6: ESM-only native helper (mocked in every other suite too).
+jest.mock('react-native-iphone-x-helper', () => ({isIphoneX: () => false}));
+jest.mock('../../src/container/AppContainer', () => ({ScreenName: {
+  DETAIL_LOCATION_SCREEN: 'DetailLocationScreen', DETAIL_FESTIVAL_SCREEN: 'DetailFestivalScreen',
+}}));
+
+// P9.6: the components enrich results from the shared catalog; never hit the real API in tests
+// (on CI the network call outlived waitFor's 1 s and the widget stayed on "loading").
+jest.mock('../../src/services/catalogRepository', () => {
+  const actual = jest.requireActual('../../src/services/catalogRepository');
+  const snapshot = actual.buildCatalogSnapshot(
+    [{id: 1, name: 'Test Location', avatar: 'http://test.com/img.jpg', description: 'Test desc', images: []},
+      {id: 2, name: 'Another Location', avatar: 'http://test.com/img2.jpg', description: 'Another desc', images: []}],
+    [{id: 10, name: 'Test Festival', description: 'Fest desc', images: [], location_id: null}],
+  );
+  return {...actual, __esModule: true, default: {get: jest.fn(async () => snapshot), clear: jest.fn()}};
+});
+
 // Mock semantic API
 jest.mock('../../src/services/semantic.api');
 const mockedSemanticApi = semanticApi as jest.Mocked<typeof semanticApi>;

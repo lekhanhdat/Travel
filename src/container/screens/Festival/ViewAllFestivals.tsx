@@ -9,18 +9,18 @@ import colors from '../../../common/colors';
 import {IFestival} from '../../../services/festivals.api';
 import LargeItemFestival from '../../../component/LargeItemFestival';
 import NavigationService from '../NavigationService';
-import {convertCitationVietnameseUnsigned} from '../../../utils/Utils';
+import {FESTIVAL_SEARCH_FIELDS, searchCatalog} from '../../../utils/catalogSearch';
 import TextBase from '../../../common/TextBase';
 import {AppStyle} from '../../../common/AppStyle';
 import {
-  withAzureTranslation,
-  WithAzureTranslationProps,
-} from '../../../hoc/withAzureTranslation';
+  withTranslation,
+  WithTranslationProps,
+} from '../../../hoc/withTranslation';
 
 type SearchFilterType = 'all' | 'name' | 'location' | 'description';
 type SearchModeType = 'semantic' | 'keyword';
 
-interface IViewAllFestivalsProps extends WithAzureTranslationProps {
+interface IViewAllFestivalsProps extends WithTranslationProps {
   navigation: any;
   route: any; // React Navigation v5+ route prop
 }
@@ -83,52 +83,14 @@ class ViewAllFestivals extends React.PureComponent<
       return;
     }
 
-    // For keyword search, apply additional filtering
-    let festivalOut: IFestival[] = [];
-
-    allFestivals.forEach(festival => {
-      const normalizedSearch = convertCitationVietnameseUnsigned(valueSearch)?.toLowerCase();
-
-      // Apply filter based on selected filter type
-      let matches = false;
-
-      if (selectedFilter === 'all') {
-        // Search by name, description, and location
-        const nameMatch = convertCitationVietnameseUnsigned(festival.name ?? '')
-          ?.toLowerCase()
-          ?.includes(normalizedSearch);
-
-        const descriptionMatch = convertCitationVietnameseUnsigned(
-          festival.description ?? '',
-        )
-          ?.toLowerCase()
-          ?.includes(normalizedSearch);
-
-        const locationMatch = convertCitationVietnameseUnsigned(
-          festival.location ?? '',
-        )
-          ?.toLowerCase()
-          ?.includes(normalizedSearch);
-
-        matches = nameMatch || descriptionMatch || locationMatch;
-      } else if (selectedFilter === 'name') {
-        matches = convertCitationVietnameseUnsigned(festival.name ?? '')
-          ?.toLowerCase()
-          ?.includes(normalizedSearch);
-      } else if (selectedFilter === 'location') {
-        matches = convertCitationVietnameseUnsigned(festival.location ?? '')
-          ?.toLowerCase()
-          ?.includes(normalizedSearch);
-      } else if (selectedFilter === 'description') {
-        matches = convertCitationVietnameseUnsigned(festival.description ?? '')
-          ?.toLowerCase()
-          ?.includes(normalizedSearch);
-      }
-
-      if (matches) {
-        festivalOut = festivalOut.concat(festival);
-      }
-    });
+    // Keyword search: accent-insensitive, every word must match (see catalogSearch).
+    const fields: Record<SearchFilterType, (keyof IFestival)[]> = {
+      all: [...FESTIVAL_SEARCH_FIELDS],
+      name: ['name'],
+      location: ['location'],
+      description: ['description'],
+    };
+    const festivalOut = searchCatalog(allFestivals, valueSearch, fields[selectedFilter] ?? fields.all);
 
     if (__DEV__) {console.log('🔤 Keyword search results:', festivalOut.length, 'items');}
     this.setState({ festivals: festivalOut });
@@ -255,7 +217,7 @@ class ViewAllFestivals extends React.PureComponent<
           <FlatList
             data={festivals}
             renderItem={this.renderItem}
-            keyExtractor={item => item.Id?.toString() ?? Math.random().toString()}
+            keyExtractor={item => item.id.toString()}
           />
         </View>
 
@@ -289,7 +251,7 @@ class ViewAllFestivals extends React.PureComponent<
   }
 }
 
-export default withAzureTranslation(ViewAllFestivals);
+export default withTranslation(ViewAllFestivals);
 
 const styles = StyleSheet.create({
   filterButton: {

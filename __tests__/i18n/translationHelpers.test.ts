@@ -20,6 +20,8 @@ describe('translationHelpers', () => {
   });
 
   describe('catalog fields come from the API', () => {
+    afterEach(async () => {await i18n.changeLanguage('vi');});
+
     it('returns the API value without calling t', () => {
       expect(translateLocationField(mockT, 1, 'name', 'Tên từ API')).toBe('Tên từ API');
       expect(translateLocationField(mockT, 1, 'advise', 'Lời khuyên', 0)).toBe('Lời khuyên');
@@ -35,6 +37,22 @@ describe('translationHelpers', () => {
       expect(translateFestivalField(t, 1, 'name', 'Lễ hội từ API')).toBe('Lễ hội từ API');
       expect(i18n.hasResourceBundle(lng, 'locations')).toBe(false);
       expect(i18n.hasResourceBundle(lng, 'festivals')).toBe(false);
+    });
+
+    // P11 (D1): English content lives in the record (`content_en`, Neon), field by field.
+    it('uses content_en in English and falls back to Vietnamese per missing field', async () => {
+      const location = {name: 'Chùa Linh Ứng', content_en: {name: 'Linh Ung Pagoda', advise: ['Dress modestly', '  ']}};
+      const festival = {content_en: {event_time: 'June every year'}};
+      expect(translateLocationField(mockT, location, 'name', location.name)).toBe('Chùa Linh Ứng');
+      await i18n.changeLanguage('en');
+      expect(translateLocationField(mockT, location, 'name', location.name)).toBe('Linh Ung Pagoda');
+      expect(translateLocationField(mockT, location, 'description', 'Mô tả')).toBe('Mô tả');
+      expect(translateLocationField(mockT, location, 'advise', 'Ăn mặc kín đáo', 0)).toBe('Dress modestly');
+      expect(translateLocationField(mockT, location, 'advise', 'Lời khuyên 2', 1)).toBe('Lời khuyên 2');
+      expect(translateLocationField(mockT, location, 'advise', 'Lời khuyên 3', 2)).toBe('Lời khuyên 3');
+      expect(translateFestivalField(mockT, festival, 'event_time', 'Tháng 6 hàng năm')).toBe('June every year');
+      expect(translateFestivalField(mockT, {}, 'name', 'Tên')).toBe('Tên');
+      expect(mockT).not.toHaveBeenCalled();
     });
   });
 

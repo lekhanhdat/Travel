@@ -23,17 +23,84 @@ export class ApiError extends Error {
   }
 }
 
-// The token is stored as a plain string (LocalStorageCommon would JSON-encode it).
-export const tokenStore = {
-  get: () => AsyncStorage.getItem(localStorageKey.AUTH_TOKEN),
-  set: (token: string) => AsyncStorage.setItem(localStorageKey.AUTH_TOKEN, token),
-  clear: () => AsyncStorage.removeItem(localStorageKey.AUTH_TOKEN),
-};
+// Session = short access token (sent on every call) + long refresh token (only sent to /auth/refresh).
+// Tokens are stored as plain strings (LocalStorageCommon would JSON-encode them).
+const ACCESS_KEY = localStorageKey.AUTH_TOKEN;
+const REFRESH_KEY = localStorageKey.REFRESH_TOKEN;
+const EXPIRES_AT_KEY = localStorageKey.AUTH_TOKEN_EXPIRES_AT;
+// Refresh this long before the access token expires, so a call never goes out with a dying token.
+const REFRESH_MARGIN_MS = 60 * 1000;
 
-// Called when the server rejects the stored token (expired, password changed, account deleted).
+export interface TokenPair {
+  access_token: string;
+  expires_in?: number;
+  refresh_token?: string;
+}
+
+// Called when the session is over (refresh token rejected or missing: expired, password changed,
+// account deleted) and after a refresh (the server sends the account again).
 let onUnauthorized: (() => Promise<void> | void) | undefined;
+let onRefreshed: ((pair: TokenPair & Record<string, unknown>) => Promise<void> | void) | undefined;
 export function setUnauthorizedHandler(handler: typeof onUnauthorized) {
   onUnauthorized = handler;
+}
+export function setSessionRefreshedHandler(handler: typeof onRefreshed) {
+  onRefreshed = handler;
+}
+
+export const tokenStore = {
+  /** Access token for a signed-in call, refreshed first when it is about to expire; null when signed out. */
+  get: async (): Promise<string | null> => {
+    const [[, token], [, expiresAt]] = await AsyncStorage.multiGet([ACCESS_KEY, EXPIRES_AT_KEY]);
+    if (!token) {return null;}
+    if (expiresAt && Date.now() > Number(expiresAt) - REFRESH_MARGIN_MS) {
+      try {
+        return await refreshSession();
+      } catch {
+        return token; // offline: let the call go out and fail on its own
+      }
+    }
+    return token;
+  },
+  save: async (pair: TokenPair) => {
+    const entries: [string, string][] = [[ACCESS_KEY, pair.access_token]];
+    if (pair.refresh_token) {entries.push([REFRESH_KEY, pair.refresh_token]);}
+    if (pair.expires_in) {entries.push([EXPIRES_AT_KEY, String(Date.now() + pair.expires_in * 1000)]);}
+    await AsyncStorage.multiSet(entries);
+  },
+  clear: () => AsyncStorage.multiRemove([ACCESS_KEY, REFRESH_KEY, EXPIRES_AT_KEY]),
+};
+
+let refreshing: Promise<string | null> | null = null;
+
+/** New access token from the refresh token (one request at a time). Null = session over (handler called);
+ * throws on network/server errors, so being offline never signs the user out. */
+export function refreshSession(): Promise<string | null> {
+  if (refreshing) {return refreshing;}
+  refreshing = (async () => {
+    const refreshToken = await AsyncStorage.getItem(REFRESH_KEY);
+    if (!refreshToken) {
+      await onUnauthorized?.();
+      return null;
+    }
+    try {
+      const {data} = await apiRequest.post<TokenPair & Record<string, unknown>>(
+        '/auth/refresh', {refresh_token: refreshToken});
+      await tokenStore.save(data);
+      await onRefreshed?.(data);
+      return data.access_token;
+    } catch (error) {
+      const apiError = toApiError(error);
+      if (apiError.kind === 'http' && (apiError.status === 401 || apiError.status === 422)) {
+        await onUnauthorized?.();
+        return null;
+      }
+      throw apiError;
+    }
+  })().finally(() => {
+    refreshing = null;
+  });
+  return refreshing;
 }
 
 function toApiError(error: unknown): ApiError {
@@ -61,17 +128,30 @@ export async function apiCall<T>(config: AxiosRequestConfig & {signedIn?: boolea
     if (token) {headers.Authorization = `Bearer ${token}`;}
   }
   const method = (request.method || 'get').toLowerCase();
+  let refreshed = false;
   for (let attempt = 0; ; attempt++) {
     try {
       return (await apiRequest.request<T>({...request, headers})).data;
     } catch (error) {
       const apiError = toApiError(error);
+      // Access token rejected (expired early, revoked): refresh once and resend the same request.
+      if (signedIn && apiError.tokenRejected && headers.Authorization && !refreshed) {
+        refreshed = true;
+        let token: string | null;
+        try {
+          token = await refreshSession();
+        } catch {
+          throw apiError;
+        }
+        if (token) {
+          headers.Authorization = `Bearer ${token}`;
+          continue;
+        }
+        throw apiError;
+      }
       const retryable = method === 'get' && attempt === 0 &&
         (apiError.kind !== 'http' || apiError.status === 429 || (apiError.status ?? 0) >= 500);
       if (!retryable) {
-        if (signedIn && apiError.tokenRejected && headers.Authorization && onUnauthorized) {
-          await onUnauthorized();
-        }
         throw apiError;
       }
       await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));

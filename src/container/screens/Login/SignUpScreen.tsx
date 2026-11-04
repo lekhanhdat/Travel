@@ -273,6 +273,8 @@ export default class SignUpScreen extends React.PureComponent<
               textColor={colors.primary_950}
               placeholderTextColor={colors.primary_400}
               value={userName}
+              autoCapitalize="none"
+              autoCorrect={false}
               onChangeText={userName => this.setState({userName})}
             />
 

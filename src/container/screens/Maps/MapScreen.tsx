@@ -31,11 +31,12 @@ import Toast from 'react-native-toast-message';
 import {env} from '../../../utils/env';
 import Tts from 'react-native-tts';
 import {useTranslation} from 'react-i18next';
-import {translateLocationField} from '../../../utils/translationHelpers';
-import catalogRepository from '../../../services/catalogRepository';
+import {translateFestivalField, translateLocationField} from '../../../utils/translationHelpers';
+import catalogRepository, {CatalogFestival} from '../../../services/catalogRepository';
 import {catalogImage} from '../../../utils/catalogDisplay';
 import CachedImage from '../../../component/CachedImage';
 import haversineDistance from '../../../utils/haversineDistance';
+import {getPreciseLocation} from '../../../utils/preciseLocation';
 
 MapboxGL.setAccessToken(env.MAPBOX_ACCESS_TOKEN || '');
 // "auto" means Android's LocationManager, where high accuracy is GPS-only and rarely gets a fix
@@ -46,6 +47,16 @@ Geolocation.setRNConfiguration({skipPermissionRequests: false, locationProvider:
 // from the catalog area for the map to open on the user's position.
 const DEFAULT_CENTER = {latitude: 15.974620784990472, longitude: 108.25290513035998};
 const NEAR_CATALOG_METERS = 100 * 1000;
+
+type MapMode = 'locations' | 'festivals';
+type FestivalMarker = {festival: CatalogFestival; lat: number; long: number};
+
+/** Festivals placed at their venue (location_id → a location with GPS; any location, not only publishable). */
+const buildFestivalMarkers = (festivals: CatalogFestival[], locationById: Map<number, ILocation>): FestivalMarker[] =>
+  festivals.flatMap(festival => {
+    const venue = festival.location_id !== null ? locationById.get(festival.location_id) : undefined;
+    return venue && hasGps(venue) ? [{festival, lat: venue.lat, long: venue.long}] : [];
+  });
 
 const hasGps = (location: ILocation): location is ILocation & {lat: number; long: number} =>
   typeof location.lat === 'number' && Number.isFinite(location.lat) &&
@@ -212,32 +223,21 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
     }
   };
 
-  const getCurrentLocation = (highAccuracy = true) => {
-    Geolocation.getCurrentPosition(
-      (position) => {
-        const {latitude, longitude} = position.coords;
+  // High-accuracy fix (utils/preciseLocation); the Đà Nẵng fallback only centers the camera.
+  const getCurrentLocation = () => {
+    getPreciseLocation()
+      .then(position => {
+        const {latitude, longitude, accuracy} = position.coords;
         setCurrentLat(latitude);
         setCurrentLong(longitude);
         setHasUserLocation(true);
-        console.log('Current location:', latitude, longitude);
-      },
-      (error) => {
+        console.log('Current location:', latitude, longitude, `±${Math.round(accuracy)}m`);
+      })
+      .catch(error => {
         console.log('Error getting location:', error);
-        // Retry once with Wi-Fi/cell accuracy before giving up on a real position.
-        if (highAccuracy && error?.code !== 1) {
-          getCurrentLocation(false);
-          return;
-        }
-        // Fallback to default Đà Nẵng coordinates
         setCurrentLat(15.974620784990472);
         setCurrentLong(108.25290513035998);
-      },
-      {
-        enableHighAccuracy: highAccuracy,
-        timeout: 15000,
-        maximumAge: 10000,
-      },
-    );
+      });
   };
 
   const watchUserLocation = () => {
@@ -310,6 +310,10 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
   const [shouldShowRoute, setShouldShowRoute] = useState(false);
   const [pendingZoomRoute, setPendingZoomRoute] = useState<{latitude: number; longitude: number}[] | null>(null);
   const [currentZoom, setCurrentZoom] = useState<number>(12); // Track zoom level
+  // Catalog map only (not when opened for one place): show place markers or festival markers.
+  const [isCatalogMap, setIsCatalogMap] = useState(false);
+  const [mapMode, setMapMode] = useState<MapMode>('locations');
+  const [festivalMarkers, setFestivalMarkers] = useState<FestivalMarker[]>([]);
 
   useEffect(() => {
     console.log('restart0-----------');
@@ -333,8 +337,10 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
       // Sẽ fetch trong useEffect riêng khi đã có vị trí
     } else {
       // Nếu không, lấy marker từ catalog
+      setIsCatalogMap(true);
       catalogRepository.get().then(catalog => {
         setLocations(catalog.mapMarkers);
+        setFestivalMarkers(buildFestivalMarkers(catalog.festivals, catalog.locationById as Map<number, ILocation>));
       }).catch(error => console.warn('Catalog unavailable for map:', error));
     }
 
@@ -604,6 +610,23 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
         zoomToFitRoute(straightLineRoute.coordinates);
       }
     }
+  };
+
+  const changeMapMode = (mode: MapMode) => {
+    if (mode === mapMode) {return;}
+    setMapMode(mode);
+    setSelectedLocation(null);
+    setFocusLocation(null);
+    setShouldShowRoute(false);
+    setRouteCoordinates([]);
+    setRouteDistance(0);
+    setRouteDuration(0);
+    setRouteSteps([]);
+    setRoutes([]);
+  };
+
+  const onFestivalMarkerPress = (festival: CatalogFestival) => {
+    NavigationService.navigate(ScreenName.DETAIL_FESTIVAL_SCREEN, {festival});
   };
 
   const onMarkerPress = (location: ILocation) => {
@@ -924,6 +947,7 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
       <View style={{flex: 1}}>
         <MapboxGL.MapView
           ref={mapRef}
+          scaleBarPosition={isCatalogMap ? {top: 58, left: 10} : undefined}
           style={{flex: 1}}
           styleURL={MAP_STYLES.find(s => s.id === currentMapStyle)?.url || MapboxGL.StyleURL.Satellite}
           onCameraChanged={onRegionDidChange}
@@ -947,7 +971,7 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
             animationDuration={1000}
           />
 
-          {
+          {mapMode === 'locations' &&
             locations.filter((loc): loc is ILocation & {lat: number; long: number} =>
               isMapLocationVisible(loc) ||
               // Always show the focused/selected place (e.g. opened from Detail) when it has GPS.
@@ -1006,6 +1030,26 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
               );
             })
           }
+
+          {/* Festival mode: every festival at its venue (overlapping markers are accepted for now). */}
+          {mapMode === 'festivals' && festivalMarkers.map(({festival, lat, long}) => (
+            <MapboxGL.MarkerView key={`festival-${festival.id}`} id={`festival-${festival.id}`} coordinate={[long, lat]}>
+              <TouchableOpacity onPress={() => onFestivalMarkerPress(festival)} style={{alignItems: 'center'}}>
+                <TextBase style={{fontSize: getMarkerSize(currentZoom, false) * 0.8}}>🎉</TextBase>
+                <TextBase style={{
+                  fontSize: getTextSize(currentZoom, false),
+                  fontWeight: 'bold',
+                  color: getTextColorForMapStyle(currentMapStyle),
+                  ...getTextShadowForMapStyle(currentMapStyle),
+                  marginTop: -2,
+                  maxWidth: 160,
+                  textAlign: 'center',
+                }} numberOfLines={2}>
+                  {translateFestivalField(t, festival, 'name', festival.name)}
+                </TextBase>
+              </TouchableOpacity>
+            </MapboxGL.MarkerView>
+          ))}
 
           {/* Current Location Marker - Blue circle like Google Maps */}
           {hasUserLocation && (
@@ -1123,6 +1167,43 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
             </MapboxGL.ShapeSource>
           )}
         </MapboxGL.MapView>
+
+        {/* Map mode: places / festivals */}
+        {isCatalogMap && (
+          <View style={{
+            position: 'absolute',
+            top: 10,
+            left: 10,
+            flexDirection: 'row',
+            backgroundColor: colors.white,
+            borderRadius: 20,
+            padding: 3,
+            elevation: 5,
+            shadowColor: '#000',
+            shadowOffset: {width: 0, height: 2},
+            shadowOpacity: 0.25,
+            shadowRadius: 3.84,
+          }}>
+            {(['locations', 'festivals'] as MapMode[]).map(mode => {
+              const active = mapMode === mode;
+              return (
+                <TouchableOpacity
+                  key={mode}
+                  onPress={() => changeMapMode(mode)}
+                  style={{
+                    paddingVertical: 8,
+                    paddingHorizontal: 14,
+                    borderRadius: 17,
+                    backgroundColor: active ? colors.primary : 'transparent',
+                  }}>
+                  <TextBase style={{fontSize: 14, fontWeight: '600', color: active ? colors.white : colors.primary_950}}>
+                    {mode === 'locations' ? `📍 ${t('common:map.modeLocations')}` : `🎉 ${t('common:map.modeFestivals')}`}
+                  </TextBase>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        )}
 
         {/* Layer Selector Button */}
         <View style={{

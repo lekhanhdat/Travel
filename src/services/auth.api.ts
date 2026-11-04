@@ -1,10 +1,10 @@
 import {IAccount} from '../common/types';
 import {localStorageKey} from '../common/constants';
 import LocalStorageCommon from '../utils/LocalStorageCommon';
-import {ApiError, apiCall, setUnauthorizedHandler, tokenStore} from './api.client';
+import {ApiError, apiCall, setSessionRefreshedHandler, setUnauthorizedHandler, tokenStore} from './api.client';
 
 // Accounts live in the backend (Travel_BE core_api/auth.py): hashing, validation and sessions
-// happen there; the app keeps only the JWT (AUTH_TOKEN) and the profile (AVT), never a password.
+// happen there; the app keeps only the tokens (api.client tokenStore) and the profile (AVT), never a password.
 
 type Gender = 'Male' | 'Female' | 'Other';
 
@@ -24,6 +24,9 @@ interface AccountResponse {
 
 interface AuthResponse {
   access_token: string;
+  /** Seconds; with refresh_token since the refresh-token backend (older servers send only a 30-day token). */
+  expires_in?: number;
+  refresh_token?: string;
   account: AccountResponse;
 }
 
@@ -60,7 +63,7 @@ const PROFILE_FIELDS: Record<keyof ProfileUpdates, string> = {
 
 async function saveSession(response: AuthResponse): Promise<IAccount> {
   const account = toAccount(response.account);
-  await tokenStore.set(response.access_token);
+  await tokenStore.save(response);
   await LocalStorageCommon.setItem(localStorageKey.AVT, account);
   return account;
 }
@@ -70,15 +73,20 @@ async function clearSession() {
   await LocalStorageCommon.setItem(localStorageKey.AVT, null);
 }
 
-// Any 401 on a signed-in call (token expired/revoked, account deleted) signs the app out.
+// The session ends when the refresh token is rejected (expired, password changed, account deleted).
 setUnauthorizedHandler(clearSession);
+// A refresh also returns the current profile.
+setSessionRefreshedHandler(async pair => {
+  const account = (pair as Partial<AuthResponse>).account;
+  if (account) {await LocalStorageCommon.setItem(localStorageKey.AVT, toAccount(account));}
+});
 
 const authApi = {
   /** Login; returns null for a wrong user name/password, throws on network/server errors. */
   login: async (userName: string, password: string): Promise<IAccount | null> => {
     try {
       const response = await apiCall<AuthResponse>({
-        method: 'post', url: '/auth/login', data: {user_name: userName.trim(), password}, signedIn: false,
+        method: 'post', url: '/auth/login', data: {user_name: userName.trim().toLowerCase(), password}, signedIn: false,
       });
       return await saveSession(response);
     } catch (error) {
@@ -98,7 +106,8 @@ const authApi = {
     birthday?: string,
     address?: string,
   ): Promise<IAccount> => {
-    const data: Record<string, string> = {user_name: userName.trim(), password, full_name: fullName, email};
+    // User names are case-insensitive (the backend stores them in lower case); passwords are not.
+    const data: Record<string, string> = {user_name: userName.trim().toLowerCase(), password, full_name: fullName, email};
     if (phone) {data.phone = phone;}
     if (gender) {data.gender = gender;}
     if (birthday) {data.birthday = birthday;}

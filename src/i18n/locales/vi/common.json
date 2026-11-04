@@ -202,7 +202,9 @@
     "routeInfo": "Thông tin lộ trình",
     "distance": "Khoảng cách",
     "duration": "Thời gian",
-    "startNavigation": "Bắt đầu dẫn đường"
+    "startNavigation": "Bắt đầu dẫn đường",
+    "modeLocations": "Địa điểm",
+    "modeFestivals": "Lễ hội"
   },
   "camera": {
     "title": "Máy ảnh",

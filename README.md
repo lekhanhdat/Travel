@@ -102,8 +102,8 @@
 - ✅ **Mapbox Integration** - Nhiều kiểu bản đồ (vệ tinh, đường phố…), lớp giao thông
 - ✅ **Turn-by-turn Navigation** - Danh sách chỉ đường từng bước
 - ✅ **Alternative Routes** - Nhiều lộ trình lựa chọn
-- ✅ **Real-time Location** - Vị trí hiện tại (Google Fused Location)
-- ✅ **Markers** - Marker các địa điểm được phép hiện trên bản đồ, popup + Lời khuyên
+- ✅ **Real-time Location** - Vị trí hiện tại độ chính xác cao (Google Fused Location, `utils/preciseLocation.ts`)
+- ✅ **Markers** - Chọn chế độ **Địa điểm** (marker các địa điểm được phép hiện, popup + Lời khuyên) hoặc **Lễ hội** (mọi lễ hội tại địa điểm tổ chức, chạm để xem chi tiết)
 - ✅ **Distance & Duration** - Khoảng cách và thời gian di chuyển
 - ✅ **Text-to-Speech** - Đọc thuyết minh địa điểm bằng giọng nói
 - ⏸ Cảnh báo giọng nói khi tới gần địa điểm (chạy nền, `BackgroundGeolocation` — Backlog)
@@ -119,7 +119,7 @@
 - Giới hạn: 5 lần/người/ngày, 8 lần/ngày toàn hệ thống (quota SerpAPI miễn phí)
 
 ### 🔐 Xác thực (Authentication)
-- ✅ **Đăng nhập** - Username/Password qua backend, nhận JWT (30 ngày)
+- ✅ **Đăng nhập** - Username (không phân biệt hoa/thường)/Password qua backend, nhận access token (1 giờ) + refresh token (60 ngày); app tự làm mới token
 - ✅ **Đăng ký** - Tạo tài khoản mới
 - ⏸ **Quên mật khẩu** - OTP qua email (SendGrid) — màn hình và module backend có sẵn, đang tắt (Nợ N1)
 - ✅ **Bảo mật mật khẩu** - Hash scrypt ở backend; app **không lưu mật khẩu**, chỉ lưu token + hồ sơ
@@ -791,7 +791,7 @@ Danh sách endpoint, request/response đầy đủ xem bằng **Swagger** khi ch
 │ Backend (core_api/auth.py)      │
 │ - Tìm tài khoản trong Neon      │
 │ - Kiểm mật khẩu (scrypt)        │
-│ - Ký JWT (30 ngày)              │
+│ - Ký access 1h + refresh 60 ngày│
 └──────┬──────────────────────────┘
        │
        ▼

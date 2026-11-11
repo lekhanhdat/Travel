@@ -64,7 +64,7 @@ class HomeScreen extends React.PureComponent<
   IHomeScreenState
 > {
   refInput: any;
-  searchBarRef: React.RefObject<SemanticSearchBarComponent<ILocation>>;
+  searchBarRef: React.RefObject<SemanticSearchBarComponent<ILocation> | null>;
 
   constructor(props: IHomeScreenProps) {
     super(props);

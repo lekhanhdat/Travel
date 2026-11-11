@@ -48,7 +48,7 @@ class FestivalsScreen extends React.PureComponent<
 > {
   refSheet: BottomSheet | null | undefined;
   refSheetLocation: BottomSheet | null | undefined;
-  searchBarRef: React.RefObject<SemanticSearchBarComponent<IFestival>>;
+  searchBarRef: React.RefObject<SemanticSearchBarComponent<IFestival> | null>;
 
   constructor(props: IFestivalsScreenProps) {
     super(props);

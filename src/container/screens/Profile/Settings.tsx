@@ -5,7 +5,6 @@ import {
   TouchableOpacity,
   Switch,
   Alert,
-  NativeModules,
 } from 'react-native';
 import {
   withTranslation,
@@ -23,7 +22,6 @@ import NavigationService from '../NavigationService';
 import LocalStorageCommon from '../../../utils/LocalStorageCommon';
 import {localStorageKey} from '../../../common/constants';
 
-const {StatusBarManager} = NativeModules;
 
 interface ISettingsProps extends WithTranslationProps {}
 
@@ -258,7 +256,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
-    paddingTop: StatusBarManager.HEIGHT + sizes._16sdp,
+    paddingTop: sizes._16sdp,
   },
   sectionHeader: {
     paddingHorizontal: sizes._16sdp,

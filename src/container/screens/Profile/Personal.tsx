@@ -1,15 +1,14 @@
+import Modal from '../../../component/SafeAreaModal';
 import React from 'react';
 import i18n from '../../../i18n';
 import {
   Image,
-  NativeModules,
   StyleSheet,
   TouchableOpacity,
   View,
   ScrollView,
   ActivityIndicator,
-  Modal,
-} from 'react-native';
+  } from 'react-native';
 import {TextInput, IconButton} from 'react-native-paper';
 import {launchImageLibrary} from 'react-native-image-picker';
 import Toast from 'react-native-toast-message';
@@ -31,7 +30,6 @@ import {validateEmail} from '../../../utils/Utils';
 import FEATURE_FLAGS from '../../../config/featureFlags';
 import {ScreenName} from '../../AppContainer';
 
-const {StatusBarManager} = NativeModules;
 
 interface IProfileScreenProps {
   navigation?: any;
@@ -1259,7 +1257,7 @@ export default class ProfileScreen extends React.PureComponent<
 }
 const styles = StyleSheet.create({
   container: {
-    paddingTop: StatusBarManager.HEIGHT + sizes._16sdp,
+    paddingTop: sizes._16sdp,
     padding: sizes._16sdp,
     flex: 1,
     backgroundColor: colors.background,

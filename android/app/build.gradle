@@ -77,7 +77,7 @@ def enableProguardInReleaseBuilds = true
  * give correct results when using with locales other than en-US. Note that
  * this variant is about 6MiB larger per architecture than default.
  */
-def jscFlavor = 'org.webkit:android-jsc:+'
+def jscFlavor = 'io.github.react-native-community:jsc-android:2026004.+'
 
 def releaseSigningPropertyNames = [
     'MYAPP_RELEASE_STORE_FILE',
@@ -149,6 +149,12 @@ android {
             minifyEnabled enableProguardInReleaseBuilds
             shrinkResources enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
+        }
+        // Release-equivalent validation without signing credentials; never a publishable artifact.
+        verification {
+            initWith release
+            signingConfig null
+            matchingFallbacks = ['release']
         }
     }
 }

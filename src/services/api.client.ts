@@ -164,7 +164,7 @@ export async function apiCall<T>(config: AxiosRequestConfig & {signedIn?: boolea
       if (!retryable) {
         throw apiError;
       }
-      await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
+      await new Promise<void>(resolve => setTimeout(resolve, RETRY_DELAY_MS));
     }
   }
 }

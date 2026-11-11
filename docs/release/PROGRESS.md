@@ -1,28 +1,32 @@
 # Danavi — Release Progress Tracker
 
-**Last Updated:** 2026-11-11 21:45 (Claude, Tech Lead)
+**Last Updated:** 2026-11-11 23:20 (Claude, Tech Lead)
 
 ## Phase Status
 
 | Phase | Status | Notes |
 |-------|--------|-------|
-| 0 — Discovery & Audit | DONE | Scheduled run 20:00 + Tech Lead verification 21:30 (C3, H6, M7, M8, L4 added) |
-| 1 — Security fixes | IN PROGRESS | Codex A (A1–A3), Codex B (B1) |
-| 2 — Stability / tests | IN PROGRESS | Codex B4 (App.test.tsx) |
-| 3 — Branding | IN PROGRESS | Codex A4/A5 (launcher, name), B2/B3 (in-app). Splash = TASK-C (after A+B) |
-| 4 — Production prep | BLOCKED | C3/H6 need React Native upgrade → owner decision |
-| 5 — Final QA | NOT STARTED | |
+| 0 — Discovery & Audit | DONE | + H7 donation/payments policy risk, POL-03 unused RECORD_AUDIO |
+| 1 — Security fixes | DONE (A, B) | committed `ecd6861` on `dev` (local, not pushed) |
+| 2 — Stability / tests | DONE for now | 24/24 suites; 53 pre-existing TS errors remain |
+| 3 — Branding | DONE (A, B, C) | store graphics pending owner |
+| 4 — Production prep | IN PROGRESS | Batch D (RN 0.81.6) running on `release/rn-upgrade`; Batch E queued; store docs drafted |
+| 5 — Final QA | NOT STARTED | after D+E; AVDs `Danavi_API36`, `Danavi_API35_16K` prepared |
 
 ## Codex dispatch log
 
-| Batch | Brief | Scope | Status |
-|-------|-------|-------|--------|
-| A | `codex/TASK-A_android_native.md` | android/** only | Running |
-| B | `codex/TASK-B_js_branding.md` | src/**, babel, package.json, tests | Running |
-| C | Splash screen (react-native-bootsplash) | MainActivity, styles, App.tsx | Waiting for A+B |
-| D | RN upgrade → targetSdk 36 + 16 KB | whole native layer | **Approved by owner 2026-11-11** — on a separate branch, after A+B accepted |
+| Batch | Brief | Status |
+|-------|-------|--------|
+| A | `codex/TASK-A_android_native.md` | ACCEPTED, committed `ecd6861` |
+| B | `codex/TASK-B_js_branding.md` | ACCEPTED, committed `ecd6861` |
+| C | `codex/TASK-C_splash_about_fixes.md` | ACCEPTED, committed `ecd6861` |
+| D | `codex/TASK-D_rn_upgrade.md` | RUNNING on `release/rn-upgrade` (dispatched 23:00) |
+| E | `codex/TASK-E_policy_cleanup.md` | QUEUED (after D accepted) |
 
-A and B have disjoint file scopes so they run in parallel.
+## Owner documents drafted (Claude, need owner review)
+- `PLAY_STORE_LISTING.md` — name, short/full description vi/en, IARC hints, target audience, open decisions.
+- `DATA_SAFETY.md` — data types mapped to code, destinations, deletion.
+- `PRIVACY_POLICY_DRAFT.md` — Vietnamese draft to host on a public URL.
 
 ## Baseline (before changes)
 - `npx jest`: 22/23 suites, 217 passed, 1 skipped; App.test.tsx failing (pre-existing).
@@ -31,7 +35,11 @@ A and B have disjoint file scopes so they run in parallel.
 
 | Blocker | Waiting On | Impact |
 |---------|-----------|--------|
-| RN upgrade for targetSdk 36 / 16 KB (C3, H6) | Owner approval | **Blocks any Play submission** |
+| RN upgrade for targetSdk 36 / 16 KB (C3, H6) | Batch D (approved) | **Blocks any Play submission** |
+| Package name `com.travel` (generic, permanent after first upload, may be taken) | Owner decision | Decide BEFORE first upload |
+| Donation via external payment (H7) | Owner decision; Batch E hides it | Policy rejection risk |
+| Hosted privacy policy URL + web account-deletion URL (MANUAL-04/13) | Owner | Required by Play |
+| Crash reporting (Crashlytics needs a Firebase project) | Owner | Recommended before launch |
 | Real website/social/email | Owner | About/FAQ/Policy links hidden until provided |
 | Privacy Policy URL, store texts, feature graphic, screenshots | Owner | Blocks store listing |
 | New upload key + Play App Signing, local signing props | Owner | Blocks signed AAB |

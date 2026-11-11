@@ -6,6 +6,8 @@ jest.mock('@rnmapbox/maps', () => {
   const React = require('react');
   // Class components so the screen's refs (mapRef/cameraRef) attach.
   const host = name => class extends React.Component {
+    fitBounds = jest.fn();
+    setCamera = jest.fn();
     render() {return React.createElement(name, this.props, this.props.children);}
   };
   return {__esModule: true, default: {
@@ -30,6 +32,8 @@ jest.mock('react-native-toast-message', () => ({show: jest.fn()}));
 jest.mock('react-native-paper', () => ({Button: 'Button', Modal: 'Modal'}));
 jest.mock('react-i18next', () => ({useTranslation: () => ({t: key => key})}));
 jest.mock('../src/services/mapbox.api', () => ({
+  formatDistance: jest.fn(value => `${value} m`),
+  formatDuration: jest.fn(value => `${value} s`),
   getDirections: jest.fn(), convertGeoJSONToCoordinates: coords => coords.map(([longitude, latitude]) => ({latitude, longitude})),
 }));
 jest.mock('../src/assets/ImageSvg', () => new Proxy({}, {get: (_, name) => name === '__esModule' ? false : 'Icon'}));
@@ -164,7 +168,7 @@ describe('Map (P4)', () => {
 
   it('festival mode shows every festival at its venue (any location with GPS) and opens its detail', async () => {
     jest.spyOn(PermissionsAndroid, 'request').mockResolvedValue(PermissionsAndroid.RESULTS.DENIED);
-    const festival = (id, location_id) => ({id, name: `Lễ hội ${id}`, description: '', images: [], location_id,
+    const festival = (id, location_id) => ({id, name: `Lá»… há»™i ${id}`, description: '', images: [], location_id,
       event_time: '', content_en: {}});
     // 10 at a publishable place, 11 at a non-publishable place, 12 at a place without GPS, 13 without a place.
     const withFestivals = buildCatalogSnapshot(snapshot.locations,

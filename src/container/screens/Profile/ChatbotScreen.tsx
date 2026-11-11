@@ -1,3 +1,4 @@
+import Modal from '../../../component/SafeAreaModal';
 import React from 'react';
 import i18n from '../../../i18n';
 import {
@@ -12,7 +13,6 @@ import {
   ScrollView,
   Alert,
   Image,
-  Modal,
   Dimensions,
 } from 'react-native';
 import {launchImageLibrary} from 'react-native-image-picker';
@@ -552,7 +552,7 @@ export default class ChatbotScreen extends React.PureComponent<
           keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}>
           {/* Messages List */}
           <FlatList
-            ref={ref => (this.flatListRef = ref)}
+            ref={ref => { this.flatListRef = ref; }}
             data={messages}
             renderItem={this.renderMessage}
             keyExtractor={(item, index) => index.toString()}

@@ -2,7 +2,6 @@ import React from 'react';
 import {
   ScrollView,
   Linking,
-  NativeModules,
   StyleSheet,
   TouchableOpacity,
   View,
@@ -27,7 +26,6 @@ import Toast from 'react-native-toast-message';
 import authApi from '../../../services/auth.api';
 import {requireLogin} from '../../../utils/requireLogin';
 
-const {StatusBarManager} = NativeModules;
 
 interface IProfileScreenProps extends WithTranslationProps {
   navigation?: any;
@@ -437,7 +435,7 @@ class ProfileScreen extends React.PureComponent<
 }
 const styles = StyleSheet.create({
   container: {
-    paddingTop: StatusBarManager.HEIGHT + sizes._16sdp,
+    paddingTop: sizes._16sdp,
     padding: sizes._16sdp,
     flexGrow: 1,
     paddingBottom: sizes._32sdp,

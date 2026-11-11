@@ -7,7 +7,7 @@
 require('react-native-gesture-handler/jestSetup');
 jest.mock('react-native-bootsplash', () => ({
   hide: jest.fn(() => Promise.resolve()),
-  isVisible: jest.fn(() => Promise.resolve(false)),
+  isVisible: jest.fn(() => false),
   useHideAnimation: jest.fn(() => ({})),
 }));
 // Metro transforms SVG assets into components; Jest's asset mock returns objects.
@@ -85,7 +85,6 @@ jest.mock('react-native-youtube-iframe', () => require('react-native').View);
 jest.mock('react-native-webview', () => ({
   WebView: require('react-native').View,
 }));
-jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
 jest.mock('react-native-iphone-x-helper', () => ({
   isIphoneX: () => false,
   getStatusBarHeight: () => 20,

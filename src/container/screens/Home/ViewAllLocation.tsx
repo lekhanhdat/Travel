@@ -1,6 +1,7 @@
+import Modal from '../../../component/SafeAreaModal';
 import FEATURE_FLAGS from '../../../config/featureFlags';
 import React from 'react';
-import { FlatList, View, TouchableOpacity, Modal, StyleSheet } from 'react-native';
+import { FlatList, View, TouchableOpacity, StyleSheet } from 'react-native';
 import Page from '../../../component/Page';
 import HeaderBase from '../../../component/HeaderBase';
 import { BackSvg } from '../../../assets/assets/ImageSvg';

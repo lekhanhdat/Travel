@@ -4,7 +4,6 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  NativeModules,
   Linking,
 } from 'react-native';
 import Page from '../../../component/Page';
@@ -17,7 +16,6 @@ import {BackSvg} from '../../../assets/assets/ImageSvg';
 import {BRAND} from '../../../config/brand';
 import NavigationService from '../NavigationService';
 
-const {StatusBarManager} = NativeModules;
 
 interface IPolicyProps {}
 
@@ -358,7 +356,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
-    paddingTop: StatusBarManager.HEIGHT,
   },
   tabContainer: {
     flexDirection: 'row',

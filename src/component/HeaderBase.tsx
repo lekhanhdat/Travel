@@ -1,8 +1,6 @@
 import React from 'react';
 import {
   Image,
-  NativeModules,
-  StatusBar,
   StyleSheet,
   TouchableOpacity,
   View,
@@ -12,7 +10,6 @@ import colors from '../common/colors';
 import fonts from '../common/fonts';
 import sizes from '../common/sizes';
 import TextBase from '../common/TextBase';
-const {StatusBarManager} = NativeModules;
 
 interface Props {
   leftIconSvg?: any;
@@ -55,7 +52,6 @@ class HeaderBase extends React.PureComponent<Props, States> {
     } = this.props;
     return (
       <View style={styles.container}>
-        <StatusBar translucent backgroundColor={colors.transparent} />
         <View style={styles.content}>
           <View style={styles.viewLeft}>
             {!hideLeftIcon && (
@@ -141,10 +137,9 @@ export default HeaderBase;
 const styles = StyleSheet.create({
   container: {
     width: sizes.width,
-    height: sizes._60sdp + StatusBarManager.HEIGHT,
+    height: sizes._60sdp,
     backgroundColor: '#F97350',
     // backgroundColor: colors.primary_600,
-    paddingTop: StatusBarManager.HEIGHT,
 
     shadowColor: '#000',
     shadowOffset: {

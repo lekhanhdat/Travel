@@ -1,6 +1,11 @@
 import {NavigationContainer} from '@react-navigation/native';
 import React from 'react';
-// import { SafeAreaView } from 'react-native-safe-area-context';
+import {
+  SafeAreaProvider,
+  SafeAreaView,
+  initialWindowMetrics,
+} from 'react-native-safe-area-context';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {StatusBar, StyleSheet, View, Text} from 'react-native';
 import AppContainer, {TAB_NAMES} from './src/container/AppContainer';
 import BootSplash from 'react-native-bootsplash';
@@ -39,59 +44,69 @@ class App extends React.PureComponent<Props, States> {
   render() {
     if (this.state.startupError) {
       return (
-        <View style={styles.container}>
-          <Text>Không thể mở ứng dụng. Vui lòng khởi động lại Danavi.</Text>
-        </View>
+        <SafeAreaProvider initialMetrics={initialWindowMetrics}>
+          <SafeAreaView style={styles.container}>
+            <Text>Không thể mở ứng dụng. Vui lòng khởi động lại Danavi.</Text>
+          </SafeAreaView>
+        </SafeAreaProvider>
       );
     }
     return (
-      <RootSiblingParent>
-        <PaperProvider
-          theme={{
-            ...DefaultTheme,
-            colors: {
-              ...DefaultTheme.colors,
-              primary: colors.primary,
-              background: colors.white,
-              // place
-              // placeholder: colors.primary,
+      <GestureHandlerRootView style={styles.container}>
+        <SafeAreaProvider initialMetrics={initialWindowMetrics}>
+          <SafeAreaView style={styles.container}>
+            <RootSiblingParent>
+              <PaperProvider
+                theme={{
+                  ...DefaultTheme,
+                  colors: {
+                    ...DefaultTheme.colors,
+                    primary: colors.primary,
+                    background: colors.white,
+                    // place
+                    // placeholder: colors.primary,
 
-              onSurfaceVariant: colors.primary,
-            },
-          }}>
-          <View style={styles.container}>
-            <StatusBar barStyle={'dark-content'} backgroundColor={'#ffffff'} />
+                    onSurfaceVariant: colors.primary,
+                  },
+                }}>
+                <View style={styles.container}>
+                  <StatusBar barStyle="dark-content" />
 
-            <NavigationContainer
-              onReady={() => {
-                this.updateChatBubble();
-                this.hideSplash();
-              }}
-              onStateChange={state => {
-                this.updateChatBubble();
-                if (state?.routes && state.routes.length > 0) {
-                  NavigationService.setActiveScreen(
-                    state.routes[state.routes.length - 1].name,
-                  );
-                  NavigationService.setParentOfActiveScreen(
-                    state.routes[0].name,
-                  );
-                }
-              }}
-              ref={ref => {
-                if (ref) {
-                  NavigationService.setTopLevelNavigator(ref);
-                }
-              }}>
-              <AppContainer />
-            </NavigationContainer>
-            {FEATURE_FLAGS.ENABLE_AI && this.state.showChatBubble && React.createElement(
-              require('./src/component/FloatingChatBubble').default,
-            )}
-          </View>
-        </PaperProvider>
-        <Toast />
-      </RootSiblingParent>
+                  <NavigationContainer
+                    onReady={() => {
+                      this.updateChatBubble();
+                      this.hideSplash();
+                    }}
+                    onStateChange={state => {
+                      this.updateChatBubble();
+                      if (state?.routes && state.routes.length > 0) {
+                        NavigationService.setActiveScreen(
+                          state.routes[state.routes.length - 1].name,
+                        );
+                        NavigationService.setParentOfActiveScreen(
+                          state.routes[0].name,
+                        );
+                      }
+                    }}
+                    ref={ref => {
+                      if (ref) {
+                        NavigationService.setTopLevelNavigator(ref);
+                      }
+                    }}>
+                    <AppContainer />
+                  </NavigationContainer>
+                  {FEATURE_FLAGS.ENABLE_AI &&
+                    this.state.showChatBubble &&
+                    React.createElement(
+                      require('./src/component/FloatingChatBubble').default,
+                    )}
+                </View>
+              </PaperProvider>
+              <Toast />
+            </RootSiblingParent>
+          </SafeAreaView>
+        </SafeAreaProvider>
+      </GestureHandlerRootView>
     );
   }
 }

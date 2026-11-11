@@ -5,7 +5,6 @@ import {
   TouchableOpacity,
   Animated,
   PanResponder,
-  Dimensions,
   Platform,
 } from 'react-native';
 import sizes from '../common/sizes';
@@ -14,21 +13,25 @@ import {ChatBotSvg} from '../assets/ImageSvg';
 import NavigationService from '../container/screens/NavigationService';
 import {ScreenName} from '../container/AppContainer';
 import {requireLogin} from '../utils/requireLogin';
+import {
+  useSafeAreaFrame,
+  useSafeAreaInsets,
+} from 'react-native-safe-area-context';
 
-const SCREEN_WIDTH = Dimensions.get('window').width;
-const SCREEN_HEIGHT = Dimensions.get('window').height;
 const BUBBLE_SIZE = sizes._56sdp;
 const EDGE_PADDING = sizes._16sdp;
 
 interface IFloatingChatBubbleProps {
   visible?: boolean;
+  width: number;
+  height: number;
 }
 
 interface IFloatingChatBubbleState {
   pan: Animated.ValueXY;
 }
 
-export default class FloatingChatBubble extends React.PureComponent<
+class FloatingChatBubble extends React.PureComponent<
   IFloatingChatBubbleProps,
   IFloatingChatBubbleState
 > {
@@ -38,8 +41,8 @@ export default class FloatingChatBubble extends React.PureComponent<
     super(props);
 
     // Initial position (bottom right)
-    const initialX = SCREEN_WIDTH - BUBBLE_SIZE - EDGE_PADDING;
-    const initialY = SCREEN_HEIGHT - BUBBLE_SIZE - EDGE_PADDING - 100; // 100 for bottom tab bar
+    const initialX = this.props.width - BUBBLE_SIZE - EDGE_PADDING;
+    const initialY = this.props.height - BUBBLE_SIZE - EDGE_PADDING - 100; // 100 for bottom tab bar
 
     this.state = {
       pan: new Animated.ValueXY({x: initialX, y: initialY}),
@@ -79,19 +82,22 @@ export default class FloatingChatBubble extends React.PureComponent<
         let finalY = this.state.pan.y._value;
 
         // Snap to edges
-        const snapToLeft = finalX < SCREEN_WIDTH / 2;
+        const snapToLeft = finalX < this.props.width / 2;
 
         if (snapToLeft) {
           finalX = EDGE_PADDING;
         } else {
-          finalX = SCREEN_WIDTH - BUBBLE_SIZE - EDGE_PADDING;
+          finalX = this.props.width - BUBBLE_SIZE - EDGE_PADDING;
         }
 
         // Keep within vertical bounds
         if (finalY < EDGE_PADDING) {
           finalY = EDGE_PADDING;
-        } else if (finalY > SCREEN_HEIGHT - BUBBLE_SIZE - EDGE_PADDING - 100) {
-          finalY = SCREEN_HEIGHT - BUBBLE_SIZE - EDGE_PADDING - 100;
+        } else if (
+          finalY >
+          this.props.height - BUBBLE_SIZE - EDGE_PADDING - 100
+        ) {
+          finalY = this.props.height - BUBBLE_SIZE - EDGE_PADDING - 100;
         }
 
         // Animate to final position
@@ -103,6 +109,24 @@ export default class FloatingChatBubble extends React.PureComponent<
         }).start();
       },
     });
+  }
+
+  componentDidUpdate(previous: IFloatingChatBubbleProps) {
+    if (
+      previous.width !== this.props.width ||
+      previous.height !== this.props.height
+    ) {
+      this.state.pan.setValue({
+        x: Math.max(
+          EDGE_PADDING,
+          this.props.width - BUBBLE_SIZE - EDGE_PADDING,
+        ),
+        y: Math.max(
+          EDGE_PADDING,
+          this.props.height - BUBBLE_SIZE - EDGE_PADDING - 100,
+        ),
+      });
+    }
   }
 
   handlePress = async () => {
@@ -184,3 +208,14 @@ const styles = StyleSheet.create({
   },
 });
 
+export default function SafeFloatingChatBubble({visible}: {visible?: boolean}) {
+  const frame = useSafeAreaFrame();
+  const insets = useSafeAreaInsets();
+  return (
+    <FloatingChatBubble
+      visible={visible}
+      width={frame.width - insets.left - insets.right}
+      height={frame.height - insets.top - insets.bottom}
+    />
+  );
+}

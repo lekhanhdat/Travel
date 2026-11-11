@@ -1,10 +1,10 @@
+import Modal from './SafeAreaModal';
 import React, {useState} from 'react';
 import {
   View,
   Text,
   TouchableOpacity,
   StyleSheet,
-  Modal,
   FlatList,
   Dimensions,
 } from 'react-native';

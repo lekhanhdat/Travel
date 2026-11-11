@@ -1,7 +1,8 @@
+import Modal from '../../../component/SafeAreaModal';
 import FEATURE_FLAGS from '../../../config/featureFlags';
 import React from 'react';
 import CatalogStatus from '../../../component/CatalogStatus';
-import {ScrollView, View, Image, FlatList, TouchableOpacity, StyleSheet, Modal, Dimensions} from 'react-native';
+import {ScrollView, View, Image, FlatList, TouchableOpacity, StyleSheet, Dimensions} from 'react-native';
 import Page from '../../../component/Page';
 import HeaderBase from '../../../component/HeaderBase';
 import {BackSvg} from '../../../assets/assets/ImageSvg';

@@ -1,6 +1,7 @@
+import Modal from './SafeAreaModal';
 import React from 'react';
 import i18n from '../i18n';
-import {Image, View, ScrollView, TouchableOpacity, Modal, Dimensions, Alert} from 'react-native';
+import {Image, View, ScrollView, TouchableOpacity, Dimensions, Alert} from 'react-native';
 import Toast from 'react-native-toast-message';
 import {IReview} from '../common/types';
 import sizes from '../common/sizes';

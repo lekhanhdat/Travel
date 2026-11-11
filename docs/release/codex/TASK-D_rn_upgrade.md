@@ -27,3 +27,11 @@
 
 ## Out of scope
 New Architecture, iOS build, feature changes, applicationId/package rename.
+
+## Environment notes (Tech Lead, 2026-11-11 23:00)
+- You are on branch `release/rn-upgrade` (base commit `ecd6861` on `dev`). Do NOT commit, push, or switch branches — Claude reviews and commits.
+- Installed for you: `platforms;android-36`, `build-tools;36.0.0`, `ndk;27.1.12297006` in `C:/Android/Sdk`. JDK 17, Node 22. Use `.cmd` launchers (`npm.cmd`, `npx.cmd`) — PowerShell blocks `.ps1`.
+- `android/local.properties` holds `MAPBOX_DOWNLOADS_TOKEN` (secret, gitignored): use it, never print it, never copy it into tracked files or reports.
+- Existing mipmaps, bootsplash assets, `src/config/brand.ts`, security config from batches A–C must be preserved through the template merge (diff carefully; don't blindly overwrite `AndroidManifest.xml`, `MainActivity.kt`, `build.gradle`, `styles.xml`).
+- react-native-bootsplash: upgrade to v7 (RN ≥0.80) per its MIGRATION.md, regenerate assets with the same source/flags as REPORT-C.
+- If the upgrade gets stuck on one library, document it precisely in REPORT-D.md rather than leaving the tree half-migrated silently.

@@ -24,6 +24,14 @@ const config = {
     babelTransformerPath: require.resolve('react-native-svg-transformer'),
   },
   resolver: {
+    // Gradle/CMake caches change during native builds and are not JS sources.
+    blockList: [
+      ...(Array.isArray(defaultConfig.resolver.blockList)
+        ? defaultConfig.resolver.blockList
+        : [defaultConfig.resolver.blockList].filter(Boolean)),
+      /[/\\](?:\.gradle|\.cxx)[/\\].*/,
+      /[/\\]android[/\\](?:app[/\\])?build[/\\].*/,
+    ],
     assetExts: assetExts.filter(ext => ext !== 'svg'),
     sourceExts: [...sourceExts, 'svg'],
   },

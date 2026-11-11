@@ -4,7 +4,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  NativeModules,
   Linking,
 } from 'react-native';
 import Page from '../../../component/Page';
@@ -17,7 +16,6 @@ import {BackSvg} from '../../../assets/assets/ImageSvg';
 import {BRAND} from '../../../config/brand';
 import NavigationService from '../NavigationService';
 
-const {StatusBarManager} = NativeModules;
 
 interface IFAQProps {}
 
@@ -239,7 +237,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
-    paddingTop: StatusBarManager.HEIGHT,
   },
   header: {
     padding: sizes._16sdp,

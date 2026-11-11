@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useState} from 'react';
 import i18n from '../../../i18n';
-import {StyleSheet, View} from 'react-native';
+import {Alert, StyleSheet, View} from 'react-native';
 import Page from '../../../component/Page';
 import HeaderBase from '../../../component/HeaderBase';
 import {BackSvg} from '../../../assets/assets/ImageSvg';
@@ -62,7 +62,7 @@ const Donation = () => {
     try {
       const amt = parseInt(amount || '0', 10);
       if (!amt || amt < 1000 || amt > 50000000) {
-        alert(i18n.t('common:ui.donation.invalidAmount'));
+        Alert.alert(i18n.t('common:ui.donation.invalidAmount'));
         return;
       }
       setCreating(true);
@@ -80,11 +80,11 @@ const Donation = () => {
               if (pollRef.current != null) {clearInterval(pollRef.current as any);}
               pollRef.current = null;
               setQrCode(undefined);
-              alert(i18n.t('common:ui.donation.expired'));
+              Alert.alert(i18n.t('common:ui.donation.expired'));
             } else if (status.status === 'PAID') {
               if (pollRef.current != null) {clearInterval(pollRef.current as any);}
               pollRef.current = null;
-              alert(i18n.t('common:ui.donation.paid'));
+              Alert.alert(i18n.t('common:ui.donation.paid'));
               // Quay về trang Profile
               // @ts-ignore
               require('../NavigationService').default.pop();
@@ -96,7 +96,7 @@ const Donation = () => {
       }
     } catch (e: any) {
       console.error(e);
-      alert(e?.message ?? i18n.t('common:ui.donation.qrFailed'));
+      Alert.alert(e?.message ?? i18n.t('common:ui.donation.qrFailed'));
     } finally {
       setCreating(false);
     }

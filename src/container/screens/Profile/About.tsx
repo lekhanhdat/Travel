@@ -4,7 +4,6 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  NativeModules,
   Linking,
   Image,
 } from 'react-native';
@@ -19,7 +18,6 @@ import images from '../../../res/images';
 import {BRAND} from '../../../config/brand';
 import NavigationService from '../NavigationService';
 
-const {StatusBarManager} = NativeModules;
 
 interface IAboutProps {}
 
@@ -241,7 +239,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
-    paddingTop: StatusBarManager.HEIGHT,
   },
   header: {
     alignItems: 'center',

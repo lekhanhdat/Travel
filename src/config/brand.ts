@@ -21,7 +21,7 @@ export const BRAND: {
   developer: 'Danavi Team',
   copyrightYear: 2026,
   version: '1.0.0',
-  minAndroid: '6.0',
+  minAndroid: '7.0',
   releaseDate: null,
   playStoreId: 'com.travel',
   website: null,

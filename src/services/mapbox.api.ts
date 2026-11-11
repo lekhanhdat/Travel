@@ -50,8 +50,6 @@ class MapboxApi {
         },
       });
 
-      console.log('✅ Mapbox Directions API Response:', response.data);
-      console.log('📊 Routes count:', response.data.routes?.length || 0);
 
       if (response.data.routes && response.data.routes.length > 0) {
         response.data.routes.forEach((route: any, index: number) => {

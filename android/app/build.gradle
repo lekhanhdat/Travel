@@ -79,6 +79,27 @@ def enableProguardInReleaseBuilds = true
  */
 def jscFlavor = 'org.webkit:android-jsc:+'
 
+def releaseSigningPropertyNames = [
+    'MYAPP_RELEASE_STORE_FILE',
+    'MYAPP_RELEASE_STORE_PASSWORD',
+    'MYAPP_RELEASE_KEY_ALIAS',
+    'MYAPP_RELEASE_KEY_PASSWORD'
+]
+def releaseSigningProperties = releaseSigningPropertyNames.collectEntries { name ->
+    [(name): project.findProperty(name)]
+}
+def missingReleaseSigningProperties = releaseSigningPropertyNames.findAll { name ->
+    !releaseSigningProperties[name]?.toString()?.trim()
+}
+
+gradle.taskGraph.whenReady { graph ->
+    if (graph.allTasks.any { it.project == project && it.name.toLowerCase(java.util.Locale.ROOT).contains('release') }
+            && !missingReleaseSigningProperties.isEmpty()) {
+        throw new GradleException("Missing release signing properties: ${missingReleaseSigningProperties.join(', ')}. " +
+            "Set them in ~/.gradle/gradle.properties or CI ORG_GRADLE_PROJECT_<property> environment variables.")
+    }
+}
+
 android {
     ndkVersion rootProject.ext.ndkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
@@ -90,7 +111,7 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
-        versionName "1.0"
+        versionName "1.0.0"
         multiDexEnabled true
     }
 
@@ -111,10 +132,12 @@ android {
             keyPassword 'android'
         }
         release {
-            storeFile file('release.keystore')
-            storePassword 'travel123'
-            keyAlias 'travel-release'
-            keyPassword 'travel123'
+            if (missingReleaseSigningProperties.isEmpty()) {
+                storeFile file(releaseSigningProperties['MYAPP_RELEASE_STORE_FILE'])
+                storePassword releaseSigningProperties['MYAPP_RELEASE_STORE_PASSWORD']
+                keyAlias releaseSigningProperties['MYAPP_RELEASE_KEY_ALIAS']
+                keyPassword releaseSigningProperties['MYAPP_RELEASE_KEY_PASSWORD']
+            }
         }
     }
     buildTypes {

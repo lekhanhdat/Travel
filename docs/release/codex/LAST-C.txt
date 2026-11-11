@@ -1,0 +1,11 @@
+Implemented splash integration, About corrections, and Profile fixes. A+B work preserved; no commit/push or app identifier changes.
+
+- Jest: **24/24 suites pass**
+- TypeScript: **53 errors**, below the 54 limit
+- Changed-file ESLint: **clean**
+- Android debug build: **passed**
+- API 34: verified bridge splash, dismissal, Profile bubble hiding, and About label tap
+
+Flash-free packaged cold start still needs verification; Metro’s debug overlay limited that check.
+
+Details: [REPORT-C.md](D:/Project/Travel/Travel_FE/Travel/docs/release/codex/REPORT-C.md).

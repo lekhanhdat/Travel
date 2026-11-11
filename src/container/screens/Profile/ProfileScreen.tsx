@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  Image,
+  ScrollView,
   Linking,
   NativeModules,
   StyleSheet,
@@ -115,7 +115,7 @@ class ProfileScreen extends React.PureComponent<
     return (
       <Page>
         <HeaderBase hideLeftIcon title={t('profile.title')} />
-        <View style={styles.container}>
+        <ScrollView contentContainerStyle={styles.container}>
           {/* <TextBase style={[AppStyle.txt_20_bold]}>Thông tin cá nhân</TextBase> */}
 
           <View style={{alignSelf: 'center', marginBottom: sizes._10sdp}}>
@@ -284,14 +284,19 @@ class ProfileScreen extends React.PureComponent<
             ]}>
             Other
           </TextBase> */}
-          <View
+          <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel={t('profile.settings')}
+            onPress={() => {
+                NavigationService.navigate(ScreenName.SETTINGS);
+              }}
             style={{
               flexDirection: 'row',
               alignItems: 'center',
               justifyContent: 'space-between',
             }}>
             <TextBase style={AppStyle.txt_18_bold}>{t('profile.settings')}</TextBase>
-            <TouchableOpacity
+            <View
               style={{
                 width: sizes._56sdp,
                 height: sizes._40sdp,
@@ -299,19 +304,21 @@ class ProfileScreen extends React.PureComponent<
                 borderRadius: sizes._1000sdp,
                 alignItems: 'center',
                 justifyContent: 'center',
-              }}
-              onPress={() => {
-                NavigationService.navigate(ScreenName.SETTINGS);
               }}>
               <Setting
                 width={sizes._20sdp}
                 height={sizes._20sdp}
                 color={colors.primary_950}
               />
-            </TouchableOpacity>
-          </View>
+            </View>
+          </TouchableOpacity>
 
-          <View
+          <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel={t('profile.faq')}
+            onPress={() => {
+                NavigationService.navigate(ScreenName.FAQ);
+              }}
             style={{
               flexDirection: 'row',
               alignItems: 'center',
@@ -321,7 +328,7 @@ class ProfileScreen extends React.PureComponent<
             <TextBase style={AppStyle.txt_18_bold}>
               {t('profile.faq')}
             </TextBase>
-            <TouchableOpacity
+            <View
               style={{
                 width: sizes._56sdp,
                 height: sizes._40sdp,
@@ -329,19 +336,21 @@ class ProfileScreen extends React.PureComponent<
                 borderRadius: sizes._1000sdp,
                 alignItems: 'center',
                 justifyContent: 'center',
-              }}
-              onPress={() => {
-                NavigationService.navigate(ScreenName.FAQ);
               }}>
               <FAQ
                 width={sizes._20sdp}
                 height={sizes._20sdp}
                 color={colors.primary_950}
               />
-            </TouchableOpacity>
-          </View>
+            </View>
+          </TouchableOpacity>
 
-          <View
+          <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel={t('profile.policy')}
+            onPress={() => {
+                NavigationService.navigate(ScreenName.POLICY);
+              }}
             style={{
               flexDirection: 'row',
               alignItems: 'center',
@@ -351,7 +360,7 @@ class ProfileScreen extends React.PureComponent<
             <TextBase style={AppStyle.txt_18_bold}>
               {t('profile.policy')}
             </TextBase>
-            <TouchableOpacity
+            <View
               style={{
                 width: sizes._56sdp,
                 height: sizes._40sdp,
@@ -359,19 +368,21 @@ class ProfileScreen extends React.PureComponent<
                 borderRadius: sizes._1000sdp,
                 alignItems: 'center',
                 justifyContent: 'center',
-              }}
-              onPress={() => {
-                NavigationService.navigate(ScreenName.POLICY);
               }}>
               <Policy
                 width={sizes._20sdp}
                 height={sizes._20sdp}
                 color={colors.primary_950}
               />
-            </TouchableOpacity>
-          </View>
+            </View>
+          </TouchableOpacity>
 
-          <View
+          <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel={t('profile.about')}
+            onPress={() => {
+                NavigationService.navigate(ScreenName.ABOUT);
+              }}
             style={{
               flexDirection: 'row',
               alignItems: 'center',
@@ -381,7 +392,7 @@ class ProfileScreen extends React.PureComponent<
             <TextBase style={AppStyle.txt_18_bold}>
               {t('profile.about')}
             </TextBase>
-            <TouchableOpacity
+            <View
               style={{
                 width: sizes._56sdp,
                 height: sizes._40sdp,
@@ -389,17 +400,14 @@ class ProfileScreen extends React.PureComponent<
                 borderRadius: sizes._1000sdp,
                 alignItems: 'center',
                 justifyContent: 'center',
-              }}
-              onPress={() => {
-                NavigationService.navigate(ScreenName.ABOUT);
               }}>
               <TextBase style={{
                 fontSize: sizes._16sdp,
                 fontWeight: 'bold',
                 color: colors.primary_950,
               }}>i</TextBase>
-            </TouchableOpacity>
-          </View>
+            </View>
+          </TouchableOpacity>
 
           <View style={{marginTop: sizes._26sdp, marginHorizontal: sizes._26sdp}}>
             <Button
@@ -422,7 +430,7 @@ class ProfileScreen extends React.PureComponent<
               <TextBase style={[AppStyle.txt_18_bold]}></TextBase>
             </TouchableOpacity> */}
           </View>
-        </View>
+        </ScrollView>
       </Page>
     );
   }
@@ -431,7 +439,8 @@ const styles = StyleSheet.create({
   container: {
     paddingTop: StatusBarManager.HEIGHT + sizes._16sdp,
     padding: sizes._16sdp,
-    flex: 1,
+    flexGrow: 1,
+    paddingBottom: sizes._32sdp,
     backgroundColor: colors.background,
   },
   btn: {

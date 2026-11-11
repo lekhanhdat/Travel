@@ -15,6 +15,8 @@ import sizes from '../../../common/sizes';
 import colors from '../../../common/colors';
 import {AppStyle} from '../../../common/AppStyle';
 import {BackSvg} from '../../../assets/assets/ImageSvg';
+import images from '../../../res/images';
+import {BRAND} from '../../../config/brand';
 import NavigationService from '../NavigationService';
 
 const {StatusBarManager} = NativeModules;
@@ -23,32 +25,47 @@ interface IAboutProps {}
 
 interface IAboutState {}
 
-export default class About extends React.PureComponent<IAboutProps, IAboutState> {
+export default class About extends React.PureComponent<
+  IAboutProps,
+  IAboutState
+> {
   constructor(props: IAboutProps) {
     super(props);
     this.state = {};
   }
 
   handleOpenWebsite = () => {
-    Linking.openURL('https://travelapp.com');
+    if (BRAND.website) {
+      Linking.openURL(BRAND.website);
+    }
   };
 
   handleOpenFacebook = () => {
-    Linking.openURL('https://facebook.com/travelapp');
+    if (BRAND.facebook) {
+      Linking.openURL(BRAND.facebook);
+    }
   };
 
   handleOpenInstagram = () => {
-    Linking.openURL('https://instagram.com/travelapp');
+    if (BRAND.instagram) {
+      Linking.openURL(BRAND.instagram);
+    }
   };
 
   handleSendFeedback = () => {
-    Linking.openURL('mailto:feedback@travelapp.com?subject=Phản hồi về ứng dụng Travel');
+    if (BRAND.feedbackEmail) {
+      Linking.openURL(
+        `mailto:${BRAND.feedbackEmail}?subject=${encodeURIComponent(
+          `Phản hồi về ứng dụng ${BRAND.appName}`,
+        )}`,
+      );
+    }
   };
 
   handleRateApp = () => {
-    // For iOS: Linking.openURL('https://apps.apple.com/app/idXXXXXXXXX');
-    // For Android: Linking.openURL('https://play.google.com/store/apps/details?id=com.travelapp');
-    Linking.openURL('https://play.google.com/store/apps/details?id=com.travelapp');
+    Linking.openURL(
+      `https://play.google.com/store/apps/details?id=${BRAND.playStoreId}`,
+    );
   };
 
   renderInfoItem = (label: string, value: string) => {
@@ -60,7 +77,11 @@ export default class About extends React.PureComponent<IAboutProps, IAboutState>
     );
   };
 
-  renderActionButton = (title: string, subtitle: string, onPress: () => void) => {
+  renderActionButton = (
+    title: string,
+    subtitle: string,
+    onPress: () => void,
+  ) => {
     return (
       <TouchableOpacity style={styles.actionButton} onPress={onPress}>
         <View style={styles.actionContent}>
@@ -87,41 +108,45 @@ export default class About extends React.PureComponent<IAboutProps, IAboutState>
           onLeftIconPress={() => NavigationService.pop()}
         />
 
-        <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+        <ScrollView
+          style={styles.container}
+          showsVerticalScrollIndicator={false}>
           {/* App Logo and Name */}
           <View style={styles.header}>
             <View style={styles.logoContainer}>
-              <View style={styles.logoPlaceholder}>
-                <TextBase style={styles.logoText}>T</TextBase>
-              </View>
+              <Image
+                source={images.danavi_logo}
+                accessibilityLabel={BRAND.appName}
+                style={styles.logo}
+                resizeMode="contain"
+              />
             </View>
-            <TextBase style={styles.appName}>Travel App</TextBase>
-            <TextBase style={styles.appSlogan}>
-              Khám phá Việt Nam cùng chúng tôi
-            </TextBase>
+            <TextBase style={styles.appSlogan}>{BRAND.tagline}</TextBase>
           </View>
 
           {/* App Information */}
           <View style={styles.section}>
             <TextBase style={styles.sectionTitle}>Thông tin ứng dụng</TextBase>
-            {this.renderInfoItem('Phiên bản', '1.0.0')}
-            {this.renderInfoItem('Ngày phát hành', '01/01/2024')}
-            {this.renderInfoItem('Kích thước', '45.2 MB')}
-            {this.renderInfoItem('Nhà phát triển', 'Travel Team')}
-            {this.renderInfoItem('Hỗ trợ', 'iOS 12.0+, Android 8.0+')}
+            {this.renderInfoItem('Phiên bản', BRAND.version)}
+            {BRAND.releaseDate &&
+              this.renderInfoItem('Ngày phát hành', BRAND.releaseDate)}
+            {this.renderInfoItem('Nhà phát triển', BRAND.developer)}
+            {this.renderInfoItem('Hỗ trợ', `Android ${BRAND.minAndroid}+`)}
           </View>
 
           {/* About Description */}
           <View style={styles.section}>
             <TextBase style={styles.sectionTitle}>Giới thiệu</TextBase>
             <TextBase style={styles.description}>
-              Travel App là ứng dụng du lịch hàng đầu Việt Nam, giúp bạn khám phá những địa điểm tuyệt vời nhất trên khắp đất nước.
-              Với cơ sở dữ liệu phong phú về các điểm du lịch, nhà hàng, khách sạn và hoạt động giải trí,
-              chúng tôi mang đến cho bạn trải nghiệm du lịch hoàn hảo.
+              {BRAND.appName} là ứng dụng du lịch Đà Nẵng, giúp bạn khám phá các
+              địa điểm, ẩm thực và hoạt động tại thành phố. Với cơ sở dữ liệu
+              phong phú về các điểm du lịch, nhà hàng, khách sạn và hoạt động
+              giải trí, chúng tôi mang đến cho bạn trải nghiệm du lịch hoàn hảo.
             </TextBase>
             <TextBase style={styles.description}>
-              Ứng dụng cung cấp thông tin chi tiết, đánh giá từ cộng đồng, bản đồ tương tác và nhiều tính năng hữu ích khác
-              để giúp bạn lên kế hoạch và tận hưởng chuyến đi một cách tốt nhất.
+              Ứng dụng cung cấp thông tin chi tiết, đánh giá từ cộng đồng, bản
+              đồ tương tác và nhiều tính năng hữu ích khác để giúp bạn lên kế
+              hoạch và tận hưởng chuyến đi một cách tốt nhất.
             </TextBase>
           </View>
 
@@ -129,12 +154,24 @@ export default class About extends React.PureComponent<IAboutProps, IAboutState>
           <View style={styles.section}>
             <TextBase style={styles.sectionTitle}>Tính năng nổi bật</TextBase>
             <View style={styles.featureList}>
-              <TextBase style={styles.featureItem}>🗺️ Bản đồ tương tác với GPS</TextBase>
-              <TextBase style={styles.featureItem}>⭐ Đánh giá và bình luận từ cộng đồng</TextBase>
-              <TextBase style={styles.featureItem}>📸 Chia sẻ hình ảnh và trải nghiệm</TextBase>
-              <TextBase style={styles.featureItem}>🔍 Tìm kiếm thông minh</TextBase>
-              <TextBase style={styles.featureItem}>📱 Giao diện thân thiện, dễ sử dụng</TextBase>
-              <TextBase style={styles.featureItem}>🌐 Hoạt động offline</TextBase>
+              <TextBase style={styles.featureItem}>
+                🗺️ Bản đồ tương tác với GPS
+              </TextBase>
+              <TextBase style={styles.featureItem}>
+                ⭐ Đánh giá và bình luận từ cộng đồng
+              </TextBase>
+              <TextBase style={styles.featureItem}>
+                📸 Chia sẻ hình ảnh và trải nghiệm
+              </TextBase>
+              <TextBase style={styles.featureItem}>
+                🔍 Tìm kiếm thông minh
+              </TextBase>
+              <TextBase style={styles.featureItem}>
+                📱 Giao diện thân thiện, dễ sử dụng
+              </TextBase>
+              <TextBase style={styles.featureItem}>
+                🌐 Hoạt động offline
+              </TextBase>
             </View>
           </View>
 
@@ -144,37 +181,51 @@ export default class About extends React.PureComponent<IAboutProps, IAboutState>
             {this.renderActionButton(
               'Đánh giá ứng dụng',
               'Chia sẻ trải nghiệm của bạn trên cửa hàng ứng dụng',
-              this.handleRateApp
+              this.handleRateApp,
             )}
-            {this.renderActionButton(
-              'Gửi phản hồi',
-              'Góp ý để chúng tôi cải thiện ứng dụng',
-              this.handleSendFeedback
-            )}
-            {this.renderActionButton(
-              'Website chính thức',
-              'Truy cập trang web của chúng tôi',
-              this.handleOpenWebsite
-            )}
+            {BRAND.feedbackEmail &&
+              this.renderActionButton(
+                'Gửi phản hồi',
+                'Góp ý để chúng tôi cải thiện ứng dụng',
+                this.handleSendFeedback,
+              )}
+            {BRAND.website &&
+              this.renderActionButton(
+                'Website chính thức',
+                'Truy cập trang web của chúng tôi',
+                this.handleOpenWebsite,
+              )}
           </View>
 
           {/* Social Media */}
-          <View style={styles.section}>
-            <TextBase style={styles.sectionTitle}>Theo dõi chúng tôi</TextBase>
-            <View style={styles.socialContainer}>
-              <TouchableOpacity style={styles.socialButton} onPress={this.handleOpenFacebook}>
-                <TextBase style={styles.socialText}>Facebook</TextBase>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.socialButton} onPress={this.handleOpenInstagram}>
-                <TextBase style={styles.socialText}>Instagram</TextBase>
-              </TouchableOpacity>
+          {(BRAND.facebook || BRAND.instagram) && (
+            <View style={styles.section}>
+              <TextBase style={styles.sectionTitle}>
+                Theo dõi chúng tôi
+              </TextBase>
+              <View style={styles.socialContainer}>
+                {BRAND.facebook && (
+                  <TouchableOpacity
+                    style={styles.socialButton}
+                    onPress={this.handleOpenFacebook}>
+                    <TextBase style={styles.socialText}>Facebook</TextBase>
+                  </TouchableOpacity>
+                )}
+                {BRAND.instagram && (
+                  <TouchableOpacity
+                    style={styles.socialButton}
+                    onPress={this.handleOpenInstagram}>
+                    <TextBase style={styles.socialText}>Instagram</TextBase>
+                  </TouchableOpacity>
+                )}
+              </View>
             </View>
-          </View>
+          )}
 
           {/* Copyright */}
           <View style={styles.footer}>
             <TextBase style={styles.copyright}>
-              © 2024 Travel App. All rights reserved.
+              © {BRAND.copyrightYear} {BRAND.appName}
             </TextBase>
             <TextBase style={styles.copyright}>
               Made with ❤️ in Vietnam
@@ -198,24 +249,12 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
   },
   logoContainer: {
+    backgroundColor: colors.white,
     marginBottom: sizes._16sdp,
   },
-  logoPlaceholder: {
-    width: sizes._80sdp,
-    height: sizes._80sdp,
-    borderRadius: sizes._40sdp,
-    backgroundColor: colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  logoText: {
-    ...AppStyle.txt_32_bold,
-    color: colors.white,
-  },
-  appName: {
-    ...AppStyle.txt_24_bold,
-    color: colors.primary_950,
-    marginBottom: sizes._8sdp,
+  logo: {
+    width: 120,
+    height: 120,
   },
   appSlogan: {
     ...AppStyle.txt_16_regular,

@@ -4,6 +4,7 @@
  */
 
  const images = {
+    danavi_logo: require('../assets/images/danavi_logo.png'),
     caurong: require('../assets/images/caurong.jpg'),
     eye_close: require('../assets/images/eye_close.png'),
     eye_open: require('../assets/images/eye_open.png'),

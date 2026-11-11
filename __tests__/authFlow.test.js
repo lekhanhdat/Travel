@@ -22,6 +22,8 @@ jest.mock('react-native-iphone-x-helper', () => ({isIphoneX: () => false}));
 jest.mock('../src/component/Page', () => 'Page');
 jest.mock('../src/component/HeaderBase', () => 'Header');
 
+const React = require('react');
+const {render, fireEvent} = require('@testing-library/react-native');
 const Toast = require('react-native-toast-message');
 const NavigationService = require('../src/container/screens/NavigationService');
 const authApi = require('../src/services/auth.api').default;
@@ -80,6 +82,15 @@ describe('Login', () => {
 
 describe('Profile', () => {
   const props = () => ({navigation: {addListener: jest.fn()}, t: key => key});
+
+  it.each([
+    ['settings', 'Settings'], ['faq', 'FAQ'], ['policy', 'Policy'], ['about', 'About'],
+  ])('opens %s when its row label is pressed', (key, route) => {
+    const screen = render(React.createElement(ProfileScreen, props()));
+    fireEvent.press(screen.getByText(`profile.${key}`));
+    expect(NavigationService.navigate).toHaveBeenCalledWith(route);
+    screen.unmount();
+  });
 
   it('a guest asking for account info is sent to Login', async () => {
     authApi.isLoggedIn.mockResolvedValue(false);

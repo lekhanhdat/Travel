@@ -7,7 +7,7 @@ import Policy from '../src/container/screens/Profile/Policy';
 import {BRAND} from '../src/config/brand';
 
 jest.mock('../src/component/HeaderBase', () => 'HeaderBase');
-jest.mock('../src/assets/assets/ImageSvg', () => ({BackSvg: 'BackSvg'}));
+jest.mock('../src/assets/ImageSvg', () => ({BackSvg: 'BackSvg'}));
 jest.mock('../src/container/screens/NavigationService', () => ({
   pop: jest.fn(),
 }));

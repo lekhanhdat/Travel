@@ -21,9 +21,9 @@ import HeaderBase from '../../../component/HeaderBase';
 import TextBase from '../../../common/TextBase';
 import sizes from '../../../common/sizes';
 import colors from '../../../common/colors';
-import {AppStyle} from '../../../common/AppStyle';
+
 import NavigationService from '../NavigationService';
-import {BackSvg} from '../../../assets/assets/ImageSvg';
+import {BackSvg} from '../../../assets/ImageSvg';
 import {SendSvg, CameraSvg} from '../../../assets/ImageSvg';
 import {
   sendChatMessage,
@@ -104,7 +104,6 @@ export default class ChatbotScreen extends React.PureComponent<
         ]);
       }
     } catch (error) {
-      console.log('Error loading chat history:', error);
       // Fallback to welcome message
       const welcomeMessage: ChatMessage = {
         role: 'assistant',
@@ -119,7 +118,6 @@ export default class ChatbotScreen extends React.PureComponent<
     try {
       await LocalStorageCommon.setItem(localStorageKey.CHAT_HISTORY, messages);
     } catch (error) {
-      console.log('Error saving chat history:', error);
     }
   };
 
@@ -132,9 +130,7 @@ export default class ChatbotScreen extends React.PureComponent<
       },
       async (response) => {
         if (response.didCancel) {
-          console.log('User cancelled image picker');
         } else if (response.errorCode) {
-          console.log('ImagePicker Error: ', response.errorMessage);
           Alert.alert('Lỗi', i18n.t('common:ui.common.pickImageFailed'));
         } else if (response.assets && response.assets.length > 0) {
           const asset = response.assets[0];
@@ -267,9 +263,7 @@ export default class ChatbotScreen extends React.PureComponent<
 
       // If user wants to see images, search on SerpAPI
       if (wantsImage) {
-        console.log('🔍 User wants to see images');
         const imageCount = extractImageCount(userTextContent);
-        console.log(`📊 Requesting ${imageCount} images`);
 
         const imageResponse = await searchImage(userTextContent, imageCount);
 

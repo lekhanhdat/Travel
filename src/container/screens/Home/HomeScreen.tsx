@@ -146,8 +146,7 @@ class HomeScreen extends React.PureComponent<
         const {latitude, longitude} = position.coords;
         this.setState({currentLat: latitude, currentLong: longitude}, this.updateNearby);
       })
-      .catch(error => {
-        console.log('❌ Error getting location:', error);
+      .catch(_error => {
         this.setState({nearbyStatus: 'unavailable'});
       });
   };
@@ -182,7 +181,7 @@ class HomeScreen extends React.PureComponent<
   );
 
   // ============ PERFORMANCE OPTIMIZATION: Memoized render functions ============
-  renderItemHorizontal = ({item, index}: {item: ILocation; index: number}) => {
+  renderItemHorizontal = ({item}: {item: ILocation; index: number}) => {
     return (
       <BigItemLocation 
         location={item} 
@@ -192,7 +191,7 @@ class HomeScreen extends React.PureComponent<
     );
   };
 
-  renderItemLarge = ({item, index}: {item: ILocation; index: number}) => {
+  renderItemLarge = ({item}: {item: ILocation; index: number}) => {
     return (
       <LargeItemLocation 
         location={item} 
@@ -208,7 +207,7 @@ class HomeScreen extends React.PureComponent<
   // getItemLayout for horizontal FlatList (BigItemLocation)
   // BigItemLocation width: 200 + marginRight: 12 = 212
   getItemLayoutHorizontal = (
-    data: ILocation[] | null | undefined,
+    data: ArrayLike<ILocation> | null | undefined,
     index: number,
   ) => ({
     length: 212,
@@ -219,7 +218,7 @@ class HomeScreen extends React.PureComponent<
   // getItemLayout for vertical FlatList (LargeItemLocation)
   // LargeItemLocation height: approximately 120 (image 80 + padding + text)
   getItemLayoutVertical = (
-    data: ILocation[] | null | undefined,
+    data: ArrayLike<ILocation> | null | undefined,
     index: number,
   ) => ({
     length: 120,
@@ -250,7 +249,7 @@ class HomeScreen extends React.PureComponent<
   handleSearchCallback = (
     filteredData: ILocation[],
     searchValue: string,
-    isSemanticSearch?: boolean,
+    _isSemanticSearch?: boolean,
   ) => {
     this.ensureHotels();
     this.setState({valueSearch: searchValue});
@@ -262,19 +261,13 @@ class HomeScreen extends React.PureComponent<
     searchValue: string,
     isSemanticSearch?: boolean,
   ) => {
-    console.log('📥 [HomeScreen] handleSearchSubmit received:');
-    console.log('  📋 filteredData.length:', filteredData?.length || 0);
-    console.log('  📋 searchValue:', searchValue);
-    console.log('  📋 isSemanticSearch:', isSemanticSearch);
 
     if (!searchValue || searchValue.trim().length === 0) {
-      console.log('  ⚠️ Empty search, not navigating');
       return; // Don't navigate if search is empty
     }
     this.setState({valueSearch: searchValue}, () => {
       // ALWAYS use filteredData from the search component - it contains the semantic results
       const locationsToShow = filteredData;
-      console.log('  ➡️ Navigating with', locationsToShow.length, 'locations');
       this.handleSearchWithFlag(
         false,
         locationsToShow,
@@ -292,9 +285,6 @@ class HomeScreen extends React.PureComponent<
       this.searchBarRef.current?.getSearchValue?.() ||
       this.state.valueSearch ||
       '';
-    console.log('🧭 [HomeScreen] Navigating to ViewAllLocation:');
-    console.log('  📋 locations.length:', locations.length);
-    console.log('  📋 isSemanticSearch:', isSemanticSearch);
     NavigationService.navigate(ScreenName.VIEW_ALL_SCREEN, {
       title: isViewAll
         ? this.props.t('home.viewAll')

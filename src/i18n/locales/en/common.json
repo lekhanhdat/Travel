@@ -459,6 +459,7 @@
     },
     "camera": {
       "connected": "✅ Connected",
+      "connectionError": "❌ Connection error",
       "backendOk": "The server is working normally",
       "captureError": "Capture error",
       "saveFailed": "Could not save the photo",

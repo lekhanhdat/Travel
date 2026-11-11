@@ -3,7 +3,7 @@ import i18n from '../../../i18n';
 import {Alert, StyleSheet, View} from 'react-native';
 import Page from '../../../component/Page';
 import HeaderBase from '../../../component/HeaderBase';
-import {BackSvg} from '../../../assets/assets/ImageSvg';
+import {BackSvg} from '../../../assets/ImageSvg';
 import colors from '../../../common/colors';
 import sizes from '../../../common/sizes';
 import TextBase from '../../../common/TextBase';

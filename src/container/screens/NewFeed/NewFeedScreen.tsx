@@ -15,7 +15,7 @@ import TextBase from '../../../common/TextBase';
 import {AppStyle} from '../../../common/AppStyle';
 import LocalStorageCommon from '../../../utils/LocalStorageCommon';
 import {localStorageKey} from '../../../common/constants';
-import {StarActive, StarInActive} from '../../../assets/assets/ImageSvg';
+import {StarActive, StarInActive} from '../../../assets/ImageSvg';
 import {TextInput, Button} from 'react-native-paper';
 import moment from 'moment';
 import LargeItemLocation from '../../../component/LargeItemLocation';
@@ -120,7 +120,6 @@ export default class NewFeedScreen extends React.PureComponent<
     try {
       // Reviews chỉ lấy từ API (uses cache); chưa có review thì danh sách rỗng.
       const allReviews = await locationApi.getReviews();
-      if (__DEV__) {console.log('✅ Cloud reviews:', allReviews.length);}
 
       // Sắp xếp theo thời gian (mới nhất lên trên)
       const sortedReviews = allReviews.sort((a, b) => {
@@ -179,15 +178,12 @@ export default class NewFeedScreen extends React.PureComponent<
       },
       (response) => {
         if (response.didCancel) {
-          if (__DEV__) {console.log('User cancelled image picker');}
         } else if (response.errorCode) {
-          if (__DEV__) {console.log('ImagePicker Error: ', response.errorMessage);}
           Alert.alert('Lỗi', i18n.t('common:ui.common.pickImageFailed'));
         } else if (response.assets) {
           this.setState({
             selectedImages: response.assets,
           });
-          if (__DEV__) {console.log('✅ Selected images:', response.assets.length);}
         }
       },
     );
@@ -208,12 +204,10 @@ export default class NewFeedScreen extends React.PureComponent<
       // 1. Upload images nếu có (POST /uploads; lỗi một ảnh thì dừng, không đăng thiếu ảnh)
       let imageUrls: string[] = [];
       if (this.state.selectedImages.length > 0) {
-        if (__DEV__) {console.log('📤 Uploading images...');}
         for (const image of this.state.selectedImages) {
           const uploadResult = await locationApi.uploadImage(image);
           imageUrls.push(uploadResult.url);
         }
-        if (__DEV__) {console.log('✅ Images uploaded:', imageUrls.length);}
       }
 
       // 2. Review gửi lên BE (tác giả, thời gian, id do BE gán từ tài khoản đăng nhập)
@@ -226,7 +220,6 @@ export default class NewFeedScreen extends React.PureComponent<
 
       // 3. Save to BE (POST /reviews)
       const savedReview = await locationApi.createReview(newReview);
-      if (__DEV__) {console.log('✅ Review saved to cloud');}
 
       // 4. Update local state
       this.setState(
@@ -253,7 +246,7 @@ export default class NewFeedScreen extends React.PureComponent<
     }
   };
 
-  renderItemLarge = ({item, index}: {item: ILocation; index: number}) => {
+  renderItemLarge = ({item}: {item: ILocation; index: number}) => {
     return <LargeItemLocation location={item}
     onPress={() => {
       this.setState(

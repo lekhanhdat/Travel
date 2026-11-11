@@ -2,7 +2,7 @@ import {ScrollView, StyleSheet, Text, View} from 'react-native';
 import React from 'react';
 import Page from '../../../component/Page';
 import HeaderBase from '../../../component/HeaderBase';
-import {BackSvg} from '../../../assets/assets/ImageSvg';
+import {BackSvg} from '../../../assets/ImageSvg';
 import colors from '../../../common/colors';
 import sizes from '../../../common/sizes';
 import NavigationService from '../NavigationService';
@@ -18,7 +18,6 @@ interface States {}
 export default class Advise extends React.PureComponent<Props, States> {
   render(): React.ReactNode {
     const location: ILocation = this.props.route?.params?.location;
-    console.log(111, JSON.stringify(location, null, 2));
     return (
       <Page style={styles.pageContainer}>
         <HeaderBase

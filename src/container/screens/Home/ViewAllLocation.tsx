@@ -4,7 +4,7 @@ import React from 'react';
 import { FlatList, View, TouchableOpacity, StyleSheet } from 'react-native';
 import Page from '../../../component/Page';
 import HeaderBase from '../../../component/HeaderBase';
-import { BackSvg } from '../../../assets/assets/ImageSvg';
+import { BackSvg } from '../../../assets/ImageSvg';
 import sizes from '../../../common/sizes';
 import colors from '../../../common/colors';
 import { ILocation } from '../../../common/types';
@@ -12,7 +12,7 @@ import LargeItemLocation from '../../../component/LargeItemLocation';
 import NavigationService from '../NavigationService';
 import { LOCATION_SEARCH_FIELDS, searchCatalog } from '../../../utils/catalogSearch';
 import TextBase from '../../../common/TextBase';
-import { AppStyle } from '../../../common/AppStyle';
+
 import {
   withTranslation,
   WithTranslationProps,
@@ -75,11 +75,9 @@ class ViewAllLocation extends React.PureComponent<
     const params = getParams(this.props);
     const valueSearch: string = params.valueSearch ?? '';
 
-    if (__DEV__) {console.log('📋 Filtering with mode:', searchMode, 'filter:', selectedFilter);}
 
     // If semantic search mode, use pre-filtered results directly (already sorted by AI relevance)
     if (searchMode === 'semantic') {
-      if (__DEV__) {console.log('🧠 Semantic search results - using pre-filtered data:', allLocations.length, 'items');}
       this.setState({ locations: allLocations });
       return;
     }
@@ -93,7 +91,6 @@ class ViewAllLocation extends React.PureComponent<
     };
     const locationOut = searchCatalog(allLocations, valueSearch, fields[selectedFilter] ?? fields.all);
 
-    if (__DEV__) {console.log('🔤 Keyword search results:', locationOut.length, 'items');}
     this.setState({ locations: locationOut });
   };
 
@@ -109,7 +106,7 @@ class ViewAllLocation extends React.PureComponent<
     );
   };
 
-  renderItem = ({ item, index }: { item: ILocation, index: number }) => {
+  renderItem = ({ item }: { item: ILocation, index: number }) => {
     return <LargeItemLocation location={item} />
   };
 

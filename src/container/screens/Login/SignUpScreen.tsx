@@ -181,7 +181,7 @@ export default class SignUpScreen extends React.PureComponent<
               textColor={colors.primary_950}
               placeholderTextColor={colors.primary_400}
               value={fullName}
-              onChangeText={fullName => this.setState({fullName})}
+              onChangeText={fullNameInput => this.setState({fullName: fullNameInput})}
             />
 
             {/* Birthday */}
@@ -194,7 +194,7 @@ export default class SignUpScreen extends React.PureComponent<
               textColor={colors.primary_950}
               placeholderTextColor={colors.primary_400}
               value={birthday}
-              onChangeText={birthday => this.setState({birthday})}
+              onChangeText={birthdayInput => this.setState({birthday: birthdayInput})}
             />
 
             {/* Gender */}
@@ -231,7 +231,7 @@ export default class SignUpScreen extends React.PureComponent<
               textColor={colors.primary_950}
               placeholderTextColor={colors.primary_400}
               value={address}
-              onChangeText={address => this.setState({address})}
+              onChangeText={addressInput => this.setState({address: addressInput})}
             />
 
             {/* Phone */}
@@ -245,7 +245,7 @@ export default class SignUpScreen extends React.PureComponent<
               placeholderTextColor={colors.primary_400}
               keyboardType="phone-pad"
               value={phone}
-              onChangeText={phone => this.setState({phone})}
+              onChangeText={phoneInput => this.setState({phone: phoneInput})}
             />
 
             {/* Email */}
@@ -260,7 +260,7 @@ export default class SignUpScreen extends React.PureComponent<
               keyboardType="email-address"
               autoCapitalize="none"
               value={email}
-              onChangeText={email => this.setState({email})}
+              onChangeText={emailInput => this.setState({email: emailInput})}
             />
 
             {/* Username */}
@@ -275,7 +275,7 @@ export default class SignUpScreen extends React.PureComponent<
               value={userName}
               autoCapitalize="none"
               autoCorrect={false}
-              onChangeText={userName => this.setState({userName})}
+              onChangeText={userNameInput => this.setState({userName: userNameInput})}
             />
 
             {/* Password */}
@@ -289,7 +289,7 @@ export default class SignUpScreen extends React.PureComponent<
               placeholderTextColor={colors.primary_400}
               secureTextEntry={isSecureTextEntry}
               value={password}
-              onChangeText={password => this.setState({password})}
+              onChangeText={passwordInput => this.setState({password: passwordInput})}
               right={
                 <TextInput.Icon
                   icon={isSecureTextEntry ? images.eye_open : images.eye_close}
@@ -309,7 +309,7 @@ export default class SignUpScreen extends React.PureComponent<
               placeholderTextColor={colors.primary_400}
               secureTextEntry={isSecureTextEntryConfirm}
               value={confirmPassword}
-              onChangeText={confirmPassword => this.setState({confirmPassword})}
+              onChangeText={confirmPasswordInput => this.setState({confirmPassword: confirmPasswordInput})}
               right={
                 <TextInput.Icon
                   icon={

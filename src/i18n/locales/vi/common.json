@@ -459,6 +459,7 @@
     },
     "camera": {
       "connected": "✅ Kết nối thành công",
+      "connectionError": "❌ Lỗi kết nối",
       "backendOk": "Backend API đang hoạt động bình thường",
       "captureError": "Lỗi chụp ảnh",
       "saveFailed": "Không thể lưu ảnh",

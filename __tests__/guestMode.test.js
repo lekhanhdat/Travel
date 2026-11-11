@@ -3,7 +3,6 @@ const renderer = require('react-test-renderer');
 const {act} = renderer;
 
 jest.mock('../src/assets/ImageSvg', () => new Proxy({}, {get: (_, name) => name === '__esModule' ? false : 'Icon'}));
-jest.mock('../src/assets/assets/ImageSvg', () => new Proxy({}, {get: (_, name) => name === '__esModule' ? false : 'Icon'}));
 jest.mock('../src/container/AppContainer', () => ({ScreenName: {VIEW_ALL_SCREEN: 'ViewAllLocation', DETAIL_LOCATION_SCREEN: 'DetailLocationScreen'}}));
 jest.mock('../src/container/screens/NavigationService', () => ({navigate: jest.fn()}));
 jest.mock('../src/hoc/withTranslation', () => ({withTranslation: component => component}));

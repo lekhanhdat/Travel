@@ -47,8 +47,7 @@ const CachedImage: React.FC<CachedImageProps> = memo(({
   const handleError = useCallback(() => {
     setLoading(false);
     setError(true);
-    if (__DEV__) {console.log('CachedImage error loading:', uri);}
-  }, [uri]);
+  }, []);
 
   // If no URI or error, show placeholder
   if (!uri || error) {

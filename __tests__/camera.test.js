@@ -12,7 +12,6 @@ jest.mock('react-native-paper', () => ({ActivityIndicator: 'Spinner', Modal: 'Mo
 jest.mock('react-native-toast-message', () => ({show: jest.fn()}));
 jest.mock('react-native-image-viewing', () => 'ImageView');
 jest.mock('../src/assets/ImageSvg', () => new Proxy({}, {get: (_, name) => name === '__esModule' ? false : 'Icon'}));
-jest.mock('../src/assets/assets/ImageSvg', () => new Proxy({}, {get: (_, name) => name === '__esModule' ? false : 'Icon'}));
 jest.mock('../src/component/Page', () => 'Page');
 jest.mock('../src/component/HeaderBase', () => 'Header');
 jest.mock('../src/component/CameraResultModal', () => 'ResultModal');
@@ -101,4 +100,29 @@ it('Camera asks only for the camera permission (photos only)', async () => {
   expect(Camera.requestMicrophonePermission).not.toHaveBeenCalled();
   expect(screen.state.hasPermission).toBe(true);
   expect(global.fetch).toHaveBeenCalledWith(`${env.API_BASE_URL}/`, expect.anything());
+});
+
+it.each([true, false])('Camera backend diagnostics are dev-only (dev=%s)', async dev => {
+  const previousDev = global.__DEV__;
+  global.__DEV__ = dev;
+  global.fetch = jest.fn(async () => ({ok: true, status: 200, json: async () => ({})}));
+  Camera.requestCameraPermission.mockResolvedValue('granted');
+  const screen = instance(CameraScreen, {navigation: {addListener: jest.fn()}});
+  try {
+    await screen.componentDidMount();
+    expect(global.fetch).toHaveBeenCalledTimes(dev ? 1 : 0);
+    global.fetch.mockClear();
+    await screen.testBackendConnection();
+    expect(global.fetch).toHaveBeenCalledTimes(dev ? 1 : 0);
+
+    screen.state = {...screen.state, hasPermission: true, device: {id: 'back'}};
+    const hasWifiButton = node => {
+      if (!node || typeof node !== 'object') {return false;}
+      if (node.props?.name === 'wifi') {return true;}
+      return require('react').Children.toArray(node.props?.children).some(hasWifiButton);
+    };
+    expect(hasWifiButton(screen.render())).toBe(dev);
+  } finally {
+    global.__DEV__ = previousDev;
+  }
 });

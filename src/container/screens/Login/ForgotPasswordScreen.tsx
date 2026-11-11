@@ -19,7 +19,7 @@ import {AppStyle} from '../../../common/AppStyle';
 import NavigationService from '../NavigationService';
 import {ScreenName} from '../../AppContainer';
 import authApi from '../../../services/auth.api';
-import {IAccount} from '../../../common/types';
+
 
 type ForgotPasswordProps = {
   navigation: any;
@@ -258,7 +258,7 @@ export default class ForgotPasswordScreen extends React.PureComponent<
             keyboardType="email-address"
             autoCapitalize="none"
             value={email}
-            onChangeText={email => this.setState({email})}
+            onChangeText={emailInput => this.setState({email: emailInput})}
           />
 
           <TouchableOpacity
@@ -329,7 +329,7 @@ export default class ForgotPasswordScreen extends React.PureComponent<
             keyboardType="number-pad"
             maxLength={6}
             value={otp}
-            onChangeText={otp => this.setState({otp})}
+            onChangeText={otpInput => this.setState({otp: otpInput})}
           />
 
           <TouchableOpacity
@@ -407,7 +407,7 @@ export default class ForgotPasswordScreen extends React.PureComponent<
             placeholderTextColor={colors.primary_400}
             secureTextEntry={isSecureTextEntry}
             value={newPassword}
-            onChangeText={newPassword => this.setState({newPassword})}
+            onChangeText={newPasswordInput => this.setState({newPassword: newPasswordInput})}
             right={
               <TextInput.Icon
                 icon={isSecureTextEntry ? images.eye_open : images.eye_close}
@@ -426,7 +426,7 @@ export default class ForgotPasswordScreen extends React.PureComponent<
             placeholderTextColor={colors.primary_400}
             secureTextEntry={isSecureTextEntryConfirm}
             value={confirmPassword}
-            onChangeText={confirmPassword => this.setState({confirmPassword})}
+            onChangeText={confirmPasswordInput => this.setState({confirmPassword: confirmPasswordInput})}
             right={
               <TextInput.Icon
                 icon={

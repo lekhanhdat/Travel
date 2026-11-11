@@ -127,21 +127,14 @@ export default class SemanticSearchBarComponent<T> extends React.PureComponent<
     if (!FEATURE_FLAGS.ENABLE_AI) {return this.filterDataKeyword(query);}
     const {data, entityType, idField = 'id' as keyof T} = this.props;
 
-    console.log('🔍 [SemanticSearch] Starting search...');
-    console.log('  📋 Query:', query);
-    console.log('  📋 Entity type:', entityType);
-    console.log('  📋 ID field:', String(idField));
-    console.log('  📋 Data count:', data.length);
 
     if (!query || query.trim().length < 2) {
-      console.log('  ⚠️ Query too short, returning all data');
       this.setState({isSearching: false, lastFilteredData: data});
       return data;
     }
 
     this.setState({isSearching: true});
     try {
-      console.log('  🌐 Calling semantic search API...');
 
       /**
        * Semantic Search Strategy:
@@ -160,25 +153,8 @@ export default class SemanticSearchBarComponent<T> extends React.PureComponent<
         min_score: 0.1,   // Low threshold - let frontend handle filtering
       });
 
-      console.log('  📊 API Response:', {
-        success: response.success,
-        resultsCount: response.results?.length || 0,
-        topScores: response.results?.slice(0, 3).map(r => r.score.toFixed(2)),
-        error: response.error,
-      });
 
       if (response.success && response.results && response.results.length > 0) {
-        // Log API result IDs - Backend returns "id", NOT "entity_id"
-        const apiResultIds = response.results.map(r => r.id);
-        console.log('  🔢 API returned IDs:', apiResultIds);
-
-        // Log local data IDs for comparison
-        const localIds = data.slice(0, 5).map(item => {
-          const id = item[idField];
-          return { id, type: typeof id };
-        });
-        console.log('  📋 Local data IDs (first 5):', localIds);
-
         // Create score map for all results
         const scoreMap = new Map(response.results.map(r => [r.id, r.score]));
 
@@ -202,7 +178,6 @@ export default class SemanticSearchBarComponent<T> extends React.PureComponent<
           }
         });
 
-        console.log('  📊 Total matched items:', matchedWithScores.length);
 
         // Sort all matched items by score (highest first)
         matchedWithScores.sort((a, b) => b.score - a.score);
@@ -212,30 +187,16 @@ export default class SemanticSearchBarComponent<T> extends React.PureComponent<
         const aboveThreshold = matchedWithScores.filter(
           m => m.score > this.SIMILARITY_THRESHOLD
         );
-        console.log(`  📊 Items above ${this.SIMILARITY_THRESHOLD} threshold:`, aboveThreshold.length);
 
         let finalResults: T[];
 
         if (aboveThreshold.length >= this.MIN_RESULTS_COUNT) {
           // PRIMARY RULE: Show all results above threshold
-          console.log(`  ✅ Using PRIMARY rule: ${aboveThreshold.length} results above threshold`);
           finalResults = aboveThreshold.map(m => m.item);
         } else {
           // FALLBACK RULE: Show top MIN_RESULTS_COUNT results
           const topResults = matchedWithScores.slice(0, this.MIN_RESULTS_COUNT);
-          console.log(`  ⚡ Using FALLBACK rule: showing top ${topResults.length} results`);
           finalResults = topResults.map(m => m.item);
-        }
-
-        // Log final results with scores
-        if (finalResults.length > 0) {
-          console.log('  📊 Final results sorted by relevance:');
-          finalResults.slice(0, 5).forEach((item, i) => {
-            const id = Number((item[idField]));
-            const name = (item as any).name || (item as any).Name || 'Unknown';
-            const score = scoreMap.get(id) || 0;
-            console.log(`    ${i + 1}. "${name}" (score: ${score.toFixed(2)})`);
-          });
         }
 
         // Hotels matching the words (keyword search) follow the semantic results.
@@ -245,16 +206,13 @@ export default class SemanticSearchBarComponent<T> extends React.PureComponent<
         this.setState({lastFilteredData: finalResults, isSearching: false});
         return finalResults;
       } else {
-        console.log('  ⚠️ No semantic results, falling back to keyword search');
         const filtered = this.filterDataKeyword(query);
-        console.log('  📝 Keyword search results:', filtered.length);
         this.setState({lastFilteredData: filtered, isSearching: false});
         return filtered;
       }
     } catch (error) {
       console.error('  ❌ Semantic search error:', error);
       const filtered = this.filterDataKeyword(query);
-      console.log('  📝 Fallback keyword results:', filtered.length);
       this.setState({lastFilteredData: filtered, isSearching: false});
       return filtered;
     }
@@ -283,38 +241,26 @@ export default class SemanticSearchBarComponent<T> extends React.PureComponent<
     const {onSubmitSearch, onSearch, data} = this.props;
     const {searchValue, useSemanticSearch, isSearching} = this.state;
 
-    console.log('🚀 [Submit] handleSubmitSearch called');
-    console.log('  📋 searchValue:', searchValue);
-    console.log('  📋 useSemanticSearch:', useSemanticSearch);
-    console.log('  📋 isSearching:', isSearching);
-    console.log('  📋 data.length:', data.length);
 
     // Don't submit if already searching
     if (isSearching) {
-      console.log('  ⏳ Search in progress, waiting...');
       return;
     }
 
     // For semantic search, always run a fresh search on submit to ensure results are current
     let results: T[];
     if (useSemanticSearch && searchValue.trim().length >= 2) {
-      console.log('  🧠 Running semantic search...');
       results = await this.performSemanticSearch(searchValue);
     } else {
-      console.log('  🔤 Running keyword search...');
       results = searchValue.trim() ? this.filterDataKeyword(searchValue) : data;
       this.setState({lastFilteredData: results});
     }
 
-    console.log('  📤 Final results to submit:', results.length);
-    console.log('  📋 First result:', results[0] ? JSON.stringify(results[0]).substring(0, 100) : 'none');
 
     // Call the submit callback if provided, otherwise fall back to onSearch
     if (onSubmitSearch) {
-      console.log('  ➡️ Calling onSubmitSearch callback');
       onSubmitSearch(results, searchValue, useSemanticSearch);
     } else {
-      console.log('  ➡️ Calling onSearch callback (fallback)');
       onSearch(results, searchValue, useSemanticSearch);
     }
   };

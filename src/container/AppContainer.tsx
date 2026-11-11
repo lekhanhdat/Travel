@@ -1,5 +1,5 @@
 import FEATURE_FLAGS from '../config/featureFlags';
-import React, {useRef, useEffect} from 'react';
+import React, {useRef} from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {useRoute} from '@react-navigation/native';
@@ -33,7 +33,7 @@ import LocationImage from './screens/Home/LocationImage';
 import LocationVideo from './screens/Home/LocationVideo';
 import Personal from './screens/Profile/Personal';
 import Settings from './screens/Profile/Settings';
-import FAQ from './screens/Profile/FAQ';
+import FaqScreen from './screens/Profile/FAQ';
 import Policy from './screens/Profile/Policy';
 import About from './screens/Profile/About';
 import Advise from './screens/Maps/Advise';
@@ -338,7 +338,7 @@ function AppContainer() {
       {/* P6: restored. */}
       <Stack.Screen name="Personal" component={Personal} />
       <Stack.Screen name="Settings" component={Settings} />
-      <Stack.Screen name="FAQ" component={FAQ} />
+      <Stack.Screen name="FAQ" component={FaqScreen} />
       <Stack.Screen name="Policy" component={Policy} />
       <Stack.Screen name="About" component={About} />
       {/* P4: restored with Map (popup button). */}

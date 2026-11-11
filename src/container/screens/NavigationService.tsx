@@ -9,7 +9,6 @@ function setTopLevelNavigator(ref: any) {
 }
 
 function navigate(routeName: any, params?: any) {
-  console.log('NAVIGATION SERVICE: ' + navigator);
 
   navigator.dispatch(
     CommonActions.navigate({
@@ -19,12 +18,10 @@ function navigate(routeName: any, params?: any) {
   );
 }
 function push(routeName: any, params?: any) {
-  console.log('NAVIGATION SERVICE: ' + navigator);
   removeFromStack(routeName);
   navigator.dispatch(StackActions.push(routeName, params));
 }
 function replace(routeName: any, params?: any) {
-  console.log('NAVIGATION SERVICE: ' + navigator);
   removeFromStack(routeName);
   navigator.dispatch(StackActions.replace(routeName, params));
 }

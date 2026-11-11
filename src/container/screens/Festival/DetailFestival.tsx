@@ -2,10 +2,10 @@ import Modal from '../../../component/SafeAreaModal';
 import FEATURE_FLAGS from '../../../config/featureFlags';
 import React from 'react';
 import CatalogStatus from '../../../component/CatalogStatus';
-import {ScrollView, View, Image, FlatList, TouchableOpacity, StyleSheet, Dimensions} from 'react-native';
+import {ScrollView, View, Image, FlatList, TouchableOpacity, Dimensions} from 'react-native';
 import Page from '../../../component/Page';
 import HeaderBase from '../../../component/HeaderBase';
-import {BackSvg, Clock, CardSvg, ThunderSvg} from '../../../assets/assets/ImageSvg';
+import {BackSvg, Clock, CardSvg, ThunderSvg} from '../../../assets/ImageSvg';
 import sizes from '../../../common/sizes';
 import colors from '../../../common/colors';
 import NavigationService from '../NavigationService';
@@ -14,10 +14,10 @@ import {ILocation, IReview} from '../../../common/types';
 import TextBase from '../../../common/TextBase';
 import {AppStyle} from '../../../common/AppStyle';
 import ReviewItem from '../../../component/ReviewItem';
-import {StarActive, StarInActive} from '../../../assets/assets/ImageSvg';
+import {StarActive, StarInActive} from '../../../assets/ImageSvg';
 import {MapSvg, CalendarSearchSvg} from '../../../assets/ImageSvg';
 import {ScreenName} from '../../AppContainer';
-import {Button} from 'react-native-paper';
+
 import SimilarItemsComponent from '../../../component/SimilarItemsComponent';
 import {
   withTranslation,
@@ -100,7 +100,7 @@ class DetailFestivalScreen extends React.PureComponent<
     };
   };
 
-  renderReviewItem = ({item, index}: {item: IFestivalReview; index: number}) => {
+  renderReviewItem = ({item}: {item: IFestivalReview; index: number}) => {
     const review = this.convertToReview(item);
     return <ReviewItem review={review} />;
   };
@@ -117,7 +117,6 @@ class DetailFestivalScreen extends React.PureComponent<
     const currentTypes = currentFestival.types || [];
 
     if (currentTypes.length === 0) {
-      console.log('⚠️ Current festival has no types');
       return [];
     }
 
@@ -138,7 +137,6 @@ class DetailFestivalScreen extends React.PureComponent<
     // Chỉ lấy 10 festivals đầu tiên
     const limitedFestivals = similarFestivals.slice(0, 10);
 
-    console.log(`🔍 Found ${similarFestivals.length} similar festivals, showing ${limitedFestivals.length}`);
     return limitedFestivals;
   };
 
@@ -375,7 +373,6 @@ class DetailFestivalScreen extends React.PureComponent<
                         valueSearch: '',
                       });
                     } else {
-                      console.log('⚠️ No similar festivals found');
                     }
                   }}
                   style={{

@@ -1,8 +1,8 @@
-import {ScrollView, StyleSheet, Text, View} from 'react-native';
+import {ScrollView, Text, View} from 'react-native';
 import React from 'react';
 import Page from '../../../component/Page';
 import HeaderBase from '../../../component/HeaderBase';
-import {BackSvg} from '../../../assets/assets/ImageSvg';
+import {BackSvg} from '../../../assets/ImageSvg';
 import colors from '../../../common/colors';
 import sizes from '../../../common/sizes';
 import NavigationService from '../NavigationService';
@@ -56,12 +56,6 @@ export default class LocationVideo extends React.PureComponent<Props, States> {
   }
 }
 
-const styles = StyleSheet.create({
-  backgroundVideo: {
-    width: sizes.width - sizes._32sdp,
-    height: sizes._200sdp,
-  },
-});
 
 interface VideoProps {videoId: string}
 interface VideoState {}

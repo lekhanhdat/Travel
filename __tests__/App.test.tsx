@@ -43,7 +43,7 @@ it('hides the splash and shows a fallback if the first screen throws', async () 
   renderer.act(() => tree.unmount());
 });
 
-it('hides the chat bubble on Camera and Profile and restores it on Home', async () => {
+it('hides the chat bubble on Camera, Profile and Map and restores it on Home', async () => {
   jest.mocked(HomeScreen).mockImplementation(() => <View />);
   let tree: renderer.ReactTestRenderer;
   await renderer.act(async () => {
@@ -55,6 +55,7 @@ it('hides the chat bubble on Camera and Profile and restores it on Home', async 
     for (const [name, visible] of [
       [TAB_NAMES.CAMERA, false],
       [TAB_NAMES.PROFILE, false],
+      [TAB_NAMES.MAP, false],
       [TAB_NAMES.HOME, true],
     ] as const) {
       navigator.mockReturnValue({getCurrentRoute: () => ({name})} as any);

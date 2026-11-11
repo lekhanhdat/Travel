@@ -50,6 +50,7 @@ const RecommendationsWidget: React.FC<RecommendationsWidgetProps> = ({
     if (userId) {
       fetchRecommendations();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- Load recommendations when the user changes; preserve the existing refresh schedule.
   }, [userId]);
 
   const fetchRecommendations = async () => {

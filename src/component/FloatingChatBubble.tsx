@@ -72,7 +72,7 @@ class FloatingChatBubble extends React.PureComponent<
         ],
         {useNativeDriver: false},
       ),
-      onPanResponderRelease: (e, gesture) => {
+      onPanResponderRelease: (_e, _gesture) => {
         this.state.pan.flattenOffset();
 
         // Get current position

@@ -1090,8 +1090,6 @@ const sizes = new (class {
   _isIpad = () => {
     if (Platform.OS === 'ios') {
       const platformIOS = Platform as PlatformIOSStatic;
-      console.log(platformIOS.isPad);
-      console.log(platformIOS.isTV);
       return platformIOS.isPad;
     } else {
       return false;

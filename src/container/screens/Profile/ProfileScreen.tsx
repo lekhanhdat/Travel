@@ -19,7 +19,7 @@ import {IAccount} from '../../../common/types';
 import LocalStorageCommon from '../../../utils/LocalStorageCommon';
 import {localStorageKey} from '../../../common/constants';
 import {Avatar, getDisplayName} from '../../../utils/avatarUtils';
-import {UserSvg} from '../../../assets/assets/ImageSvg';
+import {UserSvg} from '../../../assets/ImageSvg';
 import {Button} from 'react-native-paper';
 import {withTranslation, WithTranslationProps} from '../../../hoc/withTranslation';
 import Toast from 'react-native-toast-message';
@@ -61,7 +61,6 @@ class ProfileScreen extends React.PureComponent<
     // Add focus listener to refresh user data when returning to this screen
     if (this.props.navigation) {
       this.props.navigation.addListener('focus', () => {
-        console.log('ProfileScreen focused - refreshing user data');
         // Force update to refresh translations
         this.forceUpdate();
         this.handleGetUser();

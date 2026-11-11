@@ -22,7 +22,7 @@ import NavigationService from '../NavigationService';
 import {IAccount} from '../../../common/types';
 import LocalStorageCommon from '../../../utils/LocalStorageCommon';
 import {localStorageKey} from '../../../common/constants';
-import {BackSvg} from '../../../assets/assets/ImageSvg';
+import {BackSvg} from '../../../assets/ImageSvg';
 import {Avatar, getDisplayName} from '../../../utils/avatarUtils';
 import authApi from '../../../services/auth.api';
 import locationApi from '../../../services/locations.api';
@@ -117,7 +117,6 @@ export default class ProfileScreen extends React.PureComponent<
     // Add focus listener to refresh user data when returning to this screen
     if (this.props.navigation) {
       this.props.navigation.addListener('focus', () => {
-        console.log('Personal screen focused - refreshing user data');
         this.handleGetUser();
       });
     }
@@ -200,9 +199,7 @@ export default class ProfileScreen extends React.PureComponent<
       },
       async response => {
         if (response.didCancel) {
-          console.log('User cancelled image picker');
         } else if (response.errorCode) {
-          console.log('ImagePicker Error: ', response.errorMessage);
           Toast.show({
             type: 'error',
             text1: 'Lỗi',
@@ -582,7 +579,6 @@ export default class ProfileScreen extends React.PureComponent<
       previewAvatarUri,
       savingProfile,
       changingPassword,
-      showGenderPicker,
       showDeleteModal,
       deletePassword,
       deletingAccount,

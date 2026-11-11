@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
-import { Text, TextProps, TextStyle } from 'react-native';
+import { Text, TextProps, TextStyle, StyleProp } from 'react-native';
 import colors from './colors';
 import sizes from './sizes';
 
 interface Props extends TextProps {
   title?: any;
-  style?: TextStyle | TextStyle[];
+  style?: StyleProp<TextStyle>;
   numberOfLines?: number;
   onPress?: () => void;
   isSecurity?: boolean;

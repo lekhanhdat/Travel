@@ -36,7 +36,6 @@ class MapboxApi {
     const url = `${MAPBOX_BASE_URL}/directions/v5/mapbox/${profile}/${coordinates}`;
 
     try {
-      console.log('🗺️ Mapbox Directions API Request:', url);
 
       const response = await axios.get(url, {
         params: {
@@ -51,15 +50,6 @@ class MapboxApi {
       });
 
 
-      if (response.data.routes && response.data.routes.length > 0) {
-        response.data.routes.forEach((route: any, index: number) => {
-          console.log(`Route ${index + 1}:`, {
-            distance: route.distance,
-            duration: route.duration,
-            steps: route.legs?.[0]?.steps?.length || 0,
-          });
-        });
-      }
 
       return response.data;
     } catch (error: any) {

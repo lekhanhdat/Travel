@@ -16,23 +16,22 @@ String.prototype.format = function () {
 };
 //$FlowFixMe
 String.prototype.toRegex = function (option = 'i') {
-  let regexStr = this.replace(/[\.\*\+\?\^\$\{\}\(\)\|\[\]\\]/g, '\\$&');
+  let regexStr = this.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   regexStr = regexStr.replace(/\s/g, '\\s?');
   return new RegExp(regexStr, option);
 };
 const getFileName = file => {
-  var fileNameMatch = file.match(/^(.+)\.[^\.]+$/);
-  return fileNameMatch && fileNameMatch[1].replace(/[\s-\+]+/g, '_');
+  var fileNameMatch = file.match(/^(.+)\.[^.]+$/);
+  return fileNameMatch && fileNameMatch[1].replace(/[\s+-]+/g, '_');
 };
 
 const folder = argv.folder || argv.d || argv._[0];
-var match = folder.match(/^(.+\/([^\/]+))\/?$/);
+var match = folder.match(/^(.+\/([^/]+))\/?$/);
 //$FlowFixMe
 var output = match && '{0}/{1}.tsx'.format(match[1], match[2]);
 output = argv.output || argv.o || output;
 
-let outputMatch = output.match(/^(?:(.*)\/)?([^\/]+)$/);
-let outputName = outputMatch[2];
+let outputMatch = output.match(/^(?:(.*)\/)?([^/]+)$/);
 let outputPath = outputMatch[1] || '.';
 let requirePath = path.posix.relative(outputPath, folder);
 let author = argv.author || argv.a || 'AW';
@@ -40,13 +39,12 @@ let template = `/**
   * @author {2}
   * @flow
   */
-  
+
   {1}
   export {
     {0}
     }`;
 
-let moduleName = argv.name || getFileName(outputName);
 fs.readdir(folder, (err, files) => {
   if (err) {
     return console.error(err);

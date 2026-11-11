@@ -2,7 +2,6 @@
  * P6: Login / Profile / Personal flows against a mocked auth.api.
  */
 jest.mock('../src/assets/ImageSvg', () => new Proxy({}, {get: (_, name) => name === '__esModule' ? false : 'Icon'}));
-jest.mock('../src/assets/assets/ImageSvg', () => new Proxy({}, {get: (_, name) => name === '__esModule' ? false : 'Icon'}));
 jest.mock('../src/container/AppContainer', () => ({ScreenName: {
   HOME_STACK_SCREEN: 'HomeStack', LOGIN_SCREEN: 'LoginScreen', PERSONAL: 'Personal', SIGN_UP: 'SignUpScreen',
   CHATBOT: 'ChatBotScreen', DONATION: 'Donation', SETTINGS: 'Settings', FAQ: 'FAQ', POLICY: 'Policy', ABOUT: 'About',

@@ -76,7 +76,7 @@ export default class CameraScreen extends React.PureComponent<
     });
 
     // Test backend connection on mount
-    this.testBackendConnection();
+    if (__DEV__) {this.testBackendConnection();}
 
     const cameraPermission = await Camera.requestCameraPermission();
     // P8: photos only, so the microphone is not requested (Play: ask only for what is used).
@@ -91,8 +91,7 @@ export default class CameraScreen extends React.PureComponent<
   }
 
   testBackendConnection = async () => {
-    console.log('=== TESTING BACKEND CONNECTION ===');
-    console.log('Testing backend connection to:', env.API_BASE_URL);
+    if (!__DEV__) {return;}
 
     try {
       const response = await fetch(`${env.API_BASE_URL}/`, {
@@ -102,35 +101,29 @@ export default class CameraScreen extends React.PureComponent<
         },
       });
 
-      console.log('Response status:', response.status);
-      console.log('Response ok:', response.ok);
 
       if (response.ok) {
-        const data = await response.json();
-        console.log('Backend connection successful:', data);
+        await response.json();
         Toast.show({
           type: 'success',
           text1: i18n.t('common:ui.camera.connected'),
           text2: i18n.t('common:ui.camera.backendOk'),
         });
       } else {
-        console.log('Backend connection failed with status:', response.status);
         Toast.show({
           type: 'error',
-          text1: '❌ Lỗi kết nối',
+          text1: i18n.t('common:ui.camera.connectionError'),
           text2: i18n.t('common:ui.camera.serverStatus', {status: response.status}),
         });
       }
     } catch (error) {
-      console.log('Backend connection error:', error);
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       Toast.show({
         type: 'error',
-        text1: '❌ Lỗi kết nối',
+        text1: i18n.t('common:ui.camera.connectionError'),
         text2: i18n.t('common:ui.camera.cannotConnect', {message: errorMessage}),
       });
     }
-    console.log('=== TESTING BACKEND CONNECTION END ===');
   };
 
   capturePhoto = () => {
@@ -145,10 +138,8 @@ export default class CameraScreen extends React.PureComponent<
               flash: this.state.isShowLightning ? 'on' : 'off',
             });
 
-            console.log('Photo captured:', photo);
 
             if (!photo.path) {
-              console.log('No photo path received');
               this.setState({
                 isLoading: false,
               });
@@ -160,7 +151,6 @@ export default class CameraScreen extends React.PureComponent<
               return;
             }
 
-            console.log('Photo path:', photo.path);
 
             // Show preview modal instead of uploading immediately
             this.setState({
@@ -169,7 +159,6 @@ export default class CameraScreen extends React.PureComponent<
               previewImagePath: photo.path,
             });
           } catch (error) {
-            console.log('Camera error:', error);
             this.setState({
               isLoading: false,
             });
@@ -227,19 +216,15 @@ export default class CameraScreen extends React.PureComponent<
       },
       response => {
         if (response.didCancel) {
-          console.log('User cancelled image picker');
         } else if (response.errorCode) {
-          console.log('ImagePicker Error: ', response.errorCode);
           Toast.show({
             type: 'error',
             text1: i18n.t('common:ui.camera.pickError'),
             text2: i18n.t('common:ui.camera.pickFailed'),
           });
         } else {
-          console.log('Image picker response:', response);
           if (response.assets && response.assets.length > 0) {
             const img = response.assets[0];
-            console.log('Selected image:', img);
 
             // Xử lý URI cho Android và iOS
             const filePath = Platform.OS === 'android'
@@ -463,9 +448,8 @@ export default class CameraScreen extends React.PureComponent<
         </TouchableOpacity>
 
         {/* Test Connection Button */}
-        <TouchableOpacity
+        {__DEV__ && <TouchableOpacity
           onPress={() => {
-            console.log('=== WIFI BUTTON PRESSED ===');
             this.testBackendConnection();
           }}
           style={{
@@ -484,7 +468,7 @@ export default class CameraScreen extends React.PureComponent<
             borderColor: 'white',
           }}>
           <Icon name="wifi" color="white" size={24} />
-        </TouchableOpacity>
+        </TouchableOpacity>}
 
         {/* Preview Modal */}
         <Portal>

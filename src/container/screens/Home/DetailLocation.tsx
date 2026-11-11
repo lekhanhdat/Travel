@@ -2,10 +2,10 @@ import Modal from '../../../component/SafeAreaModal';
 import FEATURE_FLAGS from '../../../config/featureFlags';
 import React from 'react';
 import CatalogStatus from '../../../component/CatalogStatus';
-import {ScrollView, View, Image, FlatList, TouchableOpacity, StyleSheet, Dimensions} from 'react-native';
+import {ScrollView, View, Image, FlatList, TouchableOpacity, Dimensions} from 'react-native';
 import Page from '../../../component/Page';
 import HeaderBase from '../../../component/HeaderBase';
-import {BackSvg} from '../../../assets/assets/ImageSvg';
+import {BackSvg} from '../../../assets/ImageSvg';
 import sizes from '../../../common/sizes';
 import colors from '../../../common/colors';
 import NavigationService from '../NavigationService';
@@ -14,10 +14,10 @@ import TextBase from '../../../common/TextBase';
 import {AppStyle} from '../../../common/AppStyle';
 import ReviewItem from '../../../component/ReviewItem';
 import locationApi from '../../../services/locations.api';
-import {StarActive, StarInActive, ThunderSvg} from '../../../assets/assets/ImageSvg';
+import {StarActive, StarInActive} from '../../../assets/ImageSvg';
 import {MapSvg, Call, GlobeSvg, ClockSvg, DirectionsSvg} from '../../../assets/ImageSvg';
 import {ScreenName} from '../../AppContainer';
-import {Button} from 'react-native-paper';
+
 import {IFestival} from '../../../services/festivals.api';
 import SimilarItemsComponent from '../../../component/SimilarItemsComponent';
 import {
@@ -101,7 +101,7 @@ class DetailLocationScreen extends React.PureComponent<
     }
   };
 
-  renderItem = ({item, index}: {item: IReview; index: number}) => {
+  renderItem = ({item}: {item: IReview; index: number}) => {
     return <ReviewItem review={item} />;
   };
 
@@ -123,7 +123,6 @@ class DetailLocationScreen extends React.PureComponent<
     const currentTypes = currentLocation.types || [];
 
     if (currentTypes.length === 0) {
-      if (__DEV__) {console.log('⚠️ Current location has no types');}
       return [];
     }
 
@@ -183,8 +182,6 @@ class DetailLocationScreen extends React.PureComponent<
     const limitedLocations = sortedLocations.slice(0, 20);
 
     if (__DEV__) {
-      console.log(`🔍 Found ${similarLocations.length} similar locations, showing ${limitedLocations.length}`);
-      console.log(`📋 Current types: [${currentTypes.join(', ')}]`);
     }
     return limitedLocations;
   };
@@ -400,7 +397,7 @@ class DetailLocationScreen extends React.PureComponent<
                     showsHorizontalScrollIndicator={false}
                     style={{marginBottom: sizes._8sdp}}
                   >
-                    {this.state.festivals.map((festival, index) => (
+                    {this.state.festivals.map((festival, _index) => (
                       <TouchableOpacity
                         key={`festival-${festival.id}`}
                         onPress={() => {

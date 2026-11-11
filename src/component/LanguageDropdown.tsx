@@ -12,7 +12,7 @@ import {useTranslation} from '../hooks/useTranslation';
 import {Language} from '../context/TranslationContext';
 import colors from '../common/colors';
 import sizes from '../common/sizes';
-import fonts from '../common/fonts';
+
 import {AppStyle} from '../common/AppStyle';
 import TextBase from '../common/TextBase';
 

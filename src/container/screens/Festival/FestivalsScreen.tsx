@@ -99,7 +99,7 @@ class FestivalsScreen extends React.PureComponent<
   handleFestivalSearch = (
     filteredData: IFestival[],
     searchValue: string,
-    isSemanticSearch?: boolean,
+    _isSemanticSearch?: boolean,
   ) => {
     this.setState({valueSearch: searchValue});
   };
@@ -110,19 +110,13 @@ class FestivalsScreen extends React.PureComponent<
     searchValue: string,
     isSemanticSearch?: boolean,
   ) => {
-    console.log('📥 [FestivalsScreen] handleFestivalSearchSubmit received:');
-    console.log('  📋 filteredData.length:', filteredData?.length || 0);
-    console.log('  📋 searchValue:', searchValue);
-    console.log('  📋 isSemanticSearch:', isSemanticSearch);
 
     if (!searchValue || searchValue.trim().length === 0) {
-      console.log('  ⚠️ Empty search, not navigating');
       return; // Don't navigate if search is empty
     }
     this.setState({valueSearch: searchValue}, () => {
       // ALWAYS use filteredData from the search component - it contains the semantic results
       const festivalsToShow = filteredData;
-      console.log('  ➡️ Navigating with', festivalsToShow.length, 'festivals');
       NavigationService.navigate(ScreenName.VIEW_ALL_FESTIVALS, {
         title: isSemanticSearch ? `🧠 ${this.props.t('home.aiSearchResults')}` : this.props.t('home.search'),
         festivals: festivalsToShow,

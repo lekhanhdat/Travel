@@ -37,7 +37,6 @@ jest.mock('../src/services/mapbox.api', () => ({
   getDirections: jest.fn(), convertGeoJSONToCoordinates: coords => coords.map(([longitude, latitude]) => ({latitude, longitude})),
 }));
 jest.mock('../src/assets/ImageSvg', () => new Proxy({}, {get: (_, name) => name === '__esModule' ? false : 'Icon'}));
-jest.mock('../src/assets/assets/ImageSvg', () => new Proxy({}, {get: (_, name) => name === '__esModule' ? false : 'Icon'}));
 jest.mock('../src/container/AppContainer', () => ({ScreenName: {}}));
 jest.mock('../src/container/screens/NavigationService', () => ({navigate: jest.fn(), pop: jest.fn()}));
 jest.mock('../src/component/Page', () => 'Page');

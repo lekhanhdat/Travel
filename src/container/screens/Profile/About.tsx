@@ -13,7 +13,7 @@ import TextBase from '../../../common/TextBase';
 import sizes from '../../../common/sizes';
 import colors from '../../../common/colors';
 import {AppStyle} from '../../../common/AppStyle';
-import {BackSvg} from '../../../assets/assets/ImageSvg';
+import {BackSvg} from '../../../assets/ImageSvg';
 import images from '../../../res/images';
 import {BRAND} from '../../../config/brand';
 import NavigationService from '../NavigationService';

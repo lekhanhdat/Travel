@@ -37,7 +37,6 @@ interface DailyUsage {
 
 // ============ Constants ============
 
-const STORAGE_KEY = '@api_usage_stats';
 const DAILY_USAGE_KEY = '@api_daily_usage';
 const MAX_RECORDS = 1000;
 

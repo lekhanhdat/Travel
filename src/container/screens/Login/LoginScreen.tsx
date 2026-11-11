@@ -134,7 +134,7 @@ export default class LoginScreen extends React.PureComponent<ILoginScreenProps, 
             placeholderTextColor={colors.black}
             autoCapitalize="none"
             autoCorrect={false}
-            onChangeText={userName => this.setState({ userName })}
+            onChangeText={userNameInput => this.setState({ userName: userNameInput })}
           />
 
           <TextInput
@@ -152,7 +152,7 @@ export default class LoginScreen extends React.PureComponent<ILoginScreenProps, 
                 onPress={this.toggleSecureEntry}
               />
             }
-            onChangeText={password => this.setState({ password })}
+            onChangeText={passwordInput => this.setState({ password: passwordInput })}
           />
 
           <TouchableOpacity

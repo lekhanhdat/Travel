@@ -2,7 +2,7 @@ import {Image, ScrollView, StyleSheet, Text, View} from 'react-native';
 import React from 'react';
 import Page from '../../../component/Page';
 import HeaderBase from '../../../component/HeaderBase';
-import {BackSvg} from '../../../assets/assets/ImageSvg';
+import {BackSvg} from '../../../assets/ImageSvg';
 import sizes from '../../../common/sizes';
 import colors from '../../../common/colors';
 import NavigationService from '../NavigationService';
@@ -20,10 +20,6 @@ export default class LocationImage extends React.PureComponent<Props, States> {
     const location: ILocation = this.props.route?.params?.location;
 
     // Debug log
-    console.log('LocationImage - location:', location);
-    console.log('LocationImage - images:', location?.images);
-    console.log('LocationImage - images type:', typeof location?.images);
-    console.log('LocationImage - is array:', Array.isArray(location?.images));
 
     // Kiểm tra location có tồn tại không
     if (!location) {

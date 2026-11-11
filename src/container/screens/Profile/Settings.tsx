@@ -17,10 +17,10 @@ import TextBase from '../../../common/TextBase';
 import sizes from '../../../common/sizes';
 import colors from '../../../common/colors';
 import {AppStyle} from '../../../common/AppStyle';
-import {BackSvg} from '../../../assets/assets/ImageSvg';
+import {BackSvg} from '../../../assets/ImageSvg';
 import NavigationService from '../NavigationService';
 import LocalStorageCommon from '../../../utils/LocalStorageCommon';
-import {localStorageKey} from '../../../common/constants';
+
 
 
 interface ISettingsProps extends WithTranslationProps {}
@@ -65,7 +65,6 @@ class Settings extends React.PureComponent<ISettingsProps, ISettingsState> {
         });
       }
     } catch (error) {
-      console.log('Error loading settings:', error);
     }
   };
 
@@ -80,7 +79,6 @@ class Settings extends React.PureComponent<ISettingsProps, ISettingsState> {
       };
       await LocalStorageCommon.setItem('app_settings', settings);
     } catch (error) {
-      console.log('Error saving settings:', error);
     }
   };
 

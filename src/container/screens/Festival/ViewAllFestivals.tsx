@@ -4,7 +4,7 @@ import React from 'react';
 import {FlatList, View, TouchableOpacity, StyleSheet} from 'react-native';
 import Page from '../../../component/Page';
 import HeaderBase from '../../../component/HeaderBase';
-import {BackSvg} from '../../../assets/assets/ImageSvg';
+import {BackSvg} from '../../../assets/ImageSvg';
 import sizes from '../../../common/sizes';
 import colors from '../../../common/colors';
 import {IFestival} from '../../../services/festivals.api';
@@ -12,7 +12,7 @@ import LargeItemFestival from '../../../component/LargeItemFestival';
 import NavigationService from '../NavigationService';
 import {FESTIVAL_SEARCH_FIELDS, searchCatalog} from '../../../utils/catalogSearch';
 import TextBase from '../../../common/TextBase';
-import {AppStyle} from '../../../common/AppStyle';
+
 import {
   withTranslation,
   WithTranslationProps,
@@ -75,11 +75,9 @@ class ViewAllFestivals extends React.PureComponent<
     const params = getParams(this.props);
     const valueSearch: string = params.valueSearch ?? '';
 
-    if (__DEV__) {console.log('📋 Filtering with mode:', searchMode, 'filter:', selectedFilter);}
 
     // If semantic search mode, use pre-filtered results directly (already sorted by AI relevance)
     if (searchMode === 'semantic') {
-      if (__DEV__) {console.log('🧠 Semantic search results - using pre-filtered data:', allFestivals.length, 'items');}
       this.setState({ festivals: allFestivals });
       return;
     }
@@ -93,7 +91,6 @@ class ViewAllFestivals extends React.PureComponent<
     };
     const festivalOut = searchCatalog(allFestivals, valueSearch, fields[selectedFilter] ?? fields.all);
 
-    if (__DEV__) {console.log('🔤 Keyword search results:', festivalOut.length, 'items');}
     this.setState({ festivals: festivalOut });
   };
 
@@ -109,7 +106,7 @@ class ViewAllFestivals extends React.PureComponent<
     );
   };
 
-  renderItem = ({item, index}: {item: IFestival; index: number}) => {
+  renderItem = ({item}: {item: IFestival; index: number}) => {
     return <LargeItemFestival festival={item} />;
   };
 

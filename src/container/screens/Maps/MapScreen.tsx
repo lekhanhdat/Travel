@@ -14,7 +14,7 @@ import Geolocation from '@react-native-community/geolocation';
 import MapboxGL from '@rnmapbox/maps';
 import Page from '../../../component/Page';
 import HeaderBase from '../../../component/HeaderBase';
-import {BackSvg, CirclePlay, CircleDot} from '../../../assets/assets/ImageSvg';
+import {BackSvg, CirclePlay, CircleDot} from '../../../assets/ImageSvg';
 import colors from '../../../common/colors';
 import sizes from '../../../common/sizes';
 import {ILocation} from '../../../common/types';
@@ -206,7 +206,6 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
           setLocationPermission(true);
           getCurrentLocation();
         } else {
-          console.log('Location permission denied');
           // Fallback to default Đà Nẵng coordinates
           setCurrentLat(15.974620784990472);
           setCurrentLong(108.25290513035998);
@@ -227,14 +226,12 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
   const getCurrentLocation = () => {
     getPreciseLocation()
       .then(position => {
-        const {latitude, longitude, accuracy} = position.coords;
+        const {latitude, longitude} = position.coords;
         setCurrentLat(latitude);
         setCurrentLong(longitude);
         setHasUserLocation(true);
-        console.log('Current location:', latitude, longitude, `±${Math.round(accuracy)}m`);
       })
-      .catch(error => {
-        console.log('Error getting location:', error);
+      .catch(_error => {
         setCurrentLat(15.974620784990472);
         setCurrentLong(108.25290513035998);
       });
@@ -247,10 +244,8 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
         setCurrentLat(latitude);
         setCurrentLong(longitude);
         setHasUserLocation(true);
-        console.log('📍 Location updated:', latitude, longitude);
       },
-      (error) => {
-        console.log('❌ Error watching location:', error);
+      (_error) => {
       },
       {
         enableHighAccuracy: true,
@@ -266,7 +261,6 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
 
   // Function to handle map style loaded - hide POI layers
   const onMapStyleLoaded = async () => {
-    console.log('🗺️ Map style loaded, hiding POI layers...');
 
     try {
       // Get the native map instance
@@ -289,18 +283,14 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
             try {
               if (map.getLayer && map.getLayer(layerId)) {
                 map.setLayoutProperty(layerId, 'visibility', 'none');
-                console.log(`✅ Hidden layer: ${layerId}`);
               }
             } catch (error) {
-              console.log(`⚠️ Could not hide layer ${layerId}:`, error);
             }
           });
 
-          console.log('✅ POI layers hidden successfully!');
         }
       }
     } catch (error) {
-      console.log('⚠️ Error hiding POI layers:', error);
     }
   };
 
@@ -316,7 +306,6 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
   const [festivalMarkers, setFestivalMarkers] = useState<FestivalMarker[]>([]);
 
   useEffect(() => {
-    console.log('restart0-----------');
 
     // Request location permission and get current location
     requestLocationPermission();
@@ -330,8 +319,6 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
       setLocations(locationProps);
       setFocusLocation(locationProps[0]); // Focus vào location đầu tiên
       setShouldShowRoute(showRoute); // Set flag để vẽ đường đi
-      console.log('Using location from params:', locationProps[0]);
-      console.log('Show route:', showRoute);
 
       // KHÔNG fetch route ở đây vì currentLat/currentLong chưa có
       // Sẽ fetch trong useEffect riêng khi đã có vị trí
@@ -346,22 +333,17 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
 
     const onFinishedPlayingSubscription = SoundPlayer.addEventListener(
       'FinishedPlaying',
-      ({success}) => {
-        console.log('finished playing', success);
-      },
+      () => {},
     );
 
     const onFinishedLoadingSubscription = SoundPlayer.addEventListener(
       'FinishedLoading',
-      ({success}) => {
-        console.log('finished loading', success);
-      },
+      () => {},
     );
 
     const onFinishedLoadingFileSubscription = SoundPlayer.addEventListener(
       'FinishedLoadingFile',
-      ({success, name, type}) => {
-        console.log('finished loading file111111', success, name, type);
+      ({name, type}) => {
         SoundPlayer.play();
         console.log(
           'finished loading file2222',
@@ -457,6 +439,7 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
       // Remove focus listener
       focusListener();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- Install native listeners once per mount; preserve their existing lifetime.
   }, []);
 
   useEffect(() => {
@@ -472,49 +455,34 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
   // Fetch route khi đã có vị trí hiện tại và cần hiển thị đường đi
   useEffect(() => {
     if (shouldShowRoute && focusLocation && hasUserLocation && currentLat !== 0 && currentLong !== 0) {
-      console.log('🚗 Ready to fetch route - current location available');
       fetchRouteToLocation(focusLocation);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- Keep the existing route request triggers to avoid additional network requests.
   }, [shouldShowRoute, focusLocation, hasUserLocation, currentLat, currentLong]);
 
   // ✅ Zoom khi camera đã ready và có pending zoom
   useEffect(() => {
     if (pendingZoomRoute && pendingZoomRoute.length > 0 && cameraRef.current) {
-      console.log('🎯 Camera ready - executing pending zoom');
       zoomToFitRouteImmediate(pendingZoomRoute);
       setPendingZoomRoute(null); // Clear pending zoom
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- Keep the existing pending-camera zoom triggers during cleanup.
   }, [pendingZoomRoute, cameraRef.current]);
 
-  // 🚦 Debug traffic layer state changes
-  useEffect(() => {
-    console.log('🚦 Traffic layer state changed:', showTraffic ? 'ENABLED ✅' : 'DISABLED ❌');
-    if (showTraffic) {
-      console.log('🚦 Traffic layer should now be visible on the map');
-      console.log('🚦 Current zoom level:', currentZoom);
-      console.log('🚦 Current location:', { lat: currentLat, long: currentLong });
-      console.log('🚦 Tip: Zoom to level 12+ and navigate to a major city for best results');
-    }
-  }, [showTraffic]);
 
   const fetchRouteToLocation = async (location: ILocation) => {
     if (typeof location.lat !== 'number' || typeof location.long !== 'number' ||
         !Number.isFinite(location.lat) || !Number.isFinite(location.long)) {return;}
     try {
-      console.log('=== FETCHING ROUTE WITH MAPBOX ===');
-      console.log('From:', currentLat, currentLong);
-      console.log('To:', location.name, location.lat, location.long);
 
       // Kiểm tra vị trí hiện tại đã có chưa (không chỉ đường từ tọa độ mặc định)
       if (!hasUserLocation || currentLat === 0 || currentLong === 0) {
-        console.log('❌ Current location not available yet');
         return;
       }
 
       // Mapbox format: "long1,lat1;long2,lat2"
       const coordinates = `${currentLong},${currentLat};${location.long},${location.lat}`;
 
-      console.log('Mapbox coordinates:', coordinates);
 
       const response = await mapboxApi.getDirections({
         profile: 'driving', // driving = xe máy/ô tô
@@ -527,35 +495,30 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
         voice_instructions: true,
       });
 
-      console.log('Mapbox response:', response);
 
       // Reset offline state nếu request thành công
       setIsOffline(false);
 
       if (response && response.routes && response.routes.length > 0) {
         // Lưu tất cả routes (main + alternatives)
-        const allRoutes: RouteInfo[] = response.routes.map((route: any) => {
-          const geoJsonCoordinates = route.geometry.coordinates;
+        const allRoutes: RouteInfo[] = response.routes.map((routeInput: any) => {
+          const geoJsonCoordinates = routeInput.geometry.coordinates;
           const points = mapboxApi.convertGeoJSONToCoordinates(geoJsonCoordinates);
 
           return {
-            distance: route.distance,
-            duration: route.duration,
+            distance: routeInput.distance,
+            duration: routeInput.duration,
             coordinates: points,
           };
         });
 
         setRoutes(allRoutes);
-        console.log('✅ Total routes:', allRoutes.length);
 
         // Hiển thị route đầu tiên (fastest)
         const mainRoute = response.routes[0];
         const geoJsonCoordinates = mainRoute.geometry.coordinates;
         const points = mapboxApi.convertGeoJSONToCoordinates(geoJsonCoordinates);
 
-        console.log('✅ Main route - Distance:', mainRoute.distance, 'meters');
-        console.log('✅ Main route - Duration:', mainRoute.duration, 'seconds');
-        console.log('✅ Main route - Points:', points.length);
 
         setRouteCoordinates(points);
         setRouteDistance(mainRoute.distance);
@@ -564,29 +527,19 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
         // Lưu turn-by-turn steps
         if (mainRoute.legs && mainRoute.legs[0] && mainRoute.legs[0].steps) {
           const steps = mainRoute.legs[0].steps;
-          console.log('✅ Turn-by-turn steps:', steps.length);
-          console.log('📋 First step example:', steps[0]);
           setRouteSteps(steps);
         } else {
-          console.log('❌ No steps found in route');
-          console.log('Route structure:', {
-            hasLegs: !!mainRoute.legs,
-            legsLength: mainRoute.legs?.length,
-            hasSteps: !!mainRoute.legs?.[0]?.steps,
-          });
         }
 
         // ✅ Zoom map để xem toàn bộ đường đi
         zoomToFitRoute(points);
       } else {
-        console.log('❌ No routes found in response');
       }
     } catch (error: any) {
       console.error('❌ Error fetching route:', error);
 
       // Xử lý offline - vẽ đường thẳng từ vị trí hiện tại đến đích
       if (error.message?.includes('Network') || error.code === 'ECONNABORTED' || !error.response) {
-        console.log('🔌 Offline mode - Drawing straight line');
         setIsOffline(true);
 
         // Vẽ đường thẳng đơn giản
@@ -708,7 +661,6 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
 
       if (textToRead.trim()) {
         // Speak the entire text at once - no segment splitting
-        console.log('Starting TTS - reading entire text');
         Tts.speak(textToRead);
         setIsTtsPlaying(true);
       }
@@ -743,7 +695,6 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
         zoomLevel: 14,
         animationDuration: 1000,
       });
-      console.log('📍 Recentered to current location:', currentLat, currentLong);
     }
   };
 
@@ -782,16 +733,13 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
       // Get zoom from camera state
       const zoom = feature?.properties?.zoomLevel || 12;
       setCurrentZoom(zoom);
-      console.log('📏 Zoom level:', zoom);
     } catch (error) {
-      console.log('⚠️ Error getting zoom:', error);
     }
   };
 
   // ✅ Function to zoom map to fit entire route (immediate - no delay)
   const zoomToFitRouteImmediate = (routePoints: {latitude: number; longitude: number}[]) => {
     if (!cameraRef.current || routePoints.length === 0) {
-      console.log('❌ Cannot zoom to fit route - no camera or no points');
       return;
     }
 
@@ -805,19 +753,11 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
     const maxLong = Math.max(...longs);
 
     // Tính center point
-    const centerLat = (minLat + maxLat) / 2;
-    const centerLong = (minLong + maxLong) / 2;
 
     // Tính padding (thêm 20% để route không sát mép)
     const latPadding = (maxLat - minLat) * 0.2;
     const longPadding = (maxLong - minLong) * 0.2;
 
-    console.log('🗺️ Zooming to fit route:');
-    console.log('  Center:', centerLat, centerLong);
-    console.log('  Bounds:', {
-      ne: [maxLat + latPadding, maxLong + longPadding],
-      sw: [minLat - latPadding, minLong - longPadding],
-    });
 
     // Fit camera to bounds
     cameraRef.current.fitBounds(
@@ -831,23 +771,19 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
   // ✅ Function to zoom map - set pending if camera not ready
   const zoomToFitRoute = (routePoints: {latitude: number; longitude: number}[]) => {
     if (routePoints.length === 0) {
-      console.log('❌ No route points to zoom');
       return;
     }
 
     if (cameraRef.current) {
       // Camera đã sẵn sàng - zoom ngay
-      console.log('✅ Camera ready - zooming immediately');
       zoomToFitRouteImmediate(routePoints);
     } else {
       // Camera chưa sẵn sàng - lưu lại để zoom sau
-      console.log('⏳ Camera not ready - setting pending zoom');
       setPendingZoomRoute(routePoints);
     }
   };
 
   useEffect(() => {
-    console.log({selectedLocation});
   }, [selectedLocation]);
 
   // Initialize TTS on component mount
@@ -879,7 +815,6 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
   }, [visibleSecondModal, selectedLocation]);
 
   const locationProps: ILocation[] = route?.params?.locations ?? [];
-  console.log({locationProps});
 
   // Xác định tọa độ để focus camera
   const markerPoints = locations.filter(hasGps);
@@ -924,10 +859,6 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
     );
   }
 
-  console.log([currentLong, currentLat]);
-  console.log('Focus coordinate:', focusCoordinate);
-  console.log('🗺️ Route coordinates count:', routeCoordinates.length);
-  console.log('🚗 Should show route:', shouldShowRoute);
 
   return (
     <Page>
@@ -1479,8 +1410,8 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
               marginTop: 10,
               flexWrap: 'wrap',
             }}>
-              {routes.map((route, index) => {
-                const routeDist = route?.distance != null ? route.distance : 0;
+              {routes.map((routeInput, index) => {
+                const routeDist = routeInput?.distance != null ? routeInput.distance : 0;
                 return (
                   <Button
                     key={index}
@@ -1488,10 +1419,9 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
                     compact
                     onPress={() => {
                       setSelectedRouteIndex(index);
-                      setRouteCoordinates(route.coordinates);
-                      setRouteDistance(route.distance);
-                      setRouteDuration(route.duration);
-                      console.log(`Switched to route ${index + 1}`);
+                      setRouteCoordinates(routeInput.coordinates);
+                      setRouteDistance(routeInput.distance);
+                      setRouteDuration(routeInput.duration);
                     }}
                     style={{
                       borderColor: colors.primary,
@@ -1522,7 +1452,6 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
             icon="directions"
             mode="outlined"
             onPress={() => {
-              console.log('🧭 Chỉ đường đến:', selectedLocation.name);
               if (!hasUserLocation) {
                 Toast.show({
                   type: 'info',
@@ -1571,10 +1500,6 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
             icon="directions"
             mode="contained"
             onPress={() => {
-              console.log('🧭 Opening turn-by-turn modal');
-              console.log('Route steps count:', routeSteps.length);
-              console.log('Route distance:', routeDistance);
-              console.log('Route duration:', routeDuration);
               setVisible(true);
             }}
             style={{ backgroundColor: colors.primary_700 }}

@@ -1,7 +1,10 @@
 # Danavi — Việc chủ sở hữu phải tự làm trước khi lên Google Play
 
 > Claude/Codex không được (và không thể) làm các việc dưới đây: cần tài khoản, khóa ký, quyết định kinh doanh/pháp lý của anh/chị. Làm theo thứ tự. Khi xong mục nào, báo lại để Claude cập nhật mã/kiểm tra.
-> Cập nhật: 2026-11-12.
+> Cập nhật: 2026-11-12 01:50. Mã nguồn sẵn sàng ở nhánh `release/rn-upgrade` (commit cục bộ `ec4ec0a`, **chưa push**). Ứng dụng hỗ trợ Android 7.0 trở lên.
+
+## 0. Git (anh/chị cho phép thì Claude làm)
+- Duyệt rồi cho phép **push** nhánh `release/rn-upgrade` (gồm cả commit `ecd6861` từ `dev`) và tạo PR vào `main`.
 
 ## A. Quyết định (làm trước tiên — ảnh hưởng mã nguồn)
 
@@ -53,4 +56,10 @@
 6. Mỗi lần cập nhật sau: tăng `versionCode` trong `android/app/build.gradle`.
 
 ## Việc kỹ thuật Claude đã làm xong (để đối chiếu)
-targetSdk 36 + hỗ trợ 16 KB (RN 0.81.6) · tên/biểu tượng/splash Danavi · bỏ quyền vị trí nền, exact alarm, ghi âm · chặn HTTP không mã hóa · khóa ký đọc từ biến ngoài repo · ẩn log ở bản production · xóa tài khoản trong app · ẩn Ủng hộ khi tắt thanh toán · dọn mã/tệp thừa (đợt F). Chi tiết: `PROGRESS.md`.
+targetSdk 36 + hỗ trợ 16 KB (RN 0.81.6) · tên/biểu tượng/splash Danavi · bỏ quyền vị trí nền, exact alarm, ghi âm · chặn HTTP không mã hóa · khóa ký đọc từ biến ngoài repo · ẩn log ở bản production · xóa tài khoản trong app · ẩn Ủng hộ khi tắt thanh toán · ẩn công cụ test kết nối của dev · dọn 61 tệp thừa, 173 log gỡ lỗi, lỗi TypeScript 45→23. Chi tiết: `PROGRESS.md`.
+
+## Claude có thể làm tiếp khi anh/chị yêu cầu
+- Chụp bộ ảnh màn hình cửa hàng từ máy ảo (D3).
+- Điền URL/email vào app ngay khi có C1–C3.
+- Kiểm tra AAB đã ký (B3): targetSdk, 16 KB, chữ ký, quyền.
+- Đổi package name (A1), nâng React Navigation v7 (A3) trên nhánh riêng.

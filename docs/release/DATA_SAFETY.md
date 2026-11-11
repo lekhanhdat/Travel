@@ -26,7 +26,7 @@ Người dùng có thể yêu cầu xóa dữ liệu: **Có** — xóa tài kho�
 | Tin nhắn → Tin nhắn khác trong ứng dụng | Có | Tùy chọn | Chức năng app (trợ lý AI); cá nhân hóa (bộ nhớ hội thoại) | `chatbot.api.ts`, `semantic.api.ts /chat/rag`, `/memory/store` |
 | Hoạt động trong ứng dụng → Nội dung do người dùng tạo | Có | Tùy chọn | Chức năng app (đánh giá, bảng tin) | `reviews.api.ts` |
 | Hoạt động trong ứng dụng → Lịch sử tìm kiếm trong ứng dụng | Có (gửi lên server để tìm kiếm ngữ nghĩa/gợi ý) | Tùy chọn | Chức năng app, cá nhân hóa | `semantic.api.ts /search/*`, `/recommendations` |
-| Âm thanh → Ghi âm | **Cần xác nhận** — có quyền `RECORD_AUDIO` nhưng chưa thấy luồng gửi âm thanh lên server | — | — | Nếu không dùng: gỡ quyền (TASK-E3) |
+| Âm thanh → Ghi âm | Không — quyền `RECORD_AUDIO` đã gỡ (đợt E) | — | — | — |
 | Thông tin tài chính | Không (khi ẩn Ủng hộ) | — | — | `ENABLE_PAYMENT=false` |
 | Danh bạ, lịch, SMS, sức khỏe, tệp/tài liệu | Không | — | — | — |
 | Mã định danh thiết bị / quảng cáo | Không (không có SDK quảng cáo/analytics) | — | — | `package.json` |
@@ -34,5 +34,5 @@ Người dùng có thể yêu cầu xóa dữ liệu: **Có** — xóa tài kho�
 
 Dữ liệu được **chia sẻ** với bên thứ ba: **Không** (Mapbox là nhà cung cấp dịch vụ). Xác nhận với backend xem có gửi nội dung chat/ảnh tới nhà cung cấp AI (ví dụ OpenAI/Google) không — nếu có, đó vẫn là "service provider" nhưng phải liệt kê trong chính sách quyền riêng tư.
 
-## Quyền Android sau đợt A (để đối chiếu)
-INTERNET, ACCESS_NETWORK_STATE, CAMERA, RECORD_AUDIO, ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION, READ_EXTERNAL_STORAGE (≤API 32), WRITE_EXTERNAL_STORAGE (≤API 28). Không có quyền vị trí nền, không có exact alarm → không cần biểu mẫu khai báo quyền đặc biệt.
+## Quyền Android sau đợt E (để đối chiếu)
+INTERNET, ACCESS_NETWORK_STATE, CAMERA, ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION, READ_EXTERNAL_STORAGE (≤API 32), WRITE_EXTERNAL_STORAGE (≤API 28). Thêm từ thư viện: WAKE_LOCK, ACCESS_WIFI_STATE, CHECK_LICENSE (Mapbox/Play). Không có quyền vị trí nền, không có exact alarm → không cần biểu mẫu khai báo quyền đặc biệt.

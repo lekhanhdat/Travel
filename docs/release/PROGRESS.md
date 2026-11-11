@@ -10,7 +10,7 @@
 | 1 — Security fixes | DONE (A, B) | committed `ecd6861` on `dev` (local, not pushed) |
 | 2 — Stability / tests | DONE for now | 24/24 suites; 53 pre-existing TS errors remain |
 | 3 — Branding | DONE (A, B, C) | store graphics pending owner |
-| 4 — Production prep | IN PROGRESS | Batch D ACCEPTED (`bf31b21`, local, `release/rn-upgrade`); Batch E running; store docs drafted |
+| 4 — Production prep | DONE (code side) | D `bf31b21`, E `e244d24`, F `ec4ec0a` (local, `release/rn-upgrade`, not pushed); remaining items are owner tasks → `OWNER_TODO.md` |
 | 5 — Final QA | NOT STARTED | after D+E; AVDs `Danavi_API36`, `Danavi_API35_16K` prepared |
 
 ## Codex dispatch log
@@ -21,7 +21,8 @@
 | B | `codex/TASK-B_js_branding.md` | ACCEPTED, committed `ecd6861` |
 | C | `codex/TASK-C_splash_about_fixes.md` | ACCEPTED, committed `ecd6861` |
 | D | `codex/TASK-D_rn_upgrade.md` | ACCEPTED 23:58, committed `bf31b21` (local, not pushed) |
-| E | `codex/TASK-E_policy_cleanup.md` | RUNNING (dispatched 23:59; +E5 bubble/flash, +E6 MarkerView JNI) |
+| E | `codex/TASK-E_policy_cleanup.md` | ACCEPTED 01:10, committed `e244d24` |
+| F | `codex/TASK-F_cleanup.md` | ACCEPTED 01:45, committed `ec4ec0a` |
 
 ## Owner documents drafted (Claude, need owner review)
 - `PLAY_STORE_LISTING.md` — name, short/full description vi/en, IARC hints, target audience, open decisions.
@@ -77,6 +78,18 @@ Claude's own verification (not only REPORT-D):
 - Diff scan: no secrets; `local.properties`/`.env` untracked; applicationId unchanged.
 - Known/accepted: minSdk raised to 24 (Android 7.0+). Map tiles blank on the 16 KB x86 emulator only — logcat `GL_MAX_VERTEX_UNIFORM_VECTORS (256)` emulator GPU limit, native lib loads fine → re-check on a real device. Mapbox MarkerView JNI warning (legacy arch) → E6. Chat bubble covers camera flash → E5. npm audit: 0 critical, 9 high (React Navigation v6 chain, markdown-it) → needs owner decision on Navigation v7 upgrade. iOS not built (Windows).
 - Release signing still fails fast without `MYAPP_RELEASE_*` (expected) — signed AAB needs owner upload key (MANUAL-10/11).
+
+### Batch E — ACCEPTED (Claude, 01:10)
+- jest 229 passed; tsc 45 (unchanged); merged manifest without RECORD_AUDIO (aapt2 on verification APK: 0 matches).
+- Verification APK on API 36: splash white status bar + dark icons; Profile has no "Ủng hộ" row; Camera without chat bubble, flash visible; Map marker tap selects marker and shows Chỉ đường/Xem (MarkerView JNI warning has no visible effect).
+- Debug build + Metro on API 36: JS taps intermittently unresponsive; not reproduced in release-equivalent build nor by Codex in F8 → debug-only, monitor.
+
+### Batch F — ACCEPTED (Claude, 01:45)
+- Reviewed removed non-log lines: only renames (`FAQ`→`FaqScreen`, `route`→`routeInput`), unused imports/styles, dead log-only code. Commented-out features retained (listed in REPORT-F).
+- jest 231 passed; tsc 23 (was 45); eslint 0 errors / 29 warnings; no secrets in diff.
+- Verification APK: target 36, zipalign -P 16 OK, 161 MB (was 162 MB). API 36 smoke: Camera without dev wifi button/toast, Map without bubble, directions 17 km / 2 routes with GPS set to Da Nang.
+- Not re-run on 16 KB emulator (emulator unstable; F changed only JS/resources, no native libs).
+- Note: Directions from outside the Mapbox distance limit log `Route exceeds maximum distance limitation` (422) — check the in-app message on device (low).
 
 ## Next
 - **Batch D (RN 0.81.6 upgrade, targetSdk 36, 16 KB)** — brief ready at `codex/TASK-D_rn_upgrade.md`. Needs a base commit of A–C on `dev` (local only, no push) to branch `release/rn-upgrade` from → **waiting for owner permission to commit locally.**

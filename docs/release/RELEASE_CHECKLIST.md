@@ -17,8 +17,8 @@
 - [ ] Hermes enabled (verified: OK)
 - [ ] Correct `applicationId`: `com.travel`
 - [ ] `versionCode` and `versionName` set appropriately
-- [ ] **`targetSdkVersion` = 36 (Play requirement since 2026-08-31) — currently 34 → Batch D (BLOCKER)**
-- [ ] **16 KB page size support (`zipalign -c -P 16` OK; required for updates from 2027-02-01) → Batch D**
+- [x] `targetSdkVersion` = 36 — Batch D, verified with aapt2 (bf31b21)
+- [x] 16 KB page size — zipalign -P 16 OK, all arm64 .so align 0x4000, runs on 16 KB emulator (bf31b21); re-check map on real device
 - [ ] No unnecessary permissions in manifest
 - [ ] App size within acceptable range
 

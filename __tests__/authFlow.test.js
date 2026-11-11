@@ -113,15 +113,31 @@ describe('Profile', () => {
     expect(NavigationService.reset).toHaveBeenCalledWith('HomeStack');
   });
 
-  // N2: Donation is routed; guests are sent to Login first.
-  it('Donation opens for a signed-in user and asks a guest to log in', async () => {
+  it('hides donation and prevents navigation when payments are disabled', async () => {
+    expect(FEATURE_FLAGS.ENABLE_PAYMENT).toBe(false);
+    const screen = render(React.createElement(ProfileScreen, props()));
+    expect(screen.queryByText('profile.donation')).toBeNull();
     const profile = instance(ProfileScreen, props());
-    authApi.isLoggedIn.mockResolvedValue(false);
     await profile.openDonation();
-    expect(NavigationService.navigate).toHaveBeenLastCalledWith('LoginScreen');
-    authApi.isLoggedIn.mockResolvedValue(true);
-    await profile.openDonation();
-    expect(NavigationService.navigate).toHaveBeenLastCalledWith('Donation');
+    expect(NavigationService.navigate).not.toHaveBeenCalled();
+    screen.unmount();
+  });
+
+  // Enabled payments retain the account gate.
+  it('Donation opens for a signed-in user and asks a guest to log in', async () => {
+    const previous = FEATURE_FLAGS.ENABLE_PAYMENT;
+    FEATURE_FLAGS.ENABLE_PAYMENT = true;
+    try {
+      const profile = instance(ProfileScreen, props());
+      authApi.isLoggedIn.mockResolvedValue(false);
+      await profile.openDonation();
+      expect(NavigationService.navigate).toHaveBeenLastCalledWith('LoginScreen');
+      authApi.isLoggedIn.mockResolvedValue(true);
+      await profile.openDonation();
+      expect(NavigationService.navigate).toHaveBeenLastCalledWith('Donation');
+    } finally {
+      FEATURE_FLAGS.ENABLE_PAYMENT = previous;
+    }
   });
 
   // P9: Chatbot is routed; guests are sent to Login first.

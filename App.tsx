@@ -38,7 +38,10 @@ class App extends React.PureComponent<Props, States> {
 
   updateChatBubble = () => {
     const route = NavigationService.getNavigator()?.getCurrentRoute();
-    this.setState({showChatBubble: route?.name !== TAB_NAMES.PROFILE});
+    this.setState({
+      showChatBubble:
+        route?.name !== TAB_NAMES.PROFILE && route?.name !== TAB_NAMES.CAMERA,
+    });
   };
 
   render() {

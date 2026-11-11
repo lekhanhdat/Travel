@@ -331,6 +331,21 @@ export default class Policy extends React.PureComponent<
             showsVerticalScrollIndicator={false}>
             {this.renderContent()}
 
+            {[
+              {url: BRAND.privacyPolicyUrl, label: 'Xem chính sách đầy đủ'},
+              {url: BRAND.accountDeletionUrl, label: 'Yêu cầu xóa tài khoản'},
+            ].map(({url, label}) =>
+              url ? (
+                <TouchableOpacity
+                  key={label}
+                  accessibilityRole="link"
+                  style={styles.contactSection}
+                  onPress={() => Linking.openURL(url)}>
+                  <TextBase style={styles.subTitle}>{label}</TextBase>
+                </TouchableOpacity>
+              ) : null,
+            )}
+
             {BRAND.legalEmail && (
               <View style={styles.contactSection}>
                 <TextBase style={styles.contactTitle}>

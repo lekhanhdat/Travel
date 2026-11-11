@@ -3,6 +3,7 @@ import React from 'react';
 import {Linking} from 'react-native';
 import {fireEvent, render} from '@testing-library/react-native';
 import About from '../src/container/screens/Profile/About';
+import Policy from '../src/container/screens/Profile/Policy';
 import {BRAND} from '../src/config/brand';
 
 jest.mock('../src/component/HeaderBase', () => 'HeaderBase');
@@ -10,6 +11,32 @@ jest.mock('../src/assets/assets/ImageSvg', () => ({BackSvg: 'BackSvg'}));
 jest.mock('../src/container/screens/NavigationService', () => ({
   pop: jest.fn(),
 }));
+
+it('hides policy and deletion links while their URLs are unconfigured', () => {
+  const screen = render(<Policy />);
+  expect(BRAND.privacyPolicyUrl).toBeNull();
+  expect(BRAND.accountDeletionUrl).toBeNull();
+  expect(screen.queryByText('Xem chính sách đầy đủ')).toBeNull();
+  expect(screen.queryByText('Yêu cầu xóa tài khoản')).toBeNull();
+});
+
+it.each([
+  ['privacyPolicyUrl', 'Xem chính sách đầy đủ'],
+  ['accountDeletionUrl', 'Yêu cầu xóa tài khoản'],
+])('opens the configured %s', (key, label) => {
+  const previous = BRAND[key];
+  const url = `https://example.com/${key}`;
+  const openURL = jest.spyOn(Linking, 'openURL').mockResolvedValue();
+  try {
+    BRAND[key] = url;
+    const screen = render(<Policy />);
+    fireEvent.press(screen.getByText(label));
+    expect(openURL).toHaveBeenCalledWith(url);
+  } finally {
+    BRAND[key] = previous;
+    openURL.mockRestore();
+  }
+});
 
 it('renders Danavi branding and hides unconfigured contact links', () => {
   const screen = render(<About />);

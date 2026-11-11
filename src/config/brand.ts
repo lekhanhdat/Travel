@@ -8,6 +8,8 @@ export const BRAND: {
   minAndroid: string;
   releaseDate: string | null;
   playStoreId: string;
+  privacyPolicyUrl: string | null;
+  accountDeletionUrl: string | null;
   website: string | null;
   facebook: string | null;
   instagram: string | null;
@@ -24,6 +26,9 @@ export const BRAND: {
   minAndroid: '7.0',
   releaseDate: null,
   playStoreId: 'com.travel',
+  // MANUAL-04/13: Owner must supply the published policy and deletion URLs.
+  privacyPolicyUrl: null,
+  accountDeletionUrl: null,
   website: null,
   facebook: null,
   instagram: null,

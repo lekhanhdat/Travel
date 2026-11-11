@@ -25,6 +25,7 @@ import {withTranslation, WithTranslationProps} from '../../../hoc/withTranslatio
 import Toast from 'react-native-toast-message';
 import authApi from '../../../services/auth.api';
 import {requireLogin} from '../../../utils/requireLogin';
+import FEATURE_FLAGS from '../../../config/featureFlags';
 
 
 interface IProfileScreenProps extends WithTranslationProps {
@@ -77,8 +78,11 @@ class ProfileScreen extends React.PureComponent<
     });
   };
 
-  // P6: guests are sent to Login; Chatbot (P9) and Donation (debt N2) are not routed yet.
+  // Enabled payments still require an account.
   openDonation = async () => {
+    if (!FEATURE_FLAGS.ENABLE_PAYMENT) {
+      return;
+    }
     if (await requireLogin()) {
       NavigationService.navigate(ScreenName.DONATION);
     }
@@ -233,33 +237,34 @@ class ProfileScreen extends React.PureComponent<
               />
             </TouchableOpacity>
           </View>
-          {/* Nạp tiền */}
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              marginTop: sizes._16sdp,
-            }}>
-            <TextBase style={AppStyle.txt_18_bold}>{t('profile.donation')}</TextBase>
-            <TouchableOpacity
+          {FEATURE_FLAGS.ENABLE_PAYMENT && (
+            <View
               style={{
-                width: sizes._56sdp,
-                height: sizes._40sdp,
-                backgroundColor: colors.primary,
-                borderRadius: sizes._1000sdp,
+                flexDirection: 'row',
                 alignItems: 'center',
-                justifyContent: 'center',
-              }}
-              // N2: Donation routed; guests are asked to log in first.
-              onPress={this.openDonation}>
-              <TextBase style={{
-                fontSize: sizes._16sdp,
-                fontWeight: 'bold',
-                color: colors.primary_950,
-              }}>₫</TextBase>
-            </TouchableOpacity>
-          </View>
+                justifyContent: 'space-between',
+                marginTop: sizes._16sdp,
+              }}>
+              <TextBase style={AppStyle.txt_18_bold}>{t('profile.donation')}</TextBase>
+              <TouchableOpacity
+                style={{
+                  width: sizes._56sdp,
+                  height: sizes._40sdp,
+                  backgroundColor: colors.primary,
+                  borderRadius: sizes._1000sdp,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+                // N2: Donation routed; guests are asked to log in first.
+                onPress={this.openDonation}>
+                <TextBase style={{
+                  fontSize: sizes._16sdp,
+                  fontWeight: 'bold',
+                  color: colors.primary_950,
+                }}>₫</TextBase>
+              </TouchableOpacity>
+            </View>
+          )}
 
           <View
             style={{

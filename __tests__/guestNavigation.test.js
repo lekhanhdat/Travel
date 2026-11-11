@@ -38,7 +38,7 @@ jest.mock('../src/services/auth.api', () => {throw new Error('Guest must not ini
 // P9: Chatbot is routed (screen covered by __tests__/chatbot.test.js); the shell itself never loads chatbot.api.
 jest.mock('../src/container/screens/Profile/ChatbotScreen', () => 'Chatbot');
 jest.mock('../src/services/chatbot.api', () => {throw new Error('Guest must not initialize Chatbot');});
-// N2: Donation is routed (screen mocked here); the shell itself never loads payment.api.
+// Donation is gated by ENABLE_PAYMENT; the shell itself never loads payment.api.
 jest.mock('../src/container/screens/Profile/Donation', () => 'Donation');
 jest.mock('../src/services/payment.api', () => {throw new Error('Guest must not initialize Payment');});
 
@@ -49,7 +49,8 @@ it('registers guest + account routes and Home/Festival/Feed/Map/Camera/Profile t
   const routes = tree.root.findAllByType('Route').map(route => route.props.name);
   expect(routes).toEqual(['HomeStack', 'LoginScreen', 'ViewAllLocation', 'DetailLocationScreen', 'PreviewImage', 'MapsScreen',
     'LocationImage', 'LocationVideo', 'Personal', 'Settings', 'FAQ', 'Policy', 'About', 'Advise',
-    'SearchScreen', 'DetailFestivalScreen', 'ViewAllFestivals', 'SignUpScreen', 'Donation', 'ChatBotScreen']);
+    'SearchScreen', 'DetailFestivalScreen', 'ViewAllFestivals', 'SignUpScreen', 'ChatBotScreen']);
+  expect(routes).not.toContain('Donation');
   // Debt N1: still out of navigation.
   expect(routes).not.toEqual(expect.arrayContaining(['ForgotPasswordScreen']));
   expect(tree.root.findByType('Stack').props.initialRouteName).toBe('HomeStack');

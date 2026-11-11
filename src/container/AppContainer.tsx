@@ -357,8 +357,9 @@ function AppContainer() {
         component={ForgotPasswordScreen}
       />
       */}
-      {/* N2: Donation restored (PayOS via the Cloud Run API, module payments). */}
-      <Stack.Screen name="Donation" component={Donation} />
+      {FEATURE_FLAGS.ENABLE_PAYMENT && (
+        <Stack.Screen name={ScreenName.DONATION} component={Donation} />
+      )}
       {/* P9: restored (RAG chat on the BE; needs an account). */}
       <Stack.Screen name="ChatBotScreen" component={ChatBotScreen} />
     </Stack.Navigator>

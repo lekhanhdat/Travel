@@ -20,6 +20,7 @@ function httpError(status, detail, headers = {}) {
 let store;
 beforeEach(() => {
   store = {};
+  AsyncStorage.multiRemove = jest.fn(async keys => {keys.forEach(key => {delete store[key];});});
   AsyncStorage.setItem.mockImplementation(async (key, value) => {store[key] = value;});
   AsyncStorage.getItem.mockImplementation(async key => (key in store ? store[key] : null));
   AsyncStorage.removeItem.mockImplementation(async key => {delete store[key];});

@@ -15,7 +15,7 @@ import {
   Image,
   Dimensions,
 } from 'react-native';
-import {launchImageLibrary} from 'react-native-image-picker';
+import {launchImageLibrary} from '../../../utils/imagePicker';
 import Page from '../../../component/Page';
 import HeaderBase from '../../../component/HeaderBase';
 import TextBase from '../../../common/TextBase';
@@ -25,6 +25,7 @@ import colors from '../../../common/colors';
 import NavigationService from '../NavigationService';
 import {BackSvg} from '../../../assets/ImageSvg';
 import {SendSvg, CameraSvg} from '../../../assets/ImageSvg';
+import {Icon} from '../../../ui/Icon';
 import {
   sendChatMessage,
   ChatMessage,
@@ -35,7 +36,8 @@ import {
   resetChatSession,
 } from '../../../services/chatbot.api';
 import LocalStorageCommon from '../../../utils/LocalStorageCommon';
-import {localStorageKey} from '../../../common/constants';
+import {chatAccountId, chatKey, chatRevision, writeChat, invalidateChatSession, subscribeChatSession} from '../../../services/chatStorage';
+import {EndpointMissingError, getConversation, getLatestConversation, StoredChatMessage} from '../../../services/semantic.api';
 import locationApi from '../../../services/locations.api';
 import Markdown from 'react-native-markdown-display';
 
@@ -53,12 +55,19 @@ interface ChatbotScreenState {
   selectedImage: {uri: string; url?: string} | null;
   uploadingImage: boolean;
   fullScreenImage: string | null; // For image viewer modal
+  syncingHistory: boolean; // loading the Neon history after (re)login
 }
 
 export default class ChatbotScreen extends React.PureComponent<
   ChatbotScreenProps,
   ChatbotScreenState
 > {
+  private accountId = 'guest';
+  private generation = 0;
+  private pending = false;
+  private ready = false;
+  private unsubscribeFocus?: () => void;
+  private unsubscribeSession?: () => void;
   private flatListRef: FlatList | null = null;
 
   constructor(props: ChatbotScreenProps) {
@@ -71,6 +80,7 @@ export default class ChatbotScreen extends React.PureComponent<
       selectedImage: null,
       uploadingImage: false,
       fullScreenImage: null,
+      syncingHistory: false,
     };
   }
 
@@ -78,17 +88,44 @@ export default class ChatbotScreen extends React.PureComponent<
     this.loadChatHistory();
 
     // Listen for focus event to reload chat history
-    this.props.navigation?.addListener('focus', () => {
+    this.unsubscribeSession = subscribeChatSession(() => {
+      this.generation++;
+      this.ready = false;
+      this.pending = false;
+      this.setState({messages: [], inputText: '', selectedImage: null, uploadingImage: false, fullScreenImage: null, isLoading: false});
+    });
+    this.unsubscribeFocus = this.props.navigation?.addListener('focus', () => {
       this.loadChatHistory();
     });
   }
 
+  componentWillUnmount() {
+    this.generation++;
+    this.unsubscribeFocus?.();
+    this.unsubscribeSession?.();
+  }
+
   loadChatHistory = async () => {
+    if (this.pending) {return;}
+    const generation = ++this.generation;
+    this.ready = false;
+    this.pending = false;
+    this.setState({messages: [], isLoading: false, selectedImage: null, inputText: ''});
     try {
+      const accountId = await chatAccountId();
+      if (generation !== this.generation) {return;}
+      this.accountId = accountId;
       const savedMessages = await LocalStorageCommon.getItem(
-        localStorageKey.CHAT_HISTORY,
+        chatKey('CHAT_HISTORY', this.accountId),
       );
 
+      if (generation !== this.generation) {return;}
+      this.ready = true;
+      const hasLocal = Array.isArray(savedMessages) && savedMessages.length > 1;
+      if (!hasLocal) {
+        // Nothing cached on this device for the account (e.g. after logout): restore from Neon.
+        this.syncFromServer(generation);
+      }
       if (savedMessages && Array.isArray(savedMessages) && savedMessages.length > 0) {
         this.setState({messages: savedMessages});
       } else {
@@ -99,11 +136,13 @@ export default class ChatbotScreen extends React.PureComponent<
             i18n.t('common:ui.chatbot.welcome'),
         };
         this.setState({messages: [welcomeMessage]});
-        await LocalStorageCommon.setItem(localStorageKey.CHAT_HISTORY, [
+        await writeChat(chatKey('CHAT_HISTORY', this.accountId), [
           welcomeMessage,
         ]);
       }
     } catch (error) {
+      if (generation !== this.generation) {return;}
+      this.ready = false;
       // Fallback to welcome message
       const welcomeMessage: ChatMessage = {
         role: 'assistant',
@@ -114,14 +153,57 @@ export default class ChatbotScreen extends React.PureComponent<
     }
   };
 
+  /**
+   * Restore the account's latest conversation stored in Neon (BE `public.conversations`).
+   * Falls back to the stored session id while the BE predates /memory/conversations/latest.
+   * Never wipes anything on failure; the chat stays usable.
+   */
+  syncFromServer = async (generation: number) => {
+    const accountId = this.accountId;
+    if (accountId === 'guest') {return;}
+    this.setState({syncingHistory: true});
+    try {
+      let sessionId: string | null = null;
+      let stored: StoredChatMessage[] = [];
+      try {
+        ({sessionId, messages: stored} = await getLatestConversation());
+      } catch (error) {
+        if (!(error instanceof EndpointMissingError)) {throw error;}
+        const saved = await LocalStorageCommon.getItem(chatKey('CHAT_SESSION_ID', accountId));
+        if (typeof saved === 'string' && saved) {
+          sessionId = saved;
+          stored = await getConversation(saved);
+        }
+      }
+      // The user may have started typing meanwhile: keep their newer conversation.
+      if (generation !== this.generation || this.pending || stored.length === 0) {return;}
+      const welcome: ChatMessage = {role: 'assistant', content: i18n.t('common:ui.chatbot.welcome')};
+      const messages: ChatMessage[] = [
+        welcome,
+        ...stored
+          .filter(m => (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string')
+          .map(m => ({role: m.role, content: m.content})),
+      ];
+      this.setState({messages});
+      await writeChat(chatKey('CHAT_HISTORY', accountId), messages);
+      if (sessionId) {await writeChat(chatKey('CHAT_SESSION_ID', accountId), sessionId);}
+    } catch {
+      // Offline / server error: keep what is shown; the next visit retries.
+    } finally {
+      if (generation === this.generation) {this.setState({syncingHistory: false});}
+    }
+  };
+
   saveChatHistory = async (messages: ChatMessage[]) => {
     try {
-      await LocalStorageCommon.setItem(localStorageKey.CHAT_HISTORY, messages);
+      await writeChat(chatKey('CHAT_HISTORY', this.accountId), messages);
     } catch (error) {
     }
   };
 
   handlePickImage = () => {
+    if (!this.ready || this.pending) {return;}
+    const generation = this.generation;
     launchImageLibrary(
       {
         mediaType: 'photo',
@@ -129,6 +211,7 @@ export default class ChatbotScreen extends React.PureComponent<
         selectionLimit: 1,
       },
       async (response) => {
+        if (generation !== this.generation) {return;}
         if (response.didCancel) {
         } else if (response.errorCode) {
           Alert.alert('Lỗi', i18n.t('common:ui.common.pickImageFailed'));
@@ -144,6 +227,7 @@ export default class ChatbotScreen extends React.PureComponent<
               fileName: asset.fileName || `chat_${Date.now()}.jpg`,
             });
 
+            if (generation !== this.generation) {return;}
             this.setState({
               selectedImage: {
                 uri: asset.uri!,
@@ -152,6 +236,7 @@ export default class ChatbotScreen extends React.PureComponent<
               uploadingImage: false,
             });
           } catch (error) {
+            if (generation !== this.generation) {return;}
             console.error('Error uploading image:', error);
             Alert.alert('Lỗi', i18n.t('common:ui.chatbot.uploadFailed'));
             this.setState({uploadingImage: false});
@@ -166,12 +251,17 @@ export default class ChatbotScreen extends React.PureComponent<
   };
 
   handleSendMessage = async () => {
+    if (this.pending || !this.ready || this.state.uploadingImage) {return;}
     const {inputText, messages, selectedImage} = this.state;
 
     if (!inputText.trim() && !selectedImage) {
       return;
     }
 
+    this.pending = true;
+    const generation = this.generation;
+    const revision = chatRevision();
+    const accountId = this.accountId;
     // Build message content
     let messageContent: ChatMessage['content'];
 
@@ -217,6 +307,7 @@ export default class ChatbotScreen extends React.PureComponent<
       },
       () => {
         // Save to storage
+        if (generation !== this.generation) {return;}
         this.saveChatHistory(newMessages);
         // Scroll to bottom
         setTimeout(() => {
@@ -237,7 +328,8 @@ export default class ChatbotScreen extends React.PureComponent<
       let finalMessages = newMessages;
 
       // Use direct OpenAI chat
-      const response = await sendChatMessage(newMessages);
+      const response = await sendChatMessage(newMessages, undefined, accountId);
+      if (generation !== this.generation || revision !== chatRevision()) {return;}
 
       if (response.error) {
         const errorMessage: ChatMessage = {
@@ -267,6 +359,7 @@ export default class ChatbotScreen extends React.PureComponent<
 
         const imageResponse = await searchImage(userTextContent, imageCount);
 
+        if (generation !== this.generation || revision !== chatRevision()) {return;}
         if (imageResponse.error) {
           const imageErrorMessage: ChatMessage = {
             role: 'assistant',
@@ -301,8 +394,14 @@ export default class ChatbotScreen extends React.PureComponent<
         this.flatListRef?.scrollToEnd({animated: true});
       }, 100);
     } catch (error) {
+      if (generation !== this.generation) {return;}
       console.error('Error sending message:', error);
       this.setState({isLoading: false});
+    } finally {
+      if (generation === this.generation) {
+        this.pending = false;
+        this.setState({isLoading: false});
+      }
     }
   };
 
@@ -325,6 +424,9 @@ export default class ChatbotScreen extends React.PureComponent<
           text: i18n.t('common:ui.common.delete'),
           style: 'destructive',
           onPress: async () => {
+            invalidateChatSession();
+            const generation = this.generation;
+            this.ready = false;
             const welcomeMessage: ChatMessage = {
               role: 'assistant',
               content:
@@ -334,8 +436,15 @@ export default class ChatbotScreen extends React.PureComponent<
               messages: [welcomeMessage],
             });
             await this.saveChatHistory([welcomeMessage]);
+            if (generation !== this.generation) {return;}
             // P9: the BE session (history used as context) starts over too.
-            await resetChatSession();
+            try {await resetChatSession(this.accountId);} catch {
+              if (generation === this.generation) {
+                Alert.alert(i18n.t('common:common.error'), i18n.t('common:ui.common.serverError'));
+              }
+            } finally {
+              if (generation === this.generation) {this.ready = true;}
+            }
           },
         },
       ],
@@ -525,7 +634,7 @@ export default class ChatbotScreen extends React.PureComponent<
               <TouchableOpacity
                 style={styles.closeButton}
                 onPress={() => this.setState({fullScreenImage: null})}>
-                <TextBase style={styles.closeButtonText}>✕</TextBase>
+                <Icon name="close" size={24} color={colors.white} accessibilityLabel={i18n.t('common:buttons.back')} />
               </TouchableOpacity>
             </TouchableOpacity>
           </View>
@@ -544,6 +653,14 @@ export default class ChatbotScreen extends React.PureComponent<
           style={styles.container}
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}
           keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}>
+          {this.state.syncingHistory ? (
+            <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 6}}>
+              <ActivityIndicator size="small" color={colors.primary} />
+              <TextBase style={{marginLeft: 8, fontSize: 13, color: colors.gray}}>
+                {i18n.t('common:chat.loadingHistory')}
+              </TextBase>
+            </View>
+          ) : null}
           {/* Messages List */}
           <FlatList
             ref={ref => { this.flatListRef = ref; }}
@@ -580,7 +697,7 @@ export default class ChatbotScreen extends React.PureComponent<
                 <TouchableOpacity
                   style={styles.removeImageButton}
                   onPress={this.handleRemoveImage}>
-                  <TextBase style={styles.removeImageText}>✕</TextBase>
+                  <Icon name="close" size={16} color={colors.white} />
                 </TouchableOpacity>
               </View>
             )}
@@ -590,7 +707,7 @@ export default class ChatbotScreen extends React.PureComponent<
               <TouchableOpacity
                 style={styles.imageButton}
                 onPress={this.handlePickImage}
-                disabled={uploadingImage}>
+                disabled={uploadingImage || isLoading}>
                 {uploadingImage ? (
                   <ActivityIndicator size="small" color={colors.primary} />
                 ) : (
@@ -617,7 +734,7 @@ export default class ChatbotScreen extends React.PureComponent<
                   (!inputText.trim() && !selectedImage) && styles.sendButtonDisabled,
                 ]}
                 onPress={this.handleSendMessage}
-                disabled={!inputText.trim() && !selectedImage}>
+                disabled={isLoading || uploadingImage || (!inputText.trim() && !selectedImage)}>
                 <SendSvg
                   width={sizes._24sdp}
                   height={sizes._24sdp}

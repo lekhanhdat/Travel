@@ -1,3 +1,4 @@
+import {chatAccountId, clearAccountChat, invalidateChatSession} from './chatStorage';
 import {IAccount} from '../common/types';
 import {localStorageKey} from '../common/constants';
 import LocalStorageCommon from '../utils/LocalStorageCommon';
@@ -65,16 +66,19 @@ async function saveSession(response: AuthResponse): Promise<IAccount> {
   const account = toAccount(response.account);
   await tokenStore.save(response);
   await LocalStorageCommon.setItem(localStorageKey.AVT, account);
+  invalidateChatSession();
   return account;
 }
 
-async function clearSession() {
+async function clearSession({keepChatSession = false} = {}) {
+  const accountId = await chatAccountId();
+  await clearAccountChat(accountId, {keepSession: keepChatSession});
   await tokenStore.clear();
   await LocalStorageCommon.setItem(localStorageKey.AVT, null);
 }
 
 // The session ends when the refresh token is rejected (expired, password changed, account deleted).
-setUnauthorizedHandler(clearSession);
+setUnauthorizedHandler(() => clearSession({keepChatSession: true}));
 // A refresh also returns the current profile.
 setSessionRefreshedHandler(async pair => {
   const account = (pair as Partial<AuthResponse>).account;
@@ -153,7 +157,8 @@ const authApi = {
     await clearSession();
   },
 
-  logout: clearSession,
+  // Logout keeps the chat session id so the Neon history comes back after the next login.
+  logout: () => clearSession({keepChatSession: true}),
 
   isLoggedIn: async (): Promise<boolean> => Boolean(await tokenStore.get()),
 

@@ -1,8 +1,8 @@
 import React from 'react';
 import {
-  Image,
+  Alert,
+  ScrollView,
   Linking,
-  NativeModules,
   StyleSheet,
   TouchableOpacity,
   View,
@@ -20,14 +20,16 @@ import {IAccount} from '../../../common/types';
 import LocalStorageCommon from '../../../utils/LocalStorageCommon';
 import {localStorageKey} from '../../../common/constants';
 import {Avatar, getDisplayName} from '../../../utils/avatarUtils';
-import {UserSvg} from '../../../assets/assets/ImageSvg';
+import {UserSvg} from '../../../assets/ImageSvg';
 import {Button} from 'react-native-paper';
+import {Icon} from '../../../ui/Icon';
+import {color, radius} from '../../../theme/tokens';
 import {withTranslation, WithTranslationProps} from '../../../hoc/withTranslation';
 import Toast from 'react-native-toast-message';
 import authApi from '../../../services/auth.api';
 import {requireLogin} from '../../../utils/requireLogin';
+import FEATURE_FLAGS from '../../../config/featureFlags';
 
-const {StatusBarManager} = NativeModules;
 
 interface IProfileScreenProps extends WithTranslationProps {
   navigation?: any;
@@ -48,12 +50,18 @@ class ProfileScreen extends React.PureComponent<
     };
   }
 
-  phoneNumber = 'tel:0528777528'; // Số điện thoại cần gọi
+  phoneNumber = 'tel:113'; // Số điện thoại cần gọi
 
   handleOpenCall = () => {
-    Linking.openURL(this.phoneNumber).catch(err =>
-      console.error('Error opening call:', err),
-    );
+    const {t} = this.props;
+    Alert.alert(t('profile.emergency113'), t('profile.emergencyConfirm'), [
+      {text: t('ui.common.cancel'), style: 'cancel'},
+      {text: t('profile.call'), onPress: () => {
+        Linking.openURL(this.phoneNumber).catch(() => {
+          Alert.alert(t('common.error'), t('profile.callFailed'));
+        });
+      }},
+    ]);
   };
 
   componentDidMount(): void {
@@ -62,7 +70,6 @@ class ProfileScreen extends React.PureComponent<
     // Add focus listener to refresh user data when returning to this screen
     if (this.props.navigation) {
       this.props.navigation.addListener('focus', () => {
-        console.log('ProfileScreen focused - refreshing user data');
         // Force update to refresh translations
         this.forceUpdate();
         this.handleGetUser();
@@ -79,8 +86,11 @@ class ProfileScreen extends React.PureComponent<
     });
   };
 
-  // P6: guests are sent to Login; Chatbot (P9) and Donation (debt N2) are not routed yet.
+  // Enabled payments still require an account.
   openDonation = async () => {
+    if (!FEATURE_FLAGS.ENABLE_PAYMENT) {
+      return;
+    }
     if (await requireLogin()) {
       NavigationService.navigate(ScreenName.DONATION);
     }
@@ -115,7 +125,7 @@ class ProfileScreen extends React.PureComponent<
     return (
       <Page>
         <HeaderBase hideLeftIcon title={t('profile.title')} />
-        <View style={styles.container}>
+        <ScrollView contentContainerStyle={styles.container}>
           {/* <TextBase style={[AppStyle.txt_20_bold]}>Thông tin cá nhân</TextBase> */}
 
           <View style={{alignSelf: 'center', marginBottom: sizes._10sdp}}>
@@ -128,7 +138,7 @@ class ProfileScreen extends React.PureComponent<
               AppStyle.txt_18_bold_review,
               {alignSelf: 'center'},
             ]}>
-            {getDisplayName(this.state.account)}
+            {account ? getDisplayName(account) : t('profile.guest')}
           </TextBase>
 
           <View
@@ -165,7 +175,7 @@ class ProfileScreen extends React.PureComponent<
               style={{
                 width: sizes._56sdp,
                 height: sizes._40sdp,
-                backgroundColor: colors.primary,
+                backgroundColor: colors.primary_100,
                 borderRadius: sizes._1000sdp,
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -175,7 +185,7 @@ class ProfileScreen extends React.PureComponent<
               <ChatBotSvg
                 width={sizes._20sdp}
                 height={sizes._20sdp}
-                color={colors.primary_950}
+                color={colors.primary}
               />
             </TouchableOpacity>
           </View>
@@ -188,13 +198,13 @@ class ProfileScreen extends React.PureComponent<
               marginTop: sizes._16sdp,
             }}>
             <TextBase style={AppStyle.txt_18_bold}>
-              {t('profile.emergencyCall')}
+              {t('profile.emergency113')}
             </TextBase>
             <TouchableOpacity
               style={{
                 width: sizes._56sdp,
                 height: sizes._40sdp,
-                backgroundColor: colors.primary,
+                backgroundColor: colors.primary_100,
                 borderRadius: sizes._1000sdp,
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -203,7 +213,7 @@ class ProfileScreen extends React.PureComponent<
               <Call
                 width={sizes._20sdp}
                 height={sizes._20sdp}
-                color={colors.primary_950}
+                color={colors.primary}
               />
             </TouchableOpacity>
           </View>
@@ -222,7 +232,7 @@ class ProfileScreen extends React.PureComponent<
               style={{
                 width: sizes._56sdp,
                 height: sizes._40sdp,
-                backgroundColor: colors.primary,
+                backgroundColor: colors.primary_100,
                 borderRadius: sizes._1000sdp,
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -231,37 +241,38 @@ class ProfileScreen extends React.PureComponent<
               <UserSvg
                 width={sizes._20sdp}
                 height={sizes._20sdp}
-                color={colors.primary_950}
+                color={colors.primary}
               />
             </TouchableOpacity>
           </View>
-          {/* Nạp tiền */}
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              marginTop: sizes._16sdp,
-            }}>
-            <TextBase style={AppStyle.txt_18_bold}>{t('profile.donation')}</TextBase>
-            <TouchableOpacity
+          {FEATURE_FLAGS.ENABLE_PAYMENT && (
+            <View
               style={{
-                width: sizes._56sdp,
-                height: sizes._40sdp,
-                backgroundColor: colors.primary,
-                borderRadius: sizes._1000sdp,
+                flexDirection: 'row',
                 alignItems: 'center',
-                justifyContent: 'center',
-              }}
-              // N2: Donation routed; guests are asked to log in first.
-              onPress={this.openDonation}>
-              <TextBase style={{
-                fontSize: sizes._16sdp,
-                fontWeight: 'bold',
-                color: colors.primary_950,
-              }}>₫</TextBase>
-            </TouchableOpacity>
-          </View>
+                justifyContent: 'space-between',
+                marginTop: sizes._16sdp,
+              }}>
+              <TextBase style={AppStyle.txt_18_bold}>{t('profile.donation')}</TextBase>
+              <TouchableOpacity
+                style={{
+                  width: sizes._56sdp,
+                  height: sizes._40sdp,
+                  backgroundColor: colors.primary_100,
+                  borderRadius: sizes._1000sdp,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+                // N2: Donation routed; guests are asked to log in first.
+                onPress={this.openDonation}>
+                <TextBase style={{
+                  fontSize: sizes._16sdp,
+                  fontWeight: 'bold',
+                  color: colors.primary,
+                }}>₫</TextBase>
+              </TouchableOpacity>
+            </View>
+          )}
 
           <View
             style={{
@@ -284,34 +295,41 @@ class ProfileScreen extends React.PureComponent<
             ]}>
             Other
           </TextBase> */}
-          <View
+          <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel={t('profile.settings')}
+            onPress={() => {
+                NavigationService.navigate(ScreenName.SETTINGS);
+              }}
             style={{
               flexDirection: 'row',
               alignItems: 'center',
               justifyContent: 'space-between',
             }}>
             <TextBase style={AppStyle.txt_18_bold}>{t('profile.settings')}</TextBase>
-            <TouchableOpacity
+            <View
               style={{
                 width: sizes._56sdp,
                 height: sizes._40sdp,
-                backgroundColor: colors.primary,
+                backgroundColor: colors.primary_100,
                 borderRadius: sizes._1000sdp,
                 alignItems: 'center',
                 justifyContent: 'center',
-              }}
-              onPress={() => {
-                NavigationService.navigate(ScreenName.SETTINGS);
               }}>
               <Setting
                 width={sizes._20sdp}
                 height={sizes._20sdp}
-                color={colors.primary_950}
+                color={colors.primary}
               />
-            </TouchableOpacity>
-          </View>
+            </View>
+          </TouchableOpacity>
 
-          <View
+          <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel={t('profile.faq')}
+            onPress={() => {
+                NavigationService.navigate(ScreenName.FAQ);
+              }}
             style={{
               flexDirection: 'row',
               alignItems: 'center',
@@ -321,27 +339,29 @@ class ProfileScreen extends React.PureComponent<
             <TextBase style={AppStyle.txt_18_bold}>
               {t('profile.faq')}
             </TextBase>
-            <TouchableOpacity
+            <View
               style={{
                 width: sizes._56sdp,
                 height: sizes._40sdp,
-                backgroundColor: colors.primary,
+                backgroundColor: colors.primary_100,
                 borderRadius: sizes._1000sdp,
                 alignItems: 'center',
                 justifyContent: 'center',
-              }}
-              onPress={() => {
-                NavigationService.navigate(ScreenName.FAQ);
               }}>
               <FAQ
                 width={sizes._20sdp}
                 height={sizes._20sdp}
-                color={colors.primary_950}
+                color={colors.primary}
               />
-            </TouchableOpacity>
-          </View>
+            </View>
+          </TouchableOpacity>
 
-          <View
+          <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel={t('profile.policy')}
+            onPress={() => {
+                NavigationService.navigate(ScreenName.POLICY);
+              }}
             style={{
               flexDirection: 'row',
               alignItems: 'center',
@@ -351,27 +371,29 @@ class ProfileScreen extends React.PureComponent<
             <TextBase style={AppStyle.txt_18_bold}>
               {t('profile.policy')}
             </TextBase>
-            <TouchableOpacity
+            <View
               style={{
                 width: sizes._56sdp,
                 height: sizes._40sdp,
-                backgroundColor: colors.primary,
+                backgroundColor: colors.primary_100,
                 borderRadius: sizes._1000sdp,
                 alignItems: 'center',
                 justifyContent: 'center',
-              }}
-              onPress={() => {
-                NavigationService.navigate(ScreenName.POLICY);
               }}>
               <Policy
                 width={sizes._20sdp}
                 height={sizes._20sdp}
-                color={colors.primary_950}
+                color={colors.primary}
               />
-            </TouchableOpacity>
-          </View>
+            </View>
+          </TouchableOpacity>
 
-          <View
+          <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel={t('profile.about')}
+            onPress={() => {
+                NavigationService.navigate(ScreenName.ABOUT);
+              }}
             style={{
               flexDirection: 'row',
               alignItems: 'center',
@@ -381,30 +403,28 @@ class ProfileScreen extends React.PureComponent<
             <TextBase style={AppStyle.txt_18_bold}>
               {t('profile.about')}
             </TextBase>
-            <TouchableOpacity
+            <View
               style={{
                 width: sizes._56sdp,
                 height: sizes._40sdp,
-                backgroundColor: colors.primary,
+                backgroundColor: colors.primary_100,
                 borderRadius: sizes._1000sdp,
                 alignItems: 'center',
                 justifyContent: 'center',
-              }}
-              onPress={() => {
-                NavigationService.navigate(ScreenName.ABOUT);
               }}>
-              <TextBase style={{
-                fontSize: sizes._16sdp,
-                fontWeight: 'bold',
-                color: colors.primary_950,
-              }}>i</TextBase>
-            </TouchableOpacity>
-          </View>
+              <Icon name="information-outline" size={sizes._20sdp} color={colors.primary} />
+            </View>
+          </TouchableOpacity>
 
-          <View style={{marginTop: sizes._26sdp, marginHorizontal: sizes._26sdp}}>
+          <View style={{marginTop: sizes._26sdp}}>
+            {/* Previous: contained blue button with red (#B22222) label — low contrast. */}
             <Button
-              mode="contained"
-              labelStyle={{ fontSize: 16, height: sizes._30sdp, textAlignVertical: 'center', color: '#B22222' }}
+              mode={account ? 'outlined' : 'contained'}
+              icon={account ? 'logout' : 'login'}
+              textColor={account ? color.error : color.onPrimary}
+              style={account ? {borderColor: color.error, borderRadius: radius.md} : {borderRadius: radius.md}}
+              contentStyle={{height: 48}}
+              labelStyle={{fontSize: 16}}
               onPress={() => {
                 if (account) {
                   this.handleLogout();
@@ -422,16 +442,17 @@ class ProfileScreen extends React.PureComponent<
               <TextBase style={[AppStyle.txt_18_bold]}></TextBase>
             </TouchableOpacity> */}
           </View>
-        </View>
+        </ScrollView>
       </Page>
     );
   }
 }
 const styles = StyleSheet.create({
   container: {
-    paddingTop: StatusBarManager.HEIGHT + sizes._16sdp,
+    paddingTop: sizes._16sdp,
     padding: sizes._16sdp,
-    flex: 1,
+    flexGrow: 1,
+    paddingBottom: sizes._32sdp,
     backgroundColor: colors.background,
   },
   btn: {

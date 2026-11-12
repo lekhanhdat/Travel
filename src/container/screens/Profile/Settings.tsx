@@ -5,7 +5,6 @@ import {
   TouchableOpacity,
   Switch,
   Alert,
-  NativeModules,
 } from 'react-native';
 import {
   withTranslation,
@@ -18,12 +17,16 @@ import TextBase from '../../../common/TextBase';
 import sizes from '../../../common/sizes';
 import colors from '../../../common/colors';
 import {AppStyle} from '../../../common/AppStyle';
-import {BackSvg} from '../../../assets/assets/ImageSvg';
+import {BackSvg} from '../../../assets/ImageSvg';
 import NavigationService from '../NavigationService';
-import LocalStorageCommon from '../../../utils/LocalStorageCommon';
-import {localStorageKey} from '../../../common/constants';
+import catalogRepository from '../../../services/catalogRepository';
+import {cacheControls} from '../../../services/semantic.api';
 
-const {StatusBarManager} = NativeModules;
+const SHOW_UNFINISHED = false;
+
+import LocalStorageCommon from '../../../utils/LocalStorageCommon';
+
+
 
 interface ISettingsProps extends WithTranslationProps {}
 
@@ -45,7 +48,7 @@ class Settings extends React.PureComponent<ISettingsProps, ISettingsState> {
       autoSync: false,
       darkMode: false,
       language: 'Tiếng Việt',
-      cacheSize: '0 MB',
+      cacheSize: '',
     };
   }
 
@@ -67,7 +70,6 @@ class Settings extends React.PureComponent<ISettingsProps, ISettingsState> {
         });
       }
     } catch (error) {
-      console.log('Error loading settings:', error);
     }
   };
 
@@ -82,14 +84,12 @@ class Settings extends React.PureComponent<ISettingsProps, ISettingsState> {
       };
       await LocalStorageCommon.setItem('app_settings', settings);
     } catch (error) {
-      console.log('Error saving settings:', error);
     }
   };
 
   calculateCacheSize = () => {
-    // Simulate cache size calculation
-    const randomSize = Math.floor(Math.random() * 50) + 10;
-    this.setState({cacheSize: `${randomSize} MB`});
+    // The existing services cache in memory; report entries rather than inventing a byte count.
+    this.setState({cacheSize: this.props.t('settings.cacheEntries').replace('{{count}}', String(cacheControls.getStats().size))});
   };
 
   handleToggleNotifications = (value: boolean) => {
@@ -122,10 +122,12 @@ class Settings extends React.PureComponent<ISettingsProps, ISettingsState> {
           text: this.props.t('settings.clearCache'),
           style: 'destructive',
           onPress: () => {
-            this.setState({cacheSize: '0 MB'});
+            catalogRepository.clear();
+            cacheControls.invalidateAll();
+            this.calculateCacheSize();
             Alert.alert(
               this.props.t('common.success'),
-              this.props.t('settings.clearCacheSuccess'),
+              this.props.t('settings.cacheCleared'),
             );
           },
         },
@@ -179,6 +181,7 @@ class Settings extends React.PureComponent<ISettingsProps, ISettingsState> {
         />
 
         <View style={styles.container}>
+          {SHOW_UNFINISHED && <>
           {this.renderSectionHeader(this.props.t('settings.notifications'))}
 
           {this.renderSettingItem(
@@ -231,6 +234,8 @@ class Settings extends React.PureComponent<ISettingsProps, ISettingsState> {
             />,
           )}
 
+          </>}
+
           <LanguageDropdown style={styles.languageDropdown} />
 
           {this.renderSectionHeader(this.props.t('settings.storage'))}
@@ -258,7 +263,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
-    paddingTop: StatusBarManager.HEIGHT + sizes._16sdp,
+    paddingTop: sizes._16sdp,
   },
   sectionHeader: {
     paddingHorizontal: sizes._16sdp,

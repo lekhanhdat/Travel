@@ -1077,7 +1077,7 @@ const sizes = new (class {
       ? isIphoneX()
         ? this._40sdp
         : this._20sdp
-      : Platform.Version >= 21
+      : Number(Platform.Version) >= 21
       ? StatusBar.currentHeight
         ? StatusBar.currentHeight
         : 0
@@ -1090,8 +1090,6 @@ const sizes = new (class {
   _isIpad = () => {
     if (Platform.OS === 'ios') {
       const platformIOS = Platform as PlatformIOSStatic;
-      console.log(platformIOS.isPad);
-      console.log(platformIOS.isTVOS);
       return platformIOS.isPad;
     } else {
       return false;

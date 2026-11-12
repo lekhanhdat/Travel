@@ -16,7 +16,7 @@ function sourceFiles(dir) {
 
 describe('environment allowlist', () => {
   it('babel dotenv plugin only allows public variables', () => {
-    const config = require('../babel.config.js');
+    const config = require('../babel.config.js')({env: () => false});
     const dotenv = config.plugins.find(
       plugin => Array.isArray(plugin) && plugin[0] === 'module:react-native-dotenv',
     );

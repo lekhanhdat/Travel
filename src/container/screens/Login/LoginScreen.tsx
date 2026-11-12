@@ -1,15 +1,10 @@
 import React from 'react';
 import i18n from '../../../i18n';
-import { View, StyleSheet, Image, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { TextInput } from 'react-native-paper';
-import Swiper from 'react-native-swiper';
+import {StyleSheet} from 'react-native';
 import Toast from 'react-native-toast-message';
 
-import Page from '../../../component/Page';
-import sizes from '../../../common/sizes';
-import colors from '../../../common/colors';
-import images from '../../../res/images';
-import { AppStyle } from '../../../common/AppStyle';
+import {AuthButton, AuthInput, AuthLayout, AuthSwitch, PasswordInput} from '../../../features/auth/AuthLayout';
+import {Text} from '../../../ui/Text';
 import NavigationService from '../NavigationService';
 import { ScreenName } from '../../AppContainer';
 import authApi from '../../../services/auth.api';
@@ -19,21 +14,18 @@ interface ILoginScreenProps {
 }
 
 interface ILoginScreenState {
-  isSecureTextEntry: boolean;
   userName: string;
   password: string;
-  banners: any[];
   loading: boolean;
 }
 
 export default class LoginScreen extends React.PureComponent<ILoginScreenProps, ILoginScreenState> {
   constructor(props: ILoginScreenProps) {
     super(props);
+    // The banner carousel (images.caurong/cauvang/dienhai/nharong) was replaced by one static header image.
     this.state = {
-      isSecureTextEntry: true,
       userName: '',
       password: '',
-      banners: [images.caurong, images.cauvang, images.dienhai, images.nharong],
       loading: false,
     };
   }
@@ -88,181 +80,75 @@ export default class LoginScreen extends React.PureComponent<ILoginScreenProps, 
     }
   };
 
-  toggleSecureEntry = () => {
-    this.setState(prevState => ({
-      isSecureTextEntry: !prevState.isSecureTextEntry,
-    }));
+  goBack = () => {
+    if (this.props.navigation?.canGoBack()) {
+      this.props.navigation.goBack();
+    } else {
+      NavigationService.reset(ScreenName.HOME_STACK_SCREEN);
+    }
   };
 
-  renderBanner = (banner: any, index: number) => (
-    <View key={index} style={styles.bannerContainer}>
-      <Image
-        source={banner}
-        style={styles.bannerImage}
-      />
-    </View>
-  );
-
   render() {
-    const { userName, password, isSecureTextEntry, banners, loading } = this.state;
+    const {userName, password, loading} = this.state;
     const isLoginDisabled = !userName || !password || loading;
 
     return (
-      <Page>
-        <View style={styles.wrapper}>
-          <Swiper
-            height={sizes._400sdp}
-            autoplay
-            activeDotColor={colors.white}
-          >
-            {banners.map(this.renderBanner)}
-          </Swiper>
-        </View>
-
-        <View style={styles.titleContainer}>
-          <Text style={styles.title}>{i18n.t('common:ui.common.login')}</Text>
-        </View>
-
-        <View style={styles.container}>
-          <TextInput
-            mode="outlined"
-            label={i18n.t('common:ui.common.userName')}
-            placeholder={i18n.t('common:ui.common.userNamePlaceholder')}
-            style={styles.textInput}
-            outlineStyle={styles.inputOutline}
-            textColor={colors.primary_950}
-            placeholderTextColor={colors.black}
-            autoCapitalize="none"
-            autoCorrect={false}
-            onChangeText={userName => this.setState({ userName })}
+      <AuthLayout
+        title={i18n.t('common:ui.common.login')}
+        subtitle={i18n.t('common:auth.loginSubtitle')}
+        onBack={this.goBack}
+        backLabel={i18n.t('common:buttons.back')}
+        footer={
+          <AuthSwitch
+            question={i18n.t('common:ui.login.noAccount')}
+            action={i18n.t('common:ui.common.signup')}
+            onPress={() => NavigationService.reset(ScreenName.SIGN_UP)}
           />
-
-          <TextInput
-            mode="outlined"
-            label="Mật khẩu"
-            placeholder="Nhập mật khẩu"
-            style={styles.textInput}
-            outlineStyle={styles.inputOutline}
-            textColor={colors.primary_950}
-            placeholderTextColor={colors.black}
-            secureTextEntry={isSecureTextEntry}
-            right={
-              <TextInput.Icon
-                icon={isSecureTextEntry ? images.eye_open : images.eye_close}
-                onPress={this.toggleSecureEntry}
-              />
-            }
-            onChangeText={password => this.setState({ password })}
-          />
-
-          <TouchableOpacity
-            // Debt N1: email OTP is off in the backend; ForgotPasswordScreen stays out of navigation.
-            onPress={() => Toast.show({type: 'info', text1: i18n.t('common:ui.login.forgotSoon')})}
-          >
-            <Text style={styles.forgotPassword}>{i18n.t('common:ui.login.forgot')}</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.loginButton, isLoginDisabled && styles.disabledButton]}
-            onPress={this.handleLogin}
-            disabled={isLoginDisabled}
-          >
-            {loading ? (
-              <ActivityIndicator size="small" color={colors.white} />
-            ) : (
-              <Text
-                style={[
-                  AppStyle.txt_20_bold,
-                  { color: isLoginDisabled ? colors.primary_400 : colors.white },
-                ]}
-              >
-                {i18n.t('common:ui.common.login')}
-              </Text>
-            )}
-          </TouchableOpacity>
-
-          <View style={styles.signupContainer}>
-            <Text style={styles.signupText}>
-              {i18n.t('common:ui.login.noAccount')}{' '}
-              <TouchableOpacity
-                onPress={() => NavigationService.reset(ScreenName.SIGN_UP)}
-              >
-                <Text style={styles.signupLink}>{i18n.t('common:ui.common.signup')}</Text>
-              </TouchableOpacity>
-            </Text>
-          </View>
-        </View>
-      </Page>
+        }>
+        <AuthInput
+          icon="account-outline"
+          label={i18n.t('common:ui.common.userName')}
+          placeholder={i18n.t('common:ui.common.userNamePlaceholder')}
+          autoCapitalize="none"
+          autoCorrect={false}
+          autoComplete="username"
+          textContentType="username"
+          returnKeyType="next"
+          value={userName}
+          onChangeText={userNameInput => this.setState({userName: userNameInput})}
+        />
+        <PasswordInput
+          label={i18n.t('common:auth.password')}
+          placeholder={i18n.t('common:auth.enterPassword')}
+          autoComplete="password"
+          textContentType="password"
+          returnKeyType="done"
+          value={password}
+          onSubmitEditing={this.handleLogin}
+          onChangeText={passwordInput => this.setState({password: passwordInput})}
+        />
+        <Text
+          variant="label"
+          tone="primary"
+          style={styles.forgot}
+          accessibilityRole="link"
+          // Debt N1 restored (email OTP through Gmail SMTP). Previous behaviour, kept for reference:
+          // onPress={() => Toast.show({type: 'info', text1: i18n.t('common:ui.login.forgotSoon')})}
+          onPress={() => NavigationService.navigate(ScreenName.FORGOT_PASSWORD)}>
+          {i18n.t('common:ui.login.forgot')}
+        </Text>
+        <AuthButton
+          label={i18n.t('common:ui.common.login')}
+          icon="login"
+          onPress={this.handleLogin}
+          loading={loading}
+          disabled={isLoginDisabled}
+        />
+      </AuthLayout>
     );
   }
 }
 
 const styles = StyleSheet.create({
-  wrapper: {
-    width: '100%',
-    height: sizes._320sdp,
-    marginBottom: sizes._30sdp,
-    borderBottomLeftRadius: sizes._50sdp,
-    borderBottomRightRadius: sizes._50sdp,
-    overflow: 'hidden',
-  },
-  bannerContainer: {
-    flex: 1,
-  },
-  bannerImage: {
-    width: sizes.width,
-    height: sizes._400sdp,
-    borderBottomLeftRadius: sizes._50sdp,
-    borderBottomRightRadius: sizes._50sdp,
-    alignSelf: 'center',
-  },
-  titleContainer: {
-    alignItems: 'center',
-  },
-  title: {
-    color: colors.black,
-    fontSize: sizes._25sdp,
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  container: {
-    flex: 1,
-    paddingHorizontal: sizes._16sdp,
-    marginTop: sizes._10sdp,
-  },
-  textInput: {
-    width: '100%',
-    marginBottom: sizes._16sdp,
-  },
-  inputOutline: {
-    borderColor: colors.black,
-    borderRadius: sizes._16sdp,
-  },
-  forgotPassword: {
-    color: colors.primary,
-    marginTop: sizes._10sdp,
-    marginLeft: sizes._10sdp,
-  },
-  loginButton: {
-    width: '100%',
-    paddingVertical: sizes._16sdp,
-    borderRadius: sizes._16sdp,
-    backgroundColor: colors.black,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: sizes._40sdp,
-  },
-  disabledButton: {
-    backgroundColor: colors.primary_200,
-  },
-  signupContainer: {
-    marginTop: sizes._10sdp,
-  },
-  signupText: {
-    color: colors.primary,
-    textAlign: 'center',
-  },
-  signupLink: {
-    fontWeight: 'bold',
-  },
+  forgot: {alignSelf: 'flex-end', paddingVertical: 4},
 });

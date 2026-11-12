@@ -1,5 +1,5 @@
 /**
- * i18n Configuration for React Native Travel App
+ * i18n Configuration for React Native Danavi
  * 
  * This module configures react-i18next for internationalization.
  * Supports English (en) and Vietnamese (vi) languages.

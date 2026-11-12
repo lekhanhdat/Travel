@@ -1,49 +1,24 @@
 import FEATURE_FLAGS from '../config/featureFlags';
-import React, {useRef, useEffect} from 'react';
+import React from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import {useRoute} from '@react-navigation/native';
-import {StyleSheet, View, Image, TouchableOpacity} from 'react-native';
+import {Pressable, StyleSheet, View} from 'react-native';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {TranslationProvider} from '../context/TranslationContext';
 import {useTranslation} from '../hooks/useTranslation';
-import images from '../res/images';
-import sizes from '../common/sizes';
-import TextBase from '../common/TextBase';
-import fonts from '../common/fonts';
-import colors from '../common/colors';
-import {
-  HomeSvg,
-  FireworksSvg,
-  NewFeed,
-  MapSvg,
-  CameraSvg,
-  ProfileSvg,
-} from '../assets/ImageSvg';
-// P1: Keep deferred imports commented to avoid native/service initialization.
-import LoginScreen from './screens/Login/LoginScreen';
+import {Icon, IconName} from '../ui/Icon';
+import {Text} from '../ui/Text';
+import {color, space} from '../theme/tokens';
+// Tab roots are imported eagerly; every other screen is loaded on first use via
+// `getComponent` (R-NAV1) so startup only evaluates what the first frame needs.
 import HomeScreen from './screens/Home/HomeScreen';
 import NewFeedScreen from './screens/NewFeed/NewFeedScreen';
 import MapsScreen from './screens/Maps/MapScreen';
 import CameraScreen from './screens/Camera/CameraScreen';
 import ProfileScreen from './screens/Profile/ProfileScreen';
-import ViewAllLocation from './screens/Home/ViewAllLocation';
-import DetailItemScreen from './screens/Home/DetailLocation';
-import PreviewImage from './screens/Camera/PreviewImage';
-import LocationImage from './screens/Home/LocationImage';
-import LocationVideo from './screens/Home/LocationVideo';
-import Personal from './screens/Profile/Personal';
-import Settings from './screens/Profile/Settings';
-import FAQ from './screens/Profile/FAQ';
-import Policy from './screens/Profile/Policy';
-import About from './screens/Profile/About';
-import Advise from './screens/Maps/Advise';
-import FestivalsScreen from './screens/Festival/FestivalsScreen';
-import DetailFestivalScreen from './screens/Festival/DetailFestival';
-import ViewAllFestivals from './screens/Festival/ViewAllFestivals';
-import SignUpScreen from './screens/Login/SignUpScreen';
+// D-2: the Festivals tab is merged into Home; FestivalsScreen, ViewAllLocation and
+// ViewAllFestivals were replaced by the Home sections + screens/Discover/ViewAllScreen.
 // import ForgotPasswordScreen from './screens/Login/ForgotPasswordScreen';
-import Donation from './screens/Profile/Donation';
-import ChatBotScreen from './screens/Profile/ChatbotScreen';
 
 export enum ScreenName {
   SPLASH_SCREEN = 'SplashScreen',
@@ -80,10 +55,15 @@ export const TAB_NAMES = {
   PROFILE: 'TabProfile',
 } as const;
 
-// Fixed icon order for getTabIcon, independent of which tabs are currently enabled
-const TAB_ORDER: string[] = [
-  TAB_NAMES.HOME, TAB_NAMES.FESTIVAL, TAB_NAMES.FEED, TAB_NAMES.MAP, TAB_NAMES.CAMERA, TAB_NAMES.PROFILE,
-];
+// [inactive, active] icon per tab
+const TAB_ICONS: Record<string, [IconName, IconName]> = {
+  [TAB_NAMES.HOME]: ['compass-outline', 'compass'],
+  [TAB_NAMES.FESTIVAL]: ['party-popper', 'party-popper'],
+  [TAB_NAMES.FEED]: ['newspaper-variant-outline', 'newspaper-variant'],
+  [TAB_NAMES.MAP]: ['map-outline', 'map'],
+  [TAB_NAMES.CAMERA]: ['camera-outline', 'camera'],
+  [TAB_NAMES.PROFILE]: ['account-circle-outline', 'account-circle'],
+};
 
 // Translation keys for tab labels
 const TAB_TRANSLATION_KEYS = {
@@ -94,58 +74,30 @@ const TAB_TRANSLATION_KEYS = {
   [TAB_NAMES.CAMERA]: 'navigation.camera',
   [TAB_NAMES.PROFILE]: 'navigation.profile',
 } as const;
-function MyTabBar({
-  state,
-  _descriptors,
-  navigation,
-  _position,
-}: {
-  state: any;
-  _descriptors: any;
-  navigation: any;
-  _position: any;
-}) {
+
+function MyTabBar({state, navigation}: {state: any; navigation: any}) {
   const {t} = useTranslation();
-  let refScroll = useRef(null);
-
-  if (refScroll.current) {
-    //@ts-ignore
-    refScroll.current.scrollToIndex({index: state.index});
-  }
-
-  // Get icon for tab index
-  // Active tab: dark color (colors.black)
-  // Inactive tab: light/muted color (colors.xam)
-  const getTabIcon = (index: number, isFocused: boolean) => {
-    const iconColor = isFocused ? colors.black : colors.xam;
-    switch (index) {
-      case 0:
-        return <HomeSvg width={24} height={24} fill={iconColor} />;
-      case 1:
-        return <FireworksSvg width={24} height={24} fill={iconColor} />;
-      case 2:
-        return <NewFeed width={24} height={24} fill={iconColor} />;
-      case 3:
-        return <MapSvg width={24} height={24} fill={iconColor} />;
-      case 4:
-        return <CameraSvg width={24} height={24} fill={iconColor} />;
-      case 5:
-        return <ProfileSvg width={24} height={24} fill={iconColor} />;
-      default:
-        return <HomeSvg width={24} height={24} fill={iconColor} />;
-    }
-  };
-
-  // Get translated label for tab
+  const insets = useSafeAreaInsets();
   const getTabLabel = (tabName: string) => {
-    const translationKey = TAB_TRANSLATION_KEYS[tabName as keyof typeof TAB_TRANSLATION_KEYS];
+    const translationKey =
+      TAB_TRANSLATION_KEYS[tabName as keyof typeof TAB_TRANSLATION_KEYS];
     return translationKey ? t(translationKey) : tabName;
   };
 
   return (
-    <View style={[styles.containerTab, {}]}>
+    <View
+      style={[
+        styles.containerTab,
+        {paddingBottom: Math.max(insets.bottom, space.xxs)},
+      ]}>
       {state.routes.map((item: any, index: number) => {
         const isFocused = state.index === index;
+        const label = getTabLabel(item.name);
+        const [idle, active] = TAB_ICONS[item.name] ?? [
+          'circle-outline',
+          'circle',
+        ];
+        const tint = isFocused ? color.primary : color.textMuted;
 
         const onPress = () => {
           const event = navigation.emit({
@@ -157,167 +109,72 @@ function MyTabBar({
             navigation.navigate(item.name);
           }
         };
-
         const onLongPress = () => {
-          navigation.emit({
-            type: 'tabLongPress',
-            target: item.key,
-          });
+          navigation.emit({type: 'tabLongPress', target: item.key});
         };
         return (
-          <TouchableOpacity
+          <Pressable
             key={item.key}
             onPress={onPress}
             onLongPress={onLongPress}
-            style={[styles.containerTouch]}>
-            {getTabIcon(TAB_ORDER.indexOf(item.name), isFocused)}
-            <TextBase
-              style={[
-                styles.title,
-                {color: isFocused ? colors.black : colors.xam},
-              ]}>
-              {getTabLabel(item.name)}
-            </TextBase>
-          </TouchableOpacity>
+            accessibilityRole="tab"
+            accessibilityLabel={label}
+            accessibilityState={{selected: isFocused}}
+            style={styles.containerTouch}>
+            {/* Keyed per state: on Android (legacy arch) changing only the background of a
+                rounded view can drop its corner radius, leaving a square highlight. */}
+            <View key={isFocused ? 'on' : 'off'} style={[styles.pill, isFocused && styles.pillActive]}>
+              <Icon name={isFocused ? active : idle} size={24} color={tint} />
+            </View>
+            <Text
+              variant="caption"
+              numberOfLines={1}
+              style={[styles.title, {color: tint}]}>
+              {label}
+            </Text>
+          </Pressable>
         );
       })}
     </View>
   );
 }
+
+const renderTabBar = (props: any) => <MyTabBar {...props} />;
+
 const Tabs = createBottomTabNavigator();
 function HomeStack() {
-  const route = useRoute();
-  //@ts-ignore
-  const tabIndex = route.params?.tabIndex ?? 0;
-  const getRouterFromProp = () => {
-    switch (Number(tabIndex)) {
-      case 0:
-        return TAB_NAMES.HOME;
-      case 1:
-        return TAB_NAMES.FESTIVAL;
-      case 2:
-        return TAB_NAMES.FEED;
-      case 3:
-        return TAB_NAMES.MAP;
-      case 4:
-        return TAB_NAMES.CAMERA;
-      case 5:
-        return TAB_NAMES.PROFILE;
-      default:
-        return TAB_NAMES.HOME;
-    }
-  };
+  // Previously the navigator was remounted with key={getRouterFromProp()} (route param
+  // tabIndex). Nothing navigates with tabIndex any more and the remount lost every
+  // tab's state, so it is gone (R-NAV2).
   return (
     <View style={styles.container}>
       <Tabs.Navigator
-        key={getRouterFromProp()}
         initialRouteName={TAB_NAMES.HOME}
-        screenOptions={{
-          headerShown: false,
-        }}
-        tabBar={props => (
-          <MyTabBar _descriptors={undefined} _position={undefined} {...props} />
-        )}>
-        <Tabs.Screen
-          name={TAB_NAMES.HOME}
-          component={HomeScreen}
-          options={{
-            tabBarIcon: ({focused}) => (
-              <Image
-                source={
-                  focused
-                    ? images.tab_add_friends_focus
-                    : images.tab_add_friends
-                }
-              />
-            ),
-          }}
-        />
-        <Tabs.Screen
-          name={TAB_NAMES.FESTIVAL}
-          component={FestivalsScreen}
-          options={{
-            tabBarIcon: ({focused}) => (
-              <View>
-                <Image
-                  source={
-                    focused
-                      ? images.tab_add_friends_focus
-                      : images.tab_add_friends
-                  }
-                />
-              </View>
-            ),
-          }}
-        />
+        screenOptions={{headerShown: false}}
+        tabBar={renderTabBar}>
+        <Tabs.Screen name={TAB_NAMES.HOME} component={HomeScreen} />
+        {/* D-2: Festivals tab merged into Home (mixed sections + filter chips).
+        <Tabs.Screen name={TAB_NAMES.FESTIVAL} component={FestivalsScreen} />
+        */}
         {/* P7: Feed restored (reviews via BE; writing needs an account). */}
         {FEATURE_FLAGS.ENABLE_FEED && (
-        <Tabs.Screen
-          name={TAB_NAMES.FEED}
-          component={NewFeedScreen}
-          options={{
-            tabBarIcon: ({focused}) => (
-              <View>
-                <Image
-                  source={
-                    focused ? images.tab_add_friends : images.tab_add_friends
-                  }
-                />
-              </View>
-            ),
-          }}
-        />
+          <Tabs.Screen name={TAB_NAMES.FEED} component={NewFeedScreen} />
         )}
         {/* P4: Map restored. */}
-        <Tabs.Screen
-          name={TAB_NAMES.MAP}
-          component={MapsScreen}
-          options={{
-            tabBarIcon: ({focused}) => (
-              <Image
-                source={
-                  focused ? images.tab_add_friends : images.tab_add_friends
-                }
-              />
-            ),
-          }}
-        />
+        <Tabs.Screen name={TAB_NAMES.MAP} component={MapsScreen} />
         {/* P8: Camera restored (POST /detect; recognising needs an account). */}
         {FEATURE_FLAGS.ENABLE_CAMERA && (
-        <Tabs.Screen
-          name={TAB_NAMES.CAMERA}
-          component={CameraScreen}
-          options={{
-            tabBarIcon: ({focused}) => (
-              <Image
-                source={
-                  focused ? images.tab_add_friends : images.tab_add_friends
-                }
-              />
-            ),
-          }}
-        />
+          <Tabs.Screen name={TAB_NAMES.CAMERA} component={CameraScreen} />
         )}
         {/* P6: Profile restored (guest sees Settings/FAQ/Policy/About + Login). */}
-        <Tabs.Screen
-          name={TAB_NAMES.PROFILE}
-          component={ProfileScreen}
-          options={{
-            tabBarIcon: ({focused}) => (
-              <Image
-                source={
-                  focused ? images.tab_add_friends : images.tab_add_friends
-                }
-              />
-            ),
-          }}
-        />
+        <Tabs.Screen name={TAB_NAMES.PROFILE} component={ProfileScreen} />
       </Tabs.Navigator>
     </View>
   );
 }
 
 const Stack = createStackNavigator();
+const lazy = (load: () => any) => () => load().default;
 
 function AppContainer() {
   return (
@@ -326,41 +183,93 @@ function AppContainer() {
       screenOptions={{headerShown: false}}>
       <Stack.Screen name="HomeStack" component={HomeStack} />
       {/* P6: restored. */}
-      <Stack.Screen name="LoginScreen" component={LoginScreen} />
-      <Stack.Screen name="ViewAllLocation" component={ViewAllLocation} />
-      <Stack.Screen name="DetailLocationScreen" component={DetailItemScreen} />
+      <Stack.Screen
+        name="LoginScreen"
+        getComponent={lazy(() => require('./screens/Login/LoginScreen'))}
+      />
+      {/* D-2: one list for places + festivals; both legacy route names open it. */}
+      <Stack.Screen
+        name="ViewAllLocation"
+        getComponent={lazy(() => require('./screens/Discover/ViewAllScreen'))}
+      />
+      <Stack.Screen
+        name="ViewAllFestivals"
+        getComponent={lazy(() => require('./screens/Discover/ViewAllScreen'))}
+      />
+      <Stack.Screen
+        name="DetailLocationScreen"
+        getComponent={lazy(() => require('./screens/Home/DetailLocation'))}
+      />
       {/* P8: restored with Camera. */}
-      <Stack.Screen name="PreviewImage" component={PreviewImage} />
+      <Stack.Screen
+        name="PreviewImage"
+        getComponent={lazy(() => require('./screens/Camera/PreviewImage'))}
+      />
       {/* P4: Map restored. */}
       <Stack.Screen name="MapsScreen" component={MapsScreen} />
-      <Stack.Screen name="LocationImage" component={LocationImage} />
-      <Stack.Screen name="LocationVideo" component={LocationVideo} />
+      <Stack.Screen
+        name="LocationImage"
+        getComponent={lazy(() => require('./screens/Home/LocationImage'))}
+      />
+      <Stack.Screen
+        name="LocationVideo"
+        getComponent={lazy(() => require('./screens/Home/LocationVideo'))}
+      />
       {/* P6: restored. */}
-      <Stack.Screen name="Personal" component={Personal} />
-      <Stack.Screen name="Settings" component={Settings} />
-      <Stack.Screen name="FAQ" component={FAQ} />
-      <Stack.Screen name="Policy" component={Policy} />
-      <Stack.Screen name="About" component={About} />
+      <Stack.Screen
+        name="Personal"
+        getComponent={lazy(() => require('./screens/Profile/Personal'))}
+      />
+      <Stack.Screen
+        name="Settings"
+        getComponent={lazy(() => require('./screens/Profile/Settings'))}
+      />
+      <Stack.Screen
+        name="FAQ"
+        getComponent={lazy(() => require('./screens/Profile/FAQ'))}
+      />
+      <Stack.Screen
+        name="Policy"
+        getComponent={lazy(() => require('./screens/Profile/Policy'))}
+      />
+      <Stack.Screen
+        name="About"
+        getComponent={lazy(() => require('./screens/Profile/About'))}
+      />
       {/* P4: restored with Map (popup button). */}
-      <Stack.Screen name="Advise" component={Advise} />
+      <Stack.Screen
+        name="Advise"
+        getComponent={lazy(() => require('./screens/Maps/Advise'))}
+      />
+      {/* Unused route, Festivals merged into Home (D-2):
       <Stack.Screen name="SearchScreen" component={FestivalsScreen} />
+      */}
       <Stack.Screen
         name="DetailFestivalScreen"
-        component={DetailFestivalScreen}
+        getComponent={lazy(() => require('./screens/Festival/DetailFestival'))}
       />
-      <Stack.Screen name="ViewAllFestivals" component={ViewAllFestivals} />
       {/* P6: restored. */}
-      <Stack.Screen name="SignUpScreen" component={SignUpScreen} />
-      {/* P1: Temporarily disabled; retain for restoration. Debt N1 (email module off).
+      <Stack.Screen
+        name="SignUpScreen"
+        getComponent={lazy(() => require('./screens/Login/SignUpScreen'))}
+      />
+      {/* Debt N1 restored: email OTP via Gmail SMTP (BE module `email`). While the module is off the
+          screen shows "coming soon" on the 404, so no app update is needed when it is switched on. */}
       <Stack.Screen
         name="ForgotPasswordScreen"
-        component={ForgotPasswordScreen}
+        getComponent={lazy(() => require('./screens/Login/ForgotPasswordScreen'))}
       />
-      */}
-      {/* N2: Donation restored (PayOS via the Cloud Run API, module payments). */}
-      <Stack.Screen name="Donation" component={Donation} />
+      {FEATURE_FLAGS.ENABLE_PAYMENT && (
+        <Stack.Screen
+          name={ScreenName.DONATION}
+          getComponent={lazy(() => require('./screens/Profile/Donation'))}
+        />
+      )}
       {/* P9: restored (RAG chat on the BE; needs an account). */}
-      <Stack.Screen name="ChatBotScreen" component={ChatBotScreen} />
+      <Stack.Screen
+        name="ChatBotScreen"
+        getComponent={lazy(() => require('./screens/Profile/ChatbotScreen'))}
+      />
     </Stack.Navigator>
   );
 }
@@ -370,44 +279,32 @@ const styles = StyleSheet.create({
     height: '100%',
     width: '100%',
   },
-  txtLabel: {
-    fontSize: sizes._12sdp,
-    fontFamily: fonts.GoogleSans_Regular,
-  },
   containerTouch: {
     flex: 1,
-    height: sizes._49sdp,
+    minHeight: 56,
     alignItems: 'center',
     justifyContent: 'center',
   },
   containerTab: {
-    width: sizes.width,
-    height: sizes._64sdp,
-    backgroundColor: colors.white,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 5,
-    },
-    shadowOpacity: 0.36,
-    shadowRadius: 6.68,
-
-    elevation: 11,
+    backgroundColor: color.surface,
+    paddingTop: space.xxs,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: color.border,
   },
-  imageTab: {
-    width: sizes._24sdp,
-    height: sizes._24sdp,
-    resizeMode: 'contain',
+  pill: {
+    width: 56,
+    height: 30,
+    borderRadius: 15,
+    overflow: 'hidden',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
+  pillActive: {backgroundColor: color.primaryContainer},
   title: {
     textAlign: 'center',
-    fontSize: sizes._14sdp,
-    fontFamily: fonts.GoogleSans_Regular,
-    marginTop: sizes._4sdp,
+    marginTop: 2,
   },
 });
 // Wrap AppContainer with TranslationProvider (replaces LanguageProvider)

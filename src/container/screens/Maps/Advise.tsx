@@ -1,28 +1,31 @@
-import {ScrollView, StyleSheet, Text, View} from 'react-native';
+import {ScrollView, StyleSheet, View} from 'react-native';
 import React from 'react';
+import Text from '../../../ui/Text';
+import {color} from '../../../theme/tokens';
+import {withTranslation, WithTranslation} from 'react-i18next';
 import Page from '../../../component/Page';
 import HeaderBase from '../../../component/HeaderBase';
-import {BackSvg} from '../../../assets/assets/ImageSvg';
+import {BackSvg} from '../../../assets/ImageSvg';
 import colors from '../../../common/colors';
 import sizes from '../../../common/sizes';
 import NavigationService from '../NavigationService';
 import {ILocation} from '../../../common/types';
 import {AppStyle} from '../../../common/AppStyle';
 
-interface Props {
+interface Props extends WithTranslation {
   navigation: any;
   route: any;
 }
 interface States {}
 
-export default class Advise extends React.PureComponent<Props, States> {
+class Advise extends React.PureComponent<Props, States> {
   render(): React.ReactNode {
+    const {t} = this.props;
     const location: ILocation = this.props.route?.params?.location;
-    console.log(111, JSON.stringify(location, null, 2));
     return (
       <Page style={styles.pageContainer}>
         <HeaderBase
-          title={'Quy tắc ứng xử văn minh'}
+          title={t('map.adviseTitle')}
           leftIconSvg={
             <BackSvg
               width={sizes._24sdp}
@@ -37,7 +40,7 @@ export default class Advise extends React.PureComponent<Props, States> {
 
         <View style={styles.contentContainer}>
           <Text style={[AppStyle.txt_20_bold, styles.titleText]}>
-            Một số lưu ý khi tham quan tại địa điểm:
+            {t('map.adviseIntro')}
           </Text>
         </View>
 
@@ -55,7 +58,7 @@ export default class Advise extends React.PureComponent<Props, States> {
           ) : (
             <View style={styles.adviseItem}>
               <Text style={styles.noContentText}>
-                Không có thông tin quy tắc ứng xử
+                {t('map.noAdvise')}
               </Text>
             </View>
           )}
@@ -113,7 +116,7 @@ const styles = StyleSheet.create({
   },
   adviseText: {
     fontSize: 16,
-    color: '#333',
+    color: color.text,
     lineHeight: 24,
     textAlign: 'justify',
   },
@@ -124,3 +127,5 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
   },
 });
+
+export default withTranslation('common')(Advise);

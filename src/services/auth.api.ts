@@ -1,3 +1,4 @@
+import {chatAccountId, clearAccountChat, invalidateChatSession} from './chatStorage';
 import {IAccount} from '../common/types';
 import {localStorageKey} from '../common/constants';
 import LocalStorageCommon from '../utils/LocalStorageCommon';
@@ -65,16 +66,19 @@ async function saveSession(response: AuthResponse): Promise<IAccount> {
   const account = toAccount(response.account);
   await tokenStore.save(response);
   await LocalStorageCommon.setItem(localStorageKey.AVT, account);
+  invalidateChatSession();
   return account;
 }
 
-async function clearSession() {
+async function clearSession({keepChatSession = false} = {}) {
+  const accountId = await chatAccountId();
+  await clearAccountChat(accountId, {keepSession: keepChatSession});
   await tokenStore.clear();
   await LocalStorageCommon.setItem(localStorageKey.AVT, null);
 }
 
 // The session ends when the refresh token is rejected (expired, password changed, account deleted).
-setUnauthorizedHandler(clearSession);
+setUnauthorizedHandler(() => clearSession({keepChatSession: true}));
 // A refresh also returns the current profile.
 setSessionRefreshedHandler(async pair => {
   const account = (pair as Partial<AuthResponse>).account;
@@ -153,13 +157,14 @@ const authApi = {
     await clearSession();
   },
 
-  logout: clearSession,
+  // Logout keeps the chat session id so the Neon history comes back after the next login.
+  logout: () => clearSession({keepChatSession: true}),
 
   isLoggedIn: async (): Promise<boolean> => Boolean(await tokenStore.get()),
 
-  // Forgot password by email is debt N1: the backend module `email` is off, so these calls get 404
-  // until it is enabled. ForgotPasswordScreen (still commented out of navigation) moves to
-  // sendOTPEmail + resetPassword when N1 is done.
+  // Forgot password (debt N1): BE module `email` sends a 6-digit OTP through Gmail SMTP. The answer is the
+  // same whether or not the email is registered (no account enumeration); the OTP is checked by
+  // reset-password. While the module is off the routes return 404 -> "coming soon".
   sendOTPEmail: async (email: string): Promise<{success: boolean; error?: string}> => {
     try {
       await apiCall({method: 'post', url: '/auth/forgot-password', data: {email}, signedIn: false});
@@ -170,8 +175,14 @@ const authApi = {
     }
   },
 
-  resetPassword: async (email: string, otp: string, newPassword: string): Promise<void> => {
-    await apiCall({method: 'post', url: '/auth/reset-password', data: {email, otp, new_password: newPassword}, signedIn: false});
+  resetPassword: async (email: string, otp: string, newPassword: string): Promise<{success: boolean; error?: string}> => {
+    try {
+      await apiCall({method: 'post', url: '/auth/reset-password', data: {email, otp, new_password: newPassword}, signedIn: false});
+      return {success: true};
+    } catch (error) {
+      return {success: false, error: error instanceof ApiError && error.status !== 404
+        ? error.message : 'Tính năng quên mật khẩu sẽ có ở bản sau'};
+    }
   },
 
   checkEmailExists: async (_email: string): Promise<IAccount | null> => {

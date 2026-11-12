@@ -49,6 +49,7 @@ const SimilarItemsComponent: React.FC<SimilarItemsComponentProps> = ({
 
   useEffect(() => {
     fetchSimilarItems();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- Load similar items when the entity changes; preserve the existing refresh schedule.
   }, [entityType, entityId]);
 
   const fetchSimilarItems = async () => {

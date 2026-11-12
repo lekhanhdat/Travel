@@ -1,4 +1,4 @@
-import React, {useState, useCallback, memo} from 'react';
+import React, {useState, useEffect, useCallback, memo} from 'react';
 import {
   Image,
   ImageProps,
@@ -36,6 +36,11 @@ const CachedImage: React.FC<CachedImageProps> = memo(({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
+  useEffect(() => {
+    setError(false);
+    setLoading(true);
+  }, [uri]);
+
   const handleLoadStart = useCallback(() => {
     setLoading(true);
   }, []);
@@ -47,8 +52,7 @@ const CachedImage: React.FC<CachedImageProps> = memo(({
   const handleError = useCallback(() => {
     setLoading(false);
     setError(true);
-    if (__DEV__) {console.log('CachedImage error loading:', uri);}
-  }, [uri]);
+  }, []);
 
   // If no URI or error, show placeholder
   if (!uri || error) {

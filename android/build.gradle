@@ -1,11 +1,11 @@
 buildscript {
     ext {
-        buildToolsVersion = "34.0.0"
-        minSdkVersion = 23
-        compileSdkVersion = 34
-        targetSdkVersion = 34
-        ndkVersion = "26.1.10909125"
-        kotlinVersion = "1.9.24"
+        buildToolsVersion = "36.0.0"
+        minSdkVersion = 24
+        compileSdkVersion = 36
+        targetSdkVersion = 36
+        ndkVersion = "27.1.12297006"
+        kotlinVersion = "2.1.20"
         googlePlayServicesLocationVersion = "21.0.1"
         RNMapboxMapsImpl = "mapbox"
     }
@@ -24,6 +24,14 @@ buildscript {
 }
 
 apply plugin: "com.facebook.react.rootproject"
+// Download credentials stay in the gitignored local.properties or Gradle user properties.
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withInputStream { localProperties.load(it) }
+}
+def mapboxDownloadsToken = findProperty("MAPBOX_DOWNLOADS_TOKEN") ?: localProperties.getProperty("MAPBOX_DOWNLOADS_TOKEN", "")
+
 allprojects {
     repositories {
         google()
@@ -40,8 +48,14 @@ allprojects {
                 // This should always be `mapbox` (not your username).
                 username = 'mapbox'
                 // Use the secret token you stored in gradle.properties as the password
-                password = project.properties['MAPBOX_DOWNLOADS_TOKEN'] ?: ""
+                password = mapboxDownloadsToken
             }
         }
+    }
+}
+// Libraries without an explicit tools version otherwise request AGP's 35.0.0 default.
+subprojects { subproject ->
+    subproject.plugins.withId("com.android.library") {
+        subproject.android.buildToolsVersion = rootProject.ext.buildToolsVersion
     }
 }

@@ -20,6 +20,7 @@ function httpError(status, detail, headers = {}) {
 let store;
 beforeEach(() => {
   store = {};
+  AsyncStorage.multiRemove = jest.fn(async keys => {keys.forEach(key => {delete store[key];});});
   AsyncStorage.setItem.mockImplementation(async (key, value) => {store[key] = value;});
   AsyncStorage.getItem.mockImplementation(async key => (key in store ? store[key] : null));
   AsyncStorage.removeItem.mockImplementation(async key => {delete store[key];});
@@ -178,7 +179,22 @@ describe('auth.api (backend)', () => {
   it('forgot password is debt N1: a disabled backend module gives a clear message', async () => {
     jest.spyOn(apiRequest, 'request').mockRejectedValue(httpError(404, 'Not Found'));
     await expect(authApi.sendOTPEmail('a@b.vn')).resolves.toEqual({success: false, error: 'Tính năng quên mật khẩu sẽ có ở bản sau'});
-    expect(authApi.verifyOTP('a@b.vn', '123456').valid).toBe(false);
+    await expect(authApi.resetPassword('a@b.vn', '123456', 'matkhau789'))
+      .resolves.toEqual({success: false, error: 'Tính năng quên mật khẩu sẽ có ở bản sau'});
+  });
+
+  it('forgot password: OTP request and reset go to the email module; a wrong code shows the server message', async () => {
+    const request = jest.spyOn(apiRequest, 'request')
+      .mockResolvedValueOnce({data: {detail: 'Nếu email đã đăng ký, mã xác thực đã được gửi'}})
+      .mockRejectedValueOnce(httpError(400, 'Mã xác thực không chính xác hoặc đã hết hạn'))
+      .mockResolvedValueOnce({data: {detail: 'Đặt lại mật khẩu thành công'}});
+    await expect(authApi.sendOTPEmail('a@b.vn')).resolves.toEqual({success: true});
+    expect(request.mock.calls[0][0]).toMatchObject({method: 'post', url: '/auth/forgot-password', data: {email: 'a@b.vn'}});
+    await expect(authApi.resetPassword('a@b.vn', '000000', 'matkhau789'))
+      .resolves.toEqual({success: false, error: 'Mã xác thực không chính xác hoặc đã hết hạn'});
+    await expect(authApi.resetPassword('a@b.vn', '123456', 'matkhau789')).resolves.toEqual({success: true});
+    expect(request.mock.calls[2][0]).toMatchObject({url: '/auth/reset-password',
+      data: {email: 'a@b.vn', otp: '123456', new_password: 'matkhau789'}});
   });
 
   it('no request reaches any host other than the API', async () => {

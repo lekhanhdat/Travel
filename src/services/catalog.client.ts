@@ -43,7 +43,7 @@ async function getPage(path: '/locations' | '/festivals' | '/hotels', offset: nu
           deadline - Date.now() <= RETRY_DELAY_MS) {
         throw new CatalogError(kind, status);
       }
-      await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
+      await new Promise<void>(resolve => setTimeout(resolve, RETRY_DELAY_MS));
     }
   }
 }

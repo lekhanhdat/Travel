@@ -7,7 +7,6 @@ const renderer = require('react-test-renderer');
 
 jest.mock('axios', () => jest.requireActual(require('path').join(require.resolve('axios/package.json'), '..', 'dist', 'node', 'axios.cjs')));
 jest.mock('../src/assets/ImageSvg', () => new Proxy({}, {get: (_, name) => name === '__esModule' ? false : 'Icon'}));
-jest.mock('../src/assets/assets/ImageSvg', () => new Proxy({}, {get: (_, name) => name === '__esModule' ? false : 'Icon'}));
 jest.mock('../src/container/AppContainer', () => ({ScreenName: {LOGIN_SCREEN: 'LoginScreen'}}));
 jest.mock('../src/container/screens/NavigationService', () => ({navigate: jest.fn()}));
 jest.mock('../src/utils/requireLogin', () => ({requireLogin: jest.fn()}));

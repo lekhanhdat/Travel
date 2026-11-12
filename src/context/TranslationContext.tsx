@@ -51,7 +51,6 @@ export const TranslationProvider: React.FC<TranslationProviderProps> = ({
        await i18n.changeLanguage('vi');
       }
     } catch (error) {
-      console.log('Error loading language:', error);
     }
   };
 
@@ -62,7 +61,6 @@ export const TranslationProvider: React.FC<TranslationProviderProps> = ({
      // Sync with i18n
      await i18n.changeLanguage(lang);
     } catch (error) {
-      console.log('Error saving language:', error);
     }
   };
 

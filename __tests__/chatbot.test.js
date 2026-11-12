@@ -16,6 +16,8 @@ let ids;
 beforeEach(() => {
   jest.clearAllMocks();
   store = {};
+  AsyncStorage.multiRemove = jest.fn(async keys => {keys.forEach(key => {delete store[key];});});
+  store.AVT = JSON.stringify({id: 7});
   ids = 0;
   AsyncStorage.setItem.mockImplementation(async (key, value) => {store[key] = value;});
   AsyncStorage.getItem.mockImplementation(async key => (key in store ? store[key] : null));
@@ -37,6 +39,8 @@ describe('chatbot.api via BE RAG chat', () => {
       {role: 'user', content: 'Cầu Rồng có gì đặc biệt?'},
     ];
     expect(await chatbot.sendChatMessage(history)).toEqual({message: 'Cầu Rồng phun lửa cuối tuần.'});
+    expect(store['CHAT_SESSION_ID:7']).toBe(JSON.stringify('session_1'));
+    expect(store.CHAT_SESSION_ID).toBeUndefined();
     await chatbot.sendChatMessage(history, 'system prompt is ignored');
     expect(semantic.chatWithRAG.mock.calls.map(([request]) => request)).toEqual([
       {message: 'Cầu Rồng có gì đặc biệt?', session_id: 'session_1', include_sources: true},

@@ -14,7 +14,6 @@ jest.mock('../src/services/auth.api', () => ({__esModule: true, default: {
 }}));
 jest.mock('../src/services/locations.api', () => ({__esModule: true, default: {uploadImage: jest.fn()}}));
 jest.mock('react-native-toast-message', () => ({show: jest.fn()}));
-jest.mock('react-native-swiper', () => 'Swiper');
 jest.mock('react-native-paper', () => ({TextInput: Object.assign(() => null, {Icon: () => null}), IconButton: 'IconButton', Button: 'Button'}));
 jest.mock('react-native-image-picker', () => ({launchImageLibrary: jest.fn()}));
 jest.mock('react-native-iphone-x-helper', () => ({isIphoneX: () => false}));

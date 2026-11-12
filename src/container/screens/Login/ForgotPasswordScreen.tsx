@@ -1,21 +1,8 @@
 import React from 'react';
-import {
-  View,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  Image,
-  ScrollView,
-  ActivityIndicator,
-} from 'react-native';
-import {TextInput} from 'react-native-paper';
+import i18n from '../../../i18n';
 import Toast from 'react-native-toast-message';
-
-import Page from '../../../component/Page';
-import sizes from '../../../common/sizes';
-import colors from '../../../common/colors';
 import images from '../../../res/images';
-import {AppStyle} from '../../../common/AppStyle';
+import {AuthButton, AuthInput, AuthLayout, AuthSwitch, PasswordInput} from '../../../features/auth/AuthLayout';
 import NavigationService from '../NavigationService';
 import {ScreenName} from '../../AppContainer';
 import authApi from '../../../services/auth.api';
@@ -33,8 +20,6 @@ type ForgotPasswordState = {
   step: 1 | 2 | 3;
   loading: boolean;
   accountId: number | null;
-  isSecureTextEntry: boolean;
-  isSecureTextEntryConfirm: boolean;
 };
 
 export default class ForgotPasswordScreen extends React.PureComponent<
@@ -51,8 +36,6 @@ export default class ForgotPasswordScreen extends React.PureComponent<
       step: 1,
       loading: false,
       accountId: null,
-      isSecureTextEntry: true,
-      isSecureTextEntryConfirm: true,
     };
   }
 
@@ -208,341 +191,111 @@ export default class ForgotPasswordScreen extends React.PureComponent<
     }
   };
 
-  toggleSecureEntry = () => {
-    this.setState(prevState => ({
-      isSecureTextEntry: !prevState.isSecureTextEntry,
-    }));
-  };
-
-  toggleSecureEntryConfirm = () => {
-    this.setState(prevState => ({
-      isSecureTextEntryConfirm: !prevState.isSecureTextEntryConfirm,
-    }));
-  };
-
+  // Debt N1: still out of navigation until the BE email OTP is enabled; layout matches Login/SignUp.
   renderStep1() {
     const {email, loading} = this.state;
-
     return (
-      <ScrollView
-        contentContainerStyle={styles.scrollContainer}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Illustration */}
-        <View style={styles.illustrationContainer}>
-          <Image
-            source={images.dienhai}
-            style={styles.illustration}
-            resizeMode="contain"
-          />
-        </View>
-
-        {/* Title */}
-        <View style={styles.titleContainer}>
-          <Text style={styles.title}>Quên mật khẩu?</Text>
-          <Text style={styles.subtitle}>
-            Nhập email để nhận mã xác thực
-          </Text>
-        </View>
-
-        {/* Form */}
-        <View style={styles.formContainer}>
-          <TextInput
-            mode="outlined"
-            label="Email"
-            placeholder="Nhập email của bạn"
-            style={styles.input}
-            outlineStyle={styles.inputOutline}
-            textColor={colors.primary_950}
-            placeholderTextColor={colors.primary_400}
-            keyboardType="email-address"
-            autoCapitalize="none"
-            value={email}
-            onChangeText={emailInput => this.setState({email: emailInput})}
-          />
-
-          <TouchableOpacity
-            style={[styles.btn, !email && styles.disabledButton]}
-            onPress={this.handleSendOTP}
-            disabled={!email || loading}
-          >
-            {loading ? (
-              <ActivityIndicator size="small" color={colors.white} />
-            ) : (
-              <Text
-                style={[
-                  AppStyle.txt_20_bold,
-                  {color: !email ? colors.primary_400 : colors.white},
-                ]}
-              >
-                Gửi mã xác thực
-              </Text>
-            )}
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={() => NavigationService.reset(ScreenName.LOGIN_SCREEN)}
-          >
-            <Text style={styles.backText}>← Quay lại đăng nhập</Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
+      <AuthLayout
+        title={i18n.t('common:forgot.title')}
+        subtitle={i18n.t('common:forgot.step1')}
+        image={images.caurong}
+        onBack={() => NavigationService.reset(ScreenName.LOGIN_SCREEN)}
+        backLabel={i18n.t('common:buttons.back')}>
+        <AuthInput
+          icon="email-outline"
+          label="Email"
+          placeholder={i18n.t('common:auth.emailPlaceholder')}
+          keyboardType="email-address"
+          autoCapitalize="none"
+          autoComplete="email"
+          value={email}
+          onChangeText={emailInput => this.setState({email: emailInput})}
+        />
+        <AuthButton
+          label={i18n.t('common:forgot.sendCode')}
+          icon="email-fast-outline"
+          onPress={this.handleSendOTP}
+          loading={loading}
+          disabled={!email}
+        />
+      </AuthLayout>
     );
   }
 
   renderStep2() {
     const {otp, loading} = this.state;
-
     return (
-      <ScrollView
-        contentContainerStyle={styles.scrollContainer}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Illustration */}
-        <View style={styles.illustrationContainer}>
-          <Image
-            source={images.nharong}
-            style={styles.illustration}
-            resizeMode="contain"
-          />
-        </View>
-
-        {/* Title */}
-        <View style={styles.titleContainer}>
-          <Text style={styles.title}>Nhập mã xác thực</Text>
-          <Text style={styles.subtitle}>
-            Mã xác thực đã được gửi đến email của bạn
-          </Text>
-        </View>
-
-        {/* Form */}
-        <View style={styles.formContainer}>
-          <TextInput
-            mode="outlined"
-            label="Mã xác thực (6 số)"
-            placeholder="Nhập mã 6 số"
-            style={styles.input}
-            outlineStyle={styles.inputOutline}
-            textColor={colors.primary_950}
-            placeholderTextColor={colors.primary_400}
-            keyboardType="number-pad"
-            maxLength={6}
-            value={otp}
-            onChangeText={otpInput => this.setState({otp: otpInput})}
-          />
-
-          <TouchableOpacity
-            style={[styles.btn, !otp && styles.disabledButton]}
-            onPress={this.handleVerifyOTP}
-            disabled={!otp || loading}
-          >
-            {loading ? (
-              <ActivityIndicator size="small" color={colors.white} />
-            ) : (
-              <Text
-                style={[
-                  AppStyle.txt_20_bold,
-                  {color: !otp ? colors.primary_400 : colors.white},
-                ]}
-              >
-                Xác nhận
-              </Text>
-            )}
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.resendButton}
+      <AuthLayout
+        title={i18n.t('common:forgot.enterCode')}
+        subtitle={i18n.t('common:forgot.step2')}
+        image={images.caurong}
+        onBack={() => this.setState({step: 1})}
+        backLabel={i18n.t('common:buttons.back')}
+        footer={
+          <AuthSwitch
+            question={i18n.t('common:forgot.noCode')}
+            action={i18n.t('common:forgot.resend')}
             onPress={this.handleSendOTP}
-          >
-            <Text style={styles.resendText}>Gửi lại mã</Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
+          />
+        }>
+        <AuthInput
+          icon="shield-key-outline"
+          label={i18n.t('common:forgot.code')}
+          placeholder="000000"
+          keyboardType="number-pad"
+          maxLength={6}
+          value={otp}
+          onChangeText={otpInput => this.setState({otp: otpInput})}
+        />
+        <AuthButton
+          label={i18n.t('common:forgot.verify')}
+          icon="check"
+          onPress={this.handleVerifyOTP}
+          loading={loading}
+          disabled={!otp}
+        />
+      </AuthLayout>
     );
   }
 
   renderStep3() {
-    const {
-      newPassword,
-      confirmPassword,
-      loading,
-      isSecureTextEntry,
-      isSecureTextEntryConfirm,
-    } = this.state;
-
+    const {newPassword, confirmPassword, loading} = this.state;
     const isDisabled = !newPassword || !confirmPassword || loading;
-
     return (
-      <ScrollView
-        contentContainerStyle={styles.scrollContainer}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Illustration */}
-        <View style={styles.illustrationContainer}>
-          <Image
-            source={images.cauvang}
-            style={styles.illustration}
-            resizeMode="contain"
-          />
-        </View>
-
-        {/* Title */}
-        <View style={styles.titleContainer}>
-          <Text style={styles.title}>Đặt mật khẩu mới</Text>
-          <Text style={styles.subtitle}>
-            Nhập mật khẩu mới cho tài khoản của bạn
-          </Text>
-        </View>
-
-        {/* Form */}
-        <View style={styles.formContainer}>
-          <TextInput
-            mode="outlined"
-            label="Mật khẩu mới"
-            placeholder="Nhập mật khẩu mới (tối thiểu 6 ký tự)"
-            style={styles.input}
-            outlineStyle={styles.inputOutline}
-            textColor={colors.primary_950}
-            placeholderTextColor={colors.primary_400}
-            secureTextEntry={isSecureTextEntry}
-            value={newPassword}
-            onChangeText={newPasswordInput => this.setState({newPassword: newPasswordInput})}
-            right={
-              <TextInput.Icon
-                icon={isSecureTextEntry ? images.eye_open : images.eye_close}
-                onPress={this.toggleSecureEntry}
-              />
-            }
-          />
-
-          <TextInput
-            mode="outlined"
-            label="Xác nhận mật khẩu"
-            placeholder="Nhập lại mật khẩu mới"
-            style={styles.input}
-            outlineStyle={styles.inputOutline}
-            textColor={colors.primary_950}
-            placeholderTextColor={colors.primary_400}
-            secureTextEntry={isSecureTextEntryConfirm}
-            value={confirmPassword}
-            onChangeText={confirmPasswordInput => this.setState({confirmPassword: confirmPasswordInput})}
-            right={
-              <TextInput.Icon
-                icon={
-                  isSecureTextEntryConfirm ? images.eye_open : images.eye_close
-                }
-                onPress={this.toggleSecureEntryConfirm}
-              />
-            }
-          />
-
-          <TouchableOpacity
-            style={[styles.btn, isDisabled && styles.disabledButton]}
-            onPress={this.handleResetPassword}
-            disabled={isDisabled}
-          >
-            {loading ? (
-              <ActivityIndicator size="small" color={colors.white} />
-            ) : (
-              <Text
-                style={[
-                  AppStyle.txt_20_bold,
-                  {color: isDisabled ? colors.primary_400 : colors.white},
-                ]}
-              >
-                Đặt lại mật khẩu
-              </Text>
-            )}
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
+      <AuthLayout
+        title={i18n.t('common:forgot.newPassword')}
+        subtitle={i18n.t('common:forgot.step3')}
+        image={images.caurong}
+        onBack={() => this.setState({step: 2})}
+        backLabel={i18n.t('common:buttons.back')}>
+        <PasswordInput
+          label={i18n.t('common:forgot.newPassword')}
+          placeholder={i18n.t('common:ui.signup.passwordPlaceholder')}
+          value={newPassword}
+          onChangeText={newPasswordInput => this.setState({newPassword: newPasswordInput})}
+        />
+        <PasswordInput
+          label={i18n.t('common:ui.signup.confirmPassword')}
+          placeholder={i18n.t('common:ui.signup.confirmPlaceholder')}
+          error={!!confirmPassword && confirmPassword !== newPassword}
+          value={confirmPassword}
+          onChangeText={confirmPasswordInput => this.setState({confirmPassword: confirmPasswordInput})}
+        />
+        <AuthButton
+          label={i18n.t('common:forgot.reset')}
+          icon="lock-reset"
+          onPress={this.handleResetPassword}
+          loading={loading}
+          disabled={isDisabled}
+        />
+      </AuthLayout>
     );
   }
 
   render() {
     const {step} = this.state;
-
-    return (
-      <Page>
-        {step === 1 && this.renderStep1()}
-        {step === 2 && this.renderStep2()}
-        {step === 3 && this.renderStep3()}
-      </Page>
-    );
+    if (step === 2) {return this.renderStep2();}
+    if (step === 3) {return this.renderStep3();}
+    return this.renderStep1();
   }
 }
-
-const styles = StyleSheet.create({
-  scrollContainer: {
-    flexGrow: 1,
-    paddingBottom: sizes._32sdp,
-  },
-  illustrationContainer: {
-    height: sizes._250sdp,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: colors.primary_100,
-  },
-  illustration: {
-    width: '100%',
-    height: '100%',
-  },
-  titleContainer: {
-    paddingHorizontal: sizes._24sdp,
-    paddingTop: sizes._24sdp,
-    paddingBottom: sizes._16sdp,
-  },
-  title: {
-    fontSize: sizes._32sdp,
-    fontWeight: 'bold',
-    color: colors.primary_950,
-    marginBottom: sizes._8sdp,
-  },
-  subtitle: {
-    fontSize: sizes._16sdp,
-    color: colors.primary_400,
-  },
-  formContainer: {
-    paddingHorizontal: sizes._24sdp,
-  },
-  input: {
-    marginBottom: sizes._16sdp,
-    backgroundColor: colors.white,
-  },
-  inputOutline: {
-    borderColor: colors.primary,
-    borderRadius: sizes._12sdp,
-  },
-  btn: {
-    width: '100%',
-    paddingVertical: sizes._16sdp,
-    borderRadius: sizes._16sdp,
-    backgroundColor: colors.black,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: sizes._24sdp,
-  },
-  disabledButton: {
-    backgroundColor: colors.primary_200,
-  },
-  backButton: {
-    marginTop: sizes._16sdp,
-    alignItems: 'center',
-  },
-  backText: {
-    color: colors.primary,
-    fontSize: sizes._16sdp,
-    fontWeight: '600',
-  },
-  resendButton: {
-    marginTop: sizes._16sdp,
-    alignItems: 'center',
-  },
-  resendText: {
-    color: colors.primary,
-    fontSize: sizes._16sdp,
-    fontWeight: '600',
-    textDecorationLine: 'underline',
-  },
-});

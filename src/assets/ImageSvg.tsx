@@ -1,71 +1,57 @@
 /**
-  * @author AW
-  * @flow
-  */
+ * Legacy icon names. The 32 bundled SVG files were replaced by the single
+ * MaterialCommunityIcons set (src/ui/Icon.tsx); these wrappers keep the old
+ * `<HomeSvg width fill/color />` call sites working. New code: use <Icon name=… />.
+ */
+import React from 'react';
+import {StyleProp, TextStyle} from 'react-native';
+import {Icon, IconName} from '../ui/Icon';
 
-  import Add from './svg/Add.svg';
-import BackSvg from './svg/BackSvg.svg';
-import CalendarSearchSvg from './svg/CalendarSearchSvg.svg';
-import Call from './svg/Call.svg';
-import CameraSvg from './svg/CameraSvg.svg';
-import CardSvg from './svg/CardSvg.svg';
-import ChatBotSvg from './svg/ChatBotSvg.svg';
-import CircleDot from './svg/CircleDot.svg';
-import CirclePlay from './svg/CirclePlay.svg';
-import Clock from './svg/Clock.svg';
-import ClockSvg from './svg/ClockSvg.svg';
-import CloseSvg from './svg/CloseSvg.svg';
-import DirectionsSvg from './svg/DirectionsSvg.svg';
-import FAQ from './svg/FAQ.svg';
-import FireworksSvg from './svg/FireworksSvg.svg';
-import GlobeSvg from './svg/GlobeSvg.svg';
-import HomeSvg from './svg/HomeSvg.svg';
-import Lightning from './svg/Lightning.svg';
-import LightningOff from './svg/LightningOff.svg';
-import MapSvg from './svg/MapSvg.svg';
-import NewFeed from './svg/NewFeed.svg';
-import Next from './svg/Next.svg';
-import OptionsSvg from './svg/OptionsSvg.svg';
-import Play from './svg/Play.svg';
-import Policy from './svg/Policy.svg';
-import ProfileSvg from './svg/ProfileSvg.svg';
-import SendSvg from './svg/SendSvg.svg';
-import Setting from './svg/Setting.svg';
-import StarActive from './svg/StarActive.svg';
-import StarInActive from './svg/StarInActive.svg';
-import ThunderSvg from './svg/ThunderSvg.svg';
-import UserSvg from './svg/UserSvg.svg';
-  export {
-    Add,
-BackSvg,
-CalendarSearchSvg,
-Call,
-CameraSvg,
-CardSvg,
-ChatBotSvg,
-CircleDot,
-CirclePlay,
-Clock,
-ClockSvg,
-CloseSvg,
-DirectionsSvg,
-FAQ,
-FireworksSvg,
-GlobeSvg,
-HomeSvg,
-Lightning,
-LightningOff,
-MapSvg,
-NewFeed,
-Next,
-OptionsSvg,
-Play,
-Policy,
-ProfileSvg,
-SendSvg,
-Setting,
-StarActive,
-StarInActive,
-ThunderSvg,
-UserSvg,
-    }
+type LegacyProps = {
+  width?: number;
+  height?: number;
+  fill?: string;
+  color?: string;
+  style?: StyleProp<TextStyle>;
+};
+
+const make = (name: IconName, defaultSize = 24) => {
+  const C = ({width, height, fill, color, style}: LegacyProps) => (
+    <Icon name={name} size={width ?? height ?? defaultSize} color={fill ?? color} style={style} />
+  );
+  C.displayName = `Icon(${name})`;
+  return C;
+};
+
+export const Add = make('plus');
+export const BackSvg = make('arrow-left');
+export const CalendarSearchSvg = make('calendar-search');
+export const Call = make('phone-outline');
+export const CameraSvg = make('camera-outline');
+export const CardSvg = make('ticket-confirmation-outline');
+export const ChatBotSvg = make('robot-happy-outline');
+export const CircleDot = make('record-circle-outline', 10);
+export const CirclePlay = make('play-circle-outline');
+export const Clock = make('clock-outline');
+export const ClockSvg = make('clock-outline');
+export const CloseSvg = make('close');
+export const DirectionsSvg = make('directions');
+export const FAQ = make('help-circle-outline');
+export const FireworksSvg = make('party-popper');
+export const GlobeSvg = make('web');
+export const HomeSvg = make('home-variant-outline');
+export const Lightning = make('flash');
+export const LightningOff = make('flash-off');
+export const MapSvg = make('map-outline');
+export const NewFeed = make('newspaper-variant-outline');
+export const Next = make('chevron-right');
+export const OptionsSvg = make('menu');
+export const Play = make('play');
+export const Policy = make('shield-check-outline');
+export const ProfileSvg = make('account-circle-outline');
+export const SendSvg = make('send');
+export const Setting = make('cog-outline');
+export const StarActive = make('star');
+export const StarInActive = make('star-outline');
+export const ThunderSvg = make('lightbulb-on-outline');
+export const UserSvg = make('account-outline');

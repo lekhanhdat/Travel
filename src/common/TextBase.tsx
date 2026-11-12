@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Text, TextProps, TextStyle, StyleProp } from 'react-native';
 import colors from './colors';
 import sizes from './sizes';
+import {resolveFont} from '../ui/fontResolver';
 
 interface Props extends TextProps {
   title?: any;
@@ -22,14 +23,10 @@ class TextBase extends Component<Props, State> {
     return s;
   }
   render() {
-    return (
-      <Text
-        {...this.props}
-        numberOfLines={this.props.numberOfLines}
-        style={[
+    const style = [
           {
             fontSize: sizes._font_size_large,
-            color: colors.black,
+            color: colors.primary_950,
             includeFontPadding: false,
             lineHeight:
               //@ts-ignore
@@ -37,10 +34,15 @@ class TextBase extends Component<Props, State> {
                 //@ts-ignore
                 ? this.props.style.fontSize * 1.2
                 : sizes._font_size_large * 1.2,
-            letterSpacing: sizes._1sdp / 2,
+            // letterSpacing: sizes._1sdp / 2, // removed: Danavi type scale uses no tracking
           },
           this.props.style,
-        ]}>
+        ];
+    return (
+      <Text
+        {...this.props}
+        numberOfLines={this.props.numberOfLines}
+        style={[style, resolveFont(style)]}>
         {this.props.isSecurity
           ? this.props.title
             ? this.getTextSecurity(this.props.title.length)

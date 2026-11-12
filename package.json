@@ -11,8 +11,7 @@
     "lint": "eslint .",
     "reactotron": "adb reverse tcp:9090 tcp:9090",
     "realDevice": "adb reverse tcp:8081 tcp:8081",
-    "genimg": "node genimg src/assets/images --output src/res/images.tsx --name images",
-    "genimgsvg": "node genimgsvg src/assets/svg --output src/assets/ImageSvg.tsx --name ImageSvg"
+    "genimg": "node genimg src/assets/images --output src/res/images.tsx --name images"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "2.2.0",
@@ -42,8 +41,6 @@
     "react-native-screens": "4.24.0",
     "react-native-sound-player": "^0.14.3",
     "react-native-svg": "15.16.1",
-    "react-native-svg-transformer": "^1.4.0",
-    "react-native-swiper": "^1.6.0",
     "react-native-toast-message": "^2.2.1",
     "react-native-tts": "^4.1.1",
     "react-native-vector-icons": "^10.2.0",
@@ -55,11 +52,15 @@
   "devDependencies": {
     "@babel/core": "^7.20.0",
     "@babel/runtime": "^7.20.0",
+    "@react-native-community/cli": "20.0.0",
+    "@react-native-community/cli-platform-android": "20.0.0",
+    "@react-native-community/cli-platform-ios": "20.0.0",
     "@react-native/babel-preset": "0.81.6",
     "@react-native/eslint-config": "0.81.6",
     "@react-native/metro-config": "0.81.6",
     "@react-native/typescript-config": "0.81.6",
     "@testing-library/react-native": "^13.3.3",
+    "@types/jest": "^29.5.13",
     "@types/react": "^19.1.4",
     "@types/react-native-vector-icons": "^6.4.18",
     "@types/react-test-renderer": "^19.1.0",
@@ -71,11 +72,7 @@
     "react-native-dotenv": "^3.4.11",
     "react-test-renderer": "19.1.4",
     "reactotron-react-native": "^5.1.18",
-    "typescript": "^5.8.3",
-    "@react-native-community/cli": "20.0.0",
-    "@react-native-community/cli-platform-android": "20.0.0",
-    "@react-native-community/cli-platform-ios": "20.0.0",
-    "@types/jest": "^29.5.13"
+    "typescript": "^5.8.3"
   },
   "engines": {
     "node": ">=20.19.4"

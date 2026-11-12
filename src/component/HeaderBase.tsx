@@ -6,8 +6,7 @@ import {
   View,
 } from 'react-native';
 import {OptionsSvg} from '../assets/ImageSvg';
-import colors from '../common/colors';
-import fonts from '../common/fonts';
+import {color, type} from '../theme/tokens';
 import sizes from '../common/sizes';
 import TextBase from '../common/TextBase';
 
@@ -137,19 +136,12 @@ export default HeaderBase;
 const styles = StyleSheet.create({
   container: {
     width: sizes.width,
-    height: sizes._60sdp,
-    backgroundColor: '#F97350',
-    // backgroundColor: colors.primary_600,
-
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 5,
-    },
-    shadowOpacity: 0.36,
-    shadowRadius: 6.68,
-
-    elevation: 11,
+    height: 56,
+    // D-3: white app bar with a hairline; orange '#F97350' is now only an accent colour.
+    // backgroundColor: '#F97350',
+    backgroundColor: color.surface,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: color.border,
   },
   content: {
     flex: 1,
@@ -167,10 +159,8 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
   },
   title: {
-    fontSize: sizes._20sdp,
-    fontFamily: fonts.GoogleSans_Bold,
-    color: colors.black,
-    lineHeight: sizes._30sdp,
+    ...type.headline,
+    color: color.text,
   },
   viewLeft: {
     flexDirection: 'row',

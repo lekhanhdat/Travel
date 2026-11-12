@@ -10,16 +10,7 @@ jest.mock('react-native-bootsplash', () => ({
   isVisible: jest.fn(() => false),
   useHideAnimation: jest.fn(() => ({})),
 }));
-// Metro transforms SVG assets into components; Jest's asset mock returns objects.
-for (const directory of ['src/assets/svg', 'src/assets/assets/svg']) {
-  const path = require('path');
-  const folder = path.join(__dirname, directory);
-  for (const filename of require('fs').readdirSync(folder)) {
-    if (filename.endsWith('.svg')) {
-      jest.doMock(path.join(folder, filename), () => 'SvgAsset');
-    }
-  }
-}
+// SVG icon files were replaced by MaterialCommunityIcons (src/ui/Icon); nothing to mock here.
 jest.mock('react-native-root-siblings', () => ({
   RootSiblingParent: ({children}) => children,
 }));
@@ -90,7 +81,6 @@ jest.mock('react-native-iphone-x-helper', () => ({
   getStatusBarHeight: () => 20,
   getBottomSpace: () => 0,
 }));
-jest.mock('react-native-swiper', () => require('react-native').View);
 jest.mock('react-native-toast-message', () => {
   const Toast = () => null;
   Toast.show = jest.fn();

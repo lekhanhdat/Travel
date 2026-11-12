@@ -14,6 +14,7 @@ import sizes from '../../../common/sizes';
 import colors from '../../../common/colors';
 import {AppStyle} from '../../../common/AppStyle';
 import {BackSvg} from '../../../assets/ImageSvg';
+import {Icon} from '../../../ui/Icon';
 import images from '../../../res/images';
 import {BRAND} from '../../../config/brand';
 import NavigationService from '../NavigationService';
@@ -152,24 +153,30 @@ export default class About extends React.PureComponent<
           <View style={styles.section}>
             <TextBase style={styles.sectionTitle}>Tính năng nổi bật</TextBase>
             <View style={styles.featureList}>
-              <TextBase style={styles.featureItem}>
-                🗺️ Bản đồ tương tác với GPS
-              </TextBase>
-              <TextBase style={styles.featureItem}>
-                ⭐ Đánh giá và bình luận từ cộng đồng
-              </TextBase>
-              <TextBase style={styles.featureItem}>
-                📸 Chia sẻ hình ảnh và trải nghiệm
-              </TextBase>
-              <TextBase style={styles.featureItem}>
-                🔍 Tìm kiếm thông minh
-              </TextBase>
-              <TextBase style={styles.featureItem}>
-                📱 Giao diện thân thiện, dễ sử dụng
-              </TextBase>
-              <TextBase style={styles.featureItem}>
-                🌐 Hoạt động offline
-              </TextBase>
+              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                <Icon name="map-marker-radius-outline" size={20} color={colors.primary} style={{marginRight: sizes._8sdp}} />
+                <TextBase style={styles.featureItem}>Bản đồ tương tác với GPS</TextBase>
+              </View>
+              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                <Icon name="star-outline" size={20} color={colors.primary} style={{marginRight: sizes._8sdp}} />
+                <TextBase style={styles.featureItem}>Đánh giá và bình luận từ cộng đồng</TextBase>
+              </View>
+              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                <Icon name="camera-outline" size={20} color={colors.primary} style={{marginRight: sizes._8sdp}} />
+                <TextBase style={styles.featureItem}>Chia sẻ hình ảnh và trải nghiệm</TextBase>
+              </View>
+              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                <Icon name="magnify" size={20} color={colors.primary} style={{marginRight: sizes._8sdp}} />
+                <TextBase style={styles.featureItem}>Tìm kiếm thông minh</TextBase>
+              </View>
+              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                <Icon name="cellphone" size={20} color={colors.primary} style={{marginRight: sizes._8sdp}} />
+                <TextBase style={styles.featureItem}>Giao diện thân thiện, dễ sử dụng</TextBase>
+              </View>
+              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                <Icon name="cloud-off-outline" size={20} color={colors.primary} style={{marginRight: sizes._8sdp}} />
+                <TextBase style={styles.featureItem}>Hoạt động offline</TextBase>
+              </View>
             </View>
           </View>
 

@@ -6,12 +6,14 @@ import {
   initialWindowMetrics,
 } from 'react-native-safe-area-context';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
-import {StatusBar, StyleSheet, View, Text} from 'react-native';
+import {StatusBar, StyleSheet, View} from 'react-native';
 import AppContainer, {TAB_NAMES} from './src/container/AppContainer';
 import BootSplash from 'react-native-bootsplash';
 import NavigationService from './src/container/screens/NavigationService';
 import {RootSiblingParent} from 'react-native-root-siblings';
-import {MD3LightTheme as DefaultTheme, PaperProvider} from 'react-native-paper';
+import {PaperProvider} from 'react-native-paper';
+import paperTheme from './src/theme/paperTheme';
+import {Text as AppText} from './src/ui/Text';
 import colors from './src/common/colors';
 import Toast from 'react-native-toast-message';
 import FEATURE_FLAGS from './src/config/featureFlags';
@@ -42,7 +44,14 @@ class App extends React.PureComponent<Props, States> {
       showChatBubble:
         route?.name !== TAB_NAMES.PROFILE &&
         route?.name !== TAB_NAMES.CAMERA &&
-        route?.name !== TAB_NAMES.MAP,
+        route?.name !== TAB_NAMES.MAP &&
+        // Detail screens have a sticky "Chỉ đường" bar the bubble would cover.
+        route?.name !== 'DetailLocationScreen' &&
+        route?.name !== 'DetailFestivalScreen' &&
+        // Auth forms: the bubble would cover the fields and the chat needs an account anyway.
+        route?.name !== 'LoginScreen' &&
+        route?.name !== 'SignUpScreen' &&
+        route?.name !== 'ForgotPasswordScreen',
     });
   };
 
@@ -51,7 +60,7 @@ class App extends React.PureComponent<Props, States> {
       return (
         <SafeAreaProvider initialMetrics={initialWindowMetrics}>
           <SafeAreaView style={styles.container}>
-            <Text>Không thể mở ứng dụng. Vui lòng khởi động lại Danavi.</Text>
+            <AppText>Không thể mở ứng dụng. Vui lòng khởi động lại Danavi.</AppText>
           </SafeAreaView>
         </SafeAreaProvider>
       );
@@ -61,19 +70,10 @@ class App extends React.PureComponent<Props, States> {
         <SafeAreaProvider initialMetrics={initialWindowMetrics}>
           <SafeAreaView style={styles.container}>
             <RootSiblingParent>
-              <PaperProvider
-                theme={{
-                  ...DefaultTheme,
-                  colors: {
-                    ...DefaultTheme.colors,
-                    primary: colors.primary,
-                    background: colors.white,
-                    // place
-                    // placeholder: colors.primary,
-
-                    onSurfaceVariant: colors.primary,
-                  },
-                }}>
+              {/* Previous inline theme (mint primary) replaced by src/theme/paperTheme.ts:
+                theme={{...DefaultTheme, colors: {...DefaultTheme.colors, primary: colors.primary,
+                background: colors.white, onSurfaceVariant: colors.primary}}} */}
+              <PaperProvider theme={paperTheme}>
                 <View style={styles.container}>
                   <StatusBar barStyle="dark-content" />
 

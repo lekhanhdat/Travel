@@ -16,24 +16,24 @@ String.prototype.format = function () {
 };
 //$FlowFixMe
 String.prototype.toRegex = function (option = 'i') {
-  let regexStr = this.replace(/[\.\*\+\?\^\$\{\}\(\)\|\[\]\\]/g, '\\$&');
+  let regexStr = this.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   regexStr = regexStr.replace(/\s/g, '\\s?');
   // console.log('regex: {0}'.format(regexStr))
   return new RegExp(regexStr, option);
 };
 const getFileName = file => {
-  var fileNameMatch = file.match(/^(.+)\.[^\.]+$/);
-  return fileNameMatch && fileNameMatch[1].replace(/[\s-\+]+/g, '_');
+  var fileNameMatch = file.match(/^(.+)\.[^.]+$/);
+  return fileNameMatch && fileNameMatch[1].replace(/[\s+-]+/g, '_');
 };
 
 // console.log(argv)
 const folder = argv.folder || argv.d || argv._[0];
-var match = folder.match(/^(.+\/([^\/]+))\/?$/);
+var match = folder.match(/^(.+\/([^/]+))\/?$/);
 //$FlowFixMe
 var output = match && '{0}/{1}.tsx'.format(match[1], match[2]);
 output = argv.output || argv.o || output;
 
-let outputMatch = output.match(/^(?:(.*)\/)?([^\/]+)$/);
+let outputMatch = output.match(/^(?:(.*)\/)?([^/]+)$/);
 // console.log('outputMatch', outputMatch)
 let outputName = outputMatch[2];
 let outputPath = outputMatch[1] || '.';

@@ -1,3 +1,4 @@
+import {entityKey} from '../utils/entityKey';
 import FEATURE_FLAGS from '../config/featureFlags';
 /**
  * SemanticSearchBarComponent
@@ -65,6 +66,10 @@ interface SemanticSearchBarComponentProps<T> {
   entityType: EntityType; // 'location' | 'festival' | 'item'
   idField?: keyof T; // Field to match entity_id from semantic search
   onQueryChange?: (text: string) => void; // P11.4: e.g. Home loads hotels on the first keystroke
+  /** D-2: search several kinds at once (Home: places + festivals). Items then match by `${kind}:${id}`. */
+  entityTypes?: EntityType[];
+  /** Kind of an item when `entityTypes` is set (default: `item.kind ?? entityType`). */
+  kindOf?: (item: T) => EntityType;
 }
 
 // P11.4: hotels have their own ids (they collide with location ids) and are not in the semantic index,
@@ -82,6 +87,8 @@ export default class SemanticSearchBarComponent<T> extends React.PureComponent<
   SemanticSearchBarComponentProps<T>,
   SemanticSearchBarComponentState<T>
 > {
+  private generation = 0;
+  private inFlight?: {query: string; generation: number; promise: Promise<T[]>};
   private debouncedSearch: ReturnType<typeof debounce> | null = null;
 
   constructor(props: SemanticSearchBarComponentProps<T>) {
@@ -97,6 +104,11 @@ export default class SemanticSearchBarComponent<T> extends React.PureComponent<
   componentDidMount() {
     // Create debounced search function for semantic search
     this.debouncedSearch = debounce(this.performSemanticSearch, 500);
+  }
+
+  componentWillUnmount() {
+    this.generation++;
+    this.debouncedSearch?.cancel();
   }
 
   // Keyword-based filtering (existing logic)
@@ -123,25 +135,26 @@ export default class SemanticSearchBarComponent<T> extends React.PureComponent<
   private readonly MIN_RESULTS_COUNT = 10;
 
   // Semantic search using AI - returns results and stores in state
-  performSemanticSearch = async (query: string): Promise<T[]> => {
+  performSemanticSearch = (query: string): Promise<T[]> => {
+    if (this.inFlight?.query === query && this.inFlight.generation === this.generation) {return this.inFlight.promise;}
+    const generation = this.generation;
+    const promise = this.runSemanticSearch(query, generation);
+    this.inFlight = {query, generation, promise};
+    return promise;
+  };
+
+  private runSemanticSearch = async (query: string, generation: number): Promise<T[]> => {
     if (!FEATURE_FLAGS.ENABLE_AI) {return this.filterDataKeyword(query);}
     const {data, entityType, idField = 'id' as keyof T} = this.props;
 
-    console.log('🔍 [SemanticSearch] Starting search...');
-    console.log('  📋 Query:', query);
-    console.log('  📋 Entity type:', entityType);
-    console.log('  📋 ID field:', String(idField));
-    console.log('  📋 Data count:', data.length);
 
     if (!query || query.trim().length < 2) {
-      console.log('  ⚠️ Query too short, returning all data');
       this.setState({isSearching: false, lastFilteredData: data});
       return data;
     }
 
     this.setState({isSearching: true});
     try {
-      console.log('  🌐 Calling semantic search API...');
 
       /**
        * Semantic Search Strategy:
@@ -155,32 +168,20 @@ export default class SemanticSearchBarComponent<T> extends React.PureComponent<
        */
       const response = await searchSemantic({
         query: query.trim(),
-        entity_types: [entityType],
+        entity_types: this.props.entityTypes ?? [entityType],
         top_k: 50,        // Request more results to ensure we have enough candidates
         min_score: 0.1,   // Low threshold - let frontend handle filtering
       });
 
-      console.log('  📊 API Response:', {
-        success: response.success,
-        resultsCount: response.results?.length || 0,
-        topScores: response.results?.slice(0, 3).map(r => r.score.toFixed(2)),
-        error: response.error,
-      });
 
+      if (generation !== this.generation) {return [];}
       if (response.success && response.results && response.results.length > 0) {
-        // Log API result IDs - Backend returns "id", NOT "entity_id"
-        const apiResultIds = response.results.map(r => r.id);
-        console.log('  🔢 API returned IDs:', apiResultIds);
-
-        // Log local data IDs for comparison
-        const localIds = data.slice(0, 5).map(item => {
-          const id = item[idField];
-          return { id, type: typeof id };
-        });
-        console.log('  📋 Local data IDs (first 5):', localIds);
-
         // Create score map for all results
         const scoreMap = new Map(response.results.map(r => [r.id, r.score]));
+        // Multi-kind search: ids collide across kinds, so match on `${kind}:${id}`.
+        const multi = !!this.props.entityTypes;
+        const kindOf = this.props.kindOf ?? ((item: T) => ((item as any)?.kind ?? entityType) as EntityType);
+        const keyedScores = new Map(response.results.map(r => [`${(r as any).entity_type ?? entityType}:${r.id}`, r.score]));
 
         // Create a Set with both number and string versions for robust matching
         const resultIdSet = new Set<number | string>();
@@ -194,6 +195,11 @@ export default class SemanticSearchBarComponent<T> extends React.PureComponent<
         data.forEach(item => {
           if (isHotel(item)) {return;}
           const itemId = item[idField];
+          if (multi) {
+            const keyed = keyedScores.get(`${kindOf(item)}:${itemId}`);
+            if (keyed !== undefined) {matchedWithScores.push({item, score: keyed});}
+            return;
+          }
           const matchesNumber = resultIdSet.has(Number(itemId));
           const matchesString = resultIdSet.has(String(itemId));
           if (matchesNumber || matchesString) {
@@ -202,7 +208,6 @@ export default class SemanticSearchBarComponent<T> extends React.PureComponent<
           }
         });
 
-        console.log('  📊 Total matched items:', matchedWithScores.length);
 
         // Sort all matched items by score (highest first)
         matchedWithScores.sort((a, b) => b.score - a.score);
@@ -212,55 +217,41 @@ export default class SemanticSearchBarComponent<T> extends React.PureComponent<
         const aboveThreshold = matchedWithScores.filter(
           m => m.score > this.SIMILARITY_THRESHOLD
         );
-        console.log(`  📊 Items above ${this.SIMILARITY_THRESHOLD} threshold:`, aboveThreshold.length);
 
         let finalResults: T[];
 
         if (aboveThreshold.length >= this.MIN_RESULTS_COUNT) {
           // PRIMARY RULE: Show all results above threshold
-          console.log(`  ✅ Using PRIMARY rule: ${aboveThreshold.length} results above threshold`);
           finalResults = aboveThreshold.map(m => m.item);
         } else {
           // FALLBACK RULE: Show top MIN_RESULTS_COUNT results
           const topResults = matchedWithScores.slice(0, this.MIN_RESULTS_COUNT);
-          console.log(`  ⚡ Using FALLBACK rule: showing top ${topResults.length} results`);
           finalResults = topResults.map(m => m.item);
-        }
-
-        // Log final results with scores
-        if (finalResults.length > 0) {
-          console.log('  📊 Final results sorted by relevance:');
-          finalResults.slice(0, 5).forEach((item, i) => {
-            const id = Number((item[idField]));
-            const name = (item as any).name || (item as any).Name || 'Unknown';
-            const score = scoreMap.get(id) || 0;
-            console.log(`    ${i + 1}. "${name}" (score: ${score.toFixed(2)})`);
-          });
         }
 
         // Hotels matching the words (keyword search) follow the semantic results.
         const hotels = searchCatalog(data.filter(isHotel), query, this.props.searchFields);
-        finalResults = [...finalResults, ...hotels];
+        finalResults = [...new Map([...finalResults, ...hotels].map(item => [entityKey(item, entityType), item])).values()];
 
         this.setState({lastFilteredData: finalResults, isSearching: false});
         return finalResults;
       } else {
-        console.log('  ⚠️ No semantic results, falling back to keyword search');
         const filtered = this.filterDataKeyword(query);
-        console.log('  📝 Keyword search results:', filtered.length);
         this.setState({lastFilteredData: filtered, isSearching: false});
         return filtered;
       }
     } catch (error) {
+      if (generation !== this.generation) {return [];}
       console.error('  ❌ Semantic search error:', error);
       const filtered = this.filterDataKeyword(query);
-      console.log('  📝 Fallback keyword results:', filtered.length);
       this.setState({lastFilteredData: filtered, isSearching: false});
       return filtered;
     }
   };
 
   handleSearchChange = (text: string) => {
+    this.generation++;
+    this.debouncedSearch?.cancel();
     const {data} = this.props;
     this.props.onQueryChange?.(text);
     const {useSemanticSearch} = this.state;
@@ -281,48 +272,40 @@ export default class SemanticSearchBarComponent<T> extends React.PureComponent<
   // Called when user explicitly submits (presses Enter or search button)
   handleSubmitSearch = async () => {
     const {onSubmitSearch, onSearch, data} = this.props;
-    const {searchValue, useSemanticSearch, isSearching} = this.state;
+    const {searchValue, useSemanticSearch} = this.state;
+    const generation = this.generation;
+    this.debouncedSearch?.cancel();
 
-    console.log('🚀 [Submit] handleSubmitSearch called');
-    console.log('  📋 searchValue:', searchValue);
-    console.log('  📋 useSemanticSearch:', useSemanticSearch);
-    console.log('  📋 isSearching:', isSearching);
-    console.log('  📋 data.length:', data.length);
 
     // Don't submit if already searching
-    if (isSearching) {
-      console.log('  ⏳ Search in progress, waiting...');
-      return;
-    }
+    // The current query can reuse its pending request on submit.
 
     // For semantic search, always run a fresh search on submit to ensure results are current
     let results: T[];
     if (useSemanticSearch && searchValue.trim().length >= 2) {
-      console.log('  🧠 Running semantic search...');
       results = await this.performSemanticSearch(searchValue);
     } else {
-      console.log('  🔤 Running keyword search...');
       results = searchValue.trim() ? this.filterDataKeyword(searchValue) : data;
       this.setState({lastFilteredData: results});
     }
 
-    console.log('  📤 Final results to submit:', results.length);
-    console.log('  📋 First result:', results[0] ? JSON.stringify(results[0]).substring(0, 100) : 'none');
 
+    if (generation !== this.generation) {return;}
     // Call the submit callback if provided, otherwise fall back to onSearch
     if (onSubmitSearch) {
-      console.log('  ➡️ Calling onSubmitSearch callback');
       onSubmitSearch(results, searchValue, useSemanticSearch);
     } else {
-      console.log('  ➡️ Calling onSearch callback (fallback)');
       onSearch(results, searchValue, useSemanticSearch);
     }
   };
 
   toggleSearchMode = () => {
+    this.generation++;
+    this.debouncedSearch?.cancel();
+    this.inFlight = undefined;
     const {data, onSearch} = this.props;
     const newMode = FEATURE_FLAGS.ENABLE_AI && !this.state.useSemanticSearch;
-    this.setState({useSemanticSearch: newMode, searchValue: ''});
+    this.setState({useSemanticSearch: newMode, searchValue: '', isSearching: false});
     onSearch(data, '', newMode); // Reset results
   };
 
@@ -330,6 +313,9 @@ export default class SemanticSearchBarComponent<T> extends React.PureComponent<
    * Resets the search - public method called by parent components
    */
   resetSearch = () => {
+    this.generation++;
+    this.debouncedSearch?.cancel();
+    this.inFlight = undefined;
     this.setState({searchValue: '', isSearching: false});
   };
 
@@ -359,7 +345,7 @@ export default class SemanticSearchBarComponent<T> extends React.PureComponent<
           clearIcon={() => searchValue.length > 0 ? (
             <TouchableOpacity
               onPress={() => {
-                this.setState({searchValue: ''});
+                this.resetSearch();
                 this.props.onSearch(this.props.data, '', this.state.useSemanticSearch);
               }}
               style={styles.clearButton}
@@ -394,7 +380,7 @@ const styles = StyleSheet.create({
   },
   input: {
     color: colors.black,
-    fontFamily: 'GoogleSans_Regular',
+    fontFamily: 'GoogleSans-Regular',
   },
   clearButton: {
     padding: sizes._4sdp,

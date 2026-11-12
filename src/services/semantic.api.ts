@@ -434,6 +434,43 @@ export const clearChatSession = async (sessionId: string): Promise<boolean> => {
   }
 };
 
+export interface StoredChatMessage {
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp?: string;
+}
+
+/** Thrown when the BE has no route for the request (an older deployment). */
+export class EndpointMissingError extends Error {}
+
+/**
+ * The account's most recent chat session stored in Neon (`public.conversations`).
+ * Rejects with EndpointMissingError when the BE predates GET /memory/conversations/latest.
+ */
+export const getLatestConversation = async (
+  limit = 50,
+): Promise<{sessionId: string | null; messages: StoredChatMessage[]}> => {
+  try {
+    const {data} = await apiClient.get('/api/v1/memory/conversations/latest', {params: {limit}});
+    return {sessionId: data?.session_id ?? null, messages: Array.isArray(data?.messages) ? data.messages : []};
+  } catch (error: any) {
+    const status = error?.response?.status ?? error?.status;
+    // A FastAPI path that does not exist falls through to /conversation/{session_id} → 404/405/422.
+    if (status === 404 || status === 405 || status === 422) {
+      throw new EndpointMissingError(String(status));
+    }
+    throw error;
+  }
+};
+
+/** Messages of one session (owner-filtered by the BE). */
+export const getConversation = async (sessionId: string, limit = 50): Promise<StoredChatMessage[]> => {
+  const {data} = await apiClient.get(`/api/v1/memory/conversation/${encodeURIComponent(sessionId)}`, {
+    params: {limit},
+  });
+  return Array.isArray(data?.messages) ? data.messages : [];
+};
+
 /**
  * Get similar items for an entity (with caching)
  */

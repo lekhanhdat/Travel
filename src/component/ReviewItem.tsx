@@ -1,12 +1,13 @@
+import Modal from './SafeAreaModal';
 import React from 'react';
 import i18n from '../i18n';
-import {Image, View, ScrollView, TouchableOpacity, Modal, Dimensions, Alert} from 'react-native';
+import {Image, View, ScrollView, TouchableOpacity, Dimensions, Alert} from 'react-native';
 import Toast from 'react-native-toast-message';
 import {IReview} from '../common/types';
 import sizes from '../common/sizes';
 import TextBase from '../common/TextBase';
 import {AppStyle} from '../common/AppStyle';
-import {StarActive} from '../assets/assets/ImageSvg';
+import {StarActive} from '../assets/ImageSvg';
 import colors from '../common/colors';
 import {Avatar, getReviewAuthorName} from '../utils/avatarUtils';
 import CachedImage from './CachedImage';
@@ -38,16 +39,6 @@ export default class ReviewItem extends React.PureComponent<
       showImageModal: false,
       selectedImageIndex: 0,
     };
-  }
-
-  componentDidMount(): void {
-    // Debug: Log review images (only in development)
-    if (__DEV__ && this.props.review.images && this.props.review.images.length > 0) {
-      console.log('📸 ReviewItem - Review has images:', {
-        reviewId: this.props.review.id,
-        imagesCount: this.props.review.images.length,
-      });
-    }
   }
 
   // P7 (Play UGC policy): any signed-in user can report a review; several reports hide it on the BE.

@@ -2,7 +2,6 @@
  * P6: Login / Profile / Personal flows against a mocked auth.api.
  */
 jest.mock('../src/assets/ImageSvg', () => new Proxy({}, {get: (_, name) => name === '__esModule' ? false : 'Icon'}));
-jest.mock('../src/assets/assets/ImageSvg', () => new Proxy({}, {get: (_, name) => name === '__esModule' ? false : 'Icon'}));
 jest.mock('../src/container/AppContainer', () => ({ScreenName: {
   HOME_STACK_SCREEN: 'HomeStack', LOGIN_SCREEN: 'LoginScreen', PERSONAL: 'Personal', SIGN_UP: 'SignUpScreen',
   CHATBOT: 'ChatBotScreen', DONATION: 'Donation', SETTINGS: 'Settings', FAQ: 'FAQ', POLICY: 'Policy', ABOUT: 'About',
@@ -15,13 +14,14 @@ jest.mock('../src/services/auth.api', () => ({__esModule: true, default: {
 }}));
 jest.mock('../src/services/locations.api', () => ({__esModule: true, default: {uploadImage: jest.fn()}}));
 jest.mock('react-native-toast-message', () => ({show: jest.fn()}));
-jest.mock('react-native-swiper', () => 'Swiper');
 jest.mock('react-native-paper', () => ({TextInput: Object.assign(() => null, {Icon: () => null}), IconButton: 'IconButton', Button: 'Button'}));
 jest.mock('react-native-image-picker', () => ({launchImageLibrary: jest.fn()}));
 jest.mock('react-native-iphone-x-helper', () => ({isIphoneX: () => false}));
 jest.mock('../src/component/Page', () => 'Page');
 jest.mock('../src/component/HeaderBase', () => 'Header');
 
+const React = require('react');
+const {render, fireEvent} = require('@testing-library/react-native');
 const Toast = require('react-native-toast-message');
 const NavigationService = require('../src/container/screens/NavigationService');
 const authApi = require('../src/services/auth.api').default;
@@ -81,6 +81,15 @@ describe('Login', () => {
 describe('Profile', () => {
   const props = () => ({navigation: {addListener: jest.fn()}, t: key => key});
 
+  it.each([
+    ['settings', 'Settings'], ['faq', 'FAQ'], ['policy', 'Policy'], ['about', 'About'],
+  ])('opens %s when its row label is pressed', (key, route) => {
+    const screen = render(React.createElement(ProfileScreen, props()));
+    fireEvent.press(screen.getByText(`profile.${key}`));
+    expect(NavigationService.navigate).toHaveBeenCalledWith(route);
+    screen.unmount();
+  });
+
   it('a guest asking for account info is sent to Login', async () => {
     authApi.isLoggedIn.mockResolvedValue(false);
     const profile = instance(ProfileScreen, props());
@@ -102,15 +111,31 @@ describe('Profile', () => {
     expect(NavigationService.reset).toHaveBeenCalledWith('HomeStack');
   });
 
-  // N2: Donation is routed; guests are sent to Login first.
-  it('Donation opens for a signed-in user and asks a guest to log in', async () => {
+  it('hides donation and prevents navigation when payments are disabled', async () => {
+    expect(FEATURE_FLAGS.ENABLE_PAYMENT).toBe(false);
+    const screen = render(React.createElement(ProfileScreen, props()));
+    expect(screen.queryByText('profile.donation')).toBeNull();
     const profile = instance(ProfileScreen, props());
-    authApi.isLoggedIn.mockResolvedValue(false);
     await profile.openDonation();
-    expect(NavigationService.navigate).toHaveBeenLastCalledWith('LoginScreen');
-    authApi.isLoggedIn.mockResolvedValue(true);
-    await profile.openDonation();
-    expect(NavigationService.navigate).toHaveBeenLastCalledWith('Donation');
+    expect(NavigationService.navigate).not.toHaveBeenCalled();
+    screen.unmount();
+  });
+
+  // Enabled payments retain the account gate.
+  it('Donation opens for a signed-in user and asks a guest to log in', async () => {
+    const previous = FEATURE_FLAGS.ENABLE_PAYMENT;
+    FEATURE_FLAGS.ENABLE_PAYMENT = true;
+    try {
+      const profile = instance(ProfileScreen, props());
+      authApi.isLoggedIn.mockResolvedValue(false);
+      await profile.openDonation();
+      expect(NavigationService.navigate).toHaveBeenLastCalledWith('LoginScreen');
+      authApi.isLoggedIn.mockResolvedValue(true);
+      await profile.openDonation();
+      expect(NavigationService.navigate).toHaveBeenLastCalledWith('Donation');
+    } finally {
+      FEATURE_FLAGS.ENABLE_PAYMENT = previous;
+    }
   });
 
   // P9: Chatbot is routed; guests are sent to Login first.

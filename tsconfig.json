@@ -1,9 +1,9 @@
 {
+  "extends": "@react-native/typescript-config",
   "compilerOptions": {
-    "target": "es5",
-    "lib": ["es6", "dom"],
+    "target": "esnext",
     "jsx": "react-native", // hoặc "react-native" nếu bạn sử dụng React Native
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "strict": true,

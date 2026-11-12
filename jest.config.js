@@ -5,7 +5,7 @@ module.exports = {
     '^@env$': '<rootDir>/src/types/env.mock.ts',
   },
   transformIgnorePatterns: [
-    'node_modules/(?!(react-native|@react-native|react-native-vector-icons|@react-navigation|react-native-paper)/)',
+    'node_modules/(?!(react-native|@react-native|react-native-gesture-handler|react-native-vector-icons|@react-navigation|react-native-paper)/)',
   ],
   testPathIgnorePatterns: [
     '<rootDir>/node_modules/',

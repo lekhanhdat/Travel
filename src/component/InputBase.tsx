@@ -75,7 +75,7 @@ class InputBase extends React.PureComponent<Props, States> {
     error: false,
     value: this.props?.initValue ?? '',
   };
-  setValue = value => {
+  setValue = (value: string) => {
     this.setState({
       value: value,
     });
@@ -97,7 +97,6 @@ class InputBase extends React.PureComponent<Props, States> {
       secureTextEntry,
       errorMessage,
       emptyMessage,
-      initValue,
     } = this.props;
     const {error, value} = this.state;
     return (

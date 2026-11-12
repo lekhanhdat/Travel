@@ -12,6 +12,7 @@ import CachedImage from './CachedImage';
 import {translateLocationField} from '../utils/translationHelpers';
 import {catalogImage} from '../utils/catalogDisplay';
 import {formatDistance} from '../utils/nearby';
+import {Icon} from '../ui/Icon';
 
 interface ILargeItemLocationProps {
   location: ILocation;
@@ -72,9 +73,12 @@ const LargeItemLocation: React.FC<ILargeItemLocationProps> = ({location, onPress
             {translatedDescription}
           </TextBase>
           {distanceKm !== undefined ? (
-            <TextBase style={[AppStyle.txt_14_bold, {marginTop: sizes._4sdp}]}>
-              📍 {formatDistance(distanceKm)}
-            </TextBase>
+            <View style={{flexDirection: 'row', alignItems: 'center', marginTop: sizes._4sdp}}>
+              <Icon name="map-marker-distance" size={16} color={colors.primary} />
+              <TextBase style={[AppStyle.txt_14_bold, {marginLeft: 4}]}>
+                {formatDistance(distanceKm)}
+              </TextBase>
+            </View>
           ) : null}
         </View>
       </View>

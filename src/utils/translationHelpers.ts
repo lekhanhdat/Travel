@@ -20,7 +20,7 @@ export function englishValue(record: CatalogRecordRef, field: string, index?: nu
 }
 
 export function translateLocationField(
-  _t: TFunction,
+  _t: TFunction | ((text: string) => string),
   record: CatalogRecordRef,
   field: 'name' | 'description' | 'long_description' | 'address' | 'opening_hours' | 'ticket_info' | 'advise',
   fallback: string,
@@ -30,7 +30,7 @@ export function translateLocationField(
 }
 
 export function translateFestivalField(
-  _t: TFunction,
+  _t: TFunction | ((text: string) => string),
   record: CatalogRecordRef,
   field: 'name' | 'description' | 'long_description' | 'location' | 'event_time' | 'ticket_info' | 'advise',
   fallback: string,

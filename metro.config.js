@@ -9,10 +9,6 @@ const { getDefaultConfig, mergeConfig } = require('@react-native/metro-config');
 
 const defaultConfig = getDefaultConfig(__dirname);
 
-const {
-  resolver: { sourceExts, assetExts },
-} = getDefaultConfig(__dirname);
-
 const config = {
   transformer: {
     getTransformOptions: async () => ({
@@ -21,11 +17,16 @@ const config = {
         inlineRequires: true,
       },
     }),
-    babelTransformerPath: require.resolve('react-native-svg-transformer'),
   },
   resolver: {
-    assetExts: assetExts.filter(ext => ext !== 'svg'),
-    sourceExts: [...sourceExts, 'svg'],
+    // Gradle/CMake caches change during native builds and are not JS sources.
+    blockList: [
+      ...(Array.isArray(defaultConfig.resolver.blockList)
+        ? defaultConfig.resolver.blockList
+        : [defaultConfig.resolver.blockList].filter(Boolean)),
+      /[/\\](?:\.gradle|\.cxx)[/\\].*/,
+      /[/\\]android[/\\](?:app[/\\])?build[/\\].*/,
+    ],
   },
 };
 

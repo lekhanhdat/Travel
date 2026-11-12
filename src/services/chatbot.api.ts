@@ -2,7 +2,7 @@
 // are only on the BE. Function names/signatures are unchanged for ChatbotScreen.
 import {chatWithRAG, clearChatSession, generateSessionId} from './semantic.api';
 import LocalStorageCommon from '../utils/LocalStorageCommon';
-import {localStorageKey} from '../common/constants';
+import {chatAccountId, chatKey, chatRevision, writeChat} from './chatStorage';
 
 export interface ChatMessage {
   role: 'user' | 'assistant' | 'system';
@@ -23,25 +23,28 @@ export interface ImageGenerationResponse {
 
 // Images of the RAG sources of the last answer (catalog images); shown when the user asks for photos.
 let lastSourceImages: string[] = [];
+let imageOwner = -1;
 
 /** Chat session on the BE (history + quota); one per conversation, reset by "new conversation". */
-async function chatSessionId(): Promise<string> {
-  const saved = await LocalStorageCommon.getItem(localStorageKey.CHAT_SESSION_ID);
+async function chatSessionId(accountId: string, version: number): Promise<string> {
+  const saved = await LocalStorageCommon.getItem(chatKey('CHAT_SESSION_ID', accountId));
   if (typeof saved === 'string' && saved) {
     return saved;
   }
   const created = generateSessionId();
-  await LocalStorageCommon.setItem(localStorageKey.CHAT_SESSION_ID, created);
+  await writeChat(chatKey('CHAT_SESSION_ID', accountId), created, version);
   return created;
 }
 
 /** Start a new conversation: the BE forgets the old session's history. */
-export const resetChatSession = async (): Promise<void> => {
-  const saved = await LocalStorageCommon.getItem(localStorageKey.CHAT_SESSION_ID);
+export const resetChatSession = async (accountId?: string): Promise<void> => {
+  accountId = accountId ?? await chatAccountId();
+  const version = chatRevision();
+  const saved = await LocalStorageCommon.getItem(chatKey('CHAT_SESSION_ID', accountId));
+  await writeChat(chatKey('CHAT_SESSION_ID', accountId), generateSessionId(), version);
   if (typeof saved === 'string' && saved) {
     await clearChatSession(saved);
   }
-  await LocalStorageCommon.setItem(localStorageKey.CHAT_SESSION_ID, generateSessionId());
   lastSourceImages = [];
 };
 
@@ -53,7 +56,10 @@ export const resetChatSession = async (): Promise<void> => {
 export const sendChatMessage = async (
   messages: ChatMessage[],
   _systemPrompt?: string,
+  accountId?: string,
 ): Promise<ChatResponse> => {
+  const version = chatRevision();
+  const owner = accountId ?? await chatAccountId();
   const last = [...messages].reverse().find(message => message.role === 'user');
   if (!last) {
     return {message: '', error: 'Chưa có câu hỏi.'};
@@ -61,15 +67,19 @@ export const sendChatMessage = async (
   const parts = typeof last.content === 'string' ? [{type: 'text' as const, text: last.content}] : last.content;
   const text = parts.find(part => part.type === 'text')?.text?.trim() || 'Đây là gì? Hãy mô tả chi tiết.';
   const imageUrl = parts.find(part => part.type === 'image_url')?.image_url?.url;
+  const sessionId = await chatSessionId(owner, version);
+  if (version !== chatRevision()) {return {message: ''};}
   const result = await chatWithRAG({
     message: text,
-    session_id: await chatSessionId(),
+    session_id: sessionId,
     include_sources: true,
     ...(imageUrl ? {image_url: imageUrl} : {}),
   });
   if (!result.success) {
     return {message: '', error: result.error || 'Trợ lý đang gặp lỗi, vui lòng thử lại sau.'};
   }
+  if (version !== chatRevision()) {return {message: ''};}
+  imageOwner = version;
   lastSourceImages = (result.sources || [])
     .map(source => source.image_url)
     .filter((url): url is string => typeof url === 'string' && url.length > 0);
@@ -105,7 +115,7 @@ export const searchImage = async (
   _query: string,
   count: number = 3,
 ): Promise<ImageGenerationResponse> => {
-  const imageUrls = lastSourceImages.filter((url, index) => lastSourceImages.indexOf(url) === index).slice(0, count);
+  const imageUrls = (imageOwner === chatRevision() ? lastSourceImages : []).filter((url, index) => lastSourceImages.indexOf(url) === index).slice(0, count);
   return imageUrls.length > 0
     ? {imageUrls}
     : {error: 'Chưa có ảnh trong dữ liệu của ứng dụng cho nội dung này.'};

@@ -24,31 +24,34 @@ describe('catalog empty states', () => {
     expect(catalogImage(null)).toBe('');
   });
 
-  it('festival card hides venue, time and rating when the API has none', () => {
-    const LargeItemFestival = require('../../src/component/LargeItemFestival').default;
+  // D-2: festivals use the shared DiscoverCard (badge "Lễ hội", event time or venue as subtitle).
+  const card = item => {
+    const {DiscoverCard} = require('../../src/features/discover/DiscoverCard');
     let tree;
-    renderer.act(() => {tree = renderer.create(React.createElement(LargeItemFestival, {festival: festival()}));});
-    const shown = texts(tree).join('|');
+    renderer.act(() => {tree = renderer.create(React.createElement(DiscoverCard, {item}));});
+    return tree;
+  };
+
+  it('festival card hides subtitle and rating when the API has none', () => {
+    const {fromFestival} = require('../../src/features/discover/discover');
+    const tree = card(fromFestival(festival()));
+    const shown = texts(tree);
     expect(shown).toContain('Lễ hội API');
-    expect(shown).not.toContain('📍');
-    expect(shown).not.toContain('⏰');
-    expect(shown).not.toContain('⭐');
+    expect(shown.filter(Boolean)).toHaveLength(2); // badge + name only
+    expect(tree.root.findAllByType('Icon').map(icon => icon.props.name)).not.toContain('star');
     expect(tree.root.findByType('CachedImage').props.uri).toBe('');
   });
 
-  it('festival card shows the venue resolved from location_id', () => {
-    const LargeItemFestival = require('../../src/component/LargeItemFestival').default;
-    let tree;
-    renderer.act(() => {
-      tree = renderer.create(React.createElement(LargeItemFestival, {festival: festival({
-        location_id: 7, location: 'An Phú Farm', event_time: 'Tháng 3', images: ['https://img/f.jpg'],
-        rating: 4, review_count: 1,
-      })}));
-    });
-    const shown = texts(tree).join('|');
-    expect(shown).toContain('📍 An Phú Farm');
-    expect(shown).toContain('⏰ Tháng 3');
-    expect(shown).toContain('⭐ 4.0');
+  it('festival card shows its time (else the venue resolved from location_id) and the rating', () => {
+    const {fromFestival} = require('../../src/features/discover/discover');
+    let shown = texts(card(fromFestival(festival({
+      location_id: 7, location: 'An Phú Farm', event_time: 'Tháng 3', images: ['https://img/f.jpg'],
+      rating: 4, review_count: 1,
+    }))));
+    expect(shown).toEqual(expect.arrayContaining(['Lễ hội API', 'Tháng 3', '4.0', '(1)']));
+    shown = texts(card(fromFestival(festival({location_id: 7, location: 'An Phú Farm'}))));
+    expect(shown).toContain('An Phú Farm');
+    const tree = card(fromFestival(festival({images: ['https://img/f.jpg']})));
     expect(tree.root.findByType('CachedImage').props.uri).toBe('https://img/f.jpg');
   });
 });

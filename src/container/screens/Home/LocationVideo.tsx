@@ -1,13 +1,13 @@
-import {ScrollView, StyleSheet, Text, View} from 'react-native';
+import {ScrollView, Text, View} from 'react-native';
 import React from 'react';
 import Page from '../../../component/Page';
 import HeaderBase from '../../../component/HeaderBase';
-import {BackSvg} from '../../../assets/assets/ImageSvg';
+import {BackSvg} from '../../../assets/ImageSvg';
 import colors from '../../../common/colors';
 import sizes from '../../../common/sizes';
 import NavigationService from '../NavigationService';
 import {ILocation} from '../../../common/types';
-import YoutubePlayer from 'react-native-youtube-iframe';
+import YoutubePreview from '../../../component/YoutubePreview';
 
 interface Props {
   navigation: any;
@@ -56,25 +56,13 @@ export default class LocationVideo extends React.PureComponent<Props, States> {
   }
 }
 
-const styles = StyleSheet.create({
-  backgroundVideo: {
-    width: sizes.width - sizes._32sdp,
-    height: sizes._200sdp,
-  },
-});
 
 interface VideoProps {videoId: string}
 interface VideoState {}
 export class ChildVideo extends React.PureComponent<VideoProps, VideoState> {
   render(): React.ReactNode {
     return (
-      <YoutubePlayer
-        height={300}
-        play={true}
-        videoId={this.props.videoId}
-        onChangeState={() => {}}
-        mute={true}
-      />
+      <YoutubePreview height={300} videoId={this.props.videoId} />
     );
   }
 }

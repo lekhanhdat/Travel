@@ -253,12 +253,12 @@ function AppContainer() {
         name="SignUpScreen"
         getComponent={lazy(() => require('./screens/Login/SignUpScreen'))}
       />
-      {/* P1: Temporarily disabled; retain for restoration. Debt N1 (email module off).
+      {/* Debt N1 restored: email OTP via Gmail SMTP (BE module `email`). While the module is off the
+          screen shows "coming soon" on the 404, so no app update is needed when it is switched on. */}
       <Stack.Screen
         name="ForgotPasswordScreen"
-        component={ForgotPasswordScreen}
+        getComponent={lazy(() => require('./screens/Login/ForgotPasswordScreen'))}
       />
-      */}
       {FEATURE_FLAGS.ENABLE_PAYMENT && (
         <Stack.Screen
           name={ScreenName.DONATION}

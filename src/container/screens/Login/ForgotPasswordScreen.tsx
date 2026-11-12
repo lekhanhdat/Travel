@@ -58,20 +58,13 @@ export default class ForgotPasswordScreen extends React.PureComponent<
     this.setState({loading: true});
 
     try {
-      // Check if email exists
-      const account = await authApi.checkEmailExists(email);
+      // The backend answers the same for unknown emails (no account enumeration), so there is no
+      // "email exists" check here any more. Previous flow, kept for reference:
+      // const account = await authApi.checkEmailExists(email);
+      // if (!account) { Toast.show({type: 'error', text1: 'Email không tồn tại trong hệ thống'}); ... }
 
-      if (!account) {
-        Toast.show({
-          type: 'error',
-          text1: 'Email không tồn tại trong hệ thống',
-        });
-        this.setState({loading: false});
-        return;
-      }
-
-      // Send OTP via SendGrid (with rate limiting)
-      const result = await authApi.sendOTPEmail(email);
+      // Send OTP via Gmail SMTP (backend module `email`, rate limited server-side)
+      const result = await authApi.sendOTPEmail(email.trim());
 
       if (!result.success) {
         Toast.show({
@@ -83,17 +76,12 @@ export default class ForgotPasswordScreen extends React.PureComponent<
         return;
       }
 
-      // Save account ID for password reset
-      this.setState({
-        accountId: account.id ?? null,
-        step: 2,
-        loading: false,
-      });
+      this.setState({step: 2, otp: '', loading: false});
 
       Toast.show({
         type: 'success',
-        text1: 'Mã xác thực đã được gửi',
-        text2: 'Vui lòng kiểm tra email của bạn',
+        text1: 'Đã gửi yêu cầu',
+        text2: 'Nếu email đã đăng ký, mã xác thực sẽ đến trong ít phút',
       });
     } catch (error) {
       console.error('❌ Send OTP error:', error);
@@ -107,37 +95,21 @@ export default class ForgotPasswordScreen extends React.PureComponent<
     }
   };
 
-  // STEP 2: Verify OTP (with expiry check)
+  // STEP 2: OTP format only — the backend checks the code (expiry, one-time use) in reset-password.
   handleVerifyOTP = () => {
-    const {otp, email} = this.state;
+    const {otp} = this.state;
 
-    if (!otp) {
-      Toast.show({type: 'error', text1: 'Vui lòng nhập mã xác thực'});
+    if (!/^\d{6}$/.test(otp)) {
+      Toast.show({type: 'error', text1: 'Mã xác thực gồm 6 chữ số'});
       return;
     }
-
-    // Verify OTP with authApi (checks expiry and validity)
-    const result = authApi.verifyOTP(email, otp);
-
-    if (!result.valid) {
-      Toast.show({
-        type: 'error',
-        text1: result.error || 'Mã xác thực không hợp lệ',
-      });
-      return;
-    }
-
-    Toast.show({
-      type: 'success',
-      text1: 'Xác thực thành công',
-    });
 
     this.setState({step: 3});
   };
 
   // STEP 3: Reset password
   handleResetPassword = async () => {
-    const {newPassword, confirmPassword, accountId} = this.state;
+    const {email, otp, newPassword, confirmPassword} = this.state;
 
     if (!newPassword || !confirmPassword) {
       Toast.show({type: 'error', text1: 'Vui lòng nhập đầy đủ thông tin'});
@@ -157,15 +129,21 @@ export default class ForgotPasswordScreen extends React.PureComponent<
       return;
     }
 
-    if (!accountId) {
-      Toast.show({type: 'error', text1: 'Lỗi hệ thống'});
-      return;
-    }
-
     this.setState({loading: true});
 
     try {
-      await authApi.updatePassword(accountId, newPassword);
+      const result = await authApi.resetPassword(email.trim(), otp, newPassword);
+
+      if (!result.success) {
+        // Wrong or expired code: back to the code step so the user can retype or resend it.
+        this.setState({loading: false, step: 2, otp: ''});
+        Toast.show({
+          type: 'error',
+          text1: 'Không thể đặt lại mật khẩu',
+          text2: result.error || 'Vui lòng thử lại sau',
+        });
+        return;
+      }
 
       Toast.show({
         type: 'success',
@@ -191,7 +169,7 @@ export default class ForgotPasswordScreen extends React.PureComponent<
     }
   };
 
-  // Debt N1: still out of navigation until the BE email OTP is enabled; layout matches Login/SignUp.
+  // Layout matches Login/SignUp (features/auth/AuthLayout).
   renderStep1() {
     const {email, loading} = this.state;
     return (

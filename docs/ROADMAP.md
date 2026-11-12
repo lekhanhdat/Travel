@@ -40,7 +40,9 @@ giữ nguyên như trong các plan để tra cứu.
 - New Architecture (Fabric/TurboModules) khi các thư viện legacy-only có bản hỗ trợ.
 
 ## 5. Tính năng / nợ cũ (MIGRATION_TASKLIST)
-- **N1** Quên mật khẩu qua email (BE module `email` đang tắt) — màn `ForgotPasswordScreen` đã làm lại giao diện, chờ BE.
+- **N1** Quên mật khẩu qua email — code xong cả 2 đầu (BE gửi OTP qua **Gmail SMTP** + App Password, app đã mở
+  lại màn `ForgotPasswordScreen`). Còn: thêm `SMTP_USER` + `SMTP_APP_PASSWORD` vào secret `travel-app-config`,
+  thêm `email` vào `APP_FEATURES`. Giới hạn Gmail ~500 mail/ngày. Khi module tắt, app báo "sẽ có ở bản sau".
 - Chat: danh sách nhiều cuộc trò chuyện (BE đã lưu theo `session_id`), xoá từng cuộc.
 - Các nợ N2–N4 và P13/P14: xem `MIGRATION_TASKLIST.md`.
 

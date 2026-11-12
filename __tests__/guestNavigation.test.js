@@ -48,7 +48,7 @@ it('registers guest + account routes and Home/Feed/Map/Camera/Profile tabs (D-2:
   const routes = tree.root.findAllByType('Route').map(route => route.props.name);
   expect(routes).toEqual(['HomeStack', 'LoginScreen', 'ViewAllLocation', 'ViewAllFestivals', 'DetailLocationScreen',
     'PreviewImage', 'MapsScreen', 'LocationImage', 'LocationVideo', 'Personal', 'Settings', 'FAQ', 'Policy', 'About',
-    'Advise', 'DetailFestivalScreen', 'SignUpScreen', 'ChatBotScreen']);
+    'Advise', 'DetailFestivalScreen', 'SignUpScreen', 'ForgotPasswordScreen', 'ChatBotScreen']);
   // R-NAV1: stack screens other than the tab roots load lazily (getComponent), so they are not evaluated at startup.
   const lazyRoutes = tree.root.findAllByType('Route').filter(route => route.props.getComponent).map(route => route.props.name);
   expect(lazyRoutes).toEqual(expect.arrayContaining(['LoginScreen', 'DetailLocationScreen', 'Settings', 'ChatBotScreen']));
@@ -56,8 +56,8 @@ it('registers guest + account routes and Home/Feed/Map/Camera/Profile tabs (D-2:
   const viewAll = tree.root.findAllByType('Route').filter(route => route.props.name.startsWith('ViewAll'));
   expect(viewAll.map(route => route.props.getComponent())).toEqual(['ViewAll', 'ViewAll']);
   expect(routes).not.toContain('Donation');
-  // Debt N1: still out of navigation.
-  expect(routes).not.toEqual(expect.arrayContaining(['ForgotPasswordScreen']));
+  // Debt N1 restored: reachable from Login, loaded lazily.
+  expect(lazyRoutes).toContain('ForgotPasswordScreen');
   expect(tree.root.findByType('Stack').props.initialRouteName).toBe('HomeStack');
   const HomeStack = tree.root.findAllByType('Route')[0].props.component;
   let tabs;

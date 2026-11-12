@@ -132,8 +132,9 @@ export default class LoginScreen extends React.PureComponent<ILoginScreenProps, 
           tone="primary"
           style={styles.forgot}
           accessibilityRole="link"
-          // Debt N1: email OTP is off in the backend; ForgotPasswordScreen stays out of navigation.
-          onPress={() => Toast.show({type: 'info', text1: i18n.t('common:ui.login.forgotSoon')})}>
+          // Debt N1 restored (email OTP through Gmail SMTP). Previous behaviour, kept for reference:
+          // onPress={() => Toast.show({type: 'info', text1: i18n.t('common:ui.login.forgotSoon')})}
+          onPress={() => NavigationService.navigate(ScreenName.FORGOT_PASSWORD)}>
           {i18n.t('common:ui.login.forgot')}
         </Text>
         <AuthButton

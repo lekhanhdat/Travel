@@ -162,9 +162,9 @@ const authApi = {
 
   isLoggedIn: async (): Promise<boolean> => Boolean(await tokenStore.get()),
 
-  // Forgot password by email is debt N1: the backend module `email` is off, so these calls get 404
-  // until it is enabled. ForgotPasswordScreen (still commented out of navigation) moves to
-  // sendOTPEmail + resetPassword when N1 is done.
+  // Forgot password (debt N1): BE module `email` sends a 6-digit OTP through Gmail SMTP. The answer is the
+  // same whether or not the email is registered (no account enumeration); the OTP is checked by
+  // reset-password. While the module is off the routes return 404 -> "coming soon".
   sendOTPEmail: async (email: string): Promise<{success: boolean; error?: string}> => {
     try {
       await apiCall({method: 'post', url: '/auth/forgot-password', data: {email}, signedIn: false});
@@ -175,8 +175,14 @@ const authApi = {
     }
   },
 
-  resetPassword: async (email: string, otp: string, newPassword: string): Promise<void> => {
-    await apiCall({method: 'post', url: '/auth/reset-password', data: {email, otp, new_password: newPassword}, signedIn: false});
+  resetPassword: async (email: string, otp: string, newPassword: string): Promise<{success: boolean; error?: string}> => {
+    try {
+      await apiCall({method: 'post', url: '/auth/reset-password', data: {email, otp, new_password: newPassword}, signedIn: false});
+      return {success: true};
+    } catch (error) {
+      return {success: false, error: error instanceof ApiError && error.status !== 404
+        ? error.message : 'Tính năng quên mật khẩu sẽ có ở bản sau'};
+    }
   },
 
   checkEmailExists: async (_email: string): Promise<IAccount | null> => {

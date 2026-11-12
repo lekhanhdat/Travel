@@ -64,7 +64,18 @@ async function withTargets(dtos: ReviewDTO[]): Promise<IReview[]> {
   });
 }
 
+export interface ReviewPage {
+  items: IReview[];
+  hasMore: boolean;
+}
+
 const reviewsApi = {
+  listPage: async (filter: {location_id?: number; festival_id?: number}): Promise<ReviewPage> => {
+    const page = await apiCall<ReviewPageDTO>({
+      method: 'get', url: '/reviews', params: {...filter, limit: REVIEWS_PAGE_SIZE}, signedIn: false,
+    });
+    return {items: await withTargets(page.items), hasMore: page.has_more};
+  },
   list: async (filter: {location_id?: number; festival_id?: number} = {}): Promise<IReview[]> => {
     const page = await apiCall<ReviewPageDTO>({
       method: 'get', url: '/reviews', params: {...filter, limit: REVIEWS_PAGE_SIZE}, signedIn: false,

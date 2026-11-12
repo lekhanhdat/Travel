@@ -5,7 +5,7 @@ jest.mock('rn-fetch-blob', () => {
   const fetch = jest.fn();
   return {__esModule: true, default: {config: jest.fn(() => ({fetch})), wrap: path => `RNFetchBlob-file://${path}`, fetch}};
 });
-jest.mock('react-native-vision-camera', () => ({Camera: {requestCameraPermission: jest.fn(), requestMicrophonePermission: jest.fn(),
+jest.mock('react-native-vision-camera', () => ({Camera: {getCameraPermissionStatus: jest.fn(() => 'granted'), requestCameraPermission: jest.fn(), requestMicrophonePermission: jest.fn(),
   getAvailableCameraDevices: jest.fn(() => [])}}));
 jest.mock('react-native-image-picker', () => ({launchImageLibrary: jest.fn()}));
 jest.mock('react-native-paper', () => ({ActivityIndicator: 'Spinner', Modal: 'Modal', Portal: 'Portal'}));
@@ -95,6 +95,7 @@ describe.each([['CameraScreen', CameraScreen], ['PreviewImage', PreviewImage]])(
 it('Camera asks only for the camera permission (photos only)', async () => {
   global.fetch = jest.fn(async () => ({ok: true, status: 200, json: async () => ({})}));
   Camera.requestCameraPermission.mockResolvedValue('granted');
+  Camera.getCameraPermissionStatus.mockReturnValue('granted');
   const screen = instance(CameraScreen, {navigation: {addListener: jest.fn()}});
   await screen.componentDidMount();
   expect(Camera.requestMicrophonePermission).not.toHaveBeenCalled();
@@ -107,6 +108,7 @@ it.each([true, false])('Camera backend diagnostics are dev-only (dev=%s)', async
   global.__DEV__ = dev;
   global.fetch = jest.fn(async () => ({ok: true, status: 200, json: async () => ({})}));
   Camera.requestCameraPermission.mockResolvedValue('granted');
+  Camera.getCameraPermissionStatus.mockReturnValue('granted');
   const screen = instance(CameraScreen, {navigation: {addListener: jest.fn()}});
   try {
     await screen.componentDidMount();

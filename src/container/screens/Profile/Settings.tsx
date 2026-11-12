@@ -19,6 +19,11 @@ import colors from '../../../common/colors';
 import {AppStyle} from '../../../common/AppStyle';
 import {BackSvg} from '../../../assets/ImageSvg';
 import NavigationService from '../NavigationService';
+import catalogRepository from '../../../services/catalogRepository';
+import {cacheControls} from '../../../services/semantic.api';
+
+const SHOW_UNFINISHED = false;
+
 import LocalStorageCommon from '../../../utils/LocalStorageCommon';
 
 
@@ -43,7 +48,7 @@ class Settings extends React.PureComponent<ISettingsProps, ISettingsState> {
       autoSync: false,
       darkMode: false,
       language: 'Tiếng Việt',
-      cacheSize: '0 MB',
+      cacheSize: '',
     };
   }
 
@@ -83,9 +88,8 @@ class Settings extends React.PureComponent<ISettingsProps, ISettingsState> {
   };
 
   calculateCacheSize = () => {
-    // Simulate cache size calculation
-    const randomSize = Math.floor(Math.random() * 50) + 10;
-    this.setState({cacheSize: `${randomSize} MB`});
+    // The existing services cache in memory; report entries rather than inventing a byte count.
+    this.setState({cacheSize: this.props.t('settings.cacheEntries').replace('{{count}}', String(cacheControls.getStats().size))});
   };
 
   handleToggleNotifications = (value: boolean) => {
@@ -118,10 +122,12 @@ class Settings extends React.PureComponent<ISettingsProps, ISettingsState> {
           text: this.props.t('settings.clearCache'),
           style: 'destructive',
           onPress: () => {
-            this.setState({cacheSize: '0 MB'});
+            catalogRepository.clear();
+            cacheControls.invalidateAll();
+            this.calculateCacheSize();
             Alert.alert(
               this.props.t('common.success'),
-              this.props.t('settings.clearCacheSuccess'),
+              this.props.t('settings.cacheCleared'),
             );
           },
         },
@@ -175,6 +181,7 @@ class Settings extends React.PureComponent<ISettingsProps, ISettingsState> {
         />
 
         <View style={styles.container}>
+          {SHOW_UNFINISHED && <>
           {this.renderSectionHeader(this.props.t('settings.notifications'))}
 
           {this.renderSettingItem(
@@ -226,6 +233,8 @@ class Settings extends React.PureComponent<ISettingsProps, ISettingsState> {
               thumbColor={colors.white}
             />,
           )}
+
+          </>}
 
           <LanguageDropdown style={styles.languageDropdown} />
 

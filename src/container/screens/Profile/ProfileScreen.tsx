@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+  Alert,
   ScrollView,
   Linking,
   StyleSheet,
@@ -21,6 +22,8 @@ import {localStorageKey} from '../../../common/constants';
 import {Avatar, getDisplayName} from '../../../utils/avatarUtils';
 import {UserSvg} from '../../../assets/ImageSvg';
 import {Button} from 'react-native-paper';
+import {Icon} from '../../../ui/Icon';
+import {color, radius} from '../../../theme/tokens';
 import {withTranslation, WithTranslationProps} from '../../../hoc/withTranslation';
 import Toast from 'react-native-toast-message';
 import authApi from '../../../services/auth.api';
@@ -47,12 +50,18 @@ class ProfileScreen extends React.PureComponent<
     };
   }
 
-  phoneNumber = 'tel:0528777528'; // Số điện thoại cần gọi
+  phoneNumber = 'tel:113'; // Số điện thoại cần gọi
 
   handleOpenCall = () => {
-    Linking.openURL(this.phoneNumber).catch(err =>
-      console.error('Error opening call:', err),
-    );
+    const {t} = this.props;
+    Alert.alert(t('profile.emergency113'), t('profile.emergencyConfirm'), [
+      {text: t('ui.common.cancel'), style: 'cancel'},
+      {text: t('profile.call'), onPress: () => {
+        Linking.openURL(this.phoneNumber).catch(() => {
+          Alert.alert(t('common.error'), t('profile.callFailed'));
+        });
+      }},
+    ]);
   };
 
   componentDidMount(): void {
@@ -129,7 +138,7 @@ class ProfileScreen extends React.PureComponent<
               AppStyle.txt_18_bold_review,
               {alignSelf: 'center'},
             ]}>
-            {getDisplayName(this.state.account)}
+            {account ? getDisplayName(account) : t('profile.guest')}
           </TextBase>
 
           <View
@@ -166,7 +175,7 @@ class ProfileScreen extends React.PureComponent<
               style={{
                 width: sizes._56sdp,
                 height: sizes._40sdp,
-                backgroundColor: colors.primary,
+                backgroundColor: colors.primary_100,
                 borderRadius: sizes._1000sdp,
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -176,7 +185,7 @@ class ProfileScreen extends React.PureComponent<
               <ChatBotSvg
                 width={sizes._20sdp}
                 height={sizes._20sdp}
-                color={colors.primary_950}
+                color={colors.primary}
               />
             </TouchableOpacity>
           </View>
@@ -189,13 +198,13 @@ class ProfileScreen extends React.PureComponent<
               marginTop: sizes._16sdp,
             }}>
             <TextBase style={AppStyle.txt_18_bold}>
-              {t('profile.emergencyCall')}
+              {t('profile.emergency113')}
             </TextBase>
             <TouchableOpacity
               style={{
                 width: sizes._56sdp,
                 height: sizes._40sdp,
-                backgroundColor: colors.primary,
+                backgroundColor: colors.primary_100,
                 borderRadius: sizes._1000sdp,
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -204,7 +213,7 @@ class ProfileScreen extends React.PureComponent<
               <Call
                 width={sizes._20sdp}
                 height={sizes._20sdp}
-                color={colors.primary_950}
+                color={colors.primary}
               />
             </TouchableOpacity>
           </View>
@@ -223,7 +232,7 @@ class ProfileScreen extends React.PureComponent<
               style={{
                 width: sizes._56sdp,
                 height: sizes._40sdp,
-                backgroundColor: colors.primary,
+                backgroundColor: colors.primary_100,
                 borderRadius: sizes._1000sdp,
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -232,7 +241,7 @@ class ProfileScreen extends React.PureComponent<
               <UserSvg
                 width={sizes._20sdp}
                 height={sizes._20sdp}
-                color={colors.primary_950}
+                color={colors.primary}
               />
             </TouchableOpacity>
           </View>
@@ -249,7 +258,7 @@ class ProfileScreen extends React.PureComponent<
                 style={{
                   width: sizes._56sdp,
                   height: sizes._40sdp,
-                  backgroundColor: colors.primary,
+                  backgroundColor: colors.primary_100,
                   borderRadius: sizes._1000sdp,
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -259,7 +268,7 @@ class ProfileScreen extends React.PureComponent<
                 <TextBase style={{
                   fontSize: sizes._16sdp,
                   fontWeight: 'bold',
-                  color: colors.primary_950,
+                  color: colors.primary,
                 }}>₫</TextBase>
               </TouchableOpacity>
             </View>
@@ -302,7 +311,7 @@ class ProfileScreen extends React.PureComponent<
               style={{
                 width: sizes._56sdp,
                 height: sizes._40sdp,
-                backgroundColor: colors.primary,
+                backgroundColor: colors.primary_100,
                 borderRadius: sizes._1000sdp,
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -310,7 +319,7 @@ class ProfileScreen extends React.PureComponent<
               <Setting
                 width={sizes._20sdp}
                 height={sizes._20sdp}
-                color={colors.primary_950}
+                color={colors.primary}
               />
             </View>
           </TouchableOpacity>
@@ -334,7 +343,7 @@ class ProfileScreen extends React.PureComponent<
               style={{
                 width: sizes._56sdp,
                 height: sizes._40sdp,
-                backgroundColor: colors.primary,
+                backgroundColor: colors.primary_100,
                 borderRadius: sizes._1000sdp,
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -342,7 +351,7 @@ class ProfileScreen extends React.PureComponent<
               <FAQ
                 width={sizes._20sdp}
                 height={sizes._20sdp}
-                color={colors.primary_950}
+                color={colors.primary}
               />
             </View>
           </TouchableOpacity>
@@ -366,7 +375,7 @@ class ProfileScreen extends React.PureComponent<
               style={{
                 width: sizes._56sdp,
                 height: sizes._40sdp,
-                backgroundColor: colors.primary,
+                backgroundColor: colors.primary_100,
                 borderRadius: sizes._1000sdp,
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -374,7 +383,7 @@ class ProfileScreen extends React.PureComponent<
               <Policy
                 width={sizes._20sdp}
                 height={sizes._20sdp}
-                color={colors.primary_950}
+                color={colors.primary}
               />
             </View>
           </TouchableOpacity>
@@ -398,23 +407,24 @@ class ProfileScreen extends React.PureComponent<
               style={{
                 width: sizes._56sdp,
                 height: sizes._40sdp,
-                backgroundColor: colors.primary,
+                backgroundColor: colors.primary_100,
                 borderRadius: sizes._1000sdp,
                 alignItems: 'center',
                 justifyContent: 'center',
               }}>
-              <TextBase style={{
-                fontSize: sizes._16sdp,
-                fontWeight: 'bold',
-                color: colors.primary_950,
-              }}>i</TextBase>
+              <Icon name="information-outline" size={sizes._20sdp} color={colors.primary} />
             </View>
           </TouchableOpacity>
 
-          <View style={{marginTop: sizes._26sdp, marginHorizontal: sizes._26sdp}}>
+          <View style={{marginTop: sizes._26sdp}}>
+            {/* Previous: contained blue button with red (#B22222) label — low contrast. */}
             <Button
-              mode="contained"
-              labelStyle={{ fontSize: 16, height: sizes._30sdp, textAlignVertical: 'center', color: '#B22222' }}
+              mode={account ? 'outlined' : 'contained'}
+              icon={account ? 'logout' : 'login'}
+              textColor={account ? color.error : color.onPrimary}
+              style={account ? {borderColor: color.error, borderRadius: radius.md} : {borderRadius: radius.md}}
+              contentStyle={{height: 48}}
+              labelStyle={{fontSize: 16}}
               onPress={() => {
                 if (account) {
                   this.handleLogout();

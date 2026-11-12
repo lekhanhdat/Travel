@@ -1,8 +1,10 @@
 import React from 'react';
 import i18n from '../../../i18n';
-import {Platform, TouchableOpacity, View, Image} from 'react-native';
-import {launchImageLibrary} from 'react-native-image-picker';
-import {ActivityIndicator, Modal, Portal} from 'react-native-paper';
+import {Platform, TouchableOpacity, View, Image, AppState, Linking, StyleSheet} from 'react-native';
+import {launchImageLibrary} from '../../../utils/imagePicker';
+import {ActivityIndicator, Button as PaperButton, Modal, Portal} from 'react-native-paper';
+import {Text as AppText} from '../../../ui/Text';
+import {color, space} from '../../../theme/tokens';
 import Toast from 'react-native-toast-message';
 import {Camera} from 'react-native-vision-camera';
 import {CameraSvg, Lightning, LightningOff, SendSvg} from '../../../assets/ImageSvg';
@@ -12,7 +14,7 @@ import Page from '../../../component/Page';
 import {env} from '../../../utils/env';
 import {detectImage, DetectError} from '../../../services/detect.api';
 import {requireLogin} from '../../../utils/requireLogin';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import {Icon} from '../../../ui/Icon';
 import CameraResultModal from '../../../component/CameraResultModal';
 import TextBase from '../../../common/TextBase';
 
@@ -43,13 +45,32 @@ export default class CameraScreen extends React.PureComponent<
   ICameraScreenState
 > {
   camera: Camera | null = null;
+  private mounted = false;
+  private unsubscribeFocus?: () => void;
+  private unsubscribeBlur?: () => void;
+  private appSubscription?: ReturnType<typeof AppState.addEventListener>;
+  private updateActive = () => {
+    this.setState({isActive: !!this.props.navigation?.isFocused?.() && AppState.currentState === 'active'});
+    if (AppState.currentState === 'active') {this.refreshPermission();}
+  };
+  private refreshPermission = async () => {
+    const hasPermission = Camera.getCameraPermissionStatus() === 'granted';
+    const devices = hasPermission ? Camera.getAvailableCameraDevices() : [];
+    if (this.mounted) {this.setState({hasPermission, devices, device: devices[0] ?? null});}
+  };
+  componentWillUnmount() {
+    this.mounted = false;
+    this.unsubscribeFocus?.();
+    this.unsubscribeBlur?.();
+    this.appSubscription?.remove();
+  }
   constructor(props: ICameraScreenProps) {
     super(props);
     this.state = {
       hasPermission: false,
       devices: null,
       device: null,
-      isActive: true,
+      isActive: false,
       isLoading: false,
       isShowLightning: false,
       visible: false,
@@ -63,17 +84,12 @@ export default class CameraScreen extends React.PureComponent<
   }
 
   async componentDidMount() {
-    this.props.navigation?.addListener('blur', () => {
-      this.setState({
-        // isActive: false,
-      });
-    });
-
-    this.props.navigation?.addListener('focus', () => {
-      this.setState({
-        isActive: true,
-      });
-    });
+    this.mounted = true;
+    // isActive: false,
+    this.unsubscribeBlur = this.props.navigation?.addListener('blur', this.updateActive);
+    this.unsubscribeFocus = this.props.navigation?.addListener('focus', this.updateActive);
+    this.appSubscription = AppState.addEventListener('change', this.updateActive);
+    this.updateActive();
 
     // Test backend connection on mount
     if (__DEV__) {this.testBackendConnection();}
@@ -82,13 +98,18 @@ export default class CameraScreen extends React.PureComponent<
     // P8: photos only, so the microphone is not requested (Play: ask only for what is used).
     // const microphonePermission = await Camera.requestMicrophonePermission();
 
-    if (cameraPermission === 'granted') {
-      this.setState({hasPermission: true});
-      const devices = await Camera.getAvailableCameraDevices();
-      const device = devices;
-      this.setState({devices, device});
-    }
+    if (this.mounted && cameraPermission === 'granted') {await this.refreshPermission();}
   }
+
+  /** Ask again; once Android stops showing the dialog ('denied' for good), open Settings. */
+  requestPermission = async () => {
+    const result = await Camera.requestCameraPermission();
+    if (result === 'granted') {
+      await this.refreshPermission();
+    } else {
+      Linking.openSettings().catch(() => {});
+    }
+  };
 
   testBackendConnection = async () => {
     if (!__DEV__) {return;}
@@ -244,7 +265,32 @@ export default class CameraScreen extends React.PureComponent<
 
   render(): React.ReactNode {
     if (!this.state.hasPermission || !this.state.device) {
-      return <View />;
+      const noDevice = this.state.hasPermission;
+      return (
+        <Page>
+          <View style={styles.empty}>
+            <View style={styles.emptyIcon}>
+              <Icon name={noDevice ? 'camera-off-outline' : 'camera-outline'} size={40} color={color.primary} />
+            </View>
+            <AppText variant="headline" style={styles.center}>
+              {i18n.t(noDevice ? 'common:camera.noDeviceTitle' : 'common:camera.permissionTitle')}
+            </AppText>
+            <AppText variant="bodySmall" tone="textSecondary" style={[styles.center, styles.emptyText]}>
+              {i18n.t(noDevice ? 'common:camera.noDevice' : 'common:camera.permissionDenied')}
+            </AppText>
+            {!noDevice ? (
+              <PaperButton mode="contained" icon="camera" style={styles.emptyBtn} contentStyle={styles.btnContent}
+                onPress={this.requestPermission}>
+                {i18n.t('common:camera.allow')}
+              </PaperButton>
+            ) : null}
+            <PaperButton mode="outlined" icon="image-outline" style={styles.emptyBtn} contentStyle={styles.btnContent}
+              onPress={this.pickImage}>
+              {i18n.t('common:camera.pickFromGallery')}
+            </PaperButton>
+          </View>
+        </Page>
+      );
     }
     return (
       <Page>
@@ -252,8 +298,8 @@ export default class CameraScreen extends React.PureComponent<
           {
             <Camera
               style={{flex: 1}}
-              device={this.state.devices[0]}
-              isActive={true}
+              device={this.state.device}
+              isActive={this.state.isActive}
               ref={ref => {
                 this.camera = ref;
               }}
@@ -383,7 +429,7 @@ export default class CameraScreen extends React.PureComponent<
             justifyContent: 'center',
             zIndex: 3,
           }}>
-          <Icon name="insert-photo" color="white" size={24} />
+          <Icon name="image-outline" color="white" size={24} />
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -608,3 +654,20 @@ export default class CameraScreen extends React.PureComponent<
     );
   }
 }
+
+const styles = StyleSheet.create({
+  empty: {flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: space.xl},
+  emptyIcon: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: color.primaryContainer,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: space.md,
+  },
+  emptyText: {marginTop: space.xs, marginBottom: space.lg},
+  emptyBtn: {alignSelf: 'stretch', marginTop: space.sm, borderRadius: 12},
+  btnContent: {height: 48},
+  center: {textAlign: 'center'},
+});

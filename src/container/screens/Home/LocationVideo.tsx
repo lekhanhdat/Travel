@@ -7,7 +7,7 @@ import colors from '../../../common/colors';
 import sizes from '../../../common/sizes';
 import NavigationService from '../NavigationService';
 import {ILocation} from '../../../common/types';
-import YoutubePlayer from 'react-native-youtube-iframe';
+import YoutubePreview from '../../../component/YoutubePreview';
 
 interface Props {
   navigation: any;
@@ -62,13 +62,7 @@ interface VideoState {}
 export class ChildVideo extends React.PureComponent<VideoProps, VideoState> {
   render(): React.ReactNode {
     return (
-      <YoutubePlayer
-        height={300}
-        play={true}
-        videoId={this.props.videoId}
-        onChangeState={() => {}}
-        mute={true}
-      />
+      <YoutubePreview height={300} videoId={this.props.videoId} />
     );
   }
 }

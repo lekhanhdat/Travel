@@ -20,7 +20,7 @@ import {TextInput, Button} from 'react-native-paper';
 import moment from 'moment';
 import LargeItemLocation from '../../../component/LargeItemLocation';
 import locationApi from '../../../services/locations.api';
-import {launchImageLibrary} from 'react-native-image-picker';
+import {launchImageLibrary} from '../../../utils/imagePicker';
 import {convertCitationVietnameseUnsigned} from '../../../utils/Utils';
 import {requireLogin} from '../../../utils/requireLogin';
 

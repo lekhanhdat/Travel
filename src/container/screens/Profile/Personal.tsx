@@ -10,7 +10,7 @@ import {
   ActivityIndicator,
   } from 'react-native';
 import {TextInput, IconButton} from 'react-native-paper';
-import {launchImageLibrary} from 'react-native-image-picker';
+import {launchImageLibrary} from '../../../utils/imagePicker';
 import Toast from 'react-native-toast-message';
 import Page from '../../../component/Page';
 import HeaderBase from '../../../component/HeaderBase';

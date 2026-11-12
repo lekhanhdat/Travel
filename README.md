@@ -169,12 +169,12 @@ Thanh tìm kiếm `SemanticSearchBarComponent` (Trang chủ, Lễ hội) có:
 - ✅ **Khách sạn/nhà hàng** - Nạp khi gõ lần đầu, thêm vào kết quả theo từ khóa
 - ✅ **Keyword Fallback** - Tự chuyển sang từ khóa khi AI lỗi hoặc không có kết quả
 - ✅ **Nút xóa nhanh**, tự reset khi quay lại màn hình
-- ✅ **Bộ lọc ở màn Xem tất cả** - Tất cả / Tên / Địa chỉ / Mô tả
+- ✅ **Một màn Xem tất cả** cho địa điểm + lễ hội, chip lọc Tất cả / Địa điểm / Lễ hội
 - 🧩 **Autocomplete** - API gợi ý từ khóa có sẵn, chưa gắn vào thanh tìm kiếm
 
 ### 📊 Gợi ý & Đề xuất (Recommendations)
 - ✅ **SimilarItemsComponent** - Địa điểm/lễ hội tương tự dựa trên AI, hiển thị phần trăm tương đồng
-- ✅ **RecommendationsWidget** - Gợi ý địa điểm trên trang chủ (khi đăng nhập)
+- ✅ **Phù hợp với bạn** - Gợi ý AI (địa điểm + lễ hội) trên trang chủ khi đăng nhập (`features/discover/useRecommendations.ts`)
 - 🧩 **User Memory** - Bảng `user_memories` và API có sẵn nhưng chưa có luồng ghi sở thích, nên gợi ý hiện là các mục phổ biến
 
 ### 👤 Hồ sơ (Profile)
@@ -224,8 +224,8 @@ Thanh tìm kiếm `SemanticSearchBarComponent` (Trang chủ, Lễ hội) có:
 #### UI & Animation
 - **react-native-reanimated** `3.12.1` - Animations
 - **react-native-gesture-handler** `2.17.1` - Gesture handling
-- **react-native-svg** `15.3.0` + **react-native-svg-transformer** - SVG
-- **react-native-vector-icons** `10.2.0` - Icon library
+- **react-native-svg** `15.16.1` - chỉ dùng cho mã QR (Ủng hộ)
+- **react-native-vector-icons** `10.2.0` - bộ icon duy nhất (MaterialCommunityIcons, `src/ui/Icon.tsx`)
 - **react-native-markdown-display** `7.0.2` - Hiển thị Markdown (Camera, Chatbot)
 
 #### Utilities
@@ -320,29 +320,32 @@ Dự án Travel App được chia thành **2 repositories riêng biệt**:
 ```
 📁 https://github.com/lekhanhdat/Travel
 ├── 📁 src/
-│   ├── 📁 assets/              # Hình ảnh, SVG, fonts (GoogleSans)
-│   ├── 📁 common/              # colors, fonts, sizes, types, constants, AppStyle, TextBase
+│   ├── 📁 assets/              # Hình ảnh, fonts (Google Sans, OFL — docs/licenses)
+│   ├── 📁 theme/               # tokens.ts (màu, chữ, khoảng cách), paperTheme.ts
+│   ├── 📁 ui/                  # Text, Icon, Chip, AppHeader, SectionHeader
+│   ├── 📁 features/            # discover (Home + Xem tất cả), detail (Chi tiết), auth (Đăng nhập/ký)
+│   ├── 📁 common/              # colors (ánh xạ token), fonts, sizes, types, constants, AppStyle, TextBase
 │   ├── 📁 component/           # Reusable UI components
 │   │   ├── HeaderBase.tsx, Page.tsx, BottomSheet.tsx, InputBase.tsx
-│   │   ├── BigItemLocation.tsx, LargeItemLocation.tsx, LargeItemFestival.tsx
+│   │   ├── LargeItemLocation.tsx (Bảng tin), YoutubePreview.tsx, ReviewStatus.tsx
 │   │   ├── FloatingChatBubble.tsx          # Bong bóng chat nổi, kéo thả
 │   │   ├── SemanticSearchBarComponent.tsx  # Thanh tìm kiếm AI + từ khóa
-│   │   ├── RecommendationsWidget.tsx       # Gợi ý cho bạn
 │   │   ├── SimilarItemsComponent.tsx       # Địa điểm tương tự
 │   │   ├── ReviewItem.tsx, CameraResultModal.tsx, CatalogStatus.tsx, CachedImage.tsx
 │   │   └── LanguageDropdown.tsx
 │   ├── 📁 config/
 │   │   └── featureFlags.ts     # Công tắc tính năng ENABLE_*
 │   ├── 📁 container/           # Screens & navigation
-│   │   ├── AppContainer.tsx    # Stack + 6 tab
+│   │   ├── AppContainer.tsx    # Stack + 5 tab (Trang chủ, Bảng tin, Bản đồ, Máy ảnh, Hồ sơ); màn phụ tải lười
 │   │   └── screens/
-│   │       ├── Home/           # Trang chủ, Chi tiết, Xem tất cả, Ảnh, Video
+│   │       ├── Home/           # Trang chủ (địa điểm + lễ hội), Chi tiết địa điểm, Ảnh, Video
+│   │       ├── Discover/       # Xem tất cả (chung)
 │   │       ├── Maps/           # Bản đồ (MapScreen, Mapbox), Lời khuyên
 │   │       ├── Camera/         # Camera AI, Xem trước ảnh
 │   │       ├── Login/          # Đăng nhập, Đăng ký, Quên mật khẩu (tắt)
 │   │       ├── Profile/        # Hồ sơ, Cá nhân, Cài đặt, FAQ, Chính sách, Giới thiệu, Chatbot, Ủng hộ
 │   │       ├── NewFeed/        # Bảng tin
-│   │       └── Festival/       # Lễ hội
+│   │       └── Festival/       # Chi tiết lễ hội
 │   ├── 📁 context/ 📁 hoc/ 📁 hooks/  # TranslationContext, withTranslation, useTranslation
 │   ├── 📁 i18n/                # Đa ngôn ngữ
 │   │   └── locales/{vi,en}/common.json
@@ -713,9 +716,6 @@ npx tsc --noEmit
 
 # Generate image resources từ assets
 npm run genimg
-
-# Generate SVG resources
-npm run genimgsvg
 
 # Reset Metro cache (sau khi sửa .env)
 npm start -- --reset-cache

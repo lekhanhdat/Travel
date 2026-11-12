@@ -24,7 +24,7 @@
 | B3 | Khai báo khóa trong `~/.gradle/gradle.properties` (máy của anh/chị, không phải repo): `MYAPP_RELEASE_STORE_FILE`, `MYAPP_RELEASE_STORE_PASSWORD`, `MYAPP_RELEASE_KEY_ALIAS`, `MYAPP_RELEASE_KEY_PASSWORD` | Sau đó chạy `cd android && gradlew bundleRelease` → `android/app/build/outputs/bundle/release/app-release.aab`. Báo Claude để kiểm tra AAB |
 | B4 | Bật **Play App Signing** khi tạo app trong Play Console (mặc định) | Google giữ khóa ký thật, anh/chị chỉ giữ upload key |
 | B5 | **Giới hạn Mapbox token** trong tài khoản Mapbox: token `pk.` chỉ cho scope cần thiết, theo dõi usage; **thu hồi/đổi** token `sk.` (download) nếu từng chia sẻ | Token `pk.` nằm trong app, ai cũng trích được |
-| B6 | Đổi các mật khẩu/API key từng lộ trong lịch sử git (xem SECURITY_AUDIT, mục secret đã che) | Che trong tài liệu không xóa được khỏi lịch sử git |
+| B6 | Đổi các mật khẩu/API key từng lộ trong lịch sử git (danh sách trong `docs/release/SECURITY_AUDIT.md` ở lịch sử git, commit 9c4afa9) | Che trong tài liệu không xóa được khỏi lịch sử git |
 
 ## C. Nội dung pháp lý & liên hệ (gửi Claude để điền vào app)
 

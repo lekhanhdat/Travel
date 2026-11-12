@@ -1,9 +1,0 @@
-Completed A1–A6 within the allowed scope: signing externalized, network and permissions hardened, Danavi icons/name applied, version set to `1.0.0` (code `1`).
-
-- `assembleDebug`: **BUILD SUCCESSFUL**
-- Missing signing credentials: release guard failed as intended.
-- Icon dimensions, resource references, manifest merge, and whitespace checks passed.
-
-Device testing remains. No commits or branches created.
-
-[REPORT-A.md](D:/Project/Travel/Travel_FE/Travel/docs/release/codex/REPORT-A.md)

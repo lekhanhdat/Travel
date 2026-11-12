@@ -1,5 +1,7 @@
+import {useIsFocused} from '@react-navigation/native';
+import {routeDeviation} from '../../../utils/routeDeviation';
 import {isMapLocationVisible} from '../../../utils/catalogVisibility';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {
   ScrollView,
   View,
@@ -9,6 +11,7 @@ import {
   StyleSheet,
   PermissionsAndroid,
   Platform,
+  AppState,
 } from 'react-native';
 import Geolocation from '@react-native-community/geolocation';
 import MapboxGL from '@rnmapbox/maps';
@@ -19,7 +22,9 @@ import colors from '../../../common/colors';
 import sizes from '../../../common/sizes';
 import {ILocation} from '../../../common/types';
 import {AppStyle} from '../../../common/AppStyle';
-import TextBase from '../../../common/TextBase';
+import TextBase from '../../../ui/Text';
+import Icon from '../../../ui/Icon';
+import {color} from '../../../theme/tokens';
 import NavigationService from '../NavigationService';
 import {ScreenName} from '../../AppContainer';
 import SoundPlayer from 'react-native-sound-player';
@@ -36,7 +41,6 @@ import catalogRepository, {CatalogFestival} from '../../../services/catalogRepos
 import {catalogImage} from '../../../utils/catalogDisplay';
 import CachedImage from '../../../component/CachedImage';
 import haversineDistance from '../../../utils/haversineDistance';
-import {getPreciseLocation} from '../../../utils/preciseLocation';
 
 MapboxGL.setAccessToken(env.MAPBOX_ACCESS_TOKEN || '');
 // "auto" means Android's LocationManager, where high accuracy is GPS-only and rarely gets a fix
@@ -46,6 +50,7 @@ Geolocation.setRNConfiguration({skipPermissionRequests: false, locationProvider:
 // Đà Nẵng (same default the screen already falls back to) and how far the user may be
 // from the catalog area for the map to open on the user's position.
 const DEFAULT_CENTER = {latitude: 15.974620784990472, longitude: 108.25290513035998};
+const USE_SYMBOL_MARKERS = true;
 const NEAR_CATALOG_METERS = 100 * 1000;
 
 type MapMode = 'locations' | 'festivals';
@@ -106,26 +111,26 @@ interface MapStyleOption {
 
 const MAP_STYLES: MapStyleOption[] = [
   // Outdoors style - will hide POI layers programmatically
-  { id: 'outdoors', name: 'Outdoors', url: MapboxGL.StyleURL.Outdoors, icon: '🏞️' },
+  { id: 'outdoors', name: 'map.outdoors', url: MapboxGL.StyleURL.Outdoors, icon: 'pine-tree' },
 
   // Satellite style - naturally has no POIs, only satellite imagery
-  { id: 'satellite', name: 'Satellite', url: MapboxGL.StyleURL.Satellite, icon: '🛰️' },
+  { id: 'satellite', name: 'map.satellite', url: MapboxGL.StyleURL.Satellite, icon: 'satellite-variant' },
 
   // Dark style - minimal POIs
-  { id: 'dark', name: 'Dark', url: MapboxGL.StyleURL.Dark, icon: '🌙' },
+  { id: 'dark', name: 'map.dark', url: MapboxGL.StyleURL.Dark, icon: 'weather-night' },
 
   // Satellite Streets - shows roads on satellite imagery
-  { id: 'terrain', name: 'Terrain', url: 'mapbox://styles/mapbox/satellite-streets-v12', icon: '⛰️' },
+  { id: 'terrain', name: 'map.terrain', url: 'mapbox://styles/mapbox/satellite-streets-v12', icon: 'terrain' },
 ];
 
 // Helper function to get text color based on map style
 const getTextColorForMapStyle = (mapStyle: MapStyle): string => {
   // Outdoors has light background -> use dark text
   if (mapStyle === 'outdoors') {
-    return '#000000'; // Black text
+    return color.text; // Dark text
   }
   // Satellite, Dark, Terrain have dark backgrounds -> use light text
-  return '#FFFFFF'; // White text
+  return color.onPrimary; // Light text
 };
 
 // Helper function to get text shadow based on map style
@@ -146,10 +151,41 @@ const getTextShadowForMapStyle = (mapStyle: MapStyle) => {
   };
 };
 
-const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
+const MapScreenV2 = ({route}: {navigation: any; route: any}) => {
   const {t} = useTranslation('common');
-  const [currentLat, setCurrentLat] = useState(0);
-  const [currentLong, setCurrentLong] = useState(0);
+  const isFocused = useIsFocused();
+  const [appState, setAppState] = useState(AppState.currentState);
+  const screenActive = isFocused && appState === 'active';
+  const activeRef = React.useRef(screenActive);
+  activeRef.current = screenActive;
+  const routeGeneration = React.useRef(0);
+  const mountedRef = React.useRef(true);
+  const requestedTarget = React.useRef<number | null>(null);
+  const routePending = React.useRef(false);
+  const lastRouteOrigin = React.useRef<{latitude: number; longitude: number} | null>(null);
+  const [catalogError, setCatalogError] = useState(false);
+  const loadMapCatalog = async (forceRefresh = false) => {
+    setCatalogError(false);
+    try {
+      const catalog = await catalogRepository.get(forceRefresh);
+      if (!mountedRef.current) {return;}
+      setLocations(catalog.mapMarkers);
+      setFestivalMarkers(buildFestivalMarkers(catalog.festivals, catalog.locationById as Map<number, ILocation>));
+    } catch {if (mountedRef.current) {setCatalogError(true);}}
+  };
+  useEffect(() => {
+    mountedRef.current = true;
+    const subscription = AppState.addEventListener('change', setAppState);
+    const generation = routeGeneration;
+    return () => {
+      subscription.remove();
+      mountedRef.current = false;
+      activeRef.current = false;
+      generation.current++;
+    };
+  }, []);
+  const [currentLat, setCurrentLat] = useState(DEFAULT_CENTER.latitude);
+  const [currentLong, setCurrentLong] = useState(DEFAULT_CENTER.longitude);
   const [routeCoordinates, setRouteCoordinates] = useState<{latitude: number; longitude: number}[]>([]);
   const [routes, setRoutes] = useState<RouteInfo[]>([]); // Lưu tất cả routes (main + alternatives)
   const [selectedRouteIndex, setSelectedRouteIndex] = useState(0); // Route đang được chọn
@@ -163,8 +199,6 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
   const [locationPermission, setLocationPermission] = useState(false);
   // True only after a real GPS fix; the Đà Nẵng fallback only centers the camera.
   const [hasUserLocation, setHasUserLocation] = useState(false);
-  const locationPermissionRef = React.useRef(false);
-  locationPermissionRef.current = locationPermission;
   // Camera target chosen once (focus place / user near catalog / catalog area), so GPS updates
   // from watchPosition do not keep pulling the camera back while the user pans.
   const initialCenterRef = React.useRef<number[] | null>(null);
@@ -195,16 +229,15 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
         const granted = await PermissionsAndroid.request(
           PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
           {
-            title: 'Location Permission',
-            message: 'This app needs access to location to show your current position on the map.',
-            buttonNeutral: 'Ask Me Later',
-            buttonNegative: 'Cancel',
-            buttonPositive: 'OK',
+            title: t('map.permissionTitle'),
+            message: t('map.permissionMessage'),
+            buttonNeutral: t('map.askLater'),
+            buttonNegative: t('map.cancel'),
+            buttonPositive: t('map.ok'),
           },
         );
         if (granted === PermissionsAndroid.RESULTS.GRANTED) {
           setLocationPermission(true);
-          getCurrentLocation();
         } else {
           // Fallback to default Đà Nẵng coordinates
           setCurrentLat(15.974620784990472);
@@ -218,28 +251,16 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
       }
     } else {
       // iOS
-      getCurrentLocation();
+      Geolocation.requestAuthorization(() => {
+        setLocationPermission(true);
+      }, () => setLocationPermission(false));
     }
-  };
-
-  // High-accuracy fix (utils/preciseLocation); the Đà Nẵng fallback only centers the camera.
-  const getCurrentLocation = () => {
-    getPreciseLocation()
-      .then(position => {
-        const {latitude, longitude} = position.coords;
-        setCurrentLat(latitude);
-        setCurrentLong(longitude);
-        setHasUserLocation(true);
-      })
-      .catch(_error => {
-        setCurrentLat(15.974620784990472);
-        setCurrentLong(108.25290513035998);
-      });
   };
 
   const watchUserLocation = () => {
     const watchId = Geolocation.watchPosition(
       (position) => {
+        if (!activeRef.current) {return;}
         const {latitude, longitude} = position.coords;
         setCurrentLat(latitude);
         setCurrentLong(longitude);
@@ -299,11 +320,60 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
   const [focusLocation, setFocusLocation] = useState<ILocation | null>(null);
   const [shouldShowRoute, setShouldShowRoute] = useState(false);
   const [pendingZoomRoute, setPendingZoomRoute] = useState<{latitude: number; longitude: number}[] | null>(null);
-  const [currentZoom, setCurrentZoom] = useState<number>(12); // Track zoom level
+  const currentZoom = 12; // Legacy MarkerView branch uses a fixed size for one release.
   // Catalog map only (not when opened for one place): show place markers or festival markers.
   const [isCatalogMap, setIsCatalogMap] = useState(false);
   const [mapMode, setMapMode] = useState<MapMode>('locations');
   const [festivalMarkers, setFestivalMarkers] = useState<FestivalMarker[]>([]);
+
+  const markerSource = React.useRef<MapboxGL.ShapeSource>(null);
+  const [markerChoices, setMarkerChoices] = useState<GeoJSON.Feature<GeoJSON.Point>[]>([]);
+  const markerShape = useMemo<GeoJSON.FeatureCollection<GeoJSON.Point>>(() => ({
+    type: 'FeatureCollection',
+    features: mapMode === 'festivals'
+      ? festivalMarkers.map(({festival, lat, long}) => ({
+        type: 'Feature', id: `festival-${festival.id}`, geometry: {type: 'Point', coordinates: [long, lat]},
+        properties: {kind: 'festival', recordId: festival.id, label: translateFestivalField(t, festival, 'name', festival.name)},
+      }))
+      : locations.filter(location => isMapLocationVisible(location) ||
+        ((focusLocation?.id === location.id || selectedLocation?.id === location.id) && hasGps(location)))
+        .filter(hasGps).map(location => ({
+          type: 'Feature', id: `location-${location.id}`, geometry: {type: 'Point', coordinates: [location.long, location.lat]},
+          properties: {kind: 'location', recordId: location.id, label: translateLocationField(t, location, 'name', location.name)},
+        })),
+  }), [mapMode, festivalMarkers, locations, focusLocation?.id, selectedLocation?.id, t]);
+  const selectedMarkerId = selectedLocation?.id ?? focusLocation?.id ?? -1;
+  const chooseMarker = (feature: GeoJSON.Feature<GeoJSON.Point>) => {
+    setMarkerChoices([]);
+    if (feature.properties?.kind === 'festival') {
+      const marker = festivalMarkers.find(item => item.festival.id === feature.properties?.recordId);
+      if (marker) {onFestivalMarkerPress(marker.festival);}
+    } else {
+      const location = locations.find(item => item.id === feature.properties?.recordId);
+      if (location) {onMarkerPress(location);}
+    }
+  };
+  const onSourcePress = async (event: {features: GeoJSON.Feature[]}) => {
+    const feature = event.features[0];
+    if (!feature || feature.geometry.type !== 'Point') {return;}
+    if (feature.properties?.cluster) {
+      try {
+        const source = markerSource.current;
+        if (!source) {return;}
+        const zoom = await source.getClusterExpansionZoom(feature);
+        cameraRef.current?.setCamera({centerCoordinate: feature.geometry.coordinates, zoomLevel: zoom, animationDuration: 500});
+        const leaves = await source.getClusterLeaves(feature, Number(feature.properties.point_count), 0);
+        if (mountedRef.current) {setMarkerChoices(leaves.features as GeoJSON.Feature<GeoJSON.Point>[]);}
+      } catch {
+        Toast.show({type: 'info', text1: t('map.clusterRetry')});
+      }
+      return;
+    }
+    // At maximum zoom identical coordinates still overlap: offer every record at that point.
+    const point = feature.geometry.coordinates;
+    const choices = markerShape.features.filter(item => item.geometry.coordinates[0] === point[0] && item.geometry.coordinates[1] === point[1]);
+    if (choices.length > 1) {setMarkerChoices(choices);} else {chooseMarker(feature as GeoJSON.Feature<GeoJSON.Point>);}
+  };
 
   useEffect(() => {
 
@@ -325,10 +395,7 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
     } else {
       // Nếu không, lấy marker từ catalog
       setIsCatalogMap(true);
-      catalogRepository.get().then(catalog => {
-        setLocations(catalog.mapMarkers);
-        setFestivalMarkers(buildFestivalMarkers(catalog.festivals, catalog.locationById as Map<number, ILocation>));
-      }).catch(error => console.warn('Catalog unavailable for map:', error));
+      loadMapCatalog();
     }
 
     const onFinishedPlayingSubscription = SoundPlayer.addEventListener(
@@ -421,44 +488,43 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
     // }
 
     // Start watching user location for real-time updates
-    const watchId = watchUserLocation();
-
-    const focusListener = navigation.addListener('focus', () => {
-      // Refresh location when screen comes into focus
-      if (locationPermissionRef.current) {
-        getCurrentLocation();
-      }
-    });
 
     return () => {
       onFinishedPlayingSubscription.remove();
       onFinishedLoadingSubscription.remove();
       onFinishedLoadingFileSubscription.remove();
       // Clear location watch
-      Geolocation.clearWatch(watchId);
-      // Remove focus listener
-      focusListener();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps -- Install native listeners once per mount; preserve their existing lifetime.
   }, []);
 
   useEffect(() => {
     // Start watching location when permission is granted
-    if (locationPermission) {
+    if (locationPermission && screenActive) {
       const watchId = watchUserLocation();
       return () => {
         Geolocation.clearWatch(watchId);
       };
     }
-  }, [locationPermission]);
+  }, [locationPermission, screenActive]);
 
   // Fetch route khi đã có vị trí hiện tại và cần hiển thị đường đi
   useEffect(() => {
-    if (shouldShowRoute && focusLocation && hasUserLocation && currentLat !== 0 && currentLong !== 0) {
+    if (!screenActive || !shouldShowRoute || !focusLocation) {
+      routeGeneration.current++;
+      routePending.current = false;
+      requestedTarget.current = null;
+      return;
+    }
+    if (!hasUserLocation || currentLat === 0 || currentLong === 0) {return;}
+    const origin = {latitude: currentLat, longitude: currentLong};
+    const changedTarget = requestedTarget.current !== focusLocation.id;
+    const moved = lastRouteOrigin.current && haversineDistance(origin, lastRouteOrigin.current) > 50;
+    if (changedTarget || (!routePending.current && moved && routeDeviation(origin, routeCoordinates) > 50)) {
       fetchRouteToLocation(focusLocation);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- Keep the existing route request triggers to avoid additional network requests.
-  }, [shouldShowRoute, focusLocation, hasUserLocation, currentLat, currentLong]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- GPS updates only request a route after the deviation guard.
+  }, [screenActive, shouldShowRoute, focusLocation, hasUserLocation, currentLat, currentLong]);
 
   // ✅ Zoom khi camera đã ready và có pending zoom
   useEffect(() => {
@@ -473,6 +539,10 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
   const fetchRouteToLocation = async (location: ILocation) => {
     if (typeof location.lat !== 'number' || typeof location.long !== 'number' ||
         !Number.isFinite(location.lat) || !Number.isFinite(location.long)) {return;}
+    const generation = ++routeGeneration.current;
+    requestedTarget.current = location.id;
+    lastRouteOrigin.current = {latitude: currentLat, longitude: currentLong};
+    routePending.current = true;
     try {
 
       // Kiểm tra vị trí hiện tại đã có chưa (không chỉ đường từ tọa độ mặc định)
@@ -496,6 +566,7 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
       });
 
 
+      if (generation !== routeGeneration.current || !activeRef.current) {return;}
       // Reset offline state nếu request thành công
       setIsOffline(false);
 
@@ -536,6 +607,7 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
       } else {
       }
     } catch (error: any) {
+      if (generation !== routeGeneration.current || !activeRef.current) {return;}
       console.error('❌ Error fetching route:', error);
 
       // Xử lý offline - vẽ đường thẳng từ vị trí hiện tại đến đích
@@ -562,6 +634,8 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
         // ✅ Zoom map để xem toàn bộ đường đi (offline)
         zoomToFitRoute(straightLineRoute.coordinates);
       }
+    } finally {
+      if (generation === routeGeneration.current) {routePending.current = false;}
     }
   };
 
@@ -728,16 +802,6 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
   };
 
   // ✅ Handle camera region change to update zoom level
-  const onRegionDidChange = async (feature: any) => {
-    try {
-      // Get zoom from camera state
-      const zoom = feature?.properties?.zoomLevel || 12;
-      setCurrentZoom(zoom);
-    } catch (error) {
-    }
-  };
-
-  // ✅ Function to zoom map to fit entire route (immediate - no delay)
   const zoomToFitRouteImmediate = (routePoints: {latitude: number; longitude: number}[]) => {
     if (!cameraRef.current || routePoints.length === 0) {
       return;
@@ -863,7 +927,7 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
   return (
     <Page>
       <HeaderBase
-        title={'Map'}
+        title={t('map.title')}
         leftIconSvg={
           <BackSvg
             width={sizes._24sdp}
@@ -875,13 +939,16 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
           NavigationService.pop();
         }}
       />
+      {catalogError && <View>
+        <TextBase>{t('map.catalogError')}</TextBase>
+        <Button onPress={() => loadMapCatalog(true)}>{t('map.retry')}</Button>
+      </View>}
       <View style={{flex: 1}}>
         <MapboxGL.MapView
           ref={mapRef}
           scaleBarPosition={isCatalogMap ? {top: 58, left: 10} : undefined}
           style={{flex: 1}}
           styleURL={MAP_STYLES.find(s => s.id === currentMapStyle)?.url || MapboxGL.StyleURL.Satellite}
-          onCameraChanged={onRegionDidChange}
           onDidFinishLoadingMap={onMapStyleLoaded}
           onPress={() => {
             // Bỏ chọn marker khi ấn ra ngoài
@@ -902,7 +969,38 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
             animationDuration={1000}
           />
 
-          {mapMode === 'locations' &&
+          {USE_SYMBOL_MARKERS && <>
+            <MapboxGL.Images>
+              {(['place', 'festival', 'selected'] as const).map(name => (
+                <MapboxGL.Image key={name} name={`catalog-${name}`}>
+                  <View style={{width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center',
+                    backgroundColor: name === 'festival' ? color.accent : color.primary,
+                    borderWidth: name === 'selected' ? 3 : 0, borderColor: color.onPrimary}}>
+                    <Icon name={name === 'festival' ? 'party-popper' : 'map-marker'} color={color.onPrimary} size={24} />
+                  </View>
+                </MapboxGL.Image>
+              ))}
+            </MapboxGL.Images>
+            <MapboxGL.ShapeSource id="catalogMarkers" ref={markerSource} shape={markerShape}
+              cluster clusterRadius={48} clusterMaxZoomLevel={13} onPress={onSourcePress}>
+              <MapboxGL.CircleLayer id="catalogClusters" filter={['has', 'point_count']}
+                style={{circleRadius: 22, circleColor: mapMode === 'festivals' ? color.accent : color.primary,
+                  circleStrokeWidth: 2, circleStrokeColor: color.onPrimary}} />
+              <MapboxGL.SymbolLayer id="catalogClusterCount" filter={['has', 'point_count']}
+                style={{textField: ['get', 'point_count_abbreviated'], textSize: 13, textColor: color.onPrimary, textAllowOverlap: true}} />
+              <MapboxGL.SymbolLayer id="catalogPoints" filter={['!', ['has', 'point_count']]}
+                style={{iconImage: ['match', ['get', 'kind'], 'festival', 'catalog-festival', 'catalog-place'],
+                  iconSize: 0.65, iconAllowOverlap: true,
+                  textField: ['step', ['zoom'], '', 14, ['get', 'label']], textSize: 12,
+                  textOffset: [0, 1.8], textAnchor: 'top', textColor: getTextColorForMapStyle(currentMapStyle),
+                  textHaloColor: currentMapStyle === 'outdoors' ? color.surface : color.text, textHaloWidth: 1.5}} />
+              <MapboxGL.SymbolLayer id="catalogSelected" filter={['all', ['!', ['has', 'point_count']],
+                ['==', ['get', 'kind'], 'location'], ['==', ['get', 'recordId'], selectedMarkerId]]}
+                style={{iconImage: 'catalog-selected', iconSize: 1, iconAllowOverlap: true}} />
+            </MapboxGL.ShapeSource>
+          </>}
+
+          {!USE_SYMBOL_MARKERS && mapMode === 'locations' &&
             locations.filter((loc): loc is ILocation & {lat: number; long: number} =>
               isMapLocationVisible(loc) ||
               // Always show the focused/selected place (e.g. opened from Detail) when it has GPS.
@@ -944,7 +1042,7 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
                         }}
                       />
                     ) : (
-                      <TextBase style={{ fontSize: emojiSize }}>📍</TextBase>
+                      <TextBase style={{ fontSize: emojiSize }}><Icon name="crosshairs-gps" color={color.primary} size={28} /></TextBase>
                     )}
                     {/* Location Name Label - Dynamic size based on zoom */}
                     <TextBase style={{
@@ -963,10 +1061,10 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
           }
 
           {/* Festival mode: every festival at its venue (overlapping markers are accepted for now). */}
-          {mapMode === 'festivals' && festivalMarkers.map(({festival, lat, long}) => (
+          {!USE_SYMBOL_MARKERS && mapMode === 'festivals' && festivalMarkers.map(({festival, lat, long}) => (
             <MapboxGL.MarkerView key={`festival-${festival.id}`} id={`festival-${festival.id}`} coordinate={[long, lat]}>
               <TouchableOpacity onPress={() => onFestivalMarkerPress(festival)} style={{alignItems: 'center'}}>
-                <TextBase style={{fontSize: getMarkerSize(currentZoom, false) * 0.8}}>🎉</TextBase>
+                <TextBase style={{fontSize: getMarkerSize(currentZoom, false) * 0.8}}><Icon name="party-popper" color={color.accent} size={20} /></TextBase>
                 <TextBase style={{
                   fontSize: getTextSize(currentZoom, false),
                   fontWeight: 'bold',
@@ -1010,7 +1108,7 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
                 ...getTextShadowForMapStyle(currentMapStyle),
                 marginTop: 2,
               }}>
-                {t('common:common.youAreHere')}
+                {t('map.youAreHere')}
               </TextBase>
             </View>
           </MapboxGL.MarkerView>
@@ -1128,7 +1226,7 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
                     backgroundColor: active ? colors.primary : 'transparent',
                   }}>
                   <TextBase style={{fontSize: 14, fontWeight: '600', color: active ? colors.white : colors.primary_950}}>
-                    {mode === 'locations' ? `📍 ${t('common:map.modeLocations')}` : `🎉 ${t('common:map.modeFestivals')}`}
+                    <Icon name={mode === 'locations' ? 'map-marker' : 'party-popper'} size={16} color={active ? color.onPrimary : color.primary} /> {t(mode === 'locations' ? 'map.modeLocations' : 'map.modeFestivals')}
                   </TextBase>
                 </TouchableOpacity>
               );
@@ -1159,10 +1257,10 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
               justifyContent: 'center',
             }}>
             <TextBase style={{ fontSize: 20, marginRight: 8 }}>
-              {MAP_STYLES.find(s => s.id === currentMapStyle)?.icon || '🏞️'}
+              <Icon name={MAP_STYLES.find(s => s.id === currentMapStyle)?.icon || 'pine-tree'} />
             </TextBase>
             <TextBase style={{ fontSize: 14, fontWeight: '600', color: colors.primary_950 }}>
-              {MAP_STYLES.find(s => s.id === currentMapStyle)?.name || 'Outdoors'}
+              {t(MAP_STYLES.find(s => s.id === currentMapStyle)?.name || 'map.outdoors')}
             </TextBase>
           </TouchableOpacity>
 
@@ -1196,14 +1294,14 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
                     marginBottom: 4,
                   }}>
                   <TextBase style={{ fontSize: 20, marginRight: 8 }}>
-                    {style.icon}
+                    <Icon name={style.icon} />
                   </TextBase>
                   <TextBase style={{
                     fontSize: 14,
                     color: currentMapStyle === style.id ? colors.primary : colors.primary_950,
                     fontWeight: currentMapStyle === style.id ? 'bold' : 'normal',
                   }}>
-                    {style.name}
+                    {t(style.name)}
                   </TextBase>
                 </TouchableOpacity>
               ))}
@@ -1217,8 +1315,8 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
               if (!showTraffic) {
                 Toast.show({
                   type: 'info',
-                  text1: `🚦 ${t('common:common.trafficLayerEnabled')}`,
-                  text2: 'Zoom to level 12+ in major cities for best results',
+                  text1: t('map.trafficLayerEnabled'),
+                  text2: t('map.trafficHint'),
                   position: 'bottom',
                   visibilityTime: 3000,
                 });
@@ -1242,14 +1340,14 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
               borderColor: colors.primary_200,
             }}>
             <TextBase style={{ fontSize: 20, marginRight: 8 }}>
-              🚦
+              <Icon name="traffic-light" color={showTraffic ? color.onPrimary : color.primary} />
             </TextBase>
             <TextBase style={{
               fontSize: 14,
               fontWeight: '600',
               color: showTraffic ? colors.white : colors.primary_950,
             }}>
-              Mật độ giao thông
+              {t('map.traffic')}
             </TextBase>
           </TouchableOpacity>
 
@@ -1273,7 +1371,7 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
                 color: colors.primary_950,
                 marginBottom: 6,
               }}>
-                Chú thích:
+                {t('map.legend')}
               </TextBase>
 
               {/* Low Congestion */}
@@ -1286,7 +1384,7 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
                   marginRight: 6,
                 }} />
                 <TextBase style={{ fontSize: 10, color: colors.primary_950 }}>
-                  {t('common:common.trafficClear')}
+                  {t('map.trafficClear')}
                 </TextBase>
               </View>
 
@@ -1300,7 +1398,7 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
                   marginRight: 6,
                 }} />
                 <TextBase style={{ fontSize: 10, color: colors.primary_950 }}>
-                  Vừa phải
+                  {t('map.moderate')}
                 </TextBase>
               </View>
 
@@ -1314,7 +1412,7 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
                   marginRight: 6,
                 }} />
                 <TextBase style={{ fontSize: 10, color: colors.primary_950 }}>
-                  Đông đúc
+                  {t('map.heavy')}
                 </TextBase>
               </View>
 
@@ -1328,7 +1426,7 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
                   marginRight: 6,
                 }} />
                 <TextBase style={{ fontSize: 10, color: colors.primary_950 }}>
-                  {t('common:common.trafficCongested')}
+                  {t('map.trafficCongested')}
                 </TextBase>
               </View>
             </View>
@@ -1352,10 +1450,10 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
             shadowRadius: 3.84,
           }}>
             <TextBase style={{ fontSize: 14, color: colors.white, fontWeight: 'bold' }}>
-              🔌 {t('common:common.offlineMode')}
+              <Icon name="wifi-off" size={16} /> {t('map.offlineMode')}
             </TextBase>
             <TextBase style={{ fontSize: 12, color: colors.white, marginTop: 4 }}>
-              Route is approximate
+              {t('map.approximate')}
             </TextBase>
           </View>
         )}
@@ -1380,16 +1478,16 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
             <View style={{ flex: 1 }}>
               <TextBase style={{ fontSize: 16, fontWeight: 'bold', color: colors.primary }}>
-                📍 {mapboxApi.formatDistance(routeDistance)}
+                <Icon name="map-marker-distance" size={16} /> {mapboxApi.formatDistance(routeDistance)}
               </TextBase>
               {routeDuration > 0 && (
                 <TextBase style={{ fontSize: 14, color: colors.primary_950, marginTop: 4 }}>
-                  ⏱️ {mapboxApi.formatDuration(routeDuration)}
+                  <Icon name="timer-outline" size={16} /> {mapboxApi.formatDuration(routeDuration)}
                 </TextBase>
               )}
               {isOffline && (
                 <TextBase style={{ fontSize: 12, color: '#FFA500', marginTop: 4, fontStyle: 'italic' }}>
-                  As the crow flies
+                  {t('map.straightLine')}
                 </TextBase>
               )}
             </View>
@@ -1397,7 +1495,7 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
             {routes.length > 1 && !isOffline && (
               <View style={{ marginLeft: 10 }}>
                 <TextBase style={{ fontSize: 12, color: colors.primary_700 }}>
-                  {routes.length} routes
+                  {t('map.routes', {count: routes.length})}
                 </TextBase>
               </View>
             )}
@@ -1430,7 +1528,7 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
                     }}
                     labelStyle={{ fontSize: 12 }}
                   >
-                    Route {index + 1}: {mapboxApi.formatDistance(routeDist)}
+                    {t('map.route', {number: index + 1, distance: mapboxApi.formatDistance(routeDist)})}
                   </Button>
                 );
               })}
@@ -1455,8 +1553,8 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
               if (!hasUserLocation) {
                 Toast.show({
                   type: 'info',
-                  text1: 'Cần vị trí của bạn',
-                  text2: 'Bật quyền vị trí và GPS để chỉ đường',
+                  text1: t('map.needLocation'),
+                  text2: t('map.enableLocation'),
                 });
                 requestLocationPermission();
                 return;
@@ -1464,6 +1562,7 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
               // Fetch route và hiển thị
               setFocusLocation(selectedLocation);
               setShouldShowRoute(true);
+              fetchRouteToLocation(selectedLocation);
               // The route effect fetches once focusLocation/shouldShowRoute change (one Directions request).
             }}
             style={{
@@ -1475,7 +1574,7 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
               color: colors.primary,
             }}
           >
-            Chỉ đường
+            {t('map.directions')}
           </Button>
 
           <Button
@@ -1488,7 +1587,7 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
               backgroundColor: colors.primary,
             }}
           >
-            Xem
+            {t('map.view')}
           </Button>
         </View>
       )}
@@ -1504,7 +1603,7 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
             }}
             style={{ backgroundColor: colors.primary_700 }}
           >
-            Guide
+            {t('map.guide')}
           </Button>
         </View>
       )}
@@ -1530,9 +1629,23 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
             shadowOpacity: 0.25,
             shadowRadius: 3.84,
           }}>
-          <TextBase style={{ fontSize: 28 }}>📍</TextBase>
+          <TextBase style={{ fontSize: 28 }}><Icon name="crosshairs-gps" color={color.primary} size={28} /></TextBase>
         </TouchableOpacity>
       </View>
+
+      <Modal visible={markerChoices.length > 0} onDismiss={() => setMarkerChoices([])}
+        contentContainerStyle={{margin: 24, padding: 16, maxHeight: 420, backgroundColor: color.surface, borderRadius: 16}}>
+        <TextBase variant="headline">{t('map.chooseMarker')}</TextBase>
+        <ScrollView>
+          {markerChoices.map(feature => <TouchableOpacity key={String(feature.id ?? `${feature.properties?.kind}-${feature.properties?.recordId}`)}
+            onPress={() => chooseMarker(feature)} style={{paddingVertical: 14, flexDirection: 'row', alignItems: 'center', gap: 12}}>
+            <Icon name={feature.properties?.kind === 'festival' ? 'party-popper' : 'map-marker'}
+              color={feature.properties?.kind === 'festival' ? color.accent : color.primary} />
+            <TextBase style={{flex: 1}}>{feature.properties?.label}</TextBase>
+          </TouchableOpacity>)}
+        </ScrollView>
+        <Button onPress={() => setMarkerChoices([])}>{t('map.close')}</Button>
+      </Modal>
 
       {/* Modal Turn-by-Turn Navigation */}
       <Modal
@@ -1570,7 +1683,7 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
               }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                   <TextBase style={[AppStyle.txt_18_bold, { color: colors.primary }]}>
-                    🧭 Turn-by-Turn Navigation
+                    <Icon name="compass-outline" color={color.primary} size={18} /> {t('map.navigation')}
                   </TextBase>
                   {routeSteps.length > 0 && (
                     <View style={{
@@ -1581,13 +1694,13 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
                       borderRadius: 12,
                     }}>
                       <TextBase style={{ fontSize: 12, color: colors.primary, fontWeight: 'bold' }}>
-                        {routeSteps.length} bước
+                        {t('map.steps', {count: routeSteps.length})}
                       </TextBase>
                     </View>
                   )}
                 </View>
                 <TouchableOpacity onPress={() => setVisible(false)}>
-                  <TextBase style={{ fontSize: 28, color: colors.primary_700, fontWeight: 'bold' }}>×</TextBase>
+                  <TextBase style={{ fontSize: 28, color: colors.primary_700, fontWeight: 'bold' }}><Icon name="close" color={color.primary} /></TextBase>
                 </TouchableOpacity>
               </View>
 
@@ -1599,8 +1712,8 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
                 >
                   {routeSteps.map((step: any, index: number) => {
                     // Kiểm tra và xử lý data
-                    const distance = step?.distance != null ? mapboxApi.formatDistance(step.distance) : '0 m';
-                    const instruction = step?.maneuver?.instruction || 'Continue';
+                    const distance = step?.distance != null ? mapboxApi.formatDistance(step.distance) : mapboxApi.formatDistance(0);
+                    const instruction = step?.maneuver?.instruction || t('map.continue');
                     const stepName = step?.name || '';
                     const stepDuration = step?.duration != null ? step.duration : 0;
 
@@ -1642,17 +1755,17 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
                           </TextBase>
                           <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 6 }}>
                             <TextBase style={[AppStyle.txt_12_regular, { color: colors.primary_700 }]}>
-                              📍 {distance}
+                              <Icon name="map-marker-distance" size={16} /> {distance}
                             </TextBase>
                             {stepDuration > 0 && (
                               <TextBase style={[AppStyle.txt_12_regular, { color: colors.primary_600, marginLeft: 12 }]}>
-                                ⏱️ {mapboxApi.formatDuration(stepDuration)}
+                                <Icon name="timer-outline" size={16} /> {mapboxApi.formatDuration(stepDuration)}
                               </TextBase>
                             )}
                           </View>
                           {stepName && (
                             <TextBase style={[AppStyle.txt_12_regular, { color: colors.primary_600, marginTop: 4 }]}>
-                              🛣️ {stepName}
+                              <Icon name="road-variant" size={16} /> {stepName}
                             </TextBase>
                           )}
                         </View>
@@ -1670,7 +1783,7 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
                       alignItems: 'center',
                     }}>
                       <TextBase style={{ fontSize: 14, color: colors.primary_700, textAlign: 'center' }}>
-                        🎯 Total: {mapboxApi.formatDistance(routeDistance)} • {mapboxApi.formatDuration(routeDuration)}
+                        <Icon name="flag-checkered" size={16} /> {t('map.total', {distance: mapboxApi.formatDistance(routeDistance), duration: mapboxApi.formatDuration(routeDuration)})}
                       </TextBase>
                     </View>
                   )}
@@ -1678,7 +1791,7 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
               ) : (
                 <View style={{ padding: sizes._32sdp, alignItems: 'center' }}>
                   <TextBase style={{ fontSize: 16, color: colors.primary_700, textAlign: 'center' }}>
-                    No detailed instructions available
+                    {t('map.noInstructions')}
                   </TextBase>
                 </View>
               )}
@@ -1776,7 +1889,7 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
               }}
               style={[styles.customButton, { marginBottom: sizes._14sdp }]}
               labelStyle={styles.buttonText}>
-              Thông tin chi tiết
+              {t('map.details')}
             </Button>
 
             {/* 2. Lễ hội tại đây (Festivals here) */}
@@ -1792,13 +1905,13 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
                     if (!data || data.length === 0) {
                       Toast.show({
                         type: 'info',
-                        text1: 'Không có lễ hội tại đây',
-                        text2: 'Địa điểm này chưa có lễ hội nào được tổ chức',
+                        text1: t('map.noFestivals'),
+                        text2: t('map.noFestivalsHint'),
                       });
                       return;
                     }
                     NavigationService.navigate(ScreenName.VIEW_ALL_FESTIVALS, {
-                      title: 'Lễ hội tại đây',
+                      title: t('map.festivalsHere'),
                       festivals: data,
                       valueSearch: '',
                     });
@@ -1806,7 +1919,7 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
               }}
               style={[styles.customButton, { marginBottom: sizes._14sdp }]}
               labelStyle={styles.buttonText}>
-              Lễ hội tại đây
+              {t('map.festivalsHere')}
             </Button>
 
             {/* 3. Hình ảnh & Video */}
@@ -1819,7 +1932,7 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
               }}
               style={[styles.customButton, { marginBottom: sizes._14sdp }]}
               labelStyle={styles.buttonText}>
-              Hình ảnh & Video
+              {t('map.media')}
             </Button>
 
             {/* 4. Quy tắc ứng xử văn minh */}
@@ -1832,7 +1945,7 @@ const MapScreenV2 = ({navigation, route}: {navigation: any; route: any}) => {
               }}
               style={styles.customButton}
               labelStyle={styles.buttonText}>
-              Quy tắc ứng xử văn minh
+              {t('map.adviseTitle')}
             </Button>
 
             {/* TTS Control Buttons - Simplified: Only Play or Stop */}

@@ -21,7 +21,12 @@
     "loginError": "Sai tên đăng nhập hoặc mật khẩu",
     "pleaseEnterInfo": "Vui lòng nhập đầy đủ thông tin",
     "connectionError": "Lỗi kết nối",
-    "connectionErrorDesc": "Không thể kết nối đến máy chủ. Vui lòng thử lại sau."
+    "connectionErrorDesc": "Không thể kết nối đến máy chủ. Vui lòng thử lại sau.",
+    "loginSubtitle": "Chào mừng trở lại! Đăng nhập để lưu đánh giá, trò chuyện với trợ lý AI và nhận gợi ý riêng.",
+    "emailPlaceholder": "ban@example.com",
+    "optionalInfo": "Thông tin thêm (không bắt buộc)",
+    "male": "Nam",
+    "female": "Nữ"
   },
   "home": {
     "greeting": "Xin chào",
@@ -33,7 +38,7 @@
     "nearbyLocations": "Địa điểm gần bạn",
     "recommendedPlaces": "Gợi ý cho bạn",
     "recommendedLocations": "Địa điểm phù hợp",
-    "searchPlaceholder": "Tìm kiếm địa điểm, địa chỉ, mô tả...",
+    "searchPlaceholder": "Tìm địa điểm, lễ hội, địa chỉ...",
     "viewAll": "Xem tất cả",
     "search": "Tìm kiếm",
     "aiSearchResults": "Kết quả tìm kiếm AI",
@@ -63,7 +68,12 @@
     "logout": "Đăng xuất",
     "comingSoon": "Tính năng sắp có",
     "loginRequired": "Vui lòng đăng nhập để dùng tính năng này",
-    "loggedOut": "Đã đăng xuất"
+    "loggedOut": "Đã đăng xuất",
+    "emergency113": "Gọi khẩn cấp 113",
+    "emergencyConfirm": "Bạn có muốn gọi Công an qua số khẩn cấp 113?",
+    "call": "Gọi",
+    "callFailed": "Không thể mở ứng dụng gọi điện.",
+    "guest": "Khách"
   },
   "settings": {
     "title": "Cài đặt",
@@ -87,7 +97,9 @@
     "clearCache": "Xóa",
     "clearCacheTitle": "Xóa bộ nhớ đệm",
     "clearCacheMessage": "Bạn có chắc muốn xóa toàn bộ dữ liệu tạm?",
-    "clearCacheSuccess": "Đã xóa bộ nhớ đệm thành công!"
+    "clearCacheSuccess": "Đã xóa bộ nhớ đệm thành công!",
+    "cacheEntries": "{{count}} mục tìm kiếm trong bộ nhớ",
+    "cacheCleared": "Đã xoá bộ nhớ đệm danh mục và tìm kiếm. Dữ liệu sẽ được tải lại khi cần."
   },
   "faq": {
     "title": "Câu hỏi thường gặp",
@@ -174,7 +186,18 @@
     "similarFestivals": "Lễ hội tương tự",
     "noReviews": "Chưa có đánh giá",
     "similarFestivalsAI": "Lễ hội tương tự (AI gợi ý)",
-    "viewLocation": "Xem địa điểm"
+    "viewLocation": "Xem địa điểm",
+    "call": "Gọi",
+    "share": "Chia sẻ",
+    "viewOnMap": "Xem bản đồ",
+    "onMap": "Vị trí",
+    "about": "Giới thiệu",
+    "info": "Thông tin",
+    "readMore": "Xem thêm",
+    "readLess": "Thu gọn",
+    "reviews": "Đánh giá của du khách",
+    "when": "Thời gian",
+    "where": "Địa điểm tổ chức"
   },
   "priceLevel": {
     "free": "Miễn phí",
@@ -192,7 +215,8 @@
   },
   "buttons": {
     "viewAll": "Xem tất cả",
-    "refresh": "Làm mới"
+    "refresh": "Làm mới",
+    "back": "Quay lại"
   },
   "map": {
     "title": "Bản đồ",
@@ -204,7 +228,52 @@
     "duration": "Thời gian",
     "startNavigation": "Bắt đầu dẫn đường",
     "modeLocations": "Địa điểm",
-    "modeFestivals": "Lễ hội"
+    "modeFestivals": "Lễ hội",
+    "permissionTitle": "Quyền vị trí",
+    "permissionMessage": "Ứng dụng cần quyền vị trí để hiển thị vị trí hiện tại của bạn trên bản đồ.",
+    "askLater": "Để sau",
+    "cancel": "Hủy",
+    "ok": "Đồng ý",
+    "outdoors": "Ngoài trời",
+    "satellite": "Vệ tinh",
+    "dark": "Tối",
+    "terrain": "Địa hình",
+    "trafficHint": "Phóng to mức 12 trở lên tại các thành phố lớn để xem rõ hơn",
+    "traffic": "Mật độ giao thông",
+    "legend": "Chú thích:",
+    "moderate": "Vừa phải",
+    "heavy": "Đông đúc",
+    "approximate": "Lộ trình chỉ mang tính ước lượng",
+    "straightLine": "Khoảng cách đường thẳng",
+    "routes": "{{count}} lộ trình",
+    "route": "Lộ trình {{number}}: {{distance}}",
+    "needLocation": "Cần vị trí của bạn",
+    "enableLocation": "Bật quyền vị trí và GPS để chỉ đường",
+    "view": "Xem",
+    "guide": "Hướng dẫn",
+    "navigation": "Hướng dẫn từng bước",
+    "steps": "{{count}} bước",
+    "continue": "Tiếp tục",
+    "total": "Tổng: {{distance}} • {{duration}}",
+    "noInstructions": "Chưa có hướng dẫn chi tiết",
+    "details": "Thông tin chi tiết",
+    "noFestivals": "Không có lễ hội tại đây",
+    "noFestivalsHint": "Địa điểm này chưa có lễ hội nào được tổ chức",
+    "festivalsHere": "Lễ hội tại đây",
+    "media": "Hình ảnh & Video",
+    "adviseTitle": "Quy tắc ứng xử văn minh",
+    "adviseIntro": "Một số lưu ý khi tham quan tại địa điểm:",
+    "noAdvise": "Không có thông tin quy tắc ứng xử",
+    "chooseMarker": "Chọn địa điểm hoặc lễ hội",
+    "close": "Đóng",
+    "clusterRetry": "Vui lòng chạm lại nhóm điểm để thử lại",
+    "catalogError": "Không thể tải danh mục. Vui lòng thử lại.",
+    "retry": "Thử lại",
+    "youAreHere": "Bạn đang ở đây!",
+    "trafficLayerEnabled": "Đã bật lớp Giao thông",
+    "trafficClear": "Thông thoáng",
+    "trafficCongested": "Tắc nghẽn",
+    "offlineMode": "Chế độ Ngoại tuyến"
   },
   "camera": {
     "title": "Máy ảnh",
@@ -213,7 +282,14 @@
     "analyzing": "Đang phân tích...",
     "result": "Kết quả",
     "tryAgain": "Thử lại",
-    "noResult": "Không tìm thấy kết quả"
+    "noResult": "Không tìm thấy kết quả",
+    "noDevice": "Không tìm thấy camera trên thiết bị.",
+    "permissionDenied": "Danavi dùng camera để nhận diện địa danh bạn đang thấy. Bạn cũng có thể chọn một ảnh có sẵn.",
+    "openSettings": "Mở Cài đặt",
+    "permissionTitle": "Cho phép dùng camera",
+    "noDeviceTitle": "Không tìm thấy camera",
+    "allow": "Cho phép camera",
+    "pickFromGallery": "Chọn ảnh từ thư viện"
   },
   "chatbot": {
     "title": "Trợ lý AI",
@@ -294,7 +370,8 @@
   "recovery": {
     "loading": "Đang tải danh mục",
     "catalogUnavailable": "Chưa thể tải danh mục. Vui lòng kiểm tra kết nối và thử lại.",
-    "retry": "Thử lại"
+    "retry": "Thử lại",
+    "catalogError": "Không tải được danh mục."
   },
   "types": {
     "attraction": "Điểm tham quan",
@@ -552,5 +629,45 @@
       "confirm": "Xác nhận",
       "deleteWarning": "Thông tin cá nhân (họ tên, email, số điện thoại, ngày sinh, địa chỉ, ảnh đại diện) sẽ bị xóa và không thể khôi phục. Nhập mật khẩu để xác nhận."
     }
+  },
+  "discover": {
+    "all": "Tất cả",
+    "places": "Địa điểm",
+    "festivals": "Lễ hội",
+    "festival": "Lễ hội",
+    "place": "Địa điểm",
+    "stay": "Lưu trú",
+    "headline": "Khám phá Đà Nẵng",
+    "forYou": "Phù hợp với bạn",
+    "popular": "Phổ biến",
+    "nearby": "Gần bạn",
+    "nearbyHint": "Bật vị trí để xem địa điểm và lễ hội gần bạn.",
+    "emptyTitle": "Không có kết quả",
+    "emptyHint": "Thử đổi bộ lọc hoặc từ khoá khác."
+  },
+  "reviews": {
+    "loadError": "Không tải được — Thử lại",
+    "retry": "Thử lại",
+    "loading": "Đang tải…"
+  },
+  "media": {
+    "play": "Phát video"
+  },
+  "forgot": {
+    "title": "Quên mật khẩu",
+    "step1": "Nhập email đã đăng ký, chúng tôi sẽ gửi mã xác thực.",
+    "sendCode": "Gửi mã xác thực",
+    "enterCode": "Nhập mã xác thực",
+    "step2": "Mã gồm 6 số đã được gửi đến email của bạn.",
+    "code": "Mã xác thực",
+    "verify": "Xác nhận",
+    "noCode": "Chưa nhận được mã?",
+    "resend": "Gửi lại",
+    "newPassword": "Mật khẩu mới",
+    "step3": "Tạo mật khẩu mới cho tài khoản của bạn.",
+    "reset": "Đặt lại mật khẩu"
+  },
+  "chat": {
+    "loadingHistory": "Đang tải lịch sử trò chuyện…"
   }
 }

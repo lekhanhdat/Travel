@@ -1,120 +1,142 @@
+/**
+ * Home ("Khám phá") — locations and festivals together (owner decision D-2).
+ * Sections: Phù hợp (AI, signed-in) · Phổ biến · Gần bạn. Every section mixes both
+ * kinds; the chips on top narrow all sections to only places or only festivals.
+ */
 import FEATURE_FLAGS from '../../../config/featureFlags';
 import CatalogStatus from '../../../component/CatalogStatus';
-import React from 'react';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {
   FlatList,
+  PermissionsAndroid,
+  Platform,
   RefreshControl,
   ScrollView,
   StyleSheet,
-  TouchableOpacity,
   View,
-  Platform,
-  PermissionsAndroid,
 } from 'react-native';
+import {Button} from 'react-native-paper';
 import Page from '../../../component/Page';
-import sizes from '../../../common/sizes';
-import colors from '../../../common/colors';
-import TextBase from '../../../common/TextBase';
-import {AppStyle} from '../../../common/AppStyle';
 import {ILocation, IAccount} from '../../../common/types';
-import BigItemLocation from '../../../component/BigItemLocation';
-import LargeItemLocation from '../../../component/LargeItemLocation';
 import NavigationService from '../NavigationService';
 import {ScreenName} from '../../AppContainer';
-import catalogRepository from '../../../services/catalogRepository';
+import catalogRepository, {CatalogSnapshot} from '../../../services/catalogRepository';
 import LocalStorageCommon from '../../../utils/LocalStorageCommon';
 import {localStorageKey} from '../../../common/constants';
-import {
-  withTranslation,
-  WithTranslationProps,
-} from '../../../hoc/withTranslation';
+import {useTranslation} from '../../../hooks/useTranslation';
 import LanguageDropdown from '../../../component/LanguageDropdown';
 import {getPreciseLocation} from '../../../utils/preciseLocation';
 import SemanticSearchBarComponent from '../../../component/SemanticSearchBarComponent';
-import RecommendationsWidget from '../../../component/RecommendationsWidget';
-import {Button} from 'react-native-paper';
-import {sortByDistance} from '../../../utils/nearby';
 import {LOCATION_SEARCH_FIELDS} from '../../../utils/catalogSearch';
+import {Text} from '../../../ui/Text';
+import {Chip} from '../../../ui/Chip';
+import {SectionHeader} from '../../../ui/SectionHeader';
+import {color, space} from '../../../theme/tokens';
+import {
+  buildDiscoverItems,
+  DiscoverFilter,
+  DiscoverItem,
+  filterByKind,
+  fromFestival,
+  fromLocation,
+  mixPopular,
+  sortNearby,
+} from '../../../features/discover/discover';
+import {
+  DiscoverCard,
+  HERO_GAP,
+  HERO_WIDTH,
+} from '../../../features/discover/DiscoverCard';
+import {useRecommendations} from '../../../features/discover/useRecommendations';
 
-interface IHomeScreenProps extends WithTranslationProps {
+type NearbyStatus = 'idle' | 'locating' | 'denied' | 'unavailable' | 'ready';
+const NEARBY_PREVIEW = 5;
+
+const keyOf = (item: DiscoverItem) => item.key;
+const heroLayout = (_: unknown, index: number) => ({
+  length: HERO_WIDTH + HERO_GAP,
+  offset: (HERO_WIDTH + HERO_GAP) * index,
+  index,
+});
+const renderHero = ({item}: {item: DiscoverItem}) => <DiscoverCard item={item} />;
+
+interface Props {
   navigation: any;
 }
 
-type NearbyStatus = 'idle' | 'locating' | 'denied' | 'unavailable' | 'ready';
-type NearbyLocation = ILocation & {distanceKm: number};
+const HomeScreen: React.FC<Props> = ({navigation}) => {
+  const {t, language} = useTranslation();
+  const searchBarRef = useRef<SemanticSearchBarComponent<ILocation> | null>(null);
 
-interface IHomeScreenState {
-  loading: boolean;
-  refreshing: boolean;
-  error: boolean;
-  valueSearch: string;
-  locations: ILocation[];
-  locationsPopular: ILocation[];
-  locationsNearly: NearbyLocation[];
-  nearbyStatus: NearbyStatus;
-  account: IAccount | null;
-  currentLat: number;
-  currentLong: number;
-  locationPermission: boolean;
-  hotels: ILocation[]; // P11.4: loaded on the first search only
-}
+  const [snapshot, setSnapshot] = useState<CatalogSnapshot | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState(false);
+  const [filter, setFilter] = useState<DiscoverFilter>('all');
+  const [account, setAccount] = useState<IAccount | null>(null);
+  const [hotels, setHotels] = useState<ILocation[]>([]);
+  const [nearbyStatus, setNearbyStatus] = useState<NearbyStatus>('idle');
+  const [coords, setCoords] = useState<{latitude: number; longitude: number} | null>(null);
 
-class HomeScreen extends React.PureComponent<
-  IHomeScreenProps,
-  IHomeScreenState
-> {
-  refInput: any;
-  searchBarRef: React.RefObject<SemanticSearchBarComponent<ILocation> | null>;
+  const load = useCallback(async (force = false, pull = false) => {
+    pull ? setRefreshing(true) : setLoading(true);
+    setError(false);
+    try {
+      setSnapshot(await catalogRepository.get(force));
+    } catch {
+      // A failed refresh keeps what is shown; CatalogStatus offers Retry.
+      setError(true);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, []);
 
-  constructor(props: IHomeScreenProps) {
-    super(props);
-    this.searchBarRef = React.createRef();
-    this.state = {
-      hotels: [],
-      loading: true,
-      refreshing: false,
-      error: false,
-      valueSearch: '',
-      locations: [],
-      locationsNearly: [],
-      locationsPopular: [],
-      nearbyStatus: 'idle',
-      account: null,
-      currentLat: 15.974620784990472,
-      currentLong: 108.25290513035998,
-      locationPermission: false,
-    };
-  }
-
-  componentDidMount(): void {
-    this.props.navigation.addListener('focus', () => {
-      // Force update to refresh translations
-      this.forceUpdate();
-
-      this.setState({
-        valueSearch: '',
-      });
-      // Reset search bar when screen is focused
-      this.searchBarRef.current?.resetSearch();
+  useEffect(() => {
+    load();
+    if (FEATURE_FLAGS.ENABLE_AUTH) {
+      LocalStorageCommon.getItem(localStorageKey.AVT).then(setAccount);
+    }
+    const unsub = navigation.addListener('focus', () => {
+      searchBarRef.current?.resetSearch();
+      if (FEATURE_FLAGS.ENABLE_AUTH) {
+        LocalStorageCommon.getItem(localStorageKey.AVT).then(setAccount);
+      }
     });
+    return unsub;
+  }, [load, navigation]);
 
-    this.fetchLocations();
-    if (FEATURE_FLAGS.ENABLE_AUTH) {this.handleGetUser();}
-  }
+  // R-DATA1: the first get() may resolve from the saved snapshot; the background refresh arrives here.
+  useEffect(() => catalogRepository.subscribe(next => setSnapshot(next)), []);
 
-  handleGetUser = async () => {
-    const response: IAccount = await LocalStorageCommon.getItem(
-      localStorageKey.AVT,
-    );
-    this.setState({
-      account: response,
-    });
-  };
+  const all = useMemo(
+    () => (snapshot ? buildDiscoverItems(snapshot) : {locations: [], festivals: []}),
+    [snapshot],
+  );
+  const mixed = useMemo(() => [...all.locations, ...all.festivals], [all]);
+  const popular = useMemo(
+    () =>
+      filter === 'all'
+        ? mixPopular(all.locations, all.festivals, 20)
+        : mixPopular(
+            filter === 'location' ? all.locations : [],
+            filter === 'festival' ? all.festivals : [],
+            20,
+          ),
+    [all, filter],
+  );
+  const nearby = useMemo(
+    () => (coords ? sortNearby(filterByKind(mixed, filter), coords, 20) : []),
+    [coords, mixed, filter],
+  );
+
+  const userId = FEATURE_FLAGS.ENABLE_AI ? account?.id : undefined;
+  const recs = useRecommendations(userId, 10);
+  const recommended = useMemo(() => filterByKind(recs.items, filter), [recs.items, filter]);
 
   // "Gần bạn": ask for location only on demand; a denial keeps the rest of Home usable.
-  handleUseMyLocation = async () => {
-    const {t} = this.props;
-    this.setState({nearbyStatus: 'locating'});
+  const requestMyLocation = useCallback(async () => {
+    setNearbyStatus('locating');
     if (Platform.OS === 'android') {
       let granted: string | null = null;
       try {
@@ -131,365 +153,253 @@ class HomeScreen extends React.PureComponent<
         console.warn(err);
       }
       if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
-        this.setState({locationPermission: false, nearbyStatus: 'denied'});
+        setNearbyStatus('denied');
         return;
       }
     }
-    this.setState({locationPermission: true});
-    this.getCurrentLocation();
-  };
-
-  // Get current GPS location (foreground only, high accuracy — see utils/preciseLocation)
-  getCurrentLocation = () => {
-    getPreciseLocation()
-      .then(position => {
-        const {latitude, longitude} = position.coords;
-        this.setState({currentLat: latitude, currentLong: longitude}, this.updateNearby);
-      })
-      .catch(_error => {
-        this.setState({nearbyStatus: 'unavailable'});
-      });
-  };
-
-  updateNearby = () => {
-    if (!this.state.locationPermission || this.state.nearbyStatus === 'denied') {return;}
-    if (this.state.nearbyStatus !== 'locating' && this.state.nearbyStatus !== 'ready') {return;}
-    this.setState({
-      locationsNearly: sortByDistance(this.state.locations,
-        {latitude: this.state.currentLat, longitude: this.state.currentLong}),
-      nearbyStatus: 'ready',
-    });
-  };
-
-  async fetchLocations(forceRefresh = false, pullToRefresh = false) {
-    this.setState({loading: !pullToRefresh, refreshing: pullToRefresh, error: false});
     try {
-      const {locations: data} = await catalogRepository.get(forceRefresh);
-      this.setState({locations: data, locationsPopular: data.slice(0, 20)}, this.updateNearby);
+      const position = await getPreciseLocation();
+      setCoords({
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude,
+      });
+      setNearbyStatus('ready');
     } catch {
-      // A failed refresh keeps the list already shown; CatalogStatus offers Retry.
-      this.setState({error: true});
-    } finally {
-      this.setState({loading: false, refreshing: false});
+      setNearbyStatus('unavailable');
     }
-  }
+  }, [t]);
 
-  handlePullToRefresh = () => this.fetchLocations(true, true);
-
-  renderItemNearby = ({item}: {item: NearbyLocation}) => (
-    <LargeItemLocation location={item} distanceKm={item.distanceKm} />
+  const openList = useCallback(
+    (title: string, items: DiscoverItem[]) =>
+      NavigationService.navigate(ScreenName.VIEW_ALL_SCREEN, {
+        title,
+        items,
+        initialFilter: filter,
+      }),
+    [filter],
   );
 
-  // ============ PERFORMANCE OPTIMIZATION: Memoized render functions ============
-  renderItemHorizontal = ({item}: {item: ILocation; index: number}) => {
-    return (
-      <BigItemLocation 
-        location={item} 
-        // Force re-render when language changes
-        key={`h-${item.id}-${this.props.language}`}
-      />
-    );
-  };
-
-  renderItemLarge = ({item}: {item: ILocation; index: number}) => {
-    return (
-      <LargeItemLocation 
-        location={item} 
-        // Force re-render when language changes
-        key={`v-${item.id}-${this.props.language}`}
-      />
-    );
-  };
-
-  // Stable keyExtractor functions to prevent re-creation
-  keyExtractorById = (item: ILocation) => item.id.toString();
-
-  // getItemLayout for horizontal FlatList (BigItemLocation)
-  // BigItemLocation width: 200 + marginRight: 12 = 212
-  getItemLayoutHorizontal = (
-    data: ArrayLike<ILocation> | null | undefined,
-    index: number,
-  ) => ({
-    length: 212,
-    offset: 212 * index,
-    index,
-  });
-
-  // getItemLayout for vertical FlatList (LargeItemLocation)
-  // LargeItemLocation height: approximately 120 (image 80 + padding + text)
-  getItemLayoutVertical = (
-    data: ArrayLike<ILocation> | null | undefined,
-    index: number,
-  ) => ({
-    length: 120,
-    offset: 120 * index,
-    index,
-  });
-
-  handleSearch = (isViewAll: boolean, locations: ILocation[]) => {
-    const searchValue = this.searchBarRef.current?.getSearchValue() || '';
-    NavigationService.navigate(ScreenName.VIEW_ALL_SCREEN, {
-      title: isViewAll ? this.props.t('home.viewAll') : this.props.t('home.search'),
-      locations: locations,
-      valueSearch: searchValue,
-    });
-  };
-
   // P11.4: hotels join the search data the first time the user types (one lazy /hotels load).
-  hotelsRequested = false;
-  ensureHotels = () => {
-    if (this.hotelsRequested) {return;}
-    this.hotelsRequested = true;
-    catalogRepository.getHotels()
-      .then(hotels => this.setState({hotels}))
-      .catch(() => {this.hotelsRequested = false;}); // search keeps working with locations only
-  };
+  const hotelsRequested = useRef(false);
+  const ensureHotels = useCallback(() => {
+    if (hotelsRequested.current) {return;}
+    hotelsRequested.current = true;
+    catalogRepository
+      .getHotels()
+      .then(h => setHotels(h as ILocation[]))
+      .catch(() => {
+        hotelsRequested.current = false; // search keeps working with locations only
+      });
+  }, []);
 
-  // Called while typing - just update local state, don't navigate
-  handleSearchCallback = (
-    filteredData: ILocation[],
-    searchValue: string,
-    _isSemanticSearch?: boolean,
-  ) => {
-    this.ensureHotels();
-    this.setState({valueSearch: searchValue});
-  };
+  // D-2: one search over places, hotels and festivals (festivals tagged kind 'festival').
+  const searchData = useMemo(
+    () => [
+      ...((snapshot?.locations as ILocation[]) ?? []),
+      ...hotels,
+      ...((snapshot?.festivals ?? []).map(f => ({...f, kind: 'festival'})) as unknown as ILocation[]),
+    ],
+    [snapshot, hotels],
+  );
 
-  // Called when user explicitly submits search (Enter key or search button)
-  handleSearchSubmit = (
-    filteredData: ILocation[],
-    searchValue: string,
-    isSemanticSearch?: boolean,
-  ) => {
-
-    if (!searchValue || searchValue.trim().length === 0) {
-      return; // Don't navigate if search is empty
-    }
-    this.setState({valueSearch: searchValue}, () => {
-      // ALWAYS use filteredData from the search component - it contains the semantic results
-      const locationsToShow = filteredData;
-      this.handleSearchWithFlag(
-        false,
-        locationsToShow,
-        isSemanticSearch || false,
+  const onSubmitSearch = useCallback(
+    (results: ILocation[], value: string, isSemantic: boolean) => {
+      if (!value?.trim()) {return;}
+      const venueOf = (id: number | null) =>
+        id !== null ? snapshot?.locationById.get(id) : undefined;
+      const items: DiscoverItem[] = results.map(r =>
+        (r as any).kind === 'festival'
+          ? fromFestival(r as any, venueOf((r as any).location_id))
+          : fromLocation(r),
       );
-    });
-  };
+      NavigationService.navigate(ScreenName.VIEW_ALL_SCREEN, {
+        title: isSemantic ? t('home.aiSearchResults') : t('home.search'),
+        items,
+        valueSearch: value,
+        isSemanticSearch: isSemantic,
+      });
+    },
+    [t, snapshot],
+  );
 
-  handleSearchWithFlag = (
-    isViewAll: boolean,
-    locations: ILocation[],
-    isSemanticSearch: boolean,
-  ) => {
-    const searchValue =
-      this.searchBarRef.current?.getSearchValue?.() ||
-      this.state.valueSearch ||
-      '';
-    NavigationService.navigate(ScreenName.VIEW_ALL_SCREEN, {
-      title: isViewAll
-        ? this.props.t('home.viewAll')
-        : isSemanticSearch
-        ? `🧠 ${this.props.t('home.aiSearchResults')}`
-        : this.props.t('home.search'),
-      locations: locations,
-      valueSearch: searchValue,
-      isSemanticSearch: isSemanticSearch,
-    });
-  };
+  const filters: {key: DiscoverFilter; label: string; icon: any}[] = [
+    {key: 'all', label: t('discover.all'), icon: 'view-grid-outline'},
+    {key: 'location', label: t('discover.places'), icon: 'map-marker-outline'},
+    {key: 'festival', label: t('discover.festivals'), icon: 'party-popper'},
+  ];
 
-  render(): React.ReactNode {
-    return (
-      <Page style={{backgroundColor: colors.background}}>
-        {/* <HeaderBase hideLeftIcon title={strings.home_page} /> */}
+  const renderRail = (data: DiscoverItem[]) => (
+    <FlatList
+      data={data}
+      keyExtractor={keyOf}
+      renderItem={renderHero}
+      getItemLayout={heroLayout}
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      contentContainerStyle={styles.rail}
+      initialNumToRender={3}
+      maxToRenderPerBatch={4}
+      windowSize={5}
+      extraData={language}
+    />
+  );
 
-        <View style={styles.headerContainer}>
-          <TextBase
-            style={[
-              AppStyle.txt_18_bold,
-              {
-                marginTop: sizes._36sdp,
-                marginLeft: sizes._16sdp,
-                color: colors.black,
-                flex: 1,
-              },
-            ]}>
-            {this.props.t('home.greeting')}
-            {this.state.account?.fullName
-              ? `, ${this.state.account.fullName}`
-              : ''}
-          </TextBase>
-          <View style={styles.languageDropdownContainer}>
-            <LanguageDropdown
-              compact={true}
-              showFlag={true}
-              showNativeName={false}
-            />
-          </View>
+  return (
+    <Page style={styles.page}>
+      <View style={styles.header}>
+        <View style={styles.flex}>
+          <Text variant="bodySmall" tone="textSecondary">
+            {t('home.greeting')}
+            {account?.fullName ? `, ${account.fullName}` : ''}
+          </Text>
+          <Text variant="title" accessibilityRole="header">
+            {t('discover.headline')}
+          </Text>
         </View>
-        <TextBase
-          style={[
-            AppStyle.txt_20_bold,
-            {
-              marginTop: sizes._6sdp,
-              marginLeft: sizes._16sdp,
-              color: colors.black,
-            },
-          ]}>
-          {this.props.t('home.welcomeMessage')}
-        </TextBase>
-        <TextBase
-          style={[
-            AppStyle.txt_20_bold,
-            {
-              marginLeft: sizes._16sdp,
-              marginBottom: sizes._8sdp,
-              color: colors.black,
-            },
-          ]}>
-          {this.props.t('home.inDanang')}
-        </TextBase>
+        <LanguageDropdown compact={true} showFlag={true} showNativeName={false} />
+      </View>
 
-        <SemanticSearchBarComponent<ILocation>
-          ref={this.searchBarRef}
-          data={this.state.hotels.length ? [...this.state.locations, ...this.state.hotels] : this.state.locations}
-          searchFields={[...LOCATION_SEARCH_FIELDS]}
-          onSearch={this.handleSearchCallback}
-          onSubmitSearch={this.handleSearchSubmit}
-          placeholder={this.props.t('home.searchPlaceholder')}
-          entityType="location"
-          idField="id"
-          onQueryChange={this.ensureHotels}
-        />
-        <CatalogStatus loading={this.state.loading} error={this.state.error}
-          onRetry={() => this.fetchLocations(true)} />
-        <ScrollView
-          refreshControl={
-            <RefreshControl refreshing={this.state.refreshing} onRefresh={this.handlePullToRefresh} />
-          }>
-          <View style={styles.container}>
-            {/* 1. AI-Powered Recommendations - At the top */}
-            {FEATURE_FLAGS.ENABLE_AI && this.state.account?.id && (
-              <RecommendationsWidget
-                userId={this.state.account.id}
-                title={this.props.t('home.recommendedLocations')}
-                limit={10}
-              />
-            )}
+      <SemanticSearchBarComponent<ILocation>
+        ref={searchBarRef}
+        data={searchData}
+        searchFields={[...LOCATION_SEARCH_FIELDS, 'location' as keyof ILocation]}
+        onSearch={ensureHotels}
+        onSubmitSearch={onSubmitSearch}
+        placeholder={t('home.searchPlaceholder')}
+        entityType="location"
+        entityTypes={['location', 'festival']}
+        idField="id"
+        onQueryChange={ensureHotels}
+      />
 
-            {/* 2. Popular Locations */}
-            <View
-              style={[
-                styles.rowCenter,
-                {marginTop: this.state.account?.id ? sizes._24sdp : 0},
-              ]}>
-              <TextBase style={[AppStyle.txt_20_bold]}>
-                {this.props.t('home.popularLocations')}
-              </TextBase>
-              <TouchableOpacity
-                onPress={() =>
-                  this.handleSearch(true, this.state.locationsPopular)
-                }>
-                <TextBase style={[AppStyle.txt_18_regular]}>
-                  {this.props.t('home.viewAll')}
-                </TextBase>
-              </TouchableOpacity>
-            </View>
+      <View style={styles.chips}>
+        {filters.map(f => (
+          <Chip
+            key={f.key}
+            label={f.label}
+            icon={f.icon}
+            selected={filter === f.key}
+            onPress={() => setFilter(f.key)}
+          />
+        ))}
+      </View>
 
-            <FlatList
-              contentContainerStyle={{
-                paddingVertical: sizes._16sdp,
-              }}
-              data={this.state.locationsPopular}
-              renderItem={this.renderItemHorizontal}
-              keyExtractor={this.keyExtractorById}
-              getItemLayout={this.getItemLayoutHorizontal}
-              horizontal={true}
-              showsHorizontalScrollIndicator={false}
-              initialNumToRender={5}
-              maxToRenderPerBatch={5}
-              windowSize={5}
-              removeClippedSubviews={true}
+      <CatalogStatus loading={loading && !snapshot} error={error} onRetry={() => load(true)} />
+
+      <ScrollView
+        contentContainerStyle={styles.scroll}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={() => {
+              load(true, true);
+              recs.reload();
+            }}
+            colors={[color.primary]}
+          />
+        }>
+        {recommended.length > 0 ? (
+          <View style={styles.section}>
+            <SectionHeader
+              title={t('discover.forYou')}
+              actionLabel={t('home.viewAll')}
+              onAction={() => openList(t('discover.forYou'), recommended)}
             />
+            {renderRail(recommended)}
+          </View>
+        ) : null}
 
-            {/* 3. Nearby: on-demand location, distance by haversine */}
-            <View style={[styles.rowCenter, {marginTop: sizes._24sdp}]}>
-              <TextBase
-                style={[AppStyle.txt_20_bold, {marginBottom: sizes._16sdp}]}>
-                {this.props.t('home.nearbyLocations')}
-              </TextBase>
-              {this.state.nearbyStatus === 'ready' && this.state.locationsNearly.length > 0 ? (
-                <TouchableOpacity
-                  onPress={() =>
-                    this.handleSearch(true, this.state.locationsNearly)
-                  }>
-                  <TextBase
-                    style={[
-                      AppStyle.txt_18_regular,
-                      {marginBottom: sizes._16sdp},
-                    ]}>
-                    {this.props.t('home.viewAll')}
-                  </TextBase>
-                </TouchableOpacity>
-              ) : null}
-            </View>
+        {popular.length > 0 ? (
+          <View style={styles.section}>
+            <SectionHeader
+              title={t('discover.popular')}
+              actionLabel={t('home.viewAll')}
+              onAction={() =>
+                openList(
+                  t('discover.popular'),
+                  mixPopular(
+                    filter === 'festival' ? [] : all.locations,
+                    filter === 'location' ? [] : all.festivals,
+                    Number.MAX_SAFE_INTEGER,
+                  ),
+                )
+              }
+            />
+            {renderRail(popular)}
+          </View>
+        ) : null}
 
-            {this.state.nearbyStatus === 'ready' ? (
-              this.state.locationsNearly.length > 0 ? (
-                <FlatList
-                  data={this.state.locationsNearly}
-                  renderItem={this.renderItemNearby}
-                  keyExtractor={this.keyExtractorById}
-                  showsHorizontalScrollIndicator={false}
-                  scrollEnabled={false}
-                  initialNumToRender={5}
-                  maxToRenderPerBatch={5}
-                  removeClippedSubviews={true}
-                />
+        <View style={styles.section}>
+          <SectionHeader
+            title={t('discover.nearby')}
+            actionLabel={nearbyStatus === 'ready' && nearby.length > NEARBY_PREVIEW ? t('home.viewAll') : undefined}
+            onAction={() => openList(t('discover.nearby'), nearby)}
+          />
+          <View style={styles.pad}>
+            {nearbyStatus === 'ready' ? (
+              nearby.length > 0 ? (
+                nearby.slice(0, NEARBY_PREVIEW).map(item => (
+                  <DiscoverCard key={item.key} item={item} variant="row" />
+                ))
               ) : (
-                <TextBase style={AppStyle.txt_16_regular}>{this.props.t('home.noNearby')}</TextBase>
+                <Text variant="bodySmall" tone="textSecondary">
+                  {t('home.noNearby')}
+                </Text>
               )
             ) : (
-              <View>
-                {this.state.nearbyStatus === 'denied' || this.state.nearbyStatus === 'unavailable' ? (
-                  <TextBase style={[AppStyle.txt_16_regular, {marginBottom: sizes._12sdp}]}>
-                    {this.props.t(this.state.nearbyStatus === 'denied' ? 'home.locationDenied' : 'home.locationUnavailable')}
-                  </TextBase>
-                ) : null}
+              <View style={styles.nearbyCard}>
+                <Text variant="bodySmall" tone="textSecondary" style={styles.nearbyText}>
+                  {nearbyStatus === 'denied'
+                    ? t('home.locationDenied')
+                    : nearbyStatus === 'unavailable'
+                    ? t('home.locationUnavailable')
+                    : t('discover.nearbyHint')}
+                </Text>
                 <Button
-                  mode="outlined"
-                  loading={this.state.nearbyStatus === 'locating'}
-                  disabled={this.state.nearbyStatus === 'locating'}
-                  onPress={this.handleUseMyLocation}>
-                  {this.props.t(this.state.nearbyStatus === 'locating' ? 'home.locating' : 'home.useMyLocation')}
+                  mode="contained"
+                  icon="crosshairs-gps"
+                  loading={nearbyStatus === 'locating'}
+                  disabled={nearbyStatus === 'locating'}
+                  onPress={requestMyLocation}>
+                  {t(nearbyStatus === 'locating' ? 'home.locating' : 'home.useMyLocation')}
                 </Button>
               </View>
             )}
-
           </View>
-        </ScrollView>
-      </Page>
-    );
-  }
-}
+        </View>
+      </ScrollView>
+    </Page>
+  );
+};
 
-export default withTranslation(HomeScreen);
+export default HomeScreen;
 
 const styles = StyleSheet.create({
-  container: {
-    padding: sizes._16sdp,
-  },
-  rowCenter: {
+  page: {backgroundColor: color.background},
+  flex: {flex: 1},
+  header: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    paddingHorizontal: space.page,
+    paddingTop: space.lg,
+    paddingBottom: space.xs,
   },
-  headerContainer: {
+  chips: {
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingRight: sizes._16sdp,
+    paddingHorizontal: space.page,
+    paddingTop: space.xs,
+    paddingBottom: space.xs,
   },
-  languageDropdownContainer: {
-    marginTop: sizes._36sdp,
+  scroll: {paddingTop: space.xs, paddingBottom: space.xxxl},
+  section: {marginTop: space.md},
+  rail: {paddingHorizontal: space.page, paddingBottom: space.xs},
+  pad: {paddingHorizontal: space.page},
+  nearbyCard: {
+    backgroundColor: color.surface,
+    borderRadius: 16,
+    padding: space.md,
+    borderWidth: 1,
+    borderColor: color.border,
   },
+  nearbyText: {marginBottom: space.sm},
 });

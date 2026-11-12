@@ -21,7 +21,12 @@
     "loginError": "Username or password is incorrect",
     "pleaseEnterInfo": "Please enter all information",
     "connectionError": "Connection Error",
-    "connectionErrorDesc": "Cannot connect to server. Please try again later."
+    "connectionErrorDesc": "Cannot connect to server. Please try again later.",
+    "loginSubtitle": "Welcome back! Sign in to save reviews, chat with the AI assistant and get personal suggestions.",
+    "emailPlaceholder": "you@example.com",
+    "optionalInfo": "More about you (optional)",
+    "male": "Male",
+    "female": "Female"
   },
   "home": {
     "greeting": "Hello",
@@ -33,7 +38,7 @@
     "nearbyLocations": "Nearby Locations",
     "recommendedPlaces": "Recommended Places",
     "recommendedLocations": "Recommended Locations",
-    "searchPlaceholder": "Search places, addresses, descriptions...",
+    "searchPlaceholder": "Search places, festivals, addresses...",
     "viewAll": "View All",
     "search": "Search",
     "aiSearchResults": "AI Search Results",
@@ -63,7 +68,12 @@
     "logout": "Logout",
     "comingSoon": "Coming soon",
     "loginRequired": "Please log in to use this feature",
-    "loggedOut": "Logged out"
+    "loggedOut": "Logged out",
+    "emergency113": "Call emergency 113",
+    "emergencyConfirm": "Call the police emergency number 113?",
+    "call": "Call",
+    "callFailed": "Unable to open the phone app.",
+    "guest": "Guest"
   },
   "settings": {
     "title": "Settings",
@@ -87,7 +97,9 @@
     "clearCache": "Clear",
     "clearCacheTitle": "Clear Cache",
     "clearCacheMessage": "Are you sure you want to delete all temporary data?",
-    "clearCacheSuccess": "Cache cleared successfully!"
+    "clearCacheSuccess": "Cache cleared successfully!",
+    "cacheEntries": "{{count}} search entries in memory",
+    "cacheCleared": "Catalog and search caches cleared. Data will reload when needed."
   },
   "faq": {
     "title": "Frequently Asked Questions",
@@ -174,7 +186,18 @@
     "similarFestivals": "Similar Festivals",
     "noReviews": "No reviews yet",
     "similarFestivalsAI": "Similar Festivals (AI Suggestions)",
-    "viewLocation": "View location"
+    "viewLocation": "View location",
+    "call": "Call",
+    "share": "Share",
+    "viewOnMap": "View map",
+    "onMap": "Location",
+    "about": "About",
+    "info": "Information",
+    "readMore": "Read more",
+    "readLess": "Show less",
+    "reviews": "Visitor reviews",
+    "when": "When",
+    "where": "Venue"
   },
   "priceLevel": {
     "free": "Free",
@@ -192,7 +215,8 @@
   },
   "buttons": {
     "viewAll": "View All",
-    "refresh": "Refresh"
+    "refresh": "Refresh",
+    "back": "Back"
   },
   "map": {
     "title": "Map",
@@ -204,7 +228,52 @@
     "duration": "Duration",
     "startNavigation": "Start Navigation",
     "modeLocations": "Places",
-    "modeFestivals": "Festivals"
+    "modeFestivals": "Festivals",
+    "permissionTitle": "Location permission",
+    "permissionMessage": "Allow location access to show your current position on the map.",
+    "askLater": "Ask me later",
+    "cancel": "Cancel",
+    "ok": "OK",
+    "outdoors": "Outdoors",
+    "satellite": "Satellite",
+    "dark": "Dark",
+    "terrain": "Terrain",
+    "trafficHint": "Zoom to level 12+ in major cities for best results",
+    "traffic": "Traffic",
+    "legend": "Legend:",
+    "moderate": "Moderate",
+    "heavy": "Heavy",
+    "approximate": "Route is approximate",
+    "straightLine": "As the crow flies",
+    "routes": "{{count}} routes",
+    "route": "Route {{number}}: {{distance}}",
+    "needLocation": "Your location is needed",
+    "enableLocation": "Enable location permission and GPS for directions",
+    "view": "View",
+    "guide": "Guide",
+    "navigation": "Turn-by-turn navigation",
+    "steps": "{{count}} steps",
+    "continue": "Continue",
+    "total": "Total: {{distance}} • {{duration}}",
+    "noInstructions": "No detailed instructions available",
+    "details": "Details",
+    "noFestivals": "No festivals here",
+    "noFestivalsHint": "No festivals are listed at this location",
+    "festivalsHere": "Festivals here",
+    "media": "Photos & videos",
+    "adviseTitle": "Visitor guidelines",
+    "adviseIntro": "Some tips for your visit:",
+    "noAdvise": "No visitor guidelines available",
+    "chooseMarker": "Choose a place or festival",
+    "close": "Close",
+    "clusterRetry": "Tap the cluster again to retry",
+    "catalogError": "Could not load the catalog. Please try again.",
+    "retry": "Retry",
+    "youAreHere": "You're here!",
+    "trafficLayerEnabled": "Traffic Layer Enabled",
+    "trafficClear": "Clear traffic",
+    "trafficCongested": "Congested",
+    "offlineMode": "Offline Mode"
   },
   "camera": {
     "title": "Camera",
@@ -213,7 +282,14 @@
     "analyzing": "Analyzing...",
     "result": "Result",
     "tryAgain": "Try Again",
-    "noResult": "No result found"
+    "noResult": "No result found",
+    "noDevice": "No camera was found on this device.",
+    "permissionDenied": "Danavi uses the camera to recognise the landmark in front of you. You can also pick an existing photo.",
+    "openSettings": "Open Settings",
+    "permissionTitle": "Allow camera access",
+    "noDeviceTitle": "No camera found",
+    "allow": "Allow camera",
+    "pickFromGallery": "Choose from gallery"
   },
   "chatbot": {
     "title": "AI Assistant",
@@ -294,7 +370,8 @@
   "recovery": {
     "loading": "Loading catalog",
     "catalogUnavailable": "Unable to load the catalog. Please check your connection and retry.",
-    "retry": "Retry"
+    "retry": "Retry",
+    "catalogError": "Unable to load the catalog."
   },
   "types": {
     "attraction": "Attraction",
@@ -552,5 +629,45 @@
       "confirm": "Confirm",
       "deleteWarning": "Your personal data (name, email, phone, date of birth, address, profile picture) will be deleted and cannot be recovered. Enter your password to confirm."
     }
+  },
+  "discover": {
+    "all": "All",
+    "places": "Places",
+    "festivals": "Festivals",
+    "festival": "Festival",
+    "place": "Place",
+    "stay": "Stay",
+    "headline": "Discover Da Nang",
+    "forYou": "For you",
+    "popular": "Popular",
+    "nearby": "Near you",
+    "nearbyHint": "Turn on location to see places and festivals near you.",
+    "emptyTitle": "No results",
+    "emptyHint": "Try another filter or keyword."
+  },
+  "reviews": {
+    "loadError": "Unable to load — Retry",
+    "retry": "Retry",
+    "loading": "Loading…"
+  },
+  "media": {
+    "play": "Play video"
+  },
+  "forgot": {
+    "title": "Forgot password",
+    "step1": "Enter your account email and we will send you a code.",
+    "sendCode": "Send code",
+    "enterCode": "Enter the code",
+    "step2": "A 6-digit code was sent to your email.",
+    "code": "Verification code",
+    "verify": "Verify",
+    "noCode": "Didn't get the code?",
+    "resend": "Resend",
+    "newPassword": "New password",
+    "step3": "Choose a new password for your account.",
+    "reset": "Reset password"
+  },
+  "chat": {
+    "loadingHistory": "Loading your chat history…"
   }
 }
